@@ -149,14 +149,7 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	saveStudent: function(evt) {
-		this.model.save({
-			sucess: function(model, response) {
-				console.log("good", model, response);
-			},
-			error: function(model, response) {
-				console.log("error", model, response);
-			}
-		});
+		this.model.save();
 	}
 });
 
