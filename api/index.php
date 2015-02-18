@@ -11,6 +11,9 @@ $app->put('/students/:id', 'updateStudent');
 
 $app->run();
 
+/* 
+ * Returns a list of students
+ */
 function getStudents() {
     $sql = "select s.id, s.firstName, s.lastName from student s";
     try {
@@ -24,6 +27,9 @@ function getStudents() {
     }
 }
 
+/* 
+ * Returns a single student record
+ */
 function getStudentById($id) {
     $sql = "select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id";
     try {
@@ -39,25 +45,27 @@ function getStudentById($id) {
     }
 }
 
+/* 
+ * Updates a student record
+ */
 function updateStudent($id) {
     $request = Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    echo $student;
-    // $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
-    // try {
-    //     $db = getConnection();
-    //     $stmt = $db->prepare($sql);  
-    //     $stmt->bindParam("firstName", $student->firstName);
-    //     $stmt->bindParam("lastName", $student->lastName);
-    //     $stmt->bindParam("email", $student->email);
-    //     $stmt->bindParam("id", $student->id);
-    //     $stmt->execute();
-    //     $db = null;
-    //     echo json_encode($student); 
-    // } catch(PDOException $e) {
-    //     echo '{"error":{"text":'. $e->getMessage() .'}}'; 
-    // }
+    $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("firstName", $student->firstName);
+        $stmt->bindParam("lastName", $student->lastName);
+        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("id", $student->id);
+        $stmt->execute();
+        $db = null;
+        echo json_encode($student); 
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+    }
 }
 
 /* 
