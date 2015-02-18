@@ -44,9 +44,22 @@ var FetchStudentsView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["viewStudents.html"]);
 
-		var student = new Student();
-		student.fetch().then(function(data) {
-			console.log(data);
+		new Student().fetch().then(function(data) {
+			_.each(data, function(object, index) {
+				var s = new Student(object, {parse:true});
+				console.log(object);
+				console.log(s);
+			});
 		});
+	}
+});
+
+var StudentRowView = Backbone.View.extend({
+	initialize: function() {
+		this.firstName = id;
+	},
+
+	render: function() {
+
 	}
 });
