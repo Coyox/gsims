@@ -10,7 +10,7 @@ $app->get('/students', 'getStudents');
 $app->run();
 
 function getStudents() {
-    $sql = "SELECT * FROM STUDENT";
+    $sql = "select s.id, s.firstName, s.lastName, s.email from student";
     try {
         $db = getConnection();
         $stmt = $db->query($sql);
