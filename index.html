@@ -10,12 +10,26 @@
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/models/student.js"></script>
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<style type="text/css">
+			body {
+				padding: 20px;
+			}
+		</style>
 	</head>
 	<body>
-		<div id="container"></div>
-		<button id="get-students" class="btn btn-primary btn-sm">Get Students</button>
-		<button id="add-student" class="btn btn-info btn-sm">Add Student</button>
-		<br>
-		<div class="students-container col-sm-4"></div>
+		<div id="container">
+			<h4>Fetch students</h4>
+			<div id="students-container"></div>
+			<hr>
+			<h4>View student</h4>
+			<div id="student-container"></div>
+			<hr>
+			<h4>Create student</h4>
+			<div id="create-container"></div>
+			<hr>
+			<h4>Update student</h4>
+			<div id="update-container"></div>
+			<hr>
+		</div>
 	</body>
 </html>
