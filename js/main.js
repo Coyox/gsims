@@ -46,20 +46,34 @@ var FetchStudentsView = Backbone.View.extend({
 
 		new Student().fetch().then(function(data) {
 			_.each(data, function(object, index) {
-				var s = new Student(object, {parse:true});
-				console.log(object);
-				console.log(s);
+				var model = new Student(object, {parse:true});
+				new StudentRowView({
+					model: model,
+					el: view.addRow(".results");
+				});
 			});
 		});
+	},
+
+	addRow: function(selector) {
+        var container = $("<tr></tr>");
+        this.$el.find(selector).first().append(container);
+        return container;
 	}
 });
 
 var StudentRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.id %></td>"
+		+	"<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"),
+
 	initialize: function() {
-		this.firstName = id;
+		this.render();
 	},
 
 	render: function() {
-
+		this.$el.html(this.template({
+			model: this.model
+		}));
 	}
 });
