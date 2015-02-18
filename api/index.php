@@ -49,17 +49,22 @@ function getStudentById($id) {
  * Updates a student record
  */
 function updateStudent($id) {
-    $sql = "select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id";
+    $request = Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
     try {
         $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("firstName", $student->firstName);
+        $stmt->bindParam("lastName", $student->lastName);
+        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("id", $student->id);
         $stmt->execute();
-        $student = $stmt->fetchObject();
         $db = null;
-        echo json_encode($student);
+        echo json_encode($student); 
     } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
     }
 }
 
