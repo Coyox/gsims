@@ -14,21 +14,46 @@
 			body {
 				padding: 20px;
 			}
+
+			.small-width {
+				width: 800px;
+			}
 		</style>
 	</head>
 	<body>
 		<div id="container">
-			<h4>Fetch students</h4>
+			<h1>Create, Retrive, Update Examples</h1>
+			<hr>
+			<!-- GET STUDENTS -->
+			<h4>Fetch students <br>
+				<small>The following is the response when you send a GET request to /students to fetch a list of all students in the database. <br> SQL: select s.id, s.firstName, s.lastName from student s</small>
+			</h4>
 			<div id="students-container"></div>
 			<hr>
-			<h4>View student</h4>
-			<div id="student-container"></div>
+
+			<!-- VIEW STUDENT -->
+			<h4>View student <br>
+				<small>The following is the response when you send a GET request to /students/id to fetch a single student record from the database. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
+			</h4>
+			<div id="student-container" class="small-width">
+				<label>Click on the [ view ] link of any student to fetch a student record.</label>
+			</div>
 			<hr>
-			<h4>Create student</h4>
-			<div id="create-container"></div>
+
+			<!-- UPDATE STUDENT -->
+			<h4>Update student <br>
+				<small>The following sends a PUT request to /students/id to update a single student record from the database. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
+			</h4>			
+			<div id="update-container" class="small-width">
+				<label>Click on the [ edit ] link of any student to fetch a student record.</label>
+			</div>
 			<hr>
-			<h4>Update student</h4>
-			<div id="update-container"></div>
+
+			<!-- CREATE STUDENT -->
+			<h4>Create student <br>
+				<small>The following sends a PUT request to /students/id to update a single student record from the database. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
+			</h4>
+			<div id="create-container" class="small-width"></div>
 			<hr>
 		</div>
 	</body>

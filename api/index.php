@@ -7,6 +7,7 @@ $app = new \Slim\Slim();
 
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
+$app->put('/students/:id', 'updateStudent');
 
 $app->run();
 
@@ -35,6 +36,26 @@ function getStudentById($id) {
         echo json_encode($student);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function updateStudent($id) {
+    $request = Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("firstName", $student->firstName);
+        $stmt->bindParam("lastName", $student->lastName);
+        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("id", $student->id);
+        $stmt->execute();
+        $db = null;
+        echo json_encode($student); 
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
     }
 }
 
