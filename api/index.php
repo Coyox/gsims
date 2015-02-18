@@ -6,6 +6,7 @@ require 'Slim/Slim.php';
 $app = new \Slim\Slim();
 
 $app->get('/students', 'getStudents');
+$app->get('/students/:id', 'getStudentById');
 
 $app->run();
 
@@ -17,6 +18,21 @@ function getStudents() {
         $students = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
         echo json_encode($students);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function getStudentById($id) {
+    $sql = "select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("id", $id);
+        $stmt->execute();
+        $student = $stmt->fetchObject();
+        $db = null;
+        echo json_encode($student);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }

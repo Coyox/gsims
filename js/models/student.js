@@ -22,5 +22,5 @@ var Student = Backbone.Model.extend({
 		emergencyRelation: "",
 		emergencyPhoneNumber: ""
 	},
-    urlRoot: "/api/students",
+    urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
 });
