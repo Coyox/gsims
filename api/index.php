@@ -8,6 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->put('/students/:id', 'updateStudent');
+$app->post('/students', 'createStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
 $app->run();
@@ -54,6 +55,29 @@ function updateStudent($id) {
     $body = $request->getBody();
     $student = json_decode($body);
     $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("firstName", $student->firstName);
+        $stmt->bindParam("lastName", $student->lastName);
+        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("id", $student->id);
+        $stmt->execute();
+        $db = null;
+        echo json_encode($student); 
+    } catch(PDOException $e) {
+        echo $e->getMessage();
+    }
+}
+
+/* 
+ * Creates a student record
+ */
+function createStudent() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $sql = "insert into student (id, firstName, lastName, email) values (:id, :firstName, :lastName, :email)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);  

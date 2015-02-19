@@ -1,6 +1,10 @@
 var Student = Backbone.Model.extend({
 	defaults: {
+		id: "",
 		firstName: "",
+		lastName: "",
+		email: ""
+		/*firstName: "",
 		lastName: "",
 		dateOfBirth: "",
 		addressOne: "",
@@ -20,7 +24,7 @@ var Student = Backbone.Model.extend({
 		emergencyFirstName: "",
 		emergencyLastName: "",
 		emergencyRelation: "",
-		emergencyPhoneNumber: ""
+		emergencyPhoneNumber: ""*/
 	},
     urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
 });
