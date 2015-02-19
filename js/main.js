@@ -1,10 +1,13 @@
-
+/** Object to hold all HTML templates (pre-loaded) */
 var html = {};
 
+/** On load function */
 $(function() {
 	loadTemplates();
 });
 
+/** Fetches the specified templates located in the /templates directory in an
+	html object (to be used by the views later) */
 function loadTemplates() {
 	var promises = [];
 	var templates = [
@@ -66,6 +69,7 @@ var FetchStudentsView = Backbone.View.extend({
 var StudentTableRowView = Backbone.View.extend({
 	template: _.template("<td><a class='view-student' id='<%= model.id %>'>[ view ]</a></td>"
 		+	"<td><a class='edit-student' id='<%= model.id %>'>[ edit ]</a></td>"
+		+	"<td><a class='delete-student' id='<%= model.id %>'>[ delete ]</a></td>"
 		+	"<td><%= model.id %></td>"
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"),

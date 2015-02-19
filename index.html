@@ -22,10 +22,10 @@
 	</head>
 	<body>
 		<div id="container">
-			<h1>Create, Retrive, Update Examples</h1>
+			<h1>Create, Retrive, Update, Delete (CRUD) Examples</h1>
 			<hr>
 			<!-- GET STUDENTS -->
-			<h4>Fetch students <br>
+			<h4>Retrive students <br>
 				<small>The following is the response when you send a GET request to /students to fetch a list of all students in the database. <br> SQL: select s.id, s.firstName, s.lastName from student s</small>
 			</h4>
 			<div id="students-container"></div>
@@ -42,16 +42,25 @@
 
 			<!-- UPDATE STUDENT -->
 			<h4>Update student <br>
-				<small>The following sends a PUT request to /students/id to update a single student record from the database. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
+				<small>The following sends a PUT request to /students/id to update a single student record from the database. <br> SQL: update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id where id=:id</small>
 			</h4>			
 			<div id="update-container" class="small-width">
 				<label>Click on the [ edit ] link of any student to fetch a student record.</label>
 			</div>
 			<hr>
 
+			<!-- DELETE STUDENT -->
+			<h4>Delete student <br>
+				<small>The following sends a DELETE request to /students/id to delete a single student record from the database. <br> SQL: update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id where id=:id</small>
+			</h4>			
+			<div id="delete-container" class="small-width">
+				<label>Click on the [ delete ] link of any student to delete a student record. You will be prompted for confirmation before the record is actually deleted.</label>
+			</div>
+			<hr>
+
 			<!-- CREATE STUDENT -->
 			<h4>Create student <br>
-				<small>The following sends a PUT request to /students/id to update a single student record from the database. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
+				<small>The following sends a POST request to /students to update a create a new student record. <br> SQL: select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id</small>
 			</h4>
 			<div id="create-container" class="small-width"></div>
 			<hr>

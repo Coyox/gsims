@@ -49,9 +49,8 @@ function getStudentById($id) {
  * Updates a student record
  */
 function updateStudent($id) {
-    //$in = Slim::getInstance();
-    echo $app;
-    // $request = Slim::getInstance()->request();
+    //$request = Slim::getInstance()->request();
+    $request = \Slim\Slim::getInstance()->request();
     // echo $request;
     // $body = $request->getBody();
     // $student = json_decode($body);
