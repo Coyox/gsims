@@ -77,14 +77,13 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "insert into student (id, firstName, lastName, email) values (:id, :firstName, :lastName, :email)";
+    $sql = "insert into student (firstName, lastName, email) values (:firstName, :lastName, :email)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);  
         $stmt->bindParam("firstName", $student->firstName);
         $stmt->bindParam("lastName", $student->lastName);
         $stmt->bindParam("email", $student->email);
-        $stmt->bindParam("id", $student->id);
         $stmt->execute();
         $db = null;
         echo json_encode($student); 
