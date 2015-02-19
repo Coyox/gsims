@@ -240,13 +240,16 @@ var DeleteRecordView = Backbone.View.extend({
 		});
 		
 		$("#confirmation-modal").on("click", "#confirm-yes", function() {
-			new Student({id: view.id}).destroy().then(function(data) {
-				new TransactionResponseView({
-					message: "The record has been successfully deleted."
-				});
+			new Student({id: view.id}).destroy({
+				success: function(model, resp) {
+					console.log(resp);
+					new TransactionResponseView({
+						message: "The record has been successfully deleted."
+					});
+				}
 			});
 		});
-	},	
+	}	
 });
 
 var TransactionResponseView = Backbone.View.extend({

@@ -24,7 +24,7 @@ function getStudents() {
         $db = null;
         echo json_encode($students);
     } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo $e->getMessage();
     }
 }
 
@@ -42,7 +42,7 @@ function getStudentById($id) {
         $db = null;
         echo json_encode($student);
     } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo $e->getMessage();
     }
 }
 
@@ -65,7 +65,7 @@ function updateStudent($id) {
         $db = null;
         echo json_encode($student); 
     } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+        echo $e->getMessage();
     }
 }
 
@@ -82,7 +82,7 @@ function deleteStudent($id) {
         $db = null;
         echo "success";
     } catch(PDOException $e) {
-        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+        echo $e->getMessage(); 
     }
 }
 
