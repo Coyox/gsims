@@ -249,7 +249,9 @@ var CreateStudentView = Backbone.View.extend({
 		if (id == "") {
 			this.model.set("id", Math.floor(Math.random(100)));
 		}
-		this.model.save();
+		this.model.save(null, {
+			type: "POST"
+		});
 	}
 });
 
