@@ -215,7 +215,74 @@ var CreateStudentView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["createStudent.html"]);
+
+		// you would get these attributes from the student model, but i
+		// don't want to do the entire list right now. 
+		var attributes = [ "id", "firstName", "lastName", "email" ];
+		var model = new Student();
+		this.model = model;
+
+		_.each(attributes, function(name, index) {
+			new CreateStudentRowView({
+				name: name,
+				value: "",
+				model: model,
+				el: this.addRow(this.$el.find(".form-horizontal"))
+			})
+		}, this);
+
+		this.$el.find(".form-horizontal").append("<div class='form-group'><div class='col-sm-12'><button class='btn btn-primary pull-right' id='create-student'>Create Student</button></div></div>");
 	},	
+
+	events: {
+		"click #create-student": "createStudent"
+	},
+
+	addRow: function(selector) {
+        var container = $("<div class='form-group'></div>");
+        this.$el.find(selector).first().append(container);
+        return container;		
+	},
+
+	createStudent: function(evt) {
+		var id = this.model.get("id");
+		if (id == "") {
+			this.model.set("id", Math.floor(Math.random(100)));
+		}
+		this.model.save();
+	}
+});
+
+var CreateStudentRowView = Backbone.View.extend({
+	template: _.template("<label class='control-label col-sm-2'><%= name %></label>"
+		+	"<div class='col-sm-10'>"
+		+		"<input type='text' class='form-control <%= name %>'"
+		+	"</div>"),
+
+	initialize: function(options) {
+		this.name = options.name;
+		this.value = options.value;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			name: this.name,
+			value: ""
+		}));
+	},
+
+	events: {
+		"keyup input": "updateModel"
+	},
+
+	updateModel: function(evt) {
+		var val = $(evt.currentTarget).val();
+		console.log(this.name, val);
+
+		this.model.set(this.name, val);
+		console.log(this.model.toJSON());
+	}
 });
 
 var DeleteRecordView = Backbone.View.extend({

@@ -9,7 +9,7 @@ $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->put('/students/:id', 'updateStudent');
 $app->post('/students', 'createStudent');
-//$app->delete('/students/:id', 'deleteStudent');
+$app->delete('/students/:id', 'deleteStudent');
 
 $app->run();
 
