@@ -51,6 +51,8 @@ var FetchStudentsView = Backbone.View.extend({
 
 		this.$el.html(html["viewStudents.html"]);
 
+		this.$el.find("table").before("<button class='btn btn-primary' id='refresh'>Refresh Table</button><br><br>");
+
 		new Student().fetch().then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Student(object, {parse:true});
@@ -60,6 +62,14 @@ var FetchStudentsView = Backbone.View.extend({
 				});
 			});
 		});
+	},
+
+	events: {
+		"click #refresh": "refreshTable"
+	},
+
+	refreshTable: function() {
+		this.render();
 	},
 
 	addRow: function(selector) {
@@ -138,13 +148,17 @@ var StudentRecordView = Backbone.View.extend({
 			view.model = model;
 
 			_.each(data, function(value, attr) {
-				new StudentRecordRowView({
-					el: view.addRow("#student-record-table tbody"),
-					action: view.action,
-					name: attr,
-					value: value,
-					model: model
-				});
+				if (view.action == "edit" && attr == "id") {
+					// don't allow editing of ids
+				} else {
+					new StudentRecordRowView({
+						el: view.addRow("#student-record-table tbody"),
+						action: view.action,
+						name: attr,
+						value: value,
+						model: model
+					});
+				}
 			});
 
 			if (view.action == "edit") {
@@ -167,7 +181,7 @@ var StudentRecordView = Backbone.View.extend({
 	saveStudent: function(evt) {
 		this.model.save().then(function(data) {
 			new TransactionResponseView({
-				message: "Record successfully saved. Refresh the page to see your changes."
+				message: "Record successfully saved. Click the refresh button on the table to see your changes (or just refresh the page)."
 			});
 		});
 	}
@@ -245,15 +259,18 @@ var CreateStudentView = Backbone.View.extend({
 	},
 
 	createStudent: function(evt) {
-		var id = this.model.get("id");
-		if (id == "") {
-			this.model.set("id", Math.floor(Math.random(1000)));
-		}
 		this.model.set({
+			id: Math.floor(Math.random()*10000)
+		});
+
+		this.model.save(null, {
 			type: "POST",
 			url: "http://gobind-sarvar.rhcloud.com/api/students" // TODO: dont hardcode url
+		}).then(function() {
+			new TransactionResponseView({
+				message: "Record successfully created. Click the refresh button on the table to see your changes (or just refresh the page)."
+			});		
 		});
-		this.model.save();
 	}
 });
 
@@ -308,9 +325,12 @@ var DeleteRecordView = Backbone.View.extend({
 		});
 		
 		$("#confirmation-modal").on("click", "#confirm-yes", function() {
+			$("#confirmation-modal").remove();
+			$(".modal-backdrop").remove();
+
 			new Student({id: view.id}).destroy({dataType: "text"}).then(function(data) {
 				new TransactionResponseView({
-					message: "The record has been successfully deleted."
+					message: "The record has been successfully deleted. Click the refresh button on the table to see your changes (or just refresh the page)"
 				});
 			}).fail(function(data) {
 				console.log("FAILED");
