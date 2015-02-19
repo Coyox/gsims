@@ -245,6 +245,14 @@ var CreateStudentView = Backbone.View.extend({
 	},
 
 	createStudent: function(evt) {
+		var id = this.model.get("id");
+		if (id == "") {
+			this.model.set("id", Math.floor(Math.random(1000)));
+		}
+		this.model.set({
+			type: "POST",
+			url: "http://gobind-sarvar.rhcloud.com/api/students" // TODO: dont hardcode url
+		});
 		this.model.save();
 	}
 });
@@ -274,10 +282,7 @@ var CreateStudentRowView = Backbone.View.extend({
 
 	updateModel: function(evt) {
 		var val = $(evt.currentTarget).val();
-		console.log(this.name, val);
-
 		this.model.set(this.name, val);
-		console.log(this.model.toJSON());
 	}
 });
 
