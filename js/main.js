@@ -218,7 +218,7 @@ var CreateStudentView = Backbone.View.extend({
 
 		// you would get these attributes from the student model, but i
 		// don't want to do the entire list right now. 
-		var attributes = [ "id", "firstName", "lastName", "email" ];
+		var attributes = [ "firstName", "lastName", "email" ];
 		var model = new Student();
 		this.model = model;
 
@@ -245,13 +245,7 @@ var CreateStudentView = Backbone.View.extend({
 	},
 
 	createStudent: function(evt) {
-		var id = this.model.get("id");
-		if (id == "") {
-			this.model.set("id", Math.floor(Math.random(100)));
-		}
-		this.model.save(null, {
-			type: "POST"
-		});
+		this.model.save();
 	}
 });
 
