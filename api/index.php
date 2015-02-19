@@ -8,6 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->put('/students/:id', 'updateStudent');
+$app->delete('/students/:id', 'deleteStudent');
 
 $app->run();
 
@@ -63,6 +64,23 @@ function updateStudent($id) {
         $stmt->execute();
         $db = null;
         echo json_encode($student); 
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}'; 
+    }
+}
+
+/* 
+ * Updates a student record
+ */
+function deleteStudent($id) {
+    $sql = "delete from student where id=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("id", $id);
+        $stmt->execute();
+        $db = null;
+        echo "success";
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}'; 
     }

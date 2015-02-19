@@ -6,14 +6,16 @@ $(function() {
 	loadTemplates();
 });
 
-/** Fetches the specified templates located in the /templates directory in an
+/** Pre-fetches the specified templates located in the /templates directory in an
 	html object (to be used by the views later) */
 function loadTemplates() {
 	var promises = [];
 	var templates = [
 		"viewStudents.html",
 		"studentRecord.html",
-		"createStudent.html"
+		"createStudent.html",
+		"confirmationModal.html",
+		"transactionResponse.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -29,6 +31,7 @@ function loadTemplates() {
 	});
 }
 
+/** Initialization function */
 function init() {
 	new FetchStudentsView({
 		el: $("#students-container")
@@ -86,7 +89,8 @@ var StudentTableRowView = Backbone.View.extend({
 
 	events: {
 		"click .view-student": "viewStudent",
-		"click .edit-student": "editStudent"
+		"click .edit-student": "editStudent",
+		"click .delete-student": "deleteStudent"
 	},
 
 	viewStudent: function(evt) {
@@ -104,6 +108,14 @@ var StudentTableRowView = Backbone.View.extend({
 			id: id,
 			el: $("#update-container"),
 			action: "edit"
+		});		
+	},
+
+	deleteStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new DeleteRecordView({
+			id: id,
+			el: $("#delete-container")
 		});		
 	}
 });
@@ -153,7 +165,11 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	saveStudent: function(evt) {
-		this.model.save();
+		this.model.save().then(function(data) {
+			new TransactionResponseView({
+				message: "Record successfully saved. Refresh the page to see your changes."
+			});
+		});
 	}
 });
 
@@ -200,4 +216,57 @@ var CreateStudentView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["createStudent.html"]);
 	},	
+});
+
+var DeleteRecordView = Backbone.View.extend({
+	initialize: function(options) {
+		this.id = options.id;
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+
+		this.$el.append(html["confirmationModal.html"]);
+
+
+		$("#confirmation-modal").modal({
+			show: true
+		});
+		
+		$("#confirmation-modal").on("hidden.bs.modal", function() {
+			$("#confirmation-modal").remove();
+			$(".modal-backdrop").remove();
+		});
+		
+		$("#confirmation-modal").on("click", "#confirm-yes", function() {
+			new Student({id: view.id}).destroy().then(function(data) {
+				new TransactionResponseView({
+					message: "The record has been successfully deleted."
+				});
+			});
+		});
+	},	
+});
+
+var TransactionResponseView = Backbone.View.extend({
+	initialize: function(options) {
+		this.message = options.message;
+		this.render();
+	},
+
+	render: function() {
+		$("#container").append(html["transactionResponse.html"]);
+
+		$("#transaction-modal .modal-body").html(this.message);
+
+		$("#transaction-modal").modal({
+			show: true
+		});
+
+		$("#transaction-modal").on("hidden.bs.modal", function() {
+			$("#transaction-modal").remove();
+			$(".modal-backdrop").remove();
+		});
+	}
 });
