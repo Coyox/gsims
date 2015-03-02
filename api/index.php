@@ -6,6 +6,7 @@ require 'Slim/Slim.php';
 $app = new \Slim\Slim();
 
 $app->get('/students', 'getStudents');
+$app->get('/teachers', 'getTeachers');
 $app->get('/students/:id', 'getStudentById');
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
@@ -13,38 +14,29 @@ $app->delete('/students/:id', 'deleteStudent');
 
 $app->run();
 
+
 /* 
  * Returns a list of students
  */
 function getStudents() {
     $sql = "select s.id, s.firstName, s.lastName from student s";
-    try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $students = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($students);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    echo json_encode(perform_query($sql, 'GETALL'));
 }
 
+/* 
+ * Returns a list of students
+ */
+function getTeachers() {
+    $sql = "select t.id, t.firstName, t.lastName from teacher t";
+    echo json_encode(perform_query($sql, 'GETALL'));
+}
 /* 
  * Returns a single student record
  */
 function getStudentById($id) {
     $sql = "select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $student = $stmt->fetchObject();
-        $db = null;
-        echo json_encode($student);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $bindparam = ["id"=>$id];
+    echo json_encode(perform_query($sql,'GET',$bindparam)
 }
 
 /* 
@@ -55,19 +47,13 @@ function updateStudent($id) {
     $body = $request->getBody();
     $student = json_decode($body);
     $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);  
-        $stmt->bindParam("firstName", $student->firstName);
-        $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("email", $student->email);
-        $stmt->bindParam("id", $student->id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($student); 
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $bindparams = [
+        "firstName"=>$student->firstName,
+        "lastName", $student->lastName,
+        "email", $student->email,
+        "id", $student->id,
+    ];
+    perform_query($sql,'',$bindparams);
 }
 
 /* 
@@ -78,19 +64,13 @@ function createStudent() {
     $body = $request->getBody();
     $student = json_decode($body);
     $sql = "insert into student (id, firstName, lastName, email) values (:id, :firstName, :lastName, :email)";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);  
-        $stmt->bindParam("firstName", $student->firstName);
-        $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("email", $student->email);
-        $stmt->bindParam("id", $student->id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($student); 
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $bindparams = [
+        "firstName"=>$student->firstName,
+        "lastName", $student->lastName,
+        "email", $student->email,
+        "id", $student->id,
+    ];
+    perform_query($sql,'',$bindparams);
 }
 
 /* 
@@ -98,16 +78,8 @@ function createStudent() {
  */
 function deleteStudent($id) {
     $sql = "delete from student where id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);  
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $db = null;
-        echo "success";
-    } catch(PDOException $e) {
-        echo $e->getMessage(); 
-    }
+    $bindparam = ["id"=>$id];
+    perform_query($sql,'',$bindparam)
 }
 
 /* 
@@ -121,4 +93,37 @@ function getConnection() {
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
+}
+
+/*
+* wrapper to perform sql queries
+*/
+function perform_query($sql, $querytype, $bindparams=array()) {
+    try {
+        $db = getConnection();
+        $stmt = $db->query($sql);
+
+        if (array_filter($bindparams)){
+            foreach ($bindparams as $key=>$value) {
+                $stmt->bindParam($key, $value);
+            }
+            $stmt->execute();
+        }
+
+        if ($querytype == 'GET') {
+            $result = $stmt->$fetchObject();
+        }
+        elseif ($querytype == 'GETALL') {
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+        } 
+        else {
+            $result = null;
+        }
+        $db = null;
+        echo "success";
+
+    } catch(PDOException $e) {
+        echo $e->getMessage();
+    }
+    return $result;
 }
