@@ -2,6 +2,12 @@
 -- Create tables
 -- 
 
+CREATE TABLE IF NOT EXISTS `schoolyear` (
+  `schoolyearid` int(11) PRIMARY KEY NOT NULL,
+  `schoolyear` char(9) NOT NULL
+  )
+
+
 CREATE TABLE IF NOT EXISTS `school` (
   `schoolid` int(11) PRIMARY KEY NOT NULL,
   `location` varchar(50) NOT NULL,
@@ -16,10 +22,11 @@ CREATE TABLE IF NOT EXISTS `department` (
   `deptid` int(11) PRIMARY KEY NOT NULL,
   `schoolid` int(11) NOT NULL,
   `deptName` varchar(50) NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`)
+  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`),
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 
@@ -27,10 +34,11 @@ CREATE TABLE IF NOT EXISTS `course` (
   `courseid` int(11) PRIMARY KEY NOT NULL,
   `courseName` varchar(50) NOT NULL,
   `deptid` int(11) NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`deptid`) REFERENCES `department` (`deptid`) ON DELETE CASCADE
+  FOREIGN KEY (`deptid`) REFERENCES `department` (`deptid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 
@@ -44,11 +52,12 @@ CREATE TABLE IF NOT EXISTS `section` (
   `roomCapacity` smallint(5) NOT NULL,
   `roomLocation` varchar(50) NOT NULL,
   `classSize` int(5) NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
-  FOREIGN KEY (`teacherid`) REFERENCES `user` (`userid`)
+  FOREIGN KEY (`teacherid`) REFERENCES `user` (`userid`),
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 
@@ -60,11 +69,12 @@ CREATE TABLE IF NOT EXISTS `document` (
   `sectionid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `fullmark` smallint(5),
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`userid`) REFERENCES `user` (`userid`),
-  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE
+  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -129,15 +139,15 @@ CREATE TABLE IF NOT EXISTS `student` (
   `phoneNumber` char(11) NOT NULL,
   `emailAddr` varchar(50) NOT NULL,
   `allergies` varchar(255),
-  `prevAttendedGS` varchar(50),
+  `prevSchools` varchar(50),
   `parentFirstName` varchar(50) NOT NULL,
   `parentFirstName` varchar(50) NOT NULL,
-  `parentPhone` char(11) NOT NULL,    
+  `parentPhoneNumber` char(11) NOT NULL,    
   `parentEmailAddr` varchar(50) NOT NULL,
   `emergencyContactFirstName` varchar(50) NOT NULL,
   `emergencyContactLastName` varchar(50) NOT NULL,
   `emergencyContactRelation` varchar(15) NOT NULL,  
-  `emergencyContactPhone` varchar(11) NOT NULL,
+  `emergencyContactPhoneNumber` varchar(11) NOT NULL,
   `schoolid` int(11) NOT NULL,
   `paid` tinyint(1) NOT NULL default '0',
   `status` char(15) NOT NULL,
@@ -152,24 +162,26 @@ CREATE TABLE IF NOT EXISTS `student` (
   `date` date NOT NULL,
   `userid` int(11) NOT NULL,
   `sectionid` int(11) NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `date`),
   FOREIGN KEY (`userid`) REFERENCES `user` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`)
+  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`),
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 
  CREATE TABLE IF NOT EXISTS `enrollment` (
   `userid` int(11) NOT NULL,
   `sectionid` int(11) NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `schoolYear`),
   FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`)
+  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`),
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
  CREATE TABLE IF NOT EXISTS `waitlisted` (
@@ -184,12 +196,13 @@ CREATE TABLE IF NOT EXISTS `marks` (
   `assignmentid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `mark` float  NOT NULL,
-  `schoolYear` char(11) NOT NULL,
+  `schoolyearid` char(9) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`assignmentid`,`userid`, `schoolYear`),
   FOREIGN KEY (`assignmentid`) REFERENCES `document` (`docid`),
-  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE
+  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 )
 
 CREATE TABLE IF NOT EXISTS `login` (
