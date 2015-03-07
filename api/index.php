@@ -286,8 +286,9 @@ function findSectionsByDay($schoolyear, $schoolid, $days){
 # Students
 #================================================================================================================#
 function getStudents() {
-    $sql = "SELECT * from student order by firstName asc ";
-    echo json_encode(perform_query($sql, 'GETALL'));
+    echo "hello";
+    // $sql = "SELECT * from student order by firstName asc ";
+    // echo json_encode(perform_query($sql, 'GETALL'));
 }
 
 function getStudentById($id) {
