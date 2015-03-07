@@ -1,9 +1,9 @@
 USE gobind;
 
 
--- 
+--
 -- Create tables
--- 
+--
 
 CREATE TABLE IF NOT EXISTS `schoolyear` (
   `schoolyearid` int(11) PRIMARY KEY NOT NULL,
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS `teacher` (
   FOREIGN KEY (`userid`) REFERENCES `login` (`userid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`)
 );
-  
-  
+
+
 CREATE TABLE IF NOT EXISTS `superuser` (
   `userid` int(11) PRIMARY KEY NOT NULL,
   `firstName` varchar(50) NOT NULL,
@@ -102,11 +102,12 @@ CREATE TABLE IF NOT EXISTS `student` (
   `allergies` varchar(255),
   `prevSchools` varchar(50),
   `parentFirstName` varchar(50) NOT NULL,
-  `parentPhoneNumber` char(11) NOT NULL,    
+  `parentLastName` varchar(50) NOT NULL,
+  `parentPhoneNumber` char(11) NOT NULL,
   `parentEmailAddr` varchar(50) NOT NULL,
   `emergencyContactFirstName` varchar(50) NOT NULL,
   `emergencyContactLastName` varchar(50) NOT NULL,
-  `emergencyContactRelation` varchar(15) NOT NULL,  
+  `emergencyContactRelation` varchar(15) NOT NULL,
   `emergencyContactPhoneNumber` varchar(11) NOT NULL,
   `schoolid` int(11) NOT NULL,
   `paid` tinyint(1) NOT NULL default '0',
