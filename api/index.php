@@ -11,7 +11,28 @@ $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
+$app->post('/login', 'validateCredentials');
+
 $app->run();
+
+function validateCredentials() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $credentials = json_decode($body);
+    $sql = "select * from login where username=:username and password=:password";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);  
+        $stmt->bindParam("username", $credentials->username);
+        $stmt->bindParam("password", $credentials->password);
+        $stmt->execute();
+        $user = $stmt->fetchObject();
+        $db = null;
+        echo json_encode($user); 
+    } catch(PDOException $e) {
+        echo $e->getMessage();
+    }
+}
 
 /* 
  * Returns a list of students
