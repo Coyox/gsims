@@ -44,6 +44,7 @@ var Superuser = Backbone.Model.extend({
 		status: ""
 	},
     urlRoot: "http://gobind-sarvar.rhcloud.com/api/superusers",
+});
 
 var User = Backbone.Model.extend({
 	defaults: {
