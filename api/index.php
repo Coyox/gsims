@@ -17,7 +17,7 @@ $app->run();
  * Returns a list of students
  */
 function getStudents() {
-    $sql = "select s.id, s.firstName, s.lastName from student s";
+    $sql = "select s.userid, s.firstName, s.lastName from student s";
     try {
         $db = getConnection();
         $stmt = $db->query($sql);
