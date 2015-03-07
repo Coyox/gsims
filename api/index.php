@@ -38,6 +38,8 @@ $app->post('/login', 'validateCredentials');
 $app->run();
 
 
+
+
 function validateCredentials() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -56,6 +58,7 @@ function validateCredentials() {
         echo $e->getMessage();
     }
 }
+
 
 #================================================================================================================#
 # Schools, Departments, Courses, Sections
