@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 var Student = Backbone.Model.extend({
 	defaults: {
 		datefyouOBirth: "",
