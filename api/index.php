@@ -286,16 +286,17 @@ function findSectionsByDay($schoolyear, $schoolid, $days){
 # Students
 #================================================================================================================#
 function getStudents() {
-    $sql = "select s.id, s.firstName, s.lastName from student s";
-    try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $students = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($students);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    echo "hello";
+    // $sql = "select s.id, s.firstName, s.lastName from student s";
+    // try {
+    //     $db = getConnection();
+    //     $stmt = $db->query($sql);
+    //     $students = $stmt->fetchAll(PDO::FETCH_OBJ);
+    //     $db = null;
+    //     echo json_encode($students);
+    // } catch(PDOException $e) {
+    //     echo $e->getMessage();
+    // }
 }
 
 function getStudentById($id) {
