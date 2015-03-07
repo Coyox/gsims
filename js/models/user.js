@@ -32,19 +32,10 @@ var Teacher = Backbone.Model.extend({
 		emailAddr: "",
 		schoolid: "",
 		paid: "",
-		status: ""
+		status: "",
+		usertype: ""
 	},
     urlRoot: "http://gobind-sarvar.rhcloud.com/api/teachers",
-});
-
-var Administrator = Backbone.Model.extend({
-	defaults: {
-		emailAddr: "",
-		schoolid: "",
-		paid: "",
-		status: ""
-	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/admins",
 });
 
 var Superuser = Backbone.Model.extend({
@@ -56,9 +47,7 @@ var Superuser = Backbone.Model.extend({
 
 var User = Backbone.Model.extend({
 	defaults: {
-
 	},
 
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/login"
-
+    urlRoot: "http://gobind-sarvar.rhcloud.com/api/login",
 });

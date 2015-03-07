@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS `course` (
   `courseid` int(11) PRIMARY KEY NOT NULL,
   `courseName` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `prereqs` varchar(50),
   `deptid` int(11) NOT NULL,
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
