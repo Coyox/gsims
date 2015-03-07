@@ -17,7 +17,7 @@ $app->run();
  * Returns a list of students
  */
 function getStudents() {
-    $sql = "select s.userid, s.firstName, s.lastName from student s";
+    $sql = "select s.id, s.firstName, s.lastName from student s";
     try {
         $db = getConnection();
         $stmt = $db->query($sql);
@@ -117,7 +117,7 @@ function getConnection() {
     $dbhost = "127.4.196.130";
     $dbuser = "adminpVaqD1a";
     $dbpass = "GpFqpeavU2dT";
-    $dbname = "gobind";
+    $dbname = "testdb";
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
