@@ -33,7 +33,7 @@ function getStudents() {
  * Returns a single student record
  */
 function getStudentById($id) {
-    $sql = "select s.id, s.firstName, s.lastName, s.email from student s where s.id=:id";
+    $sql = "select s.id, s.firstName, s.lastName, s.emailAddr from student s where s.id=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -54,13 +54,13 @@ function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "update student set firstName=:firstName, lastName=:lastName, email=:email, id=:id WHERE id=:id";
+    $sql = "update student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, id=:id WHERE id=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);  
         $stmt->bindParam("firstName", $student->firstName);
         $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("emailAddr", $student->emailAddr);
         $stmt->bindParam("id", $student->id);
         $stmt->execute();
         $db = null;
@@ -77,13 +77,13 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "insert into student (id, firstName, lastName, email) values (:id, :firstName, :lastName, :email)";
+    $sql = "insert into student (id, firstName, lastName, emailAddr) values (:id, :firstName, :lastName, :emailAddr)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);  
         $stmt->bindParam("firstName", $student->firstName);
         $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("email", $student->email);
+        $stmt->bindParam("emailAddr", $student->emailAddr);
         $stmt->bindParam("id", $student->id);
         $stmt->execute();
         $db = null;
