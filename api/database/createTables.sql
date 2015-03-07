@@ -120,7 +120,6 @@ CREATE TABLE IF NOT EXISTS `student` (
 CREATE TABLE IF NOT EXISTS `section` (
   `sectionid` int(11) PRIMARY KEY NOT NULL,
   `courseid` int(11)  NOT NULL,
-  `teacherid` int(11) NOT NULL,
   `sectionCode` varchar(50) NOT NULL,
   `day` enum('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
   `time` time NOT NULL,
@@ -131,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `section` (
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
-  FOREIGN KEY (`teacherid`) REFERENCES `teacher` (`userid`),
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 );
 
