@@ -5,7 +5,9 @@ require 'Slim/Slim.php';
 
 $app = new \Slim\Slim();
 
-$app->get('/students', 'getStudents');
+$app->get('/students', function() {
+    echo "hello";
+});
 // $app->get('/students/:id', 'getStudentById');
 // $app->post('/students', 'createStudent');
 // $app->put('/students/:id', 'updateStudent');
