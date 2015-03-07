@@ -6,34 +6,34 @@ require 'Slim/Slim.php';
 $app = new \Slim\Slim();
 
 $app->get('/students', 'getStudents');
-$app->get('/students/:id', 'getStudentById');
-$app->post('/students', 'createStudent');
-$app->put('/students/:id', 'updateStudent');
-$app->delete('/students/:id', 'deleteStudent');
+// $app->get('/students/:id', 'getStudentById');
+// $app->post('/students', 'createStudent');
+// $app->put('/students/:id', 'updateStudent');
+// $app->delete('/students/:id', 'deleteStudent');
 
 
-$app->get('/teachers', 'getTeachers');
-$app->get('/teachers/:id', 'getTeachersById');
+// $app->get('/teachers', 'getTeachers');
+// $app->get('/teachers/:id', 'getTeachersById');
 
-$app->get('/administrators', 'getAdministrators');
-$app->get('/administrators/:id', 'getAdministratorsById');
+// $app->get('/administrators', 'getAdministrators');
+// $app->get('/administrators/:id', 'getAdministratorsById');
 
-$app->get('/schools', 'getSchools');
-$app->get('/schools/:id', 'getschoolById');
-$app->get('/departments', 'getDepartments');
-$app->get('/departments/:id', 'getDepartmentById');
-$app->get('/courses', 'getCourses');
-$app->get('/courses/:id', 'getCourseById');
-$app->get('/courses/:id/teachers', 'getCourseTeachers');
-$app->get('/sections', 'getSections');
-$app->get('/sections/:id/enrolled', 'getStudentsEnrolled');
-$app->get('/sections/:id/teachers', 'getSectionTeachers');
+// $app->get('/schools', 'getSchools');
+// $app->get('/schools/:id', 'getschoolById');
+// $app->get('/departments', 'getDepartments');
+// $app->get('/departments/:id', 'getDepartmentById');
+// $app->get('/courses', 'getCourses');
+// $app->get('/courses/:id', 'getCourseById');
+// $app->get('/courses/:id/teachers', 'getCourseTeachers');
+// $app->get('/sections', 'getSections');
+// $app->get('/sections/:id/enrolled', 'getStudentsEnrolled');
+// $app->get('/sections/:id/teachers', 'getSectionTeachers');
 
-$app->get('/search/:usertype', 'findUsersByName');
-$app->get('/search/student', 'findStudents');
-$app->get('/seasrch/sections', 'findSections');
+// $app->get('/search/:usertype', 'findUsersByName');
+// $app->get('/search/student', 'findStudents');
+// $app->get('/seasrch/sections', 'findSections');
 
-$app->post('/login', 'validateCredentials');
+// $app->post('/login', 'validateCredentials');
 
 $app->run();
 
@@ -286,7 +286,7 @@ function findSectionsByDay($schoolyear, $schoolid, $days){
 # Students
 #================================================================================================================#
 function getStudents() {
-    $sql = "select s.emailAddr, s.firstName, s.lastName from student s";
+    $sql = "select s.id, s.firstName, s.lastName from student s";
     try {
         $db = getConnection();
         $stmt = $db->query($sql);
