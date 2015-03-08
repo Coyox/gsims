@@ -23,7 +23,6 @@ $app->get('/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
-$app->get('/sections/:code', 'getSectionByCode');
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
@@ -75,10 +74,6 @@ function getCourseById($id){
 function getSectionById($id){
     $sql = "SELECT courseid, sectionCode, teacherid, day, time, roomCapacity, roomLocation, classSize, status from section where sectionid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
-}
-function getSectionByCode($code){
-    $sql = "SELECT sectionid, courseid, teacherid, day, time, roomCapacity, roomLocation, classSize, status from section where sectionCode=:code";
-    echo json_encode(perform_query($sql,'GET',array("code"=>$code)));
 }
 function getSections(){
     $schoolyear = $_GET['schoolyearid'];
@@ -221,7 +216,7 @@ function getUsers($type){
     }
 }
 #================================================================================================================#
-# Users
+# Search
 #================================================================================================================#
 /* General find for students */
 function findStudents(){
