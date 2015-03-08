@@ -29,7 +29,7 @@ function validateCredentials() {
     // } catch(PDOException $e) {
     //     echo $e->getMessage();
     // }
-    $bindparam = ["username"=> $_GET['username'], "password"=>$_GET['password']];
+    $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 
 }
