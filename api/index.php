@@ -14,6 +14,8 @@ $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
+$app->get('/search/:usertype', 'findUsersByName');
+
 $app->get('/login', 'validateCredentials');
 
 $app->run();
@@ -96,7 +98,6 @@ function deleteStudent($id) {
     echo json_encode(perform_query($sql,'', array("userid"=>$id)));
 }
 
-
 #================================================================================================================#
 # Teachers
 #================================================================================================================#
@@ -119,6 +120,88 @@ function getAdministratorById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
 }
+
+#================================================================================================================#
+# Users
+#================================================================================================================#
+function getUsers($type){
+    if ($type == "T"){
+        return getTeachers();
+    }
+    else if ($type == "S"){
+        return getStudents();
+    }
+    else if ($type == "A"){
+        return getAdministrators();
+    }
+}
+
+function findUsersByFirstName($type, $firstname) {
+    $firstname = "%".$firstname."%";
+    $bindparam = array("firstname"=>$firstname);
+    if ($type=="S") {
+        $sql = "SELECT * from student where firstName like :firstname order by firstName asc";
+    }
+    else if ($type=="A"|$type=="T"){
+        $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname order by firstName asc";
+        $bindparam["type"]=>$type;
+    }
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+function findUsersByLastName($type, $lastname) {
+    $lastname = "%".$lastname."%";
+    $bindparam = array("lastname"=>$lastname);
+    if ($type=="S") {
+        $sql = "SELECT * from student where lastName like :lastname order by lastName asc";
+    }
+    else if ($type=="A"|$type=="T"){
+        $sql = "SELECT * from teacher where usertype=:type and lastName like :lastname order by lastName asc";
+        $bindparam["type"]=>$type;
+    }
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+function findUsersByFullName($type, $firstname, $lastname) {
+    $firstname = "%".$firstname."%";
+    $lastname = "%".$lastname."%";
+    $bindparam = array(
+        "firstname" => $firstname,
+        "lastname" => $lastname,
+    );
+    if ($type=="S") {
+        $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
+    }
+    else if ($type=="A"|$type=="T"){
+        $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname and lastName like :lastname order by firstName asc";
+        $bindparam["type"]=>$type;
+    }
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+
+/*
+ usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
+*/
+
+function findUsersByName($usertype){
+    $firstname = $_GET['firstName'];
+    $lastname = $_GET['lastName'];
+
+    if (isset($firstname) && isset($lastname)) {
+        return findUsersByFullName($usertype,$firstname,$lastname);
+    }
+    else if (isset($firstname)){
+        return findUsersByFirstName($usertype,$firstname);
+    }
+    else if (isset($lastname)) {
+        return findUsersByLastName($usertype,$lastname);
+    }
+    else {
+        return getUsers($usertype);
+    }
+}
+
 #================================================================================================================#
 # Helpers
 #================================================================================================================#
