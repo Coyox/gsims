@@ -145,7 +145,6 @@ function perform_query($sql, $querytype, $bindparams=array()) {
             $result = null;
         }
         $db = null;
-        echo "success";
         return $result;
     } catch(PDOException $e) {
         echo $e->getMessage();
