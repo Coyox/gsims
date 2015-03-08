@@ -95,21 +95,21 @@ function getSections(){
     }
 }
 function getSectionsBySchool($schoolyear, $schoolid){
-    // $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-    //         from section s,
-    //         (select courseid from course c1,
-    //             (select deptid from department where schoolid=:schoolid and schoolyearid=:schoolyear) d
-    //             where d.deptid = c1.deptid and c1.schoolyearid=:schoolyear) c
-    //         where s.courseid = c.courseid and s.schoolyearid=:schoolyear orderby s.sectionCode asc";
-    // $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
-    // echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s,
+            (select courseid from course c1,
+                (select deptid from department where schoolid=:schoolid and schoolyearid=:schoolyear) d
+                where d.deptid = c1.deptid and c1.schoolyearid=:schoolyear) c
+            where s.courseid = c.courseid and s.schoolyearid=:schoolyear orderby s.sectionCode asc";
+    $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionsByCourse($schoolyear, $courseid){
-    // $sql = "SELECT s.sectionid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-    //  from section s where s.schoolyearid =:schoolyear and s.courseid=:courseid
-    //  order by s.sectionCode asc";
-    // $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
-    // echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    $sql = "SELECT s.sectionid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+     from section s where s.schoolyearid =:schoolyear and s.courseid=:courseid
+     order by s.sectionCode asc";
+    $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
 #================================================================================================================#
@@ -234,7 +234,7 @@ function findStudents(){
     $paid = $_GET['paid'];
     $clause = '';
     if (!(isset($firstname)||isset($lastname))){
-        echo 'must provide either first ane last name';
+        echo 'must provide either first or last name';
         return;
     }
     if (isset($firstname)) {
@@ -257,7 +257,7 @@ function findStudents(){
             $clause.=" and year(dateOfBirth)=".$year;
         }
         if (isset($gender)){
-            $clause.=" and gender=".$gender;;
+            $clause.=" and gender=".$gender;
         }
         if (isset($paid)){
             $clause.=" and paid=".$paid;
