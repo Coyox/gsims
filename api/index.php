@@ -10,7 +10,8 @@ $app->get('/students/:id', 'getStudentById');
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
-
+$app->get('/teachers', 'getTeachers');
+$app->get('/teachers/:id', 'getTeachersById');
 $app->get('/login', 'validateCredentials');
 
 $app->run();
@@ -91,6 +92,19 @@ function deleteStudent($id) {
         echo $e->getMessage();
     }
     echo json_encode(perform_query($sql,'', array("userid"=>$id)));
+}
+
+
+#================================================================================================================#
+# Teachers
+#================================================================================================================#
+function getTeachers() {
+    $sql = "SELECT * from teacher where usertype='T' order by firstName asc" ;
+    echo json_encode(perform_query($sql, 'GETALL'));
+}
+function getTeacherById($id) {
+    $sql = "SELECT * from teacher where usertype='T' and userid=:id";
+    echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
 }
 
 #================================================================================================================#
