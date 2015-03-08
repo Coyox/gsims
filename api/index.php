@@ -30,6 +30,7 @@ function validateCredentials() {
     //     echo $e->getMessage();
     // }
     $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
+    echo "test";
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 
 }
@@ -136,12 +137,14 @@ function deleteStudent($id) {
 * wrapper to perform sql queries
 */
 function perform_query($sql, $querytype, $bindparams=array()) {
+    echo "perform query";
     try {
         $db = getConnection();
         $stmt = $db->query($sql);
         if (array_filter($bindparams)){
             foreach ($bindparams as $key=>$value) {
                 $stmt->bindParam($key, $value);
+                echo "bindparam!";
             }
             $stmt->execute();
         }
