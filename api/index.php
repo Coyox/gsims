@@ -17,20 +17,7 @@ $app->run();
 
 function validateCredentials() {
     $sql = "select * from login where username=:username and password=:password";
-    // try {
-    //     $db = getConnection();
-    //     $stmt = $db->prepare($sql);
-    //     $stmt->bindParam("username", $_GET['username']);
-    //     $stmt->bindParam("password", $_GET['password']);
-    //     $stmt->execute();
-    //     $user = $stmt->fetchObject();
-    //     $db = null;
-    //     echo json_encode($user);
-    // } catch(PDOException $e) {
-    //     echo $e->getMessage();
-    // }
     $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
-    echo "test";
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 
 }
@@ -137,14 +124,12 @@ function deleteStudent($id) {
 * wrapper to perform sql queries
 */
 function perform_query($sql, $querytype, $bindparams=array()) {
-    echo "perform query";
     try {
         $db = getConnection();
-        $stmt = $db->query($sql);
+        $stmt = $db->prepare($sql);
         if (array_filter($bindparams)){
             foreach ($bindparams as $key=>$value) {
                 $stmt->bindParam($key, $value);
-                echo "bindparam!";
             }
             $stmt->execute();
         }
