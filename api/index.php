@@ -144,7 +144,7 @@ function findUsersByFirstName($type, $firstname) {
     }
     else if ($type=="A"|$type=="T"){
         $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname order by firstName asc";
-        $bindparam["type"]=>$type;
+        $bindparam["type"]=$type;
     }
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
@@ -157,7 +157,7 @@ function findUsersByLastName($type, $lastname) {
     }
     else if ($type=="A"|$type=="T"){
         $sql = "SELECT * from teacher where usertype=:type and lastName like :lastname order by lastName asc";
-        $bindparam["type"]=>$type;
+        $bindparam["type"]=$type;
     }
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
@@ -167,14 +167,14 @@ function findUsersByFullName($type, $firstname, $lastname) {
     $lastname = "%".$lastname."%";
     $bindparam = array(
         "firstname" => $firstname,
-        "lastname" => $lastname,
+        "lastname" => $lastname
     );
     if ($type=="S") {
         $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
     }
     else if ($type=="A"|$type=="T"){
         $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname and lastName like :lastname order by firstName asc";
-        $bindparam["type"]=>$type;
+        $bindparam["type"]=$type;
     }
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
