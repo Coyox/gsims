@@ -11,7 +11,13 @@ $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
+$app->get('/login', 'validateCredentials');
+
 $app->run();
+
+function validateCrednetials() {
+    echo "success";
+}
 
 /* 
  * Returns a list of students

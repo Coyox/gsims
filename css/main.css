@@ -5,3 +5,33 @@ body {
 .small-width {
 	width: 800px;
 }
+
+#example {
+	margin-top: 1000px;
+}
+
+#login-container {
+	width: 650px;
+}
+
+#login-panel {
+	overflow: auto;
+	margin-top: 20px;
+}
+
+.login-left {
+	float: left;
+	width: 50%;
+	padding-right: 20px;
+	border-right: 1px dotted #ccc;
+}
+
+.login-right {
+	float: right;
+	width: 47%;
+}
+
+.login-right .bg-info {
+	padding: 20px;
+	border-radius: 10px;
+}

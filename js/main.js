@@ -15,7 +15,8 @@ function loadTemplates() {
 		"studentRecord.html",
 		"createStudent.html",
 		"confirmationModal.html",
-		"transactionResponse.html"
+		"transactionResponse.html",
+		"login.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -33,6 +34,10 @@ function loadTemplates() {
 
 /** Initialization function */
 function init() {
+	new LoginView({
+		el: $("#landing-container")
+	});
+	// The following two are for the demo
 	new FetchStudentsView({
 		el: $("#students-container")
 	});
