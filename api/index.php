@@ -140,10 +140,10 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         $db = getConnection();
         if (array_filter($bindparams)){
             $stmt = $db->prepare($sql);
-            foreach ($bindparams as $key=>$value) {
-                $stmt->bindParam($key, $value);
-            }
-            $stmt->execute();
+            // foreach ($bindparams as $key=>$value) {
+            //     $stmt->bindParam($key, $value);
+            // }
+            $stmt->execute($bindparams);
         }
         else{
             $stmt = $db->query($sql);
@@ -164,7 +164,7 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         }
         $db = null;
         echo "success";
-        return json_encode($result);
+        return $result;
     } catch(PDOException $e) {
         echo $e->getMessage();
     }
