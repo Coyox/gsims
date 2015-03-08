@@ -18,7 +18,7 @@ $app->run();
 function validateCredentials() {
     $sql = "select * from login where username=:username and password=:password";
     $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
-    echo (perform_query($sql, 'GET', $bindparam));
+    echo json_encode(perform_query($sql, 'GET', $bindparam));
 }
 
 /*
@@ -134,7 +134,6 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         }
         if ($querytype == 'GET') {
             $result = $stmt->fetchObject();
-            echo ($result);
         }
         elseif ($querytype == 'GETALL') {
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -147,7 +146,7 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         }
         $db = null;
         echo "success";
-        return json_encode($result);
+        return $result;
     } catch(PDOException $e) {
         echo $e->getMessage();
     }
