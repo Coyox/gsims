@@ -12,6 +12,8 @@ $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
+$app->get('/administrators', 'getAdministrators');
+$app->get('/administrators/:id', 'getAdministratorById');
 $app->get('/login', 'validateCredentials');
 
 $app->run();
@@ -99,14 +101,24 @@ function deleteStudent($id) {
 # Teachers
 #================================================================================================================#
 function getTeachers() {
-    $sql = "SELECT * from teacher where usertype='T' order by firstName asc" ;
+    $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' order by firstName asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
 }
 function getTeacherById($id) {
-    $sql = "SELECT * from teacher where usertype='T' and userid=:id";
+    $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
 }
-
+#================================================================================================================#
+# Administrators
+#================================================================================================================#
+function getAdministrators() {
+    $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' order by firstName asc" ;
+    echo json_encode(perform_query($sql, 'GETALL'));
+}
+function getAdministratorById($id) {
+    $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and userid=:id";
+    echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
+}
 #================================================================================================================#
 # Helpers
 #================================================================================================================#
