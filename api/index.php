@@ -145,12 +145,15 @@ function perform_query($sql, $querytype, $bindparams=array()) {
                 $stmt->bindParam($key, $value);
             }
             $stmt->execute();
+            echo 'execute';
         }
         else{
             $stmt = $db->query($sql);
         }
         if ($querytype == 'GET') {
+            echo 'GET HERE';
             $result = $stmt->$fetchObject();
+            echo json_encode($result);
         }
         elseif ($querytype == 'GETALL') {
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
