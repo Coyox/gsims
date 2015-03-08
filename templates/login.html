@@ -1,9 +1,12 @@
 <div id="login-container" class="center-block">
 	<img src="img/logo.png" class="logo center-block">
 	<div id="login-panel" class="panel panel-default">
-		<div class="panel-heading"><strong>Gobind Sarvar School - Login</strong></div>
+		<div class="panel-heading gradient">
+ 			<span>Gobind Sarvar School - Login</span>
+ 		</div>
 		<div class="panel-body">
 			<div class="login-left">
+				<div class="alert alert-danger hide">Invalid Username/Password</div>
 				<div class="form-horizontal">
 					<div class="form-group">
 						<div class="col-sm-12">
@@ -19,6 +22,7 @@
 								<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
 								<input type="password" id="password" class="form-control" placeholder="Password">
 							</div>
+							<small id="forgot-password" class="pull-right cursor">forgot password</small>
 						</div>
 					</div>
 					<div class="form-group">
@@ -27,14 +31,13 @@
 						</div>
 					</div>
 				</div>
-				<span><a>Forgot password</a></span>
 			</div>
 			<div class="login-right">
-				<div class="bg-info">
+				<div class="login-background">
 					<strong>Don't have an account?</strong>
 					<br>
 					<span>Gobind Sarvar is currently accepting new students. 
-						<h4><a>Register today!</a></h4></span>
+						<h4><a id="register" class="center-block">Register today!</a></h4></span>
 				</div>
 			</div>
 		</div>

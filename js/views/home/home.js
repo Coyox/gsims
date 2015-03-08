@@ -31,6 +31,21 @@ var SidebarView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["sidebar.html"]);
+	},
+
+	events: {
+		"click .sidebar-link": "updateBreadcrumb"
+	},
+
+	updateBreadcrumb: function(evt) {
+		// Update the breadcrumb with the current sidebar link
+		var link = $(evt.currentTarget).html();
+		$("#breadcrumb-text").html(link);
+
+		this.$el.find("li.active").removeAttr("class");
+
+		var li = $(evt.currentTarget).closest("li");
+		li.addClass("active");
 	}
 });
 
@@ -42,7 +57,18 @@ var HeaderView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["header.html"]);
 
-		this.$el.find(".username").html(app.username);
+		var username = sessionStorage.getItem("gobind-username");
+		if (username != null) {
+			this.$el.find(".username").html(username);
+		}
+	},
+
+	events: {
+		"click #logout": "logout"
+	},
+
+	logout: function(evt) {
+		app.Router.navigate("", {trigger:true});
 	}
 });
 
@@ -52,7 +78,7 @@ var FooterView = Backbone.View.extend({
 	},
 
 	render: function() {
-
+		this.$el.html(html["footer.html"]);
 	}
 });
 

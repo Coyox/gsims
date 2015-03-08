@@ -22,7 +22,8 @@ function loadTemplates() {
 		"home.html",
 		"sidebar.html",
 		"header.html",
-		"breadcrumb.html"
+		"breadcrumb.html",
+		"footer.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -53,22 +54,34 @@ function init() {
 }
 
 var Router = Backbone.Router.extend({
+	initialize: function(options) {
+		this.el = $("#container")
+	},
+
     routes: {
-        "":             "login",
-        "home": 	    "home"
+        "":             	"login",
+        "forgotPassword": 	"forgotPassword",
+        "home": 	    	"home",
     },
 
     login: function() {
     	console.log("Login View");
     	new LoginView({
-    		el: $("#container")
+    		el: this.el
     	});
     },
 
     home: function() {
     	console.log("Home View");
     	new HomePageView({
-    		el: $("#container")
+    		el: this.el
+    	});
+    },
+
+    forgotPassword: function() {
+    	console.log("Forgot Password View");
+    	new ForgotPasswordView({
+    		el: this.el
     	});
     }
 });
