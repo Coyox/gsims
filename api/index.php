@@ -15,44 +15,30 @@ $app->get('/login', 'validateCredentials');
 
 $app->run();
 
+
 function validateCredentials() {
     $sql = "select * from login where username=:username and password=:password";
     $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 }
 
+#================================================================================================================#
+# Students
+#================================================================================================================#
 /*
  * Returns a list of students
  */
 function getStudents() {
-    $sql = "select s.id, s.firstName, s.lastName from student s";
-    try {
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $students = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($students);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $sql = "select s.userid, s.firstName, s.lastName from student s";
+    echo json_encode(perform_query($sql, 'GETALL'));
 }
 
 /*
  * Returns a single student record
  */
 function getStudentById($id) {
-    $sql = "select s.id, s.firstName, s.lastName, s.emailAddr from student s where s.id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $student = $stmt->fetchObject();
-        $db = null;
-        echo json_encode($student);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $sql = "select s.userid, s.firstName, s.lastName, s.emailAddr from student s where s.userid=:id";
+    echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
 /*
@@ -62,20 +48,14 @@ function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "update student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, id=:id WHERE id=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("firstName", $student->firstName);
-        $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("emailAddr", $student->emailAddr);
-        $stmt->bindParam("id", $student->id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($student);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $sql = "update student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, userid=:id WHERE userid=:id";
+    $bindparams = array(
+        "firstName"=>$student->firstName,
+        "lastName" => $student->lastName,
+        "email" => $student->email,
+        "id" => $student->userid,
+    );
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 
 /*
@@ -85,39 +65,37 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "insert into student (id, firstName, lastName, emailAddr) values (:id, :firstName, :lastName, :emailAddr)";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("firstName", $student->firstName);
-        $stmt->bindParam("lastName", $student->lastName);
-        $stmt->bindParam("emailAddr", $student->emailAddr);
-        $stmt->bindParam("id", $student->id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($student);
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $sql = "insert into student (userid, firstName, lastName, emailAddr) values (:id, :firstName, :lastName, :emailAddr)";
+    $bindparams = [
+        "firstName" => $student->firstName,
+        "lastName" => $student->lastName,
+        "email" => $student->emailAddr,
+        "id" => $student->userid,
+    ];
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
 /*
  * Updates a student record
  */
 function deleteStudent($id) {
-    $sql = "delete from student where id=:id";
+    $sql = "delete from student where userid=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
+        $stmt->bindParam("userid", $id);
         $stmt->execute();
         $db = null;
         echo "success";
     } catch(PDOException $e) {
         echo $e->getMessage();
     }
+    echo json_encode(perform_query($sql,'', array("userid"=>$id)));
 }
 
+#================================================================================================================#
+# Helpers
+#================================================================================================================#
 
 /*
 * wrapper to perform sql queries
