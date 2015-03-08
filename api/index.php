@@ -133,9 +133,11 @@ function deleteStudent($id) {
  */
 function getConnection() {
     $dbhost = "127.4.196.130";
+    $dbname = "testdb";   
     $dbuser = "adminpVaqD1a";
     $dbpass = "GpFqpeavU2dT";
-    $dbname = "testdb";
+    $dbname = "gobind";
+    //$dbname = "testdb";
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);  
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
