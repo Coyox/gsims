@@ -15,7 +15,7 @@ $app->get('/login', 'validateCredentials');
 
 $app->run();
 
-function validateCrednetials() {
+function validateCredentials() {
     echo "success";
 }
 
