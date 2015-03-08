@@ -11,7 +11,7 @@ $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
-$app->get('/teachers/:id', 'getTeachersById');
+$app->get('/teachers/:id', 'getTeacherById');
 $app->get('/login', 'validateCredentials');
 
 $app->run();
@@ -67,12 +67,12 @@ function createStudent() {
     $body = $request->getBody();
     $student = json_decode($body);
     $sql = "insert into student (userid, firstName, lastName, emailAddr) values (:id, :firstName, :lastName, :emailAddr)";
-    $bindparams = [
+    $bindparams = array(
         "firstName" => $student->firstName,
         "lastName" => $student->lastName,
         "email" => $student->emailAddr,
         "id" => $student->userid,
-    ];
+    );
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
