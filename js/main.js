@@ -1,3 +1,5 @@
+var app = {};
+
 /** Object to hold all HTML templates (pre-loaded) */
 var html = {};
 
@@ -16,7 +18,11 @@ function loadTemplates() {
 		"createStudent.html",
 		"confirmationModal.html",
 		"transactionResponse.html",
-		"login.html"
+		"login.html",
+		"home.html",
+		"sidebar.html",
+		"header.html",
+		"breadcrumb.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -34,9 +40,9 @@ function loadTemplates() {
 
 /** Initialization function */
 function init() {
-	new LoginView({
-		el: $("#landing-container")
-	});
+	app.Router = new Router();
+	Backbone.history.start();
+
 	// The following two are for the demo
 	new FetchStudentsView({
 		el: $("#students-container")
@@ -46,7 +52,26 @@ function init() {
 	});
 }
 
+var Router = Backbone.Router.extend({
+    routes: {
+        "":             "login",
+        "home": 	    "home"
+    },
 
+    login: function() {
+    	console.log("Login View");
+    	new LoginView({
+    		el: $("#container")
+    	});
+    },
+
+    home: function() {
+    	console.log("Home View");
+    	new HomePageView({
+    		el: $("#container")
+    	});
+    }
+});
 
 
 

@@ -20,7 +20,11 @@ var LoginView = Backbone.View.extend({
 				password: password
 			}
 		}).then(function(data) {
-			console.log(data);
+			if (typeof data == "object") {
+				app.username = data.username;
+				app.usertype = data.usertype;
+				app.Router.navigate("home", {trigger:true});
+			}
 		});
 	}
 });
