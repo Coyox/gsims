@@ -14,7 +14,6 @@ var LoginView = Backbone.View.extend({
 	validateCredentials: function(evt) {
 		var username = this.$el.find("#username").val();
 		var password = this.$el.find("#password").val();
-		console.log(username, password);
 		new User().fetch({
 			data: {
 				username: username,

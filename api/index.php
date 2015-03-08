@@ -16,7 +16,19 @@ $app->get('/login', 'validateCredentials');
 $app->run();
 
 function validateCredentials() {
-    echo "success";
+    $sql = "select * from login where username=:username and password=:password";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("username", $_GET['username']);
+        $stmt->bindParam("password", $_GET['password']);
+        $stmt->execute();
+        $user = $stmt->fetchObject();
+        $db = null;
+        echo json_encode($user);
+    } catch(PDOException $e) {
+        echo $e->getMessage();
+    }
 }
 
 /* 
