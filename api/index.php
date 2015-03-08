@@ -64,12 +64,12 @@ function getDepartmentById($id) {
 }
 function getCourses($deptid){
     $schoolyear = $_GET['schoolyearid'];
-    $sql = "SELECT courseid, courseName, description, prereqs, status from course where deptid=:deptid and schoolyearid=:schoolyear order by deptName asc";
+    $sql = "SELECT courseid, courseName, description, status from course where deptid=:deptid and schoolyearid=:schoolyear order by deptName asc";
     $bindparam = array("deptid"=>$deptid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getCourseById($id){
-    $sql = "SELECT courseName, schoolyearid, description, prereqs, status from course where courseid=:id";
+    $sql = "SELECT courseName, schoolyearid, description, status from course where courseid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
 function getSectionById($id){
@@ -95,21 +95,21 @@ function getSections(){
     }
 }
 function getSectionsBySchool($schoolyear, $schoolid){
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s,
-            (select courseid from course c1,
-                (select deptid from department where schoolid=:schoolid and schoolyearid=:schoolyear) d
-                where d.deptid = c1.deptid and c1.schoolyearid=:schoolyear) c
-            where s.courseid = c.courseid and s.schoolyearid=:schoolyear orderby s.sectionCode asc";
-    $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    // $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    //         from section s,
+    //         (select courseid from course c1,
+    //             (select deptid from department where schoolid=:schoolid and schoolyearid=:schoolyear) d
+    //             where d.deptid = c1.deptid and c1.schoolyearid=:schoolyear) c
+    //         where s.courseid = c.courseid and s.schoolyearid=:schoolyear orderby s.sectionCode asc";
+    // $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
+    // echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionsByCourse($schoolyear, $courseid){
-    $sql = " SELECT s.sectionid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-     from section s where s.schoolyearid =:schoolyear and s.courseid=:courseid
-     order by s.sectionCode asc";
-    $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    // $sql = "SELECT s.sectionid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    //  from section s where s.schoolyearid =:schoolyear and s.courseid=:courseid
+    //  order by s.sectionCode asc";
+    // $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
+    // echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
 #================================================================================================================#
