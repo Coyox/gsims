@@ -15,6 +15,7 @@ $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->get('/search/:usertype', 'findUsersByName');
+$app->get('/search/student', 'findStudents');
 
 $app->get('/login', 'validateCredentials');
 
@@ -134,6 +135,52 @@ function getUsers($type){
     else if ($type == "A"){
         return getAdministrators();
     }
+}
+#================================================================================================================#
+# Users
+#================================================================================================================#
+/* General find for students */
+function findStudents(){
+    $firstname = $_GET['firstName'];
+    $lastname = $_GET['lastName'];
+    $day = $_GET['day'];
+    $month = $_GET['month'];
+    $year = $_GET['year'];
+    $gender = $_GET['gender'];
+    $paid = $_GET['paid'];
+    $clause = '';
+    if (!(isset($firstname)||isset($lastname))){
+        echo 'must provide either first ane last name';
+        return;
+    }
+    if (isset($firstname)) {
+        $clause.="firstName like \"%".$firstname."%\"";
+        if (isset($lastname)){
+            $clause.="and lastName like \"%".$lastname."%\"";
+        }
+    }
+    else
+        if (isset($lastname)){
+            $clause.="lastName like \"%".$lastname."%\"";
+        }
+        if (isset($day)){
+            $clause.=" and day(dateOfBirth)=".$day;
+        }
+        if (isset($month)){
+            $clause.=" and month(dateOfBirth)=".$month;
+        }
+        if (isset($year)){
+            $clause.=" and year(dateOfBirth)=".$year;
+        }
+        if (isset($gender)){
+            $clause.=" and gender=".$gender;;
+        }
+        if (isset($paid)){
+            $clause.=" and paid=".$paid;
+        }
+    $sql = "SELECT * from student where :clause and order by firstName asc";
+    $bindparam = array("clause"=>$clause);
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
 function findUsersByFirstName($type, $firstname) {
