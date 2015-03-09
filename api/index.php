@@ -22,7 +22,7 @@ $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/sections', 'getSections');
-// $app->get('/sections/:id', 'getSectionById');
+$app->get('/sections/:id', 'getSectionById');
 
 
 $app->get('/search/:usertype', 'findUsersByName');
@@ -113,10 +113,10 @@ function getSectionsByCourse($schoolyear, $courseid){
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
-// function getSectionById($id){
-//     $sql = "SELECT courseid, sectionCode, day, time, roomCapacity, roomLocation, classSize, status from section where sectionid=:id";
-//     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
-// }
+function getSectionById($id){
+    $sql = "SELECT courseid, sectionCode, day, time, roomCapacity, roomLocation, classSize, status from section where sectionid=:id";
+    echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
+}
 
 #================================================================================================================#
 # Students
