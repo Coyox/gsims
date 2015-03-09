@@ -17,7 +17,7 @@ $app->get('/administrators/:id', 'getAdministratorById');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
-$app->get('/schools/:id/departments', 'getDepartments');
+//$app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/departments/:id', 'getDepartmentById');
 // $app->get('/departments/:id/courses', 'getCourses');
 // $app->get('/courses/:id', 'getCourseById');
