@@ -17,7 +17,7 @@ $app->get('/administrators/:id', 'getAdministratorById');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
-$app->get('/schools/:id/departments', 'getDepartments');
+// $app->get('/schools/:id/departments', 'getDepartments');
 // $app->get('/departments/:id', 'getDepartmentById');
 // $app->get('/departments/:id/courses', 'getCourses');
 // $app->get('/courses/:id', 'getCourseById');
@@ -52,12 +52,12 @@ function getSchoolById($id) {
     $sql = "SELECT location, postalCode, yearOpened, status from school where schoolid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
-function getDepartments($schoolid)
-    $schoolyear = $_GET['schoolyearid'];
-    $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
-    $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
-}
+// function getDepartments($schoolid)
+//     $schoolyear = $_GET['schoolyearid'];
+//     $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
+//     $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
+//     echo json_encode(perform_query($sql,'GETALL',$bindparam));
+// }
 // function getDepartmentById($id) {
 //     $sql = "SELECT deptName, schoolyearid, status from department where deptid=:id";
 //     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
