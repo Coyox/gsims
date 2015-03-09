@@ -52,7 +52,7 @@ function getSchoolById($id) {
     $sql = "SELECT location, postalCode, yearOpened, status from school where schoolid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
-function getDepartments($id)
+function getDepartments($id){
     // $schoolyear = $_GET['schoolyearid'];
     // $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
     // $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
