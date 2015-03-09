@@ -55,7 +55,7 @@ function getSchoolById($id) {
 function getDepartments($id)
     $schoolyear = $_GET['schoolyearid'];
     $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
-    $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
+    $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 // function getDepartmentById($id) {
