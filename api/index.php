@@ -19,10 +19,10 @@ $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/departments/:id', 'getDepartmentById');
-$app->get('/departments/:id/courses', 'getCourses');
-$app->get('/courses/:id', 'getCourseById');
-$app->get('/sections', 'getSections');
-$app->get('/sections/:id', 'getSectionById');
+// $app->get('/departments/:id/courses', 'getCourses');
+// $app->get('/courses/:id', 'getCourseById');
+// $app->get('/sections', 'getSections');
+// $app->get('/sections/:id', 'getSectionById');
 
 
 $app->get('/search/:usertype', 'findUsersByName');
