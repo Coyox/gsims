@@ -26,7 +26,8 @@ $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
-$app->get('/sections/:id/count', 'getStudentCount');
+$app->get('/sections/:id/students', 'getStudentsEnrolled');
+$app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 
 $app->get('/search/:usertype', 'findUsersByName');
@@ -127,6 +128,15 @@ function getStudentCount($id){
             where s.sectionid = :id";
     echo json_encode(perform_query($sql, 'GET', array("id"=>$id)));
 }
+function getStudentsEnrolled($id){
+    $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
+    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, parentFirstName, s.parentLastName,
+    s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
+    s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
+            FROM student s and (SELECT userid from enrollment where sectionid=:id) e
+            where e.userid = s.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
 function getSectionTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
             FROM teacher t1 and teaching t2
@@ -149,7 +159,11 @@ function getCourseTeachers($id){
  * Returns a list of students
  */
 function getStudents() {
-    $sql = "select s.userid, s.firstName, s.lastName from student s";
+    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status
+    from student";
     echo json_encode(perform_query($sql, 'GETALL'));
 }
 
@@ -157,7 +171,11 @@ function getStudents() {
  * Returns a single student record
  */
 function getStudentById($id) {
-    $sql = "select s.userid, s.firstName, s.lastName, s.emailAddr from student s where s.userid=:id";
+    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status
+    from student where userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
@@ -168,7 +186,7 @@ function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "update student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, userid=:id WHERE userid=:id";
+    $sql = "UPDATE student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, userid=:id WHERE userid=:id";
     $bindparams = array(
         "firstName"=>$student->firstName,
         "lastName" => $student->lastName,
@@ -185,12 +203,40 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "insert into student (userid, firstName, lastName, emailAddr) values (:id, :firstName, :lastName, :emailAddr)";
+    $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status) values (:userid, :firstName, :lastName, :dateOfBirth, :gender, :streetAddr1, :streetAddr2, :city,
+    :province, :country, :postalCode, :phoneNumber, :emailAddr, :allergies, :prevSchools, :parentFirstName, :parentLastName,
+    :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
+    :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
     $bindparams = array(
+        "userid" => $student->userid,
         "firstName" => $student->firstName,
         "lastName" => $student->lastName,
-        "email" => $student->emailAddr,
-        "id" => $student->userid,
+        "dateOfBirth" => $student->dateOfBirth,
+        "gender" => $student->gender,
+        "streetAddr1" => $student->streetAddr1,
+        "streetAddr2" => $student->streetAddr2,
+        "city" => $student->city,
+        "province" => $student->province,
+        "country" => $student->country,
+        "postalCode" => $student->postalCode,
+        "phoneNumber" => $student->phoneNumber,
+        "emailAddr" => $student->emailAddr,
+        "allergies" => $student->allergies,
+        "prevSchools" => $student->prevSchools,
+        "parentFirstName" => $student->parentFirstName,
+        "parentLastName" => $student->parentLastName,
+        "parentPhoneNumber" => $student->parentPhoneNumber,
+        "parentEmailAddr" => $student->parentEmailAddr,
+        "emergencyContactFirstName" => $student->emergencyContactFirstName,
+        "emergencyContactLastName" => $student->emergencyContactLastName,
+        "emergencyContactRelation" => $student->emergencyContactRelation,
+        "emergencyContactPhoneNumber" => $student->emergencyContactPhoneNumber,
+        "schoolid" => $student->schoolid,
+        "paid" => $student->paid,
+        "status" => $student->status,
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
@@ -199,17 +245,7 @@ function createStudent() {
  * Updates a student record
  */
 function deleteStudent($id) {
-    $sql = "delete from student where userid=:id";
-    try {
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("userid", $id);
-        $stmt->execute();
-        $db = null;
-        echo "success";
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
+    $sql = "DELETE from student where userid=:id";
     echo json_encode(perform_query($sql,'', array("userid"=>$id)));
 }
 
