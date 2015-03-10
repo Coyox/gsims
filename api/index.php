@@ -354,7 +354,7 @@ function findStudents(){
     $gender = $_GET['gender'];
     $paid = $_GET['paid'];
     $clause = '';
-    $bindparam = array("clause"=>$clause);
+    $bindparam = array();
     if (!(isset($firstname)||isset($lastname))){ return; }
     if (isset($firstname)) {
         $firstname = "%".$firstname."%";
@@ -363,14 +363,14 @@ function findStudents(){
         if (isset($lastname)){
             $lastname = "%".$lastname."%";
             $bindparam["lastname"] = $lastname;
-            $clause.="and lastName like :lastname";
+            $clause.=" and lastName like :lastname";
         }
     }
     else
         if (isset($lastname)){
             $lastname = "%".$lastname."%";
             $bindparam["lastname"] = $lastname;
-            $clause.="and lastName like :lastname";
+            $clause.=" and lastName like :lastname";
         }
         if (isset($day)){
             $bindparam["day"] = $day;
@@ -392,7 +392,7 @@ function findStudents(){
             $bindparam["paid"] = $paid;
             $clause.=" and paid=:paid";
         }
-    $sql = "SELECT * from student where :clause and order by firstName asc";
+    $sql = "SELECT * from student where ".$clause." order by firstName asc";
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
