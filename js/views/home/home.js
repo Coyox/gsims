@@ -60,6 +60,8 @@ var SidebarView = Backbone.View.extend({
 				app.Router.navigate("students", {trigger:true});
 				break;
 			default:
+				app.Router.navigate("");
+				$("#content").html(html["tempContent.html"]);
 				break;
 		}
 	},
