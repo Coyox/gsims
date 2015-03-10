@@ -32,7 +32,7 @@ $app->get('/sections/:id/teachers', 'getSectionTeachers');
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
-
+$app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
 
@@ -399,10 +399,124 @@ function findUsersByName($usertype){
     }
 }
 
+
+/* TODO: find by times*/
+function findSections(){
+    $schoolyear = $_GET['schoolyearid'];
+    $schoolid = $_GET['schoolid'];
+    if (!(isset($schoolyear) || (isset($schoolid)))) {
+        return;
+    }
+    $deptname = $_GET['deptName'];
+    $coursename = $_GET['courseName'];
+    $days = $_GET['days'];
+    //$times = $_GET['times'];
+    if (isset($deptname) && isset($coursename)){
+        return findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursename, $days);
+    }
+    if (isset($deptname)) {
+        return findSectionsByDept($schoolyear, $schoolid, $deptname, $days);
+    }
+    if (isset($coursename)) {
+        return findSectionsByCourse($schoolyear, $schoolid, $coursename, $days);
+    }
+    if (isset($days)){
+        return findSectionsByDay($schoolyear, $schoolid, $days);
+    }
+    return getSectionsBySchool($schoolyear, $schoolid);
+}
+
+
+function findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursename, $days=null){
+    $deptname = "%".$deptname."%";
+    $coursename = "%".$coursename."%";
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s,
+            (SELECT c.courseid from course c,
+                (SELECT deptid from department where deptName like :deptname and schoolyearid=:schoolyear and schoolid=:schoolid
+                    ) d
+                where c.coursName like :coursename and c.deptid = d.deptid and c.schoolyearid=:schoolyear
+                ) temp
+            where s.courseid = temp.courseid
+            and s.schoolyearid=:schoolyear";
+    $bindparam = array("schoolyear"->$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname, "coursename"=>$coursename);
+    if (isset($days)){
+        $days = constructDayClause($days);
+        $sql.= " and :days";
+        $bindparam["days"=$days];
+    }
+    $sql.= " order by s.sectionCode asc";
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+function findSectionsByDept($schoolyear, $schoolid, $deptname, $days=null){
+    $deptname = "%".$deptname."%";
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s,
+            (SELECT c.courseid from course c,
+                (SELECT deptid from department where deptName like :deptname and schoolyearid=:schoolyear and schoolid=:schoolid
+                    ) d
+                where c.deptid = d.deptid and c.schoolyearid=:schoolyear
+                ) temp
+            where s.courseid = temp.courseid
+            and s.schoolyearid=:schoolyear
+            order by s.sectionCode asc";
+    $bindparam = array("schoolyear"->$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname);
+    if (isset($days)){
+        $days = constructDayClause($days);
+        $sql.= " and :days";
+        $bindparam["days"=$days];
+    }
+    $sql.= " order by s.sectionCode asc";
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+function findSectionsByCourse($schoolyear, $schoolid, $coursename, $days=null){
+    $coursename = "%".$coursename."%";
+    $days = constructDayClause($days);
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s,
+            (SELECT c.courseid from course c, department d
+                where c.courseName like :coursename
+                and c.schoolyearid=:schoolyear
+                and c.deptid = d.deptid
+                and d.schoolid = :schoolid
+            ) temp
+            where s.schoolyearid=:schoolyear and s.courseid = temp.courseid";
+    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "coursename"=>$coursename, "days"=>$days);
+    if (isset($days)){
+        $days = constructDayClause($days);
+        $sql.= " and :days";
+        $bindparam["days"=$days];
+    }
+    $sql.= " order by s.sectionCode asc";
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+function findSectionsByDay($schoolyear, $schoolid, $days){
+    $days = constructDayClause($days);
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s,
+            (select courseid from course c1,
+                (select deptid from department where schoolid=:schoolid and schoolyearid=:schoolyear) d
+                where d.deptid = c1.deptid and c1.schoolyearid=:schoolyear) c
+            where s.courseid = c.courseid and s.schoolyearid=:schoolyear and :days orderby s.sectionCode asc";
+    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "days"=>$days);
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+
+
+
+
+
+
+
+
+
+
 #================================================================================================================#
 # Helpers
 #================================================================================================================#
-
 /*
 * wrapper to perform sql queries
 */
@@ -435,7 +549,6 @@ function perform_query($sql, $querytype, $bindparams=array()) {
     }
 }
 
-
 /*
  * TODO: put the credentials in a separate config file
  */
@@ -449,4 +562,15 @@ function getConnection() {
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
+}
+
+function constructDayClause($days){
+    $clause= " FIELD(`day`, \"";
+    $days = explode(',', $days);
+    foreach($days as $day) {
+        $clause.= $day.",";
+    }
+    $clause = rtrim($clause, ",");
+    $clause.= "\")";
+    return $clause;
 }
