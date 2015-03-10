@@ -23,7 +23,8 @@ function loadTemplates() {
 		"sidebar.html",
 		"header.html",
 		"breadcrumb.html",
-		"footer.html"
+		"footer.html",
+		"email.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -104,10 +105,12 @@ var Router = Backbone.Router.extend({
     	}
 		$("#content").html(html["viewStudent.html"]);
 
+		var parent = $("#student-content");
 		new StudentRecordView({
 			id: id,
 			el: $("#student-info"),
-			action: "view"
+			action: "view",
+			parentContainer: parent
 		});
     }
 });

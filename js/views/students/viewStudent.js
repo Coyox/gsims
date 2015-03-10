@@ -2,6 +2,7 @@ var StudentRecordView = Backbone.View.extend({
 	initialize: function(options) {
 		this.action = options.action;
 		this.id = options.id;
+		this.parentContainer = options.parentContainer;
 		this.render();
 	},
 
@@ -9,23 +10,8 @@ var StudentRecordView = Backbone.View.extend({
 		var view = this;
 
 		new Student({id: this.id}).fetch().then(function(data) {
-			var model = new Student(data, {parse:true});
-			view.model = model;
-			_.each(data, function(value, attr) {
-				if (view.model.nonEditable.indexOf(attr) > -1) {
-					// ignore these attributes
-				} else if (view.action == "edit" && attr == "id") {
-					// don't allow editing of ids
-				} else {
-					new StudentRecordRowView({
-						el: view.addRow(model, attr),
-						action: view.action,
-						name: attr,
-						value: value,
-						model: model
-					});
-				}
-			});
+			view.studentInformationTab(data);
+			view.emailTab(data);
 
 			// if (view.action == "edit") {
 			// 	view.addRow("#student-record-table tbody");
@@ -35,7 +21,8 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #save-student": "saveStudent"
+		"click #save-student": "saveStudent",
+		"click .delete-student": "deleteStudent"
 	},
 
 	addRow: function(model, attr) {
@@ -60,6 +47,41 @@ var StudentRecordView = Backbone.View.extend({
 			new TransactionResponseView({
 				message: "Record successfully saved. Click the refresh button on the table to see your changes (or just refresh the page)."
 			});
+		});
+	},
+
+	deleteStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new DeleteRecordView({
+			id: id,
+			el: $("#delete-container")
+		});	
+	},
+
+	studentInformationTab: function(data) {
+		var model = new Student(data, {parse:true});
+		this.model = model;
+		_.each(data, function(value, attr) {
+			if (this.model.nonEditable.indexOf(attr) > -1) {
+				// ignore these attributes
+			} else if (this.action == "edit" && attr == "id") {
+				// don't allow editing of ids
+			} else {
+				new StudentRecordRowView({
+					el: this.addRow(model, attr),
+					action: this.action,
+					name: attr,
+					value: value,
+					model: model
+				});
+			}
+		}, this);
+	},
+
+	emailTab: function(data) {
+		new EmailView({
+			el: $("#email"),
+			emailAddr: data.emailAddr
 		});
 	}
 });

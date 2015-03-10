@@ -8,6 +8,14 @@ var School = Backbone.Model.extend({
     urlRoot: "http://gobind-sarvar.rhcloud.com/api/schools",
 });
 
+var SchoolYear = Backbone.Model.extend({
+	defaults: {
+		schoolyearid: "",
+		schoolyear: ""
+	},
+	urlRoot: "http://gobind-sarvar.rhcloud.com/api/schoolyears"
+});
+
 var Dept = Backbone.Model.extend({
 	defaults: {
 		schoolid: "",

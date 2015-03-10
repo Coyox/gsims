@@ -242,3 +242,11 @@ a {
 #student-tabs {
 	height: 50px;
 }
+
+.dataTables_wrapper {
+	overflow: hidden;
+}
+
+#email-message {
+	height: 240px;
+}

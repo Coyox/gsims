@@ -18,7 +18,9 @@ var FetchStudentsView = Backbone.View.extend({
 					el: view.addRow(".results")
 				});
 			});
-			view.$el.find("table").dataTable();
+			view.$el.find("table").dataTable({
+
+			});
 		});
 	},
 
@@ -38,11 +40,11 @@ var FetchStudentsView = Backbone.View.extend({
 });
 
 var StudentTableRowView = Backbone.View.extend({
-	template: _.template("<td><a class='view-student' id='<%= model.userid %>'>[ view ]</a></td>"
-		+	"<td><%= model.userid %></td>"
+	template: _.template("<td><%= model.userid %></td>"
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+	"<td><%= model.emailAddr %></td>"),
+		+	"<td><%= model.emailAddr %></td>"
+		+   "<td><button class='view-student btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Student</button></td>"),
 
 	initialize: function(options) {
 		this.render();

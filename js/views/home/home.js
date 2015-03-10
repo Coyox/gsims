@@ -31,6 +31,8 @@ var SidebarView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["sidebar.html"]);
+		this.populateSchoolMenu();
+		this.populateSchoolYearMenu();
 	},
 
 	events: {
@@ -60,6 +62,32 @@ var SidebarView = Backbone.View.extend({
 			default:
 				break;
 		}
+	},
+
+	populateSchoolMenu: function() {
+		var select = this.$el.find("#school-options");
+		new School().fetch().then(function(data) {
+			_.each(data, function(object, index) {
+				var option = $("<option></option>");
+				option.attr("id", object.schoolid);
+				option.attr("value", object.location);
+				option.text(object.location);
+				select.append(option);
+			});
+		});
+	},
+
+	populateSchoolYearMenu: function() {
+		var select = this.$el.find("#school-year-options");
+		new SchoolYear().fetch().then(function(data) {
+			_.each(data, function(object, index) {
+				var option = $("<option></option>");
+				option.attr("id", object.schoolyearid);
+				option.attr("value", object.schoolyear);
+				option.text(object.schoolyear);
+				select.append(option);
+			});
+		});
 	}
 });
 
