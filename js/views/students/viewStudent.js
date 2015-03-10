@@ -10,8 +10,10 @@ var StudentRecordView = Backbone.View.extend({
 		var view = this;
 
 		new Student({id: this.id}).fetch().then(function(data) {
-			view.studentInformationTab(data);
+			var model = new Student(data, {parse:true});
+			view.studentInformationTab(data, model);
 			view.emailTab(data);
+			view.coursesTab(data, model);
 
 			// if (view.action == "edit") {
 			// 	view.addRow("#student-record-table tbody");
@@ -58,8 +60,7 @@ var StudentRecordView = Backbone.View.extend({
 		});	
 	},
 
-	studentInformationTab: function(data) {
-		var model = new Student(data, {parse:true});
+	studentInformationTab: function(data, model) {
 		this.model = model;
 		_.each(data, function(value, attr) {
 			if (this.model.nonEditable.indexOf(attr) > -1) {
@@ -82,6 +83,13 @@ var StudentRecordView = Backbone.View.extend({
 		new EmailView({
 			el: $("#email"),
 			emailAddr: data.emailAddr
+		});
+	},
+
+	coursesTab: function(data, model) {
+		new EnrolledSectionsView({
+			el: $("#course-info"),
+			model: model
 		});
 	}
 });
@@ -132,5 +140,83 @@ var StudentRecordRowView = Backbone.View.extend({
 			return str.slice(18);
 		}
 		return str;
+	}
+});
+
+var EnrolledSectionsView = Backbone.View.extend({
+	initialize: function(options) {
+		this.render();
+	},
+
+	render: function() {
+		console.log("render");
+		this.$el.html(html["enrolledSections.html"]);
+
+		var view = this;
+		var id = this.model.get("userid");
+		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
+			console.log(data);
+			_.each(data, function(object, index) {
+				var section = new Section(object, {parse:true});
+				console.log(section);
+				new EnrolledSectionsRowView({
+					el: view.addRow(),
+					model: section
+				});
+			});
+		});
+	},
+
+	addRow: function() {
+        var container = $("<tr></tr>");
+        this.$el.find("#enrolled-sections-table .results").first().append(container);
+        return container;
+	}
+});
+
+var EnrolledSectionsRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.courseName %></td>"
+		+	"<td><%= model.sectionCode %></td>"
+		+	"<td><%= model.day %></td>"
+		+	"<td><%= model.startTime %></td>"
+		+	"<td><%= model.endTime %></td>"
+		+   "<td><button class='view-section btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Section</button></td>"),
+
+	initialize: function(options) {
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	events: {
+		"click .view-student": "viewStudent",
+		"click .edit-student": "editStudent",
+		"click .delete-student": "deleteStudent"
+	},
+
+	viewStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		app.Router.navigate("students/" + id, {trigger:true});
+	},
+
+	editStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new StudentRecordView({
+			id: id,
+			el: $("#update-container"),
+			action: "edit"
+		});		
+	},
+
+	deleteStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new DeleteRecordView({
+			id: id,
+			el: $("#delete-container")
+		});		
 	}
 });

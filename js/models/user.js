@@ -1,10 +1,6 @@
 var Student = Backbone.Model.extend({
     urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
 
-	initialize: function(options) {
-		this.enrolledSectionsUrl = this.urlRoot + "/" + this.id + "/sections";
-	}, 
-
 	defaults: {
 		userid: "",
 		firstName: "",
@@ -64,7 +60,11 @@ var Student = Backbone.Model.extend({
    	/** Emergency contact properties */
    	emergencyProperties: [
    		"emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation", "emergencyContactPhoneNumber"
-   	]
+   	],
+
+   	getEnrolledSectionsUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/sections";
+   	}
 });
 
 var Teacher = Backbone.Model.extend({
