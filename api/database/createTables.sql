@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `student` (
   `emergencyContactFirstName` varchar(50) NOT NULL,
   `emergencyContactLastName` varchar(50) NOT NULL,
   `emergencyContactRelation` varchar(15) NOT NULL,
-  `emergencyContactPhoneNumber` varchar(11) NOT NULL,
+  `emergencyContactPhoneNumber` char(11) NOT NULL,
   `schoolid` int(11) NOT NULL,
   `paid` tinyint(1) NOT NULL default '0',
   `status` char(15) NOT NULL,
