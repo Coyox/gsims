@@ -43,7 +43,7 @@ $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/:usertype', 'findUsersByName');
-$app->get('/search/student', 'findStudents');
+$app->get('/search/students', 'findStudents');
 $app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
@@ -62,7 +62,7 @@ function validateCredentials() {
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT schoolyearid, schoolyear from schoolyear order by schoolyear asc";
+    $sql = "SELECT schoolyearid, schoolyear from schoolyear order by schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL'));
 }
 
@@ -380,6 +380,7 @@ function findStudents(){
         if (isset($paid)){
             $clause.=" and paid=".$paid;
         }
+    echo $clause;
     $sql = "SELECT * from student where :clause and order by firstName asc";
     $bindparam = array("clause"=>$clause);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));

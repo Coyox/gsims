@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `section` (
   `sectionid` int(11) PRIMARY KEY NOT NULL,
   `courseid` int(11)  NOT NULL,
   `sectionCode` varchar(50) NOT NULL,
-  `day` enum('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
+  `day` set('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
   `startTime` time NOT NULL,
   `endTime` time NOT NULL,
   `roomCapacity` smallint(5) NOT NULL,
