@@ -439,7 +439,7 @@ function findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursen
                 ) temp
             where s.courseid = temp.courseid
             and s.schoolyearid=:schoolyear";
-    $bindparam = array("schoolyear"->$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname, "coursename"=>$coursename);
+    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname, "coursename"=>$coursename);
     if (isset($days)){
         $days = constructDayClause($days);
         $sql.= " and :days";
@@ -461,7 +461,7 @@ function findSectionsByDept($schoolyear, $schoolid, $deptname, $days=null){
             where s.courseid = temp.courseid
             and s.schoolyearid=:schoolyear
             order by s.sectionCode asc";
-    $bindparam = array("schoolyear"->$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname);
+    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname);
     if (isset($days)){
         $days = constructDayClause($days);
         $sql.= " and :days";
@@ -504,12 +504,6 @@ function findSectionsByDay($schoolyear, $schoolid, $days){
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "days"=>$days);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
-
-
-
-
-
-
 
 
 
