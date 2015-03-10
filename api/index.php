@@ -353,36 +353,48 @@ function findStudents(){
     $year = $_GET['year'];
     $gender = $_GET['gender'];
     $paid = $_GET['paid'];
+    $bindparam = array();
     $clause = '';
     if (!(isset($firstname)||isset($lastname))){ return; }
     if (isset($firstname)) {
-        $clause.="firstName like \"%".$firstname."%\"";
+        $firstname = "%".$firstname."%";
+        $bindparam["firstname"] = $firstname;
+        $clause.="firstName like :firstname";
         if (isset($lastname)){
-            $clause.="and lastName like \"%".$lastname."%\"";
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.="and lastName like :lastname";
         }
     }
     else
         if (isset($lastname)){
-            $clause.="lastName like \"%".$lastname."%\"";
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.="and lastName like :lastname";
         }
         if (isset($day)){
-            $clause.=" and day(dateOfBirth)=".$day;
+            $bindparam["day"] = $day;
+            $clause.=" and day(dateOfBirth)=:day";
         }
         if (isset($month)){
-            $clause.=" and month(dateOfBirth)=".$month;
+            $bindparam["month"] = $month;
+            $clause.=" and month(dateOfBirth)=:month";
         }
         if (isset($year)){
-            $clause.=" and year(dateOfBirth)=".$year;
+            $bindparam["year"] = $year;
+            $clause.=" and year(dateOfBirth)=:year";
         }
         if (isset($gender)){
-            $clause.=" and gender=".$gender;
+            $bindparam["gender"] = $gender;
+            $clause.=" and gender=:gender";
         }
         if (isset($paid)){
-            $clause.=" and paid=".$paid;
+            $bindparam["paid"] = $paid;
+            $clause.=" and paid=:paid";
         }
     echo $clause;
     $sql = "SELECT * from student where :clause and order by firstName asc";
-    $bindparam = array("clause"=>$clause);
+    $bindparam["clause"]=$clause;
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
