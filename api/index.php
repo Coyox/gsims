@@ -62,7 +62,7 @@ function validateCredentials() {
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT schoolyearid, schoolyear from schoolyear";
+    $sql = "SELECT schoolyearid, schoolyear from schoolyear order by schoolyear asc";
     echo json_encode(perform_query($sql,'GETALL'));
 }
 
@@ -135,7 +135,7 @@ function getSections(){
     }
 }
 function getSectionsBySchool($schoolyear, $schoolid){
-    $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
@@ -147,14 +147,14 @@ function getSectionsBySchool($schoolyear, $schoolid){
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionsByCourse($schoolyear, $courseid){
-    $sql = "SELECT s.sectionid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
      from section s where s.schoolyearid =:schoolyear and s.courseid=:courseid
      order by s.sectionCode asc";
     $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionById($id){
-    $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c
             where s.sectionid=:id and s.courseid=c.courseid";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
@@ -480,7 +480,7 @@ function findSections(){
 function findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursename, $days=null){
     $deptname = "%".$deptname."%";
     $coursename = "%".$coursename."%";
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
@@ -498,7 +498,7 @@ function findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursen
 
 function findSectionsByDept($schoolyear, $schoolid, $deptname, $days=null){
     $deptname = "%".$deptname."%";
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
@@ -517,7 +517,7 @@ function findSectionsByDept($schoolyear, $schoolid, $deptname, $days=null){
 function findSectionsByCourse($schoolyear, $schoolid, $coursename, $days=null){
     $coursename = "%".$coursename."%";
     $days = constructDayClause($days);
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s where s.courseid in (SELECT c.courseid from course c, department d
                 where c.courseName like :coursename
                 and c.schoolyearid=:schoolyear
@@ -537,7 +537,7 @@ function findSectionsByCourse($schoolyear, $schoolid, $coursename, $days=null){
 
 function findSectionsByDay($schoolyear, $schoolid, $days){
     $days = constructDayClause($days);
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
