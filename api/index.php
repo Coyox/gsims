@@ -8,6 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
+$app->get('/students/:id/attendance', 'getStudentAttendance');
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
@@ -18,12 +19,15 @@ $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 
+$app->get('/schoolyears', 'getSchoolYears');
+
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
+$app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
@@ -43,14 +47,17 @@ $app->run();
 # Login
 #================================================================================================================#
 function validateCredentials() {
-    $sql = "select * from login where username=:username and password=:password";
+    $sql = "SELECT userid, username, password, usertype, lastLogin from login where username=:username and password=:password";
     $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 }
-
 #================================================================================================================#
 # Schools, Departments, Courses, Sections
 #================================================================================================================#
+function getSchoolYears(){
+    $sql = "SELECT schoolyearid, schoolyear from schoolyear";
+    echo json_encode(perform_query($sql,'GETALL'));
+}
 function getSchools() {
     $sql = "SELECT schoolid, location, postalCode, yearOpened, status from school order by location asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
@@ -68,7 +75,6 @@ function getDepartments($id){
     $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
-
 function getDepartmentById($id) {
     $sql = "SELECT deptName, schoolyearid, status from department where deptid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
@@ -150,6 +156,10 @@ function getCourseTeachers($id){
             FROM teacher t1 and teaching t2
             where t2.courseid = :id
             and t2.teacherid = t1.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+function getCoursePrereqs($id){
+    $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
