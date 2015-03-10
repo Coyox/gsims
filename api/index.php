@@ -109,7 +109,7 @@ function getCourseById($id){
 }
 function getCourseTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
-            FROM teacher t1 and teaching t2
+            FROM teacher t1, teaching t2
             where t2.courseid = :id
             and t2.teacherid = t1.userid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
@@ -136,7 +136,7 @@ function getSections(){
 }
 function getSectionsBySchool($schoolyear, $schoolid){
     $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s and course c1
+            from section s, course c1
             where s.courseid = (select c.courseid from course c
                 where c.deptid = (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
                 and c.schoolyearid=:schoolyear)
@@ -155,7 +155,7 @@ function getSectionsByCourse($schoolyear, $courseid){
 }
 function getSectionById($id){
     $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s and course c
+            from section s, course c
             where s.sectionid=:id and s.courseid=c.courseid";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
