@@ -34,10 +34,15 @@ var SidebarView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .sidebar-link": "updateBreadcrumb"
+		"click .sidebar-link": "updateBreadcrumb",
+		"click .sidebar-link": "loadPage"
 	},
 
 	updateBreadcrumb: function(evt) {
+
+	},
+
+	loadPage: function(evt) {
 		// Update the breadcrumb with the current sidebar link
 		var link = $(evt.currentTarget).html();
 		$("#breadcrumb-text").html(link);
@@ -46,6 +51,15 @@ var SidebarView = Backbone.View.extend({
 
 		var li = $(evt.currentTarget).closest("li");
 		li.addClass("active");
+
+		var link = $(evt.currentTarget).data("link");
+		switch (link) {
+			case "students":
+				app.Router.navigate("students", {trigger:true});
+				break;
+			default:
+				break;
+		}
 	}
 });
 

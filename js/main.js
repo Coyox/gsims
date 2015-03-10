@@ -14,7 +14,7 @@ function loadTemplates() {
 	var promises = [];
 	var templates = [
 		"viewStudents.html",
-		"studentRecord.html",
+		"viewStudent.html",
 		"createStudent.html",
 		"confirmationModal.html",
 		"transactionResponse.html",
@@ -62,6 +62,8 @@ var Router = Backbone.Router.extend({
         "":             	"login",
         "forgotPassword": 	"forgotPassword",
         "home": 	    	"home",
+        "students": 		"students",
+        "students/:id": 	"viewStudent"
     },
 
     login: function() {
@@ -83,6 +85,30 @@ var Router = Backbone.Router.extend({
     	new ForgotPasswordView({
     		el: this.el
     	});
+    },
+
+    students: function() {
+    	console.log("Students list view");
+      	if ($("#container").html() == "") {
+    		this.home();
+    	}
+	   	new FetchStudentsView({
+			el: $("#content")
+		});
+    },
+
+    viewStudent: function(id) {
+    	console.log("View students view");
+    	if ($("#container").html() == "") {
+    		this.home();
+    	}
+		$("#content").html(html["viewStudent.html"]);
+
+		new StudentRecordView({
+			id: id,
+			el: $("#student-info"),
+			action: "view"
+		});
     }
 });
 

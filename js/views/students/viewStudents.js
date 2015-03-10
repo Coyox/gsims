@@ -37,18 +37,18 @@ var FetchStudentsView = Backbone.View.extend({
 });
 
 var StudentTableRowView = Backbone.View.extend({
-	template: _.template("<td><a class='view-student' id='<%= model.id %>'>[ view ]</a></td>"
-		+	"<td><a class='edit-student' id='<%= model.id %>'>[ edit ]</a></td>"
-		+	"<td><a class='delete-student' id='<%= model.id %>'>[ delete ]</a></td>"
-		+	"<td><%= model.id %></td>"
+	template: _.template("<td><a class='view-student' id='<%= model.userid %>'>[ view ]</a></td>"
+		+	"<td><%= model.userid %></td>"
 		+	"<td><%= model.firstName %></td>"
-		+	"<td><%= model.lastName %></td>"),
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= model.emailAddr %></td>"),
 
 	initialize: function(options) {
 		this.render();
 	},
 
 	render: function() {
+		console.log(this.model.toJSON());
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
@@ -62,11 +62,9 @@ var StudentTableRowView = Backbone.View.extend({
 
 	viewStudent: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
-		new StudentRecordView({
-			id: id,
-			el: $("#student-container"),
-			action: "view"
-		});
+		console.log(id);
+		console.log("students/" + id);
+		app.Router.navigate("students/" + id, {trigger:true});
 	},
 
 	editStudent: function(evt) {

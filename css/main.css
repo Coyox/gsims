@@ -4,6 +4,7 @@ html, body {
 	min-height: 100%;
 	position: relative;
 	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 12px;
 }
 
 #container {
@@ -197,8 +198,6 @@ a {
 	text-align: center;
 	line-height: 30px;
 	height: 30px;
-	position: absolute;
-	bottom: 0;
 	width: 100%;
 	border-top: 1px dotted #9d426b;
 	font-weight: bold;
@@ -228,4 +227,14 @@ a {
 .btn:hover {
 	background-color: #B0507B;
 	border-color: #B0507B;
+}
+
+.property-table td:first-child {
+	font-weight: bold;
+	background-color: #f9f9f9;
+	width: 200px;
+}
+
+#student-tabs {
+	height: 50px;
 }

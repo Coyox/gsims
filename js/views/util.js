@@ -19,3 +19,11 @@ var TransactionResponseView = Backbone.View.extend({
 		});
 	}
 });
+
+function capitalize(str) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function splitChars(str) {
+	return str.replace(/([a-z])([A-Z])/g, '$1 $2');
+}

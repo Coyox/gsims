@@ -1,10 +1,15 @@
 var Student = Backbone.Model.extend({
+    urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
+
+	initialize: function(options) {
+		this.enrolledSectionsUrl = this.urlRoot + "/" + this.id + "/sections";
+	}, 
+
 	defaults: {
 		userid: "",
 		firstName: "",
 		lastName: "",
 		dateOfBirth: "",
-		gender: "",
 		streetAddr1: "",
 		streetAddr2: "",
 		city: "",
@@ -13,22 +18,53 @@ var Student = Backbone.Model.extend({
 		postalCode: "",
 		phoneNumber: "",
 		emailAddr: "",
-		allergies: "",
-		prevSchools: "",
+		gender: "",
+		allergies: false,
+		prevAttendedGS: false,
 		parentFirstName: "",
 		parentLastName: "",
 		parentPhoneNumber: "",
 		parentEmailAddr: "",
-		emergencyFirstName: "",
-		emergencytLastName: "",
+		emergencyContactFirstName: "",
+		emergencyContactLastName: "",
 		emergencyContactRelation: "",
 		emergencyContactPhoneNumber: "",
+		paid: false,
 		schoolid: "",
-		paid: "",
 		status: "",
 		lastAccessed: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
+
+    /** We will assume that a field is required unless otherwise stated below */
+    required: [
+    	"allergies", "prevAttendedGS", "streetAddr2"
+    ],
+
+    /** We will assume that a field is required unless otherwise stated below */
+   	nonEditable: [
+   		"paid", "schoolid", "status", "lastAccessed", "userid"
+   	],
+
+   	/** Student info properties */
+   	studentProperties: [
+   		"firstName", "lastName", "dateOfBirth", "phoneNumber", "emailAddr", "allergies", 
+   		"gender", "prevAttendedGS", "paid", "schoolid", "status", "lastAccessed"
+   	],
+
+   	/** Address properties */
+   	addressProperties: [
+   		"streetAddr1", "streetAddr2", "city", "province", "postalCode", "country"
+   	],
+
+   	/** Parent info properties */
+   	parentProperties: [
+   		"parentFirstName", "parentLastName", "parentPhoneNumber", "parentEmailAddr"
+   	],
+
+   	/** Emergency contact properties */
+   	emergencyProperties: [
+   		"emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation", "emergencyContactPhoneNumber"
+   	]
 });
 
 var Teacher = Backbone.Model.extend({
