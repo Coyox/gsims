@@ -1,5 +1,5 @@
 var Student = Backbone.Model.extend({
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/students",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/students",
 
 	defaults: {
 		userid: "",
@@ -75,7 +75,7 @@ var Teacher = Backbone.Model.extend({
 		status: "",
 		usertype: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/teachers",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/teachers",
 });
 
 var Superuser = Backbone.Model.extend({
@@ -83,12 +83,12 @@ var Superuser = Backbone.Model.extend({
 		emailAddr: "",
 		status: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/superusers",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/superusers",
 });
 
 var User = Backbone.Model.extend({
 	defaults: {
 	},
 
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/login",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
 });

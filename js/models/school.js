@@ -5,7 +5,7 @@ var School = Backbone.Model.extend({
 		yearOpened: "",
 		status: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/schools",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/schools",
 });
 
 var SchoolYear = Backbone.Model.extend({
@@ -13,7 +13,7 @@ var SchoolYear = Backbone.Model.extend({
 		schoolyearid: "",
 		schoolyear: ""
 	},
-	urlRoot: "http://gobind-sarvar.rhcloud.com/api/schoolyears"
+	urlRoot: "https://gobind-sarvar.rhcloud.com/api/schoolyears"
 });
 
 var Dept = Backbone.Model.extend({
@@ -23,7 +23,7 @@ var Dept = Backbone.Model.extend({
 		schoolyearid: "",
 		status: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/departments",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/departments",
 });
 
 var Course = Backbone.Model.extend({
@@ -34,7 +34,7 @@ var Course = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/courses",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/courses",
 });
 
 var Section = Backbone.Model.extend({
@@ -49,5 +49,5 @@ var Section = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    urlRoot: "http://gobind-sarvar.rhcloud.com/api/sections",
+    urlRoot: "https://gobind-sarvar.rhcloud.com/api/sections",
 });
