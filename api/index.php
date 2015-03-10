@@ -24,16 +24,21 @@ $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/departments', 'getDepartments');
+
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
+
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
+
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
+$app->delete('/sections/:id/:sid', 'dropStudent');
+$app->post('/sections/:id/:sid', 'enrollStudent');
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
@@ -52,12 +57,16 @@ function validateCredentials() {
     echo json_encode(perform_query($sql, 'GET', $bindparam));
 }
 #================================================================================================================#
-# Schools, Departments, Courses, Sections
+# School Years
 #================================================================================================================#
 function getSchoolYears(){
     $sql = "SELECT schoolyearid, schoolyear from schoolyear";
     echo json_encode(perform_query($sql,'GETALL'));
 }
+
+#================================================================================================================#
+# Schools
+#================================================================================================================#
 function getSchools() {
     $sql = "SELECT schoolid, location, postalCode, yearOpened, status from school order by location asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
@@ -66,38 +75,55 @@ function getSchoolById($id) {
     $sql = "SELECT location, postalCode, yearOpened, status from school where schoolid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
+/* Get all departments for a school */
 function getDepartments($id){
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) {
-        return;
-    }
+    if (!isset($schoolyear)) { return; }
     $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
     $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
+#================================================================================================================#
+# Departments
+#================================================================================================================#
 function getDepartmentById($id) {
     $sql = "SELECT deptName, schoolyearid, status from department where deptid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
+/* Get all courses for a department */
 function getCourses($id){
     $schoolyear = $_GET['schoolyearid'];
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) {
-        return;
-    }
+    if (!isset($schoolyear)) { return; }
     $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by deptName asc";
     $bindparam = array("deptid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
+#================================================================================================================#
+# Courses
+#================================================================================================================#
 function getCourseById($id){
     $sql = "SELECT courseName, schoolyearid, description, status from course where courseid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
+function getCourseTeachers($id){
+    $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
+            FROM teacher t1 and teaching t2
+            where t2.courseid = :id
+            and t2.teacherid = t1.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+function getCoursePrereqs($id){
+    $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+
+#================================================================================================================#
+# Sections
+#================================================================================================================#
 function getSections(){
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) {
-        return;
-    }
+    if (!isset($schoolyear)) { return; }
     $courseid = $_GET['courseid'];
     $schoolid = $_GET['schoolid'];
     if (isset($schoolid)) {
@@ -151,17 +177,24 @@ function getSectionTeachers($id){
             and t2.teacherid = t1.userid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
-function getCourseTeachers($id){
-    $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
-            FROM teacher t1 and teaching t2
-            where t2.courseid = :id
-            and t2.teacherid = t1.userid";
-    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+function dropStudent($id, $sid){
+    $sql = "DELETE from enrollment where sectionid=:id, userid=:sid";
+    echo json_encode(perform_query($sql,'', array("id"=>$id, "sid"=>$sid)));
 }
-function getCoursePrereqs($id){
-    $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
-    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+function enrollStudent($id, $sid){
+    $schoolyearid = $_POST['schoolyearid'];
+    if (!issert($schoolyearid)) { return ; }
+    $sql = "INSERT into student (userid, sectionid, schoolyearid, status)
+            values (:userid, :sectionid, :schoolyearid, :status )";
+    $bindparams = array(
+        "userid" => $sid,
+        "userid" => $id,
+        "schoolyearid" => $schoolyearid,
+        "status" => "active",
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
+
 
 #================================================================================================================#
 # Students
@@ -320,10 +353,7 @@ function findStudents(){
     $gender = $_GET['gender'];
     $paid = $_GET['paid'];
     $clause = '';
-    if (!(isset($firstname)||isset($lastname))){
-        echo 'must provide either first or last name';
-        return;
-    }
+    if (!(isset($firstname)||isset($lastname))){ return; }
     if (isset($firstname)) {
         $clause.="firstName like \"%".$firstname."%\"";
         if (isset($lastname)){
@@ -425,9 +455,7 @@ function findUsersByName($usertype){
 function findSections(){
     $schoolyear = $_GET['schoolyearid'];
     $schoolid = $_GET['schoolid'];
-    if (!(isset($schoolyear) || (isset($schoolid)))) {
-        return;
-    }
+    if (!(isset($schoolyear) || (isset($schoolid)))) { return; }
     $deptname = $_GET['deptName'];
     $coursename = $_GET['courseName'];
     $days = $_GET['days'];
