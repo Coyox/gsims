@@ -309,7 +309,7 @@ function getTeachers() {
 }
 function getTeacherById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' and userid=:id";
-    echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
+    echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 #================================================================================================================#
 # Administrators
