@@ -24,7 +24,8 @@ function loadTemplates() {
 		"header.html",
 		"breadcrumb.html",
 		"footer.html",
-		"email.html"
+		"email.html",
+		"enrolledSections.html"
 	];
 
 	$.each(templates, function(i, name) {
