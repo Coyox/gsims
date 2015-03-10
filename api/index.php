@@ -353,8 +353,8 @@ function findStudents(){
     $year = $_GET['year'];
     $gender = $_GET['gender'];
     $paid = $_GET['paid'];
-    $bindparam = array();
     $clause = '';
+    $bindparam = array("clause"=>$clause);
     if (!(isset($firstname)||isset($lastname))){ return; }
     if (isset($firstname)) {
         $firstname = "%".$firstname."%";
@@ -392,9 +392,7 @@ function findStudents(){
             $bindparam["paid"] = $paid;
             $clause.=" and paid=:paid";
         }
-    echo $clause;
     $sql = "SELECT * from student where :clause and order by firstName asc";
-    $bindparam["clause"]=$clause;
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
