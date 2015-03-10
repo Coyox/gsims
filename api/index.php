@@ -225,8 +225,10 @@ function getStudentById($id) {
 }
 
 function getEnrolledSections($id){
-    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
-    FROM section s WHERE s.sectionid =(SELECT e.sectionid from enrollment e where e.userid=:id)";
+    $sql = "SELECT s.sectionid, s.courseid, temp.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
+    FROM section s, (SELECT c.courseid, c.courseName from course c where s.courseid=) as temp
+    WHERE s.sectionid =(SELECT e.sectionid from enrollment e where e.userid=:id)
+    AND s.courseid = temp.courseid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
@@ -297,7 +299,7 @@ function createStudent() {
  */
 function deleteStudent($id) {
     $sql = "DELETE from student where userid=:id";
-    echo json_encode(perform_query($sql,'', array("userid"=>$id)));
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
 #================================================================================================================#
@@ -320,7 +322,7 @@ function getAdministrators() {
 }
 function getAdministratorById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and userid=:id";
-    echo json_encode(perform_query($sql,'GET', array("userid"=>$id)));
+    echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
 #================================================================================================================#
