@@ -121,6 +121,10 @@ a {
 	overflow: auto;
 }
 
+#content {
+	overflow: auto;
+}
+
 #main-content {
 	overflow: auto;
 	width: 100%;

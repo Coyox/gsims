@@ -8,7 +8,7 @@ var FetchStudentsView = Backbone.View.extend({
 
 		this.$el.html(html["viewStudents.html"]);
 
-		this.$el.find("table").before("<button class='btn btn-primary' id='refresh'>Refresh Table</button><br><br>");
+		//this.$el.find("table").before("<button class='btn btn-primary' id='refresh'>Refresh Table</button><br><br>");
 
 		new Student().fetch().then(function(data) {
 			_.each(data, function(object, index) {
@@ -18,6 +18,7 @@ var FetchStudentsView = Backbone.View.extend({
 					el: view.addRow(".results")
 				});
 			});
+			view.$el.find("table").dataTable();
 		});
 	},
 
@@ -48,7 +49,6 @@ var StudentTableRowView = Backbone.View.extend({
 	},
 
 	render: function() {
-		console.log(this.model.toJSON());
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
@@ -62,8 +62,6 @@ var StudentTableRowView = Backbone.View.extend({
 
 	viewStudent: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
-		console.log(id);
-		console.log("students/" + id);
 		app.Router.navigate("students/" + id, {trigger:true});
 	},
 
