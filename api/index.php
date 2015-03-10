@@ -7,6 +7,7 @@ $app = new \Slim\Slim();
 
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
+$app->get('/students/:id/sections', 'getEnrolledSections');
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
@@ -177,6 +178,16 @@ function getStudentById($id) {
     emergencyContactPhoneNumber, schoolid, paid, status
     from student where userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
+}
+
+function getEnrolledSections($id){
+    $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
+    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, parentFirstName, s.parentLastName,
+    s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
+    s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
+    FROM student s and (SELECT userid from enrollment where userid=:id) e
+    where e.userid = s.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
 /*
