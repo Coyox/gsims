@@ -111,7 +111,7 @@ function getCourseTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
             FROM teacher t1, teaching t2
             where t2.courseid = :id
-            and t2.teacherid = t1.userid";
+            and t2.userid = t1.userid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function getCoursePrereqs($id){
@@ -177,7 +177,7 @@ function getStudentsEnrolled($id){
 function getSectionTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
             FROM teacher t1
-            where t1.userid in (SELECT t2.teacherid from teaching t2 where t2.sectionid=:id)";
+            where t1.userid in (SELECT t2.userid from teaching t2 where t2.sectionid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function dropStudent($id, $sid){
