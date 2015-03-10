@@ -31,6 +31,7 @@ $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
+//$app->post('/courses/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
@@ -39,6 +40,7 @@ $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->delete('/sections/:id/:sid', 'dropStudent');
 $app->post('/sections/:id/:sid', 'enrollStudent');
+//$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
@@ -163,7 +165,7 @@ function getStudentCount($id){
 }
 function getStudentsEnrolled($id){
     $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
-    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, parentFirstName, s.parentLastName,
+    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
             FROM student s and (SELECT userid from enrollment where sectionid=:id) e
@@ -225,7 +227,7 @@ function getStudentById($id) {
 
 function getEnrolledSections($id){
     $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
-    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, parentFirstName, s.parentLastName,
+    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
     FROM student s and (SELECT userid from enrollment where userid=:id) e
