@@ -23,10 +23,11 @@ $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
+$app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
-$app->get('/sections/:id/enrolled', 'getStudentsEnrolled');
-
+$app->get('/sections/:id/count', 'getStudentCount');
+$app->get('/sections/:id/teachers', 'getSectionTeachers');
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
@@ -120,11 +121,25 @@ function getSectionById($id){
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
 /* Get number of students enrolled for a section */
-function getStudentsEnrolled($id){
+function getStudentCount($id){
     $sql = "SELECT *
             FROM (SELECT count(userid) from enrollment group by sectionid) s
             where s.sectionid = :id";
     echo json_encode(perform_query($sql, 'GET', array("id"=>$id)));
+}
+function getSectionTeachers($id){
+    $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
+            FROM teacher t1 and teaching t2
+            where t2.sectionid = :id
+            and t2.teacherid = t1.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+function getCourseTeachers($id){
+    $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
+            FROM teacher t1 and teaching t2
+            where t2.courseid = :id
+            and t2.teacherid = t1.userid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
 #================================================================================================================#
