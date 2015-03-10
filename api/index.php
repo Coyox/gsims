@@ -96,7 +96,7 @@ function getDepartmentById($id) {
 function getCourses($id){
     $schoolyear = $_GET['schoolyearid'];
     if (!isset($schoolyear)) { return; }
-    $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by deptName asc";
+    $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by courseName asc";
     $bindparam = array("id"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
