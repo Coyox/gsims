@@ -10,8 +10,10 @@ $app->get('/students/:id', 'getStudentById');
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
+
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
+
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 
@@ -23,10 +25,12 @@ $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
+$app->get('/sections/:id/enrolled', 'getStudentsEnrolled');
 
 
 $app->get('/search/:usertype', 'findUsersByName');
 $app->get('/search/student', 'findStudents');
+
 
 $app->get('/login', 'validateCredentials');
 
@@ -80,7 +84,6 @@ function getCourseById($id){
     $sql = "SELECT courseName, schoolyearid, description, status from course where courseid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
-
 function getSections(){
     $schoolyear = $_GET['schoolyearid'];
     if (!isset($schoolyear)) {
@@ -112,10 +115,16 @@ function getSectionsByCourse($schoolyear, $courseid){
     $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
-
 function getSectionById($id){
     $sql = "SELECT courseid, sectionCode, day, time, roomCapacity, roomLocation, classSize, status from section where sectionid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
+}
+/* Get number of students enrolled for a section */
+function getStudentsEnrolled($id){
+    $sql = "SELECT *
+            FROM (SELECT count(userid) from enrollment group by sectionid) s
+            where s.sectionid = :id";
+    echo json_encode(perform_query($sql, 'GET', array("id"=>$id)));
 }
 
 #================================================================================================================#
