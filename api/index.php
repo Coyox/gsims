@@ -8,7 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
-$app->get('/students/:id/attendance', 'getStudentAttendance');
+
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
