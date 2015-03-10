@@ -168,7 +168,7 @@ function getStudentsEnrolled($id){
     s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
-            FROM student s where s.userid=(SELECT e.userid from enrollment e where e.sectionid=:id)";
+            FROM student s WHERE s.userid=(SELECT e.userid from enrollment e where e.sectionid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function getSectionTeachers($id){
@@ -229,7 +229,7 @@ function getEnrolledSections($id){
     s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
-    FROM student s and s.userid =(SELECT e.userid from enrollment e where e.userid=:id)";
+    FROM student s WHERE s.userid =(SELECT e.userid from enrollment e where e.userid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
