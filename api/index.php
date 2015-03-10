@@ -225,11 +225,8 @@ function getStudentById($id) {
 }
 
 function getEnrolledSections($id){
-    $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
-    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
-    s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
-    s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
-    FROM student s WHERE s.userid =(SELECT e.userid from enrollment e where e.userid=:id)";
+    $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
+    FROM section s WHERE s.sectionid =(SELECT e.sectionid from enrollment e where e.userid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
