@@ -137,8 +137,8 @@ function getSections(){
 function getSectionsBySchool($schoolyear, $schoolid){
     $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
-            where s.courseid = (select c.courseid from course c
-                where c.deptid = (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
+            where s.courseid in (select c.courseid from course c
+                where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
                 and c.schoolyearid=:schoolyear)
             and s.schoolyearid=:schoolyear
             and s.courseid = c1.courseid
@@ -171,13 +171,13 @@ function getStudentsEnrolled($id){
     s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
-            FROM student s WHERE s.userid=(SELECT e.userid from enrollment e where e.sectionid=:id)";
+            FROM student s WHERE s.userid in (SELECT e.userid from enrollment e where e.sectionid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function getSectionTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
             FROM teacher t1
-            where t1.userid=(SELECT t2.teacherid from teaching t2 where t2.sectionid=:id)";
+            where t1.userid in (SELECT t2.teacherid from teaching t2 where t2.sectionid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function dropStudent($id, $sid){
@@ -229,7 +229,7 @@ function getStudentById($id) {
 function getEnrolledSections($id){
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
     FROM section s, course c
-    WHERE s.sectionid =(SELECT e.sectionid from enrollment e where e.userid=:id)
+    WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id)
     and s.courseid = c.courseid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
@@ -482,8 +482,8 @@ function findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursen
     $coursename = "%".$coursename."%";
     $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
-            where s.courseid = (select c.courseid from course c
-                where c.deptid = (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
+            where s.courseid in (select c.courseid from course c
+                where c.deptid in (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
                 and c.coursName like :coursename and c.schoolyearid=:schoolyear)
             and s.schoolyearid=:schoolyear";
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname, "coursename"=>$coursename);
@@ -500,8 +500,8 @@ function findSectionsByDept($schoolyear, $schoolid, $deptname, $days=null){
     $deptname = "%".$deptname."%";
     $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
-            where s.courseid = (select c.courseid from course c
-                where c.deptid = (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
+            where s.courseid in (select c.courseid from course c
+                where c.deptid in (select d.deptid from department d where d.deptName like :deptname and d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
                 and c.schoolyearid=:schoolyear)
             and s.schoolyearid=:schoolyear";
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid, "deptname"=>$deptname);
@@ -518,7 +518,7 @@ function findSectionsByCourse($schoolyear, $schoolid, $coursename, $days=null){
     $coursename = "%".$coursename."%";
     $days = constructDayClause($days);
     $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s where s.courseid= (SELECT c.courseid from course c, department d
+            from section s where s.courseid in (SELECT c.courseid from course c, department d
                 where c.courseName like :coursename
                 and c.schoolyearid=:schoolyear
                 and c.deptid = d.deptid
@@ -539,8 +539,8 @@ function findSectionsByDay($schoolyear, $schoolid, $days){
     $days = constructDayClause($days);
     $sql = "SELECT s.sectionid, s.courseid, s.sectionCode, s.teacherid, s.day, s.time, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s
-            where s.courseid = (select c.courseid from course c
-                where c.deptid = (select d.deptid from department d where d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
+            where s.courseid in (select c.courseid from course c
+                where c.deptid in (select d.deptid from department d where d.schoolyearid=:schoolyear and d.schoolid=:schoolid)
                 and c.schoolyearid=:schoolyear)
             and s.schoolyearid=:schoolyear and :days
             order by s.sectionCode asc";
