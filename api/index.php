@@ -44,16 +44,12 @@ $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/users/:usertype', 'findUsers');
-$app->get('/search/sections', 'test');
+$app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
 
 $app->run();
 
-function test(){
-    echo "testing";
-    return;
-}
 
 #================================================================================================================#
 # Login
@@ -354,110 +350,67 @@ function getUsers($type){
 */
 
 function findUsers($usertype){
+    $param = array();
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
-    $extra=array();
+    if (isset($firstname)) {
+        $param['firstName'] = $_GET['firstName'];
+    }
+    if (isset($lastname)) {
+        $param['lastName'] = $_GET['lastName'];
+    }
+
     if ($usertype=='S'){
-        $day = $_GET['day'];
-        $month = $_GET['month'];
         $year = $_GET['year'];
         $gender = $_GET['gender'];
         $paid = $_GET['paid'];
-        if (isset($day)){
-            $extra['day'] = $day;
+        if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)){
+            if (isset($year)){
+                $param['year'] = (isset($_GET['yearop']))? $_GET['yearop']."'".$year : "='".$year;
+            }
+            if (isset($gender)){
+                $param['gender'] = $gender;
+            }
+            if (isset($paid)){
+                $param['paid'] = $paid;
+            }
+            $clause = buildWhereClause($param);
+            $sql = "SELECT * from student ".$clause." order by firstName asc";
         }
-        if (isset($month)){
-            $extra['month'] = $month;
-        }
-        if (isset($year)){
-            $extra['year'] = $year;
-        }
-        if (isset($gender)){
-            $extra['gender'] = $gender;
-        }
-        if (isset($paid)){
-            $extra['paid'] = $paid;
+        else{
+            getUsers($usertype);
         }
     }
+    else if ($usertype=="A"|$usertype=="T"){
+        if (array_key_exists('firstName', $param) || array_key_exists('lastName', $param)) {
+            $clause = buildWhereClause($param);
+            $sql = "SELECT * from teacher ".$clause." order by firstName asc";
+        }
+        else{
+            getUsers($usertype);
+        }
 
-    if (isset($firstname) && isset($lastname)) {
-        return findUsersByFullName($usertype,$firstname,$lastname, $extra);
-    }
-    else if (isset($firstname)){
-        return findUsersByFirstName($usertype,$firstname, $extra);
-    }
-    else if (isset($lastname)) {
-        return findUsersByLastName($usertype,$lastname, $extra);
-    }
-    else {
-        return getUsers($usertype);
     }
 }
 
-function findUsersByFirstName($type, $firstname, $extra=array()) {
-    $firstname = "%".$firstname."%";
-    $bindparam = array("firstname"=>$firstname);
-    if ($type=="S") {
-        if (array_filter($extra)){
-            $clause = buildStudentQuery($extra);
-            //$bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where firstName like :firstname ".$clause." order by firstName asc";
-            //$sql = "SELECT * from student where firstName like :firstname and gender='F' order by firstName asc";
+function buildWhereClause($fieldArray){
+    $clause = '';
+    foreach ($fieldArray as $key => $value) {
+        $clause.=($clause==''? "WHERE ": " AND ");
+        if ($key=='firstName'||$key=='lastName'){
+            $value = "%".$value."%";
+            $clause.=$key." like '".$value."'";
+        }
+        else if ($key=='year'){
+            $clause.=$key."(dateOfBirth)".$value."'";
         }
         else {
-            $sql = "SELECT * from student where firstName like :firstname order by firstName asc";
+            $clause.=$key."='".$value."'";
         }
     }
-    else if ($type=="A"|$type=="T"){
-        $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname order by firstName asc";
-        $bindparam["type"]=$type;
-    }
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    return $clause;
 }
 
-function findUsersByLastName($type, $lastname, $extra=array()) {
-    $lastname = "%".$lastname."%";
-    $bindparam = array("lastname"=>$lastname);
-    if ($type=="S") {
-        if (array_filter($extra)){
-            $clause = buildStudentQuery($extra);
-            //$bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where lastName like :lastname ".$clause." order by lastName asc";
-        }
-        else {
-            $sql = "SELECT * from student where lastName like :lastname order by lastName asc";
-        }
-    }
-    else if ($type=="A"|$type=="T"){
-        $sql = "SELECT * from teacher where usertype=:type and lastName like :lastname order by lastName asc";
-        $bindparam["type"]=$type;
-    }
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
-}
-
-function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
-    $firstname = "%".$firstname."%";
-    $lastname = "%".$lastname."%";
-    $bindparam = array(
-        "firstname" => $firstname,
-        "lastname" => $lastname
-    );
-    if ($type=="S") {
-        if (array_filter($extra)){
-            $clause = buildStudentQuery($extra);
-            //$bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname ".$clause." order by firstName asc";
-        }
-        else {
-            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
-        }
-    }
-    else if ($type=="A"|$type=="T"){
-        $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname and lastName like :lastname order by firstName asc";
-        $bindparam["type"]=$type;
-    }
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
-}
 
 /* TODO: find by times*/
 function findSections(){
@@ -546,18 +499,5 @@ function constructDayClause($days){
     }
     $clause = rtrim($clause, ",");
     $clause.= "\")";
-    return $clause;
-}
-
-function buildStudentQuery($fieldArray){
-    $clause = '';
-    foreach ($fieldArray as $key => $value) {
-        if ($key=='day'||$key=='month'||$key=='year'){
-            $clause.=" and ".$key."(dateOfBirth)='".$value."'";
-        }
-        else {
-            $clause.=" and ".$key."='".$value."'";
-        }
-    }
     return $clause;
 }
