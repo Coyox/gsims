@@ -420,7 +420,12 @@ function findSections(){
     $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
     $courseclause = " and c.schoolyearid=:schoolyear";
     if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
-    if (isset($coursename)){ $coursecluase.= " and c.courseName like '%".$coursename."%'"; }
+    if (isset($coursename)){
+        echo "!!reached course here!!!";
+        $coursecluase.= " and c.courseName like '%".$coursename."%'";
+        echo $courseclause;
+        echo "!!!";
+    }
 
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
 
@@ -429,7 +434,7 @@ function findSections(){
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
     if (isset($day)){
-        $sql.= constructDayClause($days);
+        $sql.= buildDayClause($days);
     }
     $sql.= " order by s.sectionCode asc";
     echo $sql;
