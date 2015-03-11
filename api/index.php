@@ -350,10 +350,10 @@ function findUsersByFirstName($type, $firstname, $extra=array()) {
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
         if (array_filter($extra)){
-            //$clause = buildStudentQuery($extra);
-            //$bindparam["clause"] = $clause;
-            //$sql = "SELECT * from student where firstName like :firstname :clause order by firstName asc";
-            $sql = "SELECT * from student where firstName like :firstname and gender='F' order by firstName asc";
+            $clause = buildStudentQuery($extra);
+            $bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where firstName like :firstname :clause order by firstName asc";
+            //$sql = "SELECT * from student where firstName like :firstname and gender='F' order by firstName asc";
         }
         else {
             $sql = "SELECT * from student where firstName like :firstname order by firstName asc";
@@ -525,10 +525,10 @@ function buildStudentQuery($fieldArray){
     $clause = '';
     foreach ($fieldArray as $key => $value) {
         if ($key=='day'||$key=='month'||$key=='year'){
-            $clause.=" and ".$key."(dateOfBirth)='".$value."'";
+            $clause.=" and ".$key."(dateOfBirth)=\"".$value."\"";
         }
         else {
-            $clause.=" and ".$key."='".$value."'";
+            $clause.=" and ".$key."=\"".$value."\"";
         }
     }
     return $clause;
