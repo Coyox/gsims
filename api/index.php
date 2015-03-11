@@ -20,7 +20,6 @@ $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 
 $app->get('/schoolyears', 'getSchoolYears');
-$app->get('/schoolyears/test', 'test');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
