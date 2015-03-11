@@ -369,7 +369,14 @@ function findUsersByLastName($type, $lastname, $extra=array()) {
     $lastname = "%".$lastname."%";
     $bindparam = array("lastname"=>$lastname);
     if ($type=="S") {
-        $sql = "SELECT * from student where lastName like :lastname order by lastName asc";
+        if (array_filter($extra)){
+            $clause = buildStudentQuery($extra);
+            $bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where lastName like :lastname :clause order by lastName asc";
+        }
+        else {
+            $sql = "SELECT * from student where lastName like :lastname order by lastName asc";
+        }
     }
     else if ($type=="A"|$type=="T"){
         $sql = "SELECT * from teacher where usertype=:type and lastName like :lastname order by lastName asc";
@@ -386,7 +393,14 @@ function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
         "lastname" => $lastname
     );
     if ($type=="S") {
-        $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
+        if (array_filter($extra)){
+            $clause = buildStudentQuery($extra);
+            $bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname :clause order by firstName asc";
+        }
+        else {
+            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
+        }
     }
     else if ($type=="A"|$type=="T"){
         $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname and lastName like :lastname order by firstName asc";
@@ -510,7 +524,7 @@ function buildStudentQuery($fieldArray){
     $clause = '';
     foreach ($fieldArray as $key => $value) {
         if ($key=='day'||$key=='month'||$key=='year'){
-            $clause.="and ".$key."(dateOfBirth)=".$value;
+            $clause.=" and ".$key."(dateOfBirth)=".$value;
         }
         else {
             $clause.=" and ".$key."=".$value;
