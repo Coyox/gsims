@@ -351,8 +351,8 @@ function findUsersByFirstName($type, $firstname, $extra=array()) {
     if ($type=="S") {
         if (array_filter($extra)){
             $clause = buildStudentQuery($extra);
-            $bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where firstName like :firstname :clause order by firstName asc";
+            //$bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where firstName like :firstname ".$clause." order by firstName asc";
             //$sql = "SELECT * from student where firstName like :firstname and gender='F' order by firstName asc";
         }
         else {
@@ -372,8 +372,8 @@ function findUsersByLastName($type, $lastname, $extra=array()) {
     if ($type=="S") {
         if (array_filter($extra)){
             $clause = buildStudentQuery($extra);
-            $bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where lastName like :lastname :clause order by lastName asc";
+            //$bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where lastName like :lastname ".$clause." order by lastName asc";
         }
         else {
             $sql = "SELECT * from student where lastName like :lastname order by lastName asc";
@@ -396,8 +396,8 @@ function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
     if ($type=="S") {
         if (array_filter($extra)){
             $clause = buildStudentQuery($extra);
-            $bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname :clause order by firstName asc";
+            //$bindparam["clause"] = $clause;
+            $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname ".$clause." order by firstName asc";
         }
         else {
             $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
@@ -434,7 +434,6 @@ function findUsers($usertype){
             $extra['year'] = $year;
         }
         if (isset($gender)){
-            echo 'gender'.':'.$gender;
             $extra['gender'] = $gender;
         }
         if (isset($paid)){
@@ -533,6 +532,5 @@ function buildStudentQuery($fieldArray){
             $clause.=" and ".$key."=".$value;
         }
     }
-    echo $clause;
     return $clause;
 }
