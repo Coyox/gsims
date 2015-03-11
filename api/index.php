@@ -43,8 +43,8 @@ $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/:usertype', 'findUsersByName');
-$app->get('/search/students', 'findStudents');
-$app->get('/search/sections', 'findSections');
+//$app->get('/search/students', 'findStudents');
+//$app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
 
@@ -346,54 +346,54 @@ function getUsers($type){
 #================================================================================================================#
 /* General find for students */
 function findStudents(){
-    // $firstname = $_GET['firstName'];
-    // $lastname = $_GET['lastName'];
-    // $day = $_GET['day'];
-    // $month = $_GET['month'];
-    // $year = $_GET['year'];
-    // $gender = $_GET['gender'];
-    // $paid = $_GET['paid'];
-    // $clause = '';
-    // //$bindparam = array();
-    // $bindparam = array("clause"=>$clause);
-    // if (!(isset($firstname)||isset($lastname))){ return; }
-    // if (isset($firstname)) {
-    //     $firstname = "%".$firstname."%";
-    //     $bindparam["firstname"] = $firstname;
-    //     $clause.="firstName like :firstname";
-    //     if (isset($lastname)){
-    //         $lastname = "%".$lastname."%";
-    //         $bindparam["lastname"] = $lastname;
-    //         $clause.=" and lastName like :lastname";
-    //     }
-    // }
-    // else{
-    //     if (isset($lastname)){
-    //         $lastname = "%".$lastname."%";
-    //         $bindparam["lastname"] = $lastname;
-    //         $clause.=" and lastName like :lastname";
-    //     }
-    //     if (isset($day)){
-    //         $bindparam["day"] = $day;
-    //         $clause.=" and day(dateOfBirth)=:day";
-    //     }
-    //     if (isset($month)){
-    //         $bindparam["month"] = $month;
-    //         $clause.=" and month(dateOfBirth)=:month";
-    //     }
-    //     if (isset($year)){
-    //         $bindparam["year"] = $year;
-    //         $clause.=" and year(dateOfBirth)=:year";
-    //     }
-    //     if (isset($gender)){
-    //         $bindparam["gender"] = $gender;
-    //         $clause.=" and gender=:gender";
-    //     }
-    //     if (isset($paid)){
-    //         $bindparam["paid"] = $paid;
-    //         $clause.=" and paid=:paid";
-    //     }
-    // }
+    $firstname = $_GET['firstName'];
+    $lastname = $_GET['lastName'];
+    $day = $_GET['day'];
+    $month = $_GET['month'];
+    $year = $_GET['year'];
+    $gender = $_GET['gender'];
+    $paid = $_GET['paid'];
+    $clause = '';
+    //$bindparam = array();
+    $bindparam = array("clause"=>$clause);
+    if (!(isset($firstname)||isset($lastname))){ return; }
+    if (isset($firstname)) {
+        $firstname = "%".$firstname."%";
+        $bindparam["firstname"] = $firstname;
+        $clause.="firstName like :firstname";
+        if (isset($lastname)){
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.=" and lastName like :lastname";
+        }
+    }
+    else{
+        if (isset($lastname)){
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.=" and lastName like :lastname";
+        }
+        if (isset($day)){
+            $bindparam["day"] = $day;
+            $clause.=" and day(dateOfBirth)=:day";
+        }
+        if (isset($month)){
+            $bindparam["month"] = $month;
+            $clause.=" and month(dateOfBirth)=:month";
+        }
+        if (isset($year)){
+            $bindparam["year"] = $year;
+            $clause.=" and year(dateOfBirth)=:year";
+        }
+        if (isset($gender)){
+            $bindparam["gender"] = $gender;
+            $clause.=" and gender=:gender";
+        }
+        if (isset($paid)){
+            $bindparam["paid"] = $paid;
+            $clause.=" and paid=:paid";
+        }
+    }
     $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -403,7 +403,8 @@ function findStudents(){
     //echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
-function findUsersByFirstName($type, $firstname) {
+function findUsersByFirstName($type, $firstname)
+    $firstname = $_GET['firstName'];
     $firstname = "%".$firstname."%";
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
@@ -469,6 +470,73 @@ function findUsersByName($usertype){
     }
 }
 
+
+/*
+function findUsersByFullName($type, $firstname, $lastname) {
+    $firstname = "%".$firstname."%";
+    $lastname = "%".$lastname."%";
+    $bindparam = array(
+        "firstname" => $firstname,
+        "lastname" => $lastname
+    );
+    if ($type=="S") {
+         $firstname = $_GET['firstName'];
+    $lastname = $_GET['lastName'];
+    $day = $_GET['day'];
+    $month = $_GET['month'];
+    $year = $_GET['year'];
+    $gender = $_GET['gender'];
+    $paid = $_GET['paid'];
+    $clause = '';
+    //$bindparam = array();
+    $bindparam = array("clause"=>$clause);
+    if (!(isset($firstname)||isset($lastname))){ return; }
+    if (isset($firstname)) {
+        $firstname = "%".$firstname."%";
+        $bindparam["firstname"] = $firstname;
+        $clause.="firstName like :firstname";
+        if (isset($lastname)){
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.=" and lastName like :lastname";
+        }
+    }
+    else{
+        if (isset($lastname)){
+            $lastname = "%".$lastname."%";
+            $bindparam["lastname"] = $lastname;
+            $clause.=" and lastName like :lastname";
+        }
+        if (isset($day)){
+            $bindparam["day"] = $day;
+            $clause.=" and day(dateOfBirth)=:day";
+        }
+        if (isset($month)){
+            $bindparam["month"] = $month;
+            $clause.=" and month(dateOfBirth)=:month";
+        }
+        if (isset($year)){
+            $bindparam["year"] = $year;
+            $clause.=" and year(dateOfBirth)=:year";
+        }
+        if (isset($gender)){
+            $bindparam["gender"] = $gender;
+            $clause.=" and gender=:gender";
+        }
+        if (isset($paid)){
+            $bindparam["paid"] = $paid;
+            $clause.=" and paid=:paid";
+        }
+    }
+
+        $sql = "SELECT * from student where firstName like :firstname and lastName like :lastname order by firstName asc";
+    }
+    else if ($type=="A"|$type=="T"){
+        $sql = "SELECT * from teacher where usertype=:type and firstName like :firstname and lastName like :lastname order by firstName asc";
+        $bindparam["type"]=$type;
+    }
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}*/
 
 /* TODO: find by times*/
 function findSections(){
