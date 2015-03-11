@@ -396,7 +396,7 @@ function findUsers($usertype){
 function buildWhereClause($fieldArray){
     $clause = '';
     foreach ($fieldArray as $key => $value) {
-        $clause.=($clause==''? "WHERE ": " AND ");
+        $clause.=($clause=='')? "WHERE ": " AND ";
         if ($key=='firstName'||$key=='lastName'){
             $value = "%".$value."%";
             $clause.=$key." like '".$value."'";
