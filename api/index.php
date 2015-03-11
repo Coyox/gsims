@@ -20,7 +20,6 @@ $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 
 $app->get('/schoolyears', 'getSchoolYears');
-$app->get('/schoolyears/test', 'test');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -44,7 +43,7 @@ $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/:usertype', 'findUsers');
-$app->get('/search/sections', 'findSections');
+$app->get('/search/sections', 'test');
 
 $app->get('/login', 'validateCredentials');
 
