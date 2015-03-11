@@ -8,6 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
+//$app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
@@ -431,6 +432,8 @@ function findSections(){
         $sql.= constructDayClause($days);
     }
     $sql.= " order by s.sectionCode asc";
+    echo $sql;
+    echo "***************testing***************";
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
     else {
