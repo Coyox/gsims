@@ -366,7 +366,7 @@ function findUsers($usertype){
         $paid = $_GET['paid'];
         if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)){
             if (isset($year)){
-                $param['year'] = (isset($_GET['yearop']))? $_GET['yearop']."'".$year : "='".$year;
+                $param['year'] = (isset($_GET['yearop']))? ($_GET['yearop']."'".$year) : ("='".$year);
             }
             if (isset($gender)){
                 $param['gender'] = $gender;
@@ -396,7 +396,7 @@ function findUsers($usertype){
 function buildWhereClause($fieldArray){
     $clause = '';
     foreach ($fieldArray as $key => $value) {
-        $clause.=($clause=='')? "WHERE ": " AND ";
+        $clause.= ($clause==''? "WHERE ": " AND ");
         if ($key=='firstName'||$key=='lastName'){
             $value = "%".$value."%";
             $clause.=$key." like '".$value."'";
