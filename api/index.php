@@ -42,7 +42,7 @@ $app->delete('/sections/:id/:sid', 'dropStudent');
 $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
-$app->get('/search/:usertype', 'findUsersByName');
+$app->get('/search/:usertype', 'findUsers');
 //$app->get('/search/students', 'findStudents');
 //$app->get('/search/sections', 'findSections');
 
@@ -345,8 +345,7 @@ function getUsers($type){
 # Search
 #================================================================================================================#
 
-function findUsersByFirstName($type, $firstname) {
-    $firstname = $_GET['firstName'];
+function findUsersByFirstName($type, $firstname, $extra=array()) {
     $firstname = "%".$firstname."%";
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
@@ -359,7 +358,7 @@ function findUsersByFirstName($type, $firstname) {
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
-function findUsersByLastName($type, $lastname) {
+function findUsersByLastName($type, $lastname, $extra=array()) {
     $lastname = "%".$lastname."%";
     $bindparam = array("lastname"=>$lastname);
     if ($type=="S") {
@@ -372,7 +371,7 @@ function findUsersByLastName($type, $lastname) {
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
-function findUsersByFullName($type, $firstname, $lastname) {
+function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
     $firstname = "%".$firstname."%";
     $lastname = "%".$lastname."%";
     $bindparam = array(
@@ -397,14 +396,38 @@ function findUsersByName($usertype){
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
 
+    if ($usertype=='S'){
+        $extra=array("");
+        $day = $_GET['day'];
+        $month = $_GET['month'];
+        $year = $_GET['year'];
+        $gender = $_GET['gender'];
+        $paid = $_GET['paid'];
+        if (isset($day)){
+            $extra['day'] = $day;
+        }
+        if (isset($month)){
+            $extra['month'] = $month;
+        }
+        if (isset($year)){
+            $extra['year'] = $year;
+        }
+        if (isset($gender)){
+            $extra['gender'] = $gender;
+        }
+        if (isset($paid)){
+            $extra['paid'] = $paid;
+        }
+    }
+
     if (isset($firstname) && isset($lastname)) {
-        return findUsersByFullName($usertype,$firstname,$lastname);
+        return findUsersByFullName($usertype,$firstname,$lastname, $extra);
     }
     else if (isset($firstname)){
-        return findUsersByFirstName($usertype,$firstname);
+        return findUsersByFirstName($usertype,$firstname, $extra);
     }
     else if (isset($lastname)) {
-        return findUsersByLastName($usertype,$lastname);
+        return findUsersByLastName($usertype,$lastname, $extra);
     }
     else {
         return getUsers($usertype);
