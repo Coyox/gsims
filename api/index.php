@@ -8,7 +8,7 @@ $app = new \Slim\Slim();
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
-//$app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
+$app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
@@ -233,6 +233,15 @@ function getEnrolledSections($id){
     WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id)
     and s.courseid = c.courseid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+
+function getPrevEnrolledSections($id){
+    $schoolyearid = $_GET['schoolyearid'];
+    $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
+    FROM section s, course c
+    WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id and e.schoolyearid not in :schoolyearid)
+    and s.courseid = c.courseid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 
 /*
