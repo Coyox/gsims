@@ -507,7 +507,7 @@ function constructDayClause($days){
 }
 
 function buildStudentQuery($fieldArray){
-    $clause = ''
+    $clause = '';
     foreach ($fieldArray as $key => $value) {
         if ($key=='day'||$key=='month'||$key=='year'){
             $clause.="and ".$key."(dateOfBirth)=".$value;
