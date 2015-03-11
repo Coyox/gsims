@@ -374,7 +374,11 @@ function findUsers($usertype){
                 $param['paid'] = $paid;
             }
             $clause = buildWhereClause($param);
-            $sql = "SELECT * from student ".$clause." order by firstName asc";
+            $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status from student ".$clause." order by firstName asc";
+            echo json_encode(perform_query($sql,'GETALL'));
         }
         else{
             getUsers($usertype);
@@ -383,7 +387,8 @@ function findUsers($usertype){
     else if ($usertype=="A"|$usertype=="T"){
         if (array_key_exists('firstName', $param) || array_key_exists('lastName', $param)) {
             $clause = buildWhereClause($param);
-            $sql = "SELECT * from teacher ".$clause." order by firstName asc";
+            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher ".$clause." order by firstName asc";
+            echo json_encode(perform_query($sql,'GETALL'));
         }
         else{
             getUsers($usertype);
