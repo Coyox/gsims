@@ -105,6 +105,20 @@ var HeaderView = Backbone.View.extend({
 		if (username != null) {
 			this.$el.find(".username").html(username);
 		}
+		var usertype = sessionStorage.getItem("gobind-usertype");
+		if (usertype != null) {
+			var text;
+			if (usertype == "T") {
+				text = "teacher";
+			} else if (usertype == "A") {
+				text = "administrator";
+			} else if (usertype == "S") {
+				text = "student";
+			} else if (usertype == "SU") {
+				text = "superuser";
+			}
+			this.$el.find(".usertype").html(text);
+		}
 	},
 
 	events: {
