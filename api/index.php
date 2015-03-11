@@ -349,9 +349,9 @@ function findUsersByFirstName($type, $firstname, $extra=array()) {
     $firstname = "%".$firstname."%";
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
-        if (array_filter($extra)){
+/*        if (array_filter($extra)){
             //buildStudentQuery($extra);
-        }
+        }*/
         $sql = "SELECT * from student where firstName like :firstname order by firstName asc";
     }
     else if ($type=="A"|$type=="T"){
@@ -395,11 +395,11 @@ function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
  usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
 */
 
-function findUsersByName($usertype){
+function findUsers($usertype){
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
     $extra=array();
-/*    if ($usertype=='S'){
+    if ($usertype=='S'){
         $day = $_GET['day'];
         $month = $_GET['month'];
         $year = $_GET['year'];
@@ -420,7 +420,7 @@ function findUsersByName($usertype){
         if (isset($paid)){
             $extra['paid'] = $paid;
         }
-    }*/
+    }
 
     if (isset($firstname) && isset($lastname)) {
         return findUsersByFullName($usertype,$firstname,$lastname, $extra);
