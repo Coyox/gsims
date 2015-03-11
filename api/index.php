@@ -423,14 +423,12 @@ function findSections(){
 
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
 
-    $sql = "SELECT s.sectionid, s.courseid, c1.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+    $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
-                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.')'."and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
+                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")"."and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
     if (isset($days)){
-        $days = constructDayClause($days);
-        $sql.= " and :days";
-        $bindparam["days"]=$days;
+        $sql.= constructDayClause($days);
     }
     $sql.= " order by s.sectionCode asc";
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
