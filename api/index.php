@@ -43,8 +43,7 @@ $app->post('/sections/:id/:sid', 'enrollStudent');
 //$app->post('/sections/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/search/:usertype', 'findUsers');
-//$app->get('/search/students', 'findStudents');
-//$app->get('/search/sections', 'findSections');
+$app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
 
@@ -344,6 +343,50 @@ function getUsers($type){
 #================================================================================================================#
 # Search
 #================================================================================================================#
+/*
+ usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
+*/
+
+function findUsers($usertype){
+    $firstname = $_GET['firstName'];
+    $lastname = $_GET['lastName'];
+    $extra=array();
+    if ($usertype=='S'){
+        $day = $_GET['day'];
+        $month = $_GET['month'];
+        $year = $_GET['year'];
+        $gender = $_GET['gender'];
+        $paid = $_GET['paid'];
+        if (isset($day)){
+            $extra['day'] = $day;
+        }
+        if (isset($month)){
+            $extra['month'] = $month;
+        }
+        if (isset($year)){
+            $extra['year'] = $year;
+        }
+        if (isset($gender)){
+            $extra['gender'] = $gender;
+        }
+        if (isset($paid)){
+            $extra['paid'] = $paid;
+        }
+    }
+
+    if (isset($firstname) && isset($lastname)) {
+        return findUsersByFullName($usertype,$firstname,$lastname, $extra);
+    }
+    else if (isset($firstname)){
+        return findUsersByFirstName($usertype,$firstname, $extra);
+    }
+    else if (isset($lastname)) {
+        return findUsersByLastName($usertype,$lastname, $extra);
+    }
+    else {
+        return getUsers($usertype);
+    }
+}
 
 function findUsersByFirstName($type, $firstname, $extra=array()) {
     $firstname = "%".$firstname."%";
@@ -410,51 +453,30 @@ function findUsersByFullName($type, $firstname, $lastname, $extra=array()) {
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
-/*
- usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
-*/
-
-function findUsers($usertype){
-    $firstname = $_GET['firstName'];
-    $lastname = $_GET['lastName'];
-    $extra=array();
-    if ($usertype=='S'){
-        $day = $_GET['day'];
-        $month = $_GET['month'];
-        $year = $_GET['year'];
-        $gender = $_GET['gender'];
-        $paid = $_GET['paid'];
-        if (isset($day)){
-            $extra['day'] = $day;
-        }
-        if (isset($month)){
-            $extra['month'] = $month;
-        }
-        if (isset($year)){
-            $extra['year'] = $year;
-        }
-        if (isset($gender)){
-            $extra['gender'] = $gender;
-        }
-        if (isset($paid)){
-            $extra['paid'] = $paid;
-        }
-    }
-
-    if (isset($firstname) && isset($lastname)) {
-        return findUsersByFullName($usertype,$firstname,$lastname, $extra);
-    }
-    else if (isset($firstname)){
-        return findUsersByFirstName($usertype,$firstname, $extra);
-    }
-    else if (isset($lastname)) {
-        return findUsersByLastName($usertype,$lastname, $extra);
-    }
-    else {
-        return getUsers($usertype);
-    }
+/* TODO: find by times*/
+function findSections(){
+    echo "hello";
+    // $schoolyear = $_GET['schoolyearid'];
+    // $schoolid = $_GET['schoolid'];
+    // if (!(isset($schoolyear) || (isset($schoolid)))) { return; }
+    // $deptname = $_GET['deptName'];
+    // $coursename = $_GET['courseName'];
+    // $days = $_GET['days'];
+    // //$times = $_GET['times'];
+    // if (isset($deptname) && isset($coursename)){
+    //     return findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursename, $days);
+    // }
+    // if (isset($deptname)) {
+    //     return findSectionsByDept($schoolyear, $schoolid, $deptname, $days);
+    // }
+    // if (isset($coursename)) {
+    //     return findSectionsByCourse($schoolyear, $schoolid, $coursename, $days);
+    // }
+    // if (isset($days)){
+    //     return findSectionsByDay($schoolyear, $schoolid, $days);
+    // }
+    // return getSectionsBySchool($schoolyear, $schoolid);
 }
-
 
 
 
