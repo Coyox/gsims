@@ -362,16 +362,17 @@ function findUsers($usertype){
         $year = $_GET['year'];
         $gender = $_GET['gender'];
         $paid = $_GET['paid'];
-        if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)){
-            if (isset($year)){
-                $param['year'] = (isset($_GET['yearop']))? ($_GET['yearop']."'".$year) : ("='".$year);
-            }
-            if (isset($gender)){
-                $param['gender'] = $gender;
-            }
-            if (isset($paid)){
-                $param['paid'] = $paid;
-            }
+        $city = $_GET['city'];
+        $province = $_GET['province'];
+        $country = $_GET['country'];
+        if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+            if (isset($year)){ $param['year'] = (isset($_GET['yearop']))? ($_GET['yearop']."'".$year) : ("='".$year); }
+            if (isset($gender)){ $param['gender'] = $gender; }
+            if (isset($paid)){ $param['paid'] = $paid; }
+            if (isset($city)){ $param['city'] = $city; }
+            if (isset($province)){ $param['province'] = $province; }
+            if (isset($country)){ $param['country'] = $country; }
+
             $clause = buildWhereClause($param);
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -424,7 +425,7 @@ function findSections(){
 
     $sql = "SELECT s.sectionid, s.courseid, c1.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
-            where s.courseid in (select c.courseid, from course c
+            where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.')'."and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
     if (isset($days)){
         $days = constructDayClause($days);
