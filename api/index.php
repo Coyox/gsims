@@ -347,7 +347,6 @@ function getUsers($type){
 /*
  usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
 */
-
 function findUsers($usertype){
     $param = array();
     $firstname = $_GET['firstName'];
@@ -381,7 +380,7 @@ function findUsers($usertype){
             echo json_encode(perform_query($sql,'GETALL'));
         }
         else{
-            getUsers($usertype);
+            return getUsers($usertype);
         }
     }
     else if ($usertype=="A"|$usertype=="T"){
@@ -391,59 +390,54 @@ function findUsers($usertype){
             echo json_encode(perform_query($sql,'GETALL'));
         }
         else{
-            getUsers($usertype);
+            return getUsers($usertype);
         }
 
     }
-}
-
-function buildWhereClause($fieldArray){
-    $clause = '';
-    foreach ($fieldArray as $key => $value) {
-        $clause.= ($clause==''? "WHERE ": " AND ");
-        if ($key=='firstName'||$key=='lastName'){
-            $value = "%".$value."%";
-            $clause.=$key." like '".$value."'";
-        }
-        else if ($key=='year'){
-            $clause.=$key."(dateOfBirth)".$value."'";
-        }
-        else {
-            $clause.=$key."='".$value."'";
-        }
-    }
-    return $clause;
 }
 
 
 /* TODO: find by times*/
 function findSections(){
-    echo "hello";
-    // $schoolyear = $_GET['schoolyearid'];
-    // $schoolid = $_GET['schoolid'];
-    // if (!(isset($schoolyear) || (isset($schoolid)))) { return; }
-    // $deptname = $_GET['deptName'];
-    // $coursename = $_GET['courseName'];
-    // $days = $_GET['days'];
-    // //$times = $_GET['times'];
-    // if (isset($deptname) && isset($coursename)){
-    //     return findSectionsByDeptCourseDay($schoolyear, $schoolid, $deptname, $coursename, $days);
-    // }
-    // if (isset($deptname)) {
-    //     return findSectionsByDept($schoolyear, $schoolid, $deptname, $days);
-    // }
-    // if (isset($coursename)) {
-    //     return findSectionsByCourse($schoolyear, $schoolid, $coursename, $days);
-    // }
-    // if (isset($days)){
-    //     return findSectionsByDay($schoolyear, $schoolid, $days);
-    // }
-    // return getSectionsBySchool($schoolyear, $schoolid);
+    //Non-filter options
+    $schoolyear = $_GET['schoolyearid'];
+    $schoolid = $_GET['schoolid'];
+    if (!isset($schoolyear) || (!isset($schoolid))) { return; }
+
+
+    //Find options
+    $deptname = $_GET['deptName'];
+    $coursename = $_GET['courseName'];
+    $day = $_GET['day'];
+    $startTime = $_GET['startTime'];
+    $endTime = $_GET['endTime'];
+
+
+    if(isset($deptname)||isset($coursename)||isset($days)||isset($startTime)||isset($endTime)){
+    $params = array();
+    $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
+    $courseclause = " and c.schoolyearid=:schoolyear";
+    if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
+    if (isset($coursename)){ $coursecluase.=" and c.courseName like '%".$coursename."%'"; }
+
+    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
+
+    $sql = "SELECT s.sectionid, s.courseid, c1.courseid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s, course c1
+            where s.courseid in (select c.courseid, from course c
+                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.')'."and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
+    if (isset($days)){
+        $days = constructDayClause($days);
+        $sql.= " and :days";
+        $bindparam["days"]=$days;
+    }
+    $sql.= " order by s.sectionCode asc";
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    }
+    else {
+        return getSectionsBySchool($schoolyear, $schoolid);
+    }
 }
-
-
-
-
 
 #================================================================================================================#
 # Helpers
@@ -495,13 +489,30 @@ function getConnection() {
     return $dbh;
 }
 
-function constructDayClause($days){
-    $clause= " FIELD(`day`, \"";
+function buildDayClause($days){
+    $clause= " and FIELD(`day`, '";
     $days = explode(',', $days);
     foreach($days as $day) {
         $clause.= $day.",";
     }
     $clause = rtrim($clause, ",");
-    $clause.= "\")";
+    $clause.= "'')";
+    return $clause;
+}
+
+function buildWhereClause($fieldArray, $clause=""){
+    foreach ($fieldArray as $key => $value) {
+        $clause.= ($clause==''? "WHERE ": " AND ");
+        if(substr($key, -4) === 'Name'){
+            $value = "%".$value."%";
+            $clause.=$key." like '".$value."'";
+        }
+        else if ($key=='year'){
+            $clause.=$key."(dateOfBirth)".$value."'";
+        }
+        else {
+            $clause.=$key."='".$value."'";
+        }
+    }
     return $clause;
 }
