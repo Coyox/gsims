@@ -525,10 +525,10 @@ function buildStudentQuery($fieldArray){
     $clause = '';
     foreach ($fieldArray as $key => $value) {
         if ($key=='day'||$key=='month'||$key=='year'){
-            $clause.=" and ".$key."(dateOfBirth)=".$value;
+            $clause.=" and ".$key."(dateOfBirth)='".$value."'";
         }
         else {
-            $clause.=" and ".$key."=".$value;
+            $clause.=" and ".$key."='".$value"'";
         }
     }
     return $clause;
