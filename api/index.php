@@ -429,7 +429,7 @@ function findSections(){
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
     if (isset($day)){
-        $sql.= buildDayClause($days);
+        $sql.= buildDayClause($day);
     }
     $sql.= " order by s.sectionCode asc";
     echo $sql;
