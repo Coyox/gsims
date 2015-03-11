@@ -350,10 +350,9 @@ function findUsersByFirstName($type, $firstname, $extra=array()) {
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
         if (array_filter($extra)){
-            $clause = buildStudentQuery($extra);
-            $bindparam["clause"] = $clause;
-            $sql = "SELECT * from student where firstName like :firstname :clause order by firstName asc";
-            echo $sql;
+            //$clause = buildStudentQuery($extra);
+            //$bindparam["clause"] = $clause;
+            //$sql = "SELECT * from student where firstName like :firstname :clause order by firstName asc";
             $sql = "SELECT * from student where firstName like :firstname and gender='F' order by firstName asc";
         }
         else {
