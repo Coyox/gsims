@@ -9,6 +9,7 @@ var LoginView = Backbone.View.extend({
 
 	events: {
 		"click #login": "validateCredentials",
+		"keyup #password, #username": "loginOnEnter",
 		"click #forgot": "forgotPassword"
 	},
 
@@ -39,7 +40,15 @@ var LoginView = Backbone.View.extend({
 
 	forgotPassword: function(evt) {
 		app.Router.navigate("forgotPassword", {trigger:true});
+	},
+
+	loginOnEnter: function(evt) {
+		if(evt.keyCode == 13){
+			console.log("Logging in with enter key.");
+			this.validateCredentials();
+		}
 	}
+
 });
 
 var ForgotPasswordView = Backbone.View.extend({
