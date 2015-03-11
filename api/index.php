@@ -415,20 +415,20 @@ function findSections(){
     $endTime = $_GET['endTime'];
 
 
-    if(isset($deptname)||isset($coursename)||isset($days)||isset($startTime)||isset($endTime)){
+    if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
     $params = array();
     $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
     $courseclause = " and c.schoolyearid=:schoolyear";
     if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
-    if (isset($coursename)){ $coursecluase.=" and c.courseName like '%".$coursename."%'"; }
+    if (isset($coursename)){ $coursecluase.= " and c.courseName like '%".$coursename."%'"; }
 
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
 
     $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
-                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")"."and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
-    if (isset($days)){
+                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
+    if (isset($day)){
         $sql.= constructDayClause($days);
     }
     $sql.= " order by s.sectionCode asc";
