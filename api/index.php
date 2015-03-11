@@ -492,13 +492,11 @@ function getConnection() {
 }
 
 function buildDayClause($days){
-    $clause= " and FIELD(`day`, '";
+    $clause= "";
     $days = explode(',', $days);
     foreach($days as $day) {
-        $clause.= $day.",";
+        $clause.=" and find_in_set('".$day."',`day`)";
     }
-    $clause = rtrim($clause, ",");
-    $clause.= "')";
     return $clause;
 }
 
