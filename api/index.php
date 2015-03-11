@@ -420,12 +420,7 @@ function findSections(){
     $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
     $courseclause = " and c.schoolyearid=:schoolyear";
     if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
-    if (isset($coursename)){
-        echo "!!reached course here!!!";
-        $coursecluase.= " and c.courseName like '%".$coursename."%'";
-        echo $courseclause;
-        echo "!!!";
-    }
+    if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
 
     $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
 
@@ -503,7 +498,7 @@ function buildDayClause($days){
         $clause.= $day.",";
     }
     $clause = rtrim($clause, ",");
-    $clause.= "'')";
+    $clause.= "')";
     return $clause;
 }
 
