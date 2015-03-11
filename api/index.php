@@ -350,7 +350,7 @@ function findUsersByFirstName($type, $firstname, $extra=array()) {
     $bindparam = array("firstname"=>$firstname);
     if ($type=="S") {
         if (array_filter($extra)){
-            buildStudentQuery($extra);
+            //buildStudentQuery($extra);
         }
         $sql = "SELECT * from student where firstName like :firstname order by firstName asc";
     }
@@ -399,8 +399,7 @@ function findUsersByName($usertype){
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
     $extra=array();
-    if ($usertype=='S'){
-
+/*    if ($usertype=='S'){
         $day = $_GET['day'];
         $month = $_GET['month'];
         $year = $_GET['year'];
@@ -421,7 +420,7 @@ function findUsersByName($usertype){
         if (isset($paid)){
             $extra['paid'] = $paid;
         }
-    }
+    }*/
 
     if (isset($firstname) && isset($lastname)) {
         return findUsersByFullName($usertype,$firstname,$lastname, $extra);
@@ -503,9 +502,16 @@ function constructDayClause($days){
     return $clause;
 }
 
-function buildStudentQuery($fieldArray){
+// function buildStudentQuery($fieldArray){
 
+//     foreach ($fieldArray as $key => $value) {
+//         if ($key==)
+//     }
 
+//         $day = $_GET['day'];
+//         $month = $_GET['month'];
+//         $year = $_GET['year'];
+//         $gender = $_GET['gender'];
+//         $paid = $_GET['paid'];
 
-
-}
+// }
