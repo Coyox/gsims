@@ -45,6 +45,11 @@ var SearchStudentsView = Backbone.View.extend({
 			data.paid = paid.val();
 		}
 
+		var status = this.$el.find("#status-options option:selected");
+		if (!status.is(":disabled")) {
+			data.status = status.val();
+		}
+
 		var yearop = this.$el.find("#year-operator option:selected");
 		if (!yearop.is(":disabled")) {
 			data.yearop = yearop.val();
