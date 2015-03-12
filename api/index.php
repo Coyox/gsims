@@ -32,16 +32,16 @@ $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
-//$app->post('/courses/:id/:tid', 'assignCourseTeacher');
+$app->post('/courses/:id/:tid', 'assignCourseTeacher');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
+$app->delete('/sections/students/:id/:sid', 'dropStudent');
+$app->post('/sections/students/:id/:sid', 'enrollStudent');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
-$app->delete('/sections/:id/:sid', 'dropStudent');
-$app->post('/sections/:id/:sid', 'enrollStudent');
-//$app->post('/sections/:id/:tid', 'assignCourseTeacher');
+$app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -119,7 +119,11 @@ function getCoursePrereqs($id){
     $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
-
+function assignCourseTeahcers($id, $tid){
+     $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
+     $bindparams = array("tid"=>$tid, "id"=>$id);
+     echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 #================================================================================================================#
 # Sections
 #================================================================================================================#
@@ -196,6 +200,14 @@ function enrollStudent($id, $sid){
         "schoolyearid" => $schoolyearid,
         "status" => "active",
     );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+function assignSectionTeacher($id, $tid){
+    $sql = "INSERT into teaching
+            SELECT :tid, courseid , :id
+            FROM section
+            WHERE sectionid=id";
+    $bindparams = array("tid"=>$tid, "id"=>$id);
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
@@ -386,6 +398,7 @@ function findUsers($usertype){
         $city = $_GET['city'];
         $province = $_GET['province'];
         $country = $_GET['country'];
+        $status = $_GET['status'];
         if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){ $param['year'] = (isset($_GET['yearop']))? ($_GET['yearop']."'".$year) : ("='".$year); }
             if (isset($gender)){ $param['gender'] = $gender; }
@@ -393,6 +406,7 @@ function findUsers($usertype){
             if (isset($city)){ $param['city'] = $city; }
             if (isset($province)){ $param['province'] = $province; }
             if (isset($country)){ $param['country'] = $country; }
+            if (isset($status)){ $param['status'] = $country; }
 
             $clause = buildWhereClause($param);
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
