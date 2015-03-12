@@ -265,3 +265,12 @@ a {
 .popover-content {
 	color: #666;
 }
+
+li.paginate_button.active a {
+	background-color: #9d426b;
+	border-color: #9d426b;
+}
+
+.pagination>li>a, .pagination>li>span {
+	color: #9d426b;
+}
