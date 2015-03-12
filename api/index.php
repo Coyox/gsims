@@ -499,9 +499,9 @@ function findUsers($usertype){
             }
             if (isset($loweryear)){
                 $param['year'] = " ".$_GET['yearop']." '".$loweryear."'' and '".$upperyear;
-                $echo "************testing*************";
-                $echo $param['year'];
-                $echo "************testing*************";
+                echo "************testing*************";
+                echo $param['year'];
+                echo "************testing*************";
             }
             if (isset($gender)){ $param['gender'] = $gender; }
             if (isset($paid)){ $param['paid'] = $paid; }
