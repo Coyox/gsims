@@ -492,17 +492,12 @@ function findUsers($usertype){
         $province = $_GET['province'];
         $country = $_GET['country'];
         $status = $_GET['status'];
-        if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
             }
-            if (isset($loweryear)){
-                $param['year'] = " ".$_GET['yearop']." '".$loweryear."'' and '".$upperyear;
-                echo "************testing*************";
-                echo $param['year'];
-                echo "************testing*************";
-            }
+            if (isset($loweryear)){ $param['year'] = " ".$_GET['yearop']." '".$loweryear."'' and '".$upperyear; }
             if (isset($gender)){ $param['gender'] = $gender; }
             if (isset($paid)){ $param['paid'] = $paid; }
             if (isset($city)){ $param['city'] = $city; }
