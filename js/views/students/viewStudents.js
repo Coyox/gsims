@@ -11,7 +11,8 @@ var SearchStudentsView = Backbone.View.extend({
 	events: {
 		"click #search-students": "searchStudents",
 		"click #search-all-students": "searchAllStudents",
-		"click #clear-fields": "clearFields"
+		"click #clear-fields": "clearFields",
+		"change #year-operator": "changeOperator"
 	},
 
 	searchAllStudents: function(evt) {
@@ -52,15 +53,22 @@ var SearchStudentsView = Backbone.View.extend({
 
 		var yearop = this.$el.find("#year-operator option:selected");
 		if (!yearop.is(":disabled")) {
-			data.yearop = yearop.val();
-			data.year = this.$el.find("#year-option option:selected").val();
+			var value = yearop.val();
+			data.yearop = value;
+
+			if (value == "between") {
+				data.lowerYear = this.$el.find(".lower").val();
+				data.upperYear = this.$el.find(".upper").val(); 
+			} else {
+				data.year = this.$el.find("#year-option option:selected").val();
+			}
 		}
 
 		var city = this.$el.find("#city").val();
 		if (city != "") {
 			data.city = city;
 		}
-
+		console.log(data);
 		var model = new Student();
 		model.fetch({
 			url: model.getSearchStudentsUrl(),
@@ -81,7 +89,7 @@ var SearchStudentsView = Backbone.View.extend({
 	},
 
 	populateYearMenu: function() {
-		var menu = this.$el.find("#year-option");
+		var menu = this.$el.find("#year-option, .year-option");
 		var start = new Date().getFullYear();
 		var end = start - 50;
 		for (var i = start; i > end; i--) {
@@ -96,6 +104,16 @@ var SearchStudentsView = Backbone.View.extend({
 		var parent = this.$el.find("#filter-students-container");
 		parent.find("input[type='text']").val("");
 		parent.find("select").prop("selectedIndex", 0);
+	},
+
+	changeOperator: function(evt) {
+		var operator = $(evt.currentTarget).find("option:selected").val();
+		var elem = this.$el.find(".between");
+		if (operator == "between") {
+			elem.removeClass("hide").show();
+		} else {
+			elem.hide();
+		}
 	}
 });
 

@@ -52,10 +52,12 @@
 				<select id="year-operator" class="form-control input-sm" style="width: 110px;">
 					<option selected disabled>-- Operator --</option>
 					<option value="less">Before</option>
-					<option value="equal">In</option>
 					<option value="greater">After</option>
+					<option value="between">Between</option>
 				</select>
-				<select id="year-option" class="form-control input-sm" style="width: 100px;"></select>
+				<select id="year-option" class="lower year-option form-control input-sm" style="width: 80px;"></select>
+				<span class="between hide"> and </span>
+				<select class="upper year-option between form-control input-sm hide" style="width: 80px;"></select>
 			</div>
 		</div>
 		<div class="form-group">
