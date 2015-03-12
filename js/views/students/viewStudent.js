@@ -149,16 +149,13 @@ var EnrolledSectionsView = Backbone.View.extend({
 	},
 
 	render: function() {
-		console.log("render");
 		this.$el.html(html["enrolledSections.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
 		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
-			console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				console.log(section);
 				new EnrolledSectionsRowView({
 					el: view.addRow(),
 					model: section

@@ -6,6 +6,13 @@ var html = {};
 /** On load function */
 $(function() {
 	loadTemplates();
+
+	$("body").on("click", function(e) {
+	    if ($(e.target).data('toggle') !== 'popover'
+	        && $(e.target).parents('.popover.in').length === 0) { 
+	        $('[data-toggle="popover"]').popover('hide');
+	    }
+	});
 });
 
 /** Pre-fetches the specified templates located in the /templates directory in an
@@ -26,7 +33,8 @@ function loadTemplates() {
 		"footer.html",
 		"email.html",
 		"enrolledSections.html",
-		"tempContent.html"
+		"tempContent.html",
+		"searchStudents.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -46,14 +54,6 @@ function loadTemplates() {
 function init() {
 	app.Router = new Router();
 	Backbone.history.start();
-
-	// The following two are for the demo
-	new FetchStudentsView({
-		el: $("#students-container")
-	});
-	new CreateStudentView({
-		el: $("#create-container")
-	});
 }
 
 var Router = Backbone.Router.extend({
@@ -65,46 +65,64 @@ var Router = Backbone.Router.extend({
         "":             	"login",
         "forgotPassword": 	"forgotPassword",
         "home": 	    	"home",
+        "searchStudents": 	"searchStudents",
         "students": 		"students",
         "students/:id": 	"viewStudent"
     },
 
     login: function() {
-    	console.log("Login View");
     	new LoginView({
     		el: this.el
     	});
     },
 
+    loadHome: function() {
+      	if ($("#container").html() == "") {
+    		this.home();
+    	}
+    },
+
     home: function() {
-    	console.log("Home View");
     	new HomePageView({
     		el: this.el
     	});
     },
 
     forgotPassword: function() {
-    	console.log("Forgot Password View");
     	new ForgotPasswordView({
     		el: this.el
     	});
     },
 
-    students: function() {
-    	console.log("Students list view");
-      	if ($("#container").html() == "") {
-    		this.home();
+    searchStudents: function() {
+    	this.loadHome();
+
+    	var filterStudents = $("#hidden").find("#filter-students-container");
+    	if (filterStudents.length) {
+    		filterStudents.detach().appendTo($("#content").empty());
+    	} else {
+	    	new SearchStudentsView({
+	    		el: $("#content"),
+	    	});
     	}
-	   	new FetchStudentsView({
-			el: $("#content")
-		});
+    },
+
+    students: function() {
+    	this.loadHome();
+
+    	var studentResults = $("#hidden").find("#students-table-container");
+    	if (studentResults.length) {
+    		studentResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new StudentsTableView({
+				el: $("#content")
+			});
+    	}
     },
 
     viewStudent: function(id) {
-    	console.log("View students view");
-    	if ($("#container").html() == "") {
-    		this.home();
-    	}
+    	this.loadHome();
+    	
 		$("#content").html(html["viewStudent.html"]);
 
 		var parent = $("#student-content");

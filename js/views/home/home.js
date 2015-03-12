@@ -37,7 +37,7 @@ var SidebarView = Backbone.View.extend({
 
 	events: {
 		"click .sidebar-link": "updateBreadcrumb",
-		"click .sidebar-link": "loadPage"
+		"click .sidebar-link": "loadPage",
 	},
 
 	updateBreadcrumb: function(evt) {
@@ -57,7 +57,7 @@ var SidebarView = Backbone.View.extend({
 		var link = $(evt.currentTarget).data("link");
 		switch (link) {
 			case "students":
-				app.Router.navigate("students", {trigger:true});
+				app.Router.navigate("searchStudents", {trigger:true});
 				break;
 			default:
 				app.Router.navigate("");
@@ -122,11 +122,23 @@ var HeaderView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #logout": "logout"
+		"click #logout": "logout",
+		"click .notification-popover": "displayNotificationPopover"
 	},
 
 	logout: function(evt) {
 		app.Router.navigate("", {trigger:true});
+	},
+
+	displayNotificationPopover: function(evt) {
+		console.log("popover");
+		$(evt.currentTarget).popover({
+			show: true,
+			placement: "bottom",
+			content: "<div>notifications 1 .......................................... <br> notifications 2 .............. <br> notifications 3 .............. <br></div>",
+			title: "Notifications",
+			html: true
+		});
 	}
 });
 

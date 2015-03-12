@@ -83,7 +83,7 @@ a {
 	margin-right: 10px;
 }
 
-#sidebar li {
+#sidebar > ul li {
 	border-bottom: 1px solid #ddd;
 }
 
@@ -249,4 +249,17 @@ a {
 
 #email-message {
 	height: 240px;
+}
+
+.notification-popover:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.popover-title {
+	color: #666;
+}
+
+.popover-content {
+	color: #666;
 }

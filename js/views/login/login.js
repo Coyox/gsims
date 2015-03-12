@@ -48,7 +48,6 @@ var LoginView = Backbone.View.extend({
 			this.validateCredentials();
 		}
 	}
-
 });
 
 var ForgotPasswordView = Backbone.View.extend({

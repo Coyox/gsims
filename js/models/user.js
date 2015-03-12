@@ -64,6 +64,10 @@ var Student = Backbone.Model.extend({
 
    	getEnrolledSectionsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/sections";
+   	},
+
+   	getSearchStudentsUrl: function() {
+   		return "https://gobind-sarvar.rhcloud.com/api/search/users/S";
    	}
 });
 
