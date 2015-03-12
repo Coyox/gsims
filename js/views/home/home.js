@@ -82,6 +82,7 @@ var SidebarView = Backbone.View.extend({
 	populateSchoolYearMenu: function() {
 		var select = this.$el.find("#school-year-options");
 		new SchoolYear().fetch().then(function(data) {
+			data.reverse();
 			_.each(data, function(object, index) {
 				var option = $("<option></option>");
 				option.attr("id", object.schoolyearid);

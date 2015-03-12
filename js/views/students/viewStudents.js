@@ -51,6 +51,11 @@ var SearchStudentsView = Backbone.View.extend({
 			data.year = this.$el.find("#year-option option:selected").val();
 		}
 
+		var city = this.$el.find("#city").val();
+		if (city != "") {
+			data.city = city;
+		}
+
 		var model = new Student();
 		model.fetch({
 			url: model.getSearchStudentsUrl(),
