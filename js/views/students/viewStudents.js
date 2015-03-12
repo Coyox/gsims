@@ -10,7 +10,7 @@ var SearchStudentsView = Backbone.View.extend({
 
 	events: {
 		"click #search-students": "searchStudents",
-		"click #searhc-all-students": "searchAllStudents",
+		"click #search-all-students": "searchAllStudents",
 		"click #clear-fields": "clearFields"
 	},
 
