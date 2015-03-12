@@ -484,6 +484,8 @@ function findUsers($usertype){
 
     if ($usertype=='S'){
         $year = $_GET['year'];
+        $loweryear = $_GET['lowerYear'];
+        $upperyear = $_GET['upperYear'];
         $gender = $_GET['gender'];
         $paid = $_GET['paid'];
         $city = $_GET['city'];
@@ -495,6 +497,7 @@ function findUsers($usertype){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
             }
+            if (isset($loweryear)){ $param['year'] = $_GET['yearop']." '".$loweryear."'' and '".$upperyear; }
             if (isset($gender)){ $param['gender'] = $gender; }
             if (isset($paid)){ $param['paid'] = $paid; }
             if (isset($city)){ $param['city'] = $city; }

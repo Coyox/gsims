@@ -1,9 +1,8 @@
 <?php
 
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
-define("less","<");
-define("equal","=");
-define("greater",">");
+define("less","<=");
+define("greater",">=");
 
 
 function randomNumber($digits){
