@@ -491,7 +491,10 @@ function findUsers($usertype){
         $country = $_GET['country'];
         $status = $_GET['status'];
         if (isset($firstname)||isset($lastname)||isset($year)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
-            if (isset($year)){ $param['year'] = (isset($_GET['yearop']))? ($_GET['yearop']."'".$year) : ("='".$year); }
+            if (isset($year)){
+                $yearop = constant($_GET['yearop']);
+                $param['year'] = $yearop."'".$year;
+            }
             if (isset($gender)){ $param['gender'] = $gender; }
             if (isset($paid)){ $param['paid'] = $paid; }
             if (isset($city)){ $param['city'] = $city; }
@@ -563,7 +566,6 @@ function findSections(){
         return getSectionsBySchool($schoolyear, $schoolid);
     }
 }
-
 
 /*
  Create new user in login table with generated login creds
