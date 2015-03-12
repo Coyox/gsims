@@ -235,14 +235,25 @@ function getEnrolledSections($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
+/*
+ * provide schoolyear string instead of schoolyearid
+ */
 function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
-    FROM section s, course c
-    WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id and e.schoolyearid not in :schoolyearid)
-    and s.courseid = c.courseid";
+            FROM section s, course c
+            WHERE s.sectionid
+                IN (SELECT e.sectionid FROM enrollment e
+                    WHERE e.userid=:id
+                    AND e.schoolyearid IN
+                   (SELECT sy.schoolyearid from schoolyear sy
+                    WHERE substr(sy.schoolyear,1,4) <= (SELECT substr(sy2.schoolyear,1,4) from schoolyear sy2 where sy2.schoolyearid=:schoolyearid)
+                    AND sy.schoolyearid <> :schoolyearid
+                 ))
+            AND s.courseid = c.courseid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id, "schoolyearid"=>$schoolyearid)));
 }
+
 
 /*
  * Updates a student record
