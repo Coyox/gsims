@@ -23,6 +23,10 @@ $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
 
+$app->get('/superusers', 'getSuperusers');
+$app->get('/superusers/:id', 'getSuperuserById');
+$app->post('/superusers', 'createSuperuser');
+
 $app->get('/schoolyears', 'getSchoolYears');
 
 $app->get('/schools', 'getSchools');
@@ -367,7 +371,7 @@ function createTeacher() {
     $body = $request->getBody();
     $teacher = json_decode($body);
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
-                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype))";
+                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
 
     $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
     $bindparams = array(
@@ -400,7 +404,7 @@ function createAdministrator() {
     $body = $request->getBody();
     $admin = json_decode($body);
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
-                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype))";
+                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
     $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
 
     $bindparams = array(
@@ -414,6 +418,39 @@ function createAdministrator() {
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
+
+#================================================================================================================#
+# Superusers
+#================================================================================================================#
+function getSuperusers() {
+    $sql = "SELECT userid, firstName, lastName, emailAddr, status from superuser order by firstName asc" ;
+    echo json_encode(perform_query($sql, 'GETALL'));
+}
+function getSuperuserById($id) {
+    $sql = "SELECT userid, firstName, lastName, emailAddr, status from superuser where userid=:id";
+    echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
+}
+function createSuperuser() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $superuser = json_decode($body);
+    $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
+                         values (:userid, :firstName, :lastName, :emailAddr, :status)";
+    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
+
+    $bindparams = array(
+        "userid" => $userid,
+        "firstName" => $superuser->firstName,
+        "lastName" => $superuser->lastName,
+        "emailAddr" => $superuser->emailAddr,
+        "status" => $superuser->status,
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+
+
+
 #================================================================================================================#
 # Users
 #================================================================================================================#
