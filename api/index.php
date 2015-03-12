@@ -119,7 +119,7 @@ function getCoursePrereqs($id){
     $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
-function assignCourseTeahcers($id, $tid){
+function assignCourseTeacher($id, $tid){
      $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
      $bindparams = array("tid"=>$tid, "id"=>$id);
      echo json_encode(perform_query($sql,'POST',$bindparams));
