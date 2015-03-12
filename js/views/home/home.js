@@ -132,15 +132,8 @@ var HeaderView = Backbone.View.extend({
 		app.Router.navigate("", {trigger:true});
 	},
 
-	displayNotificationPopover: function(evt) {
-		console.log("popover");
-		$(evt.currentTarget).popover({
-			show: true,
-			placement: "bottom",
-			content: "<div>notifications 1 .......................................... <br> notifications 2 .............. <br> notifications 3 .............. <br></div>",
-			title: "Notifications",
-			html: true
-		});
+	displayNotifications: function(evt) {
+
 	}
 });
 
