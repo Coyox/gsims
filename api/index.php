@@ -1,5 +1,6 @@
 <?php
 require 'Slim/Slim.php';
+require_once 'helpers.php';
 
 \Slim\Slim::registerAutoloader();
 
@@ -16,9 +17,11 @@ $app->delete('/students/:id', 'deleteStudent');
 
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
+$app->post('/teachers', 'createTeacher');
 
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
+$app->post('/administrators', 'createAdministrator');
 
 $app->get('/schoolyears', 'getSchoolYears');
 
@@ -55,9 +58,15 @@ $app->run();
 # Login
 #================================================================================================================#
 function validateCredentials() {
-    $sql = "SELECT userid, username, password, usertype, lastLogin from login where username=:username and password=:password";
-    $bindparam = array("username"=> $_GET['username'], "password"=>$_GET['password']);
-    echo json_encode(perform_query($sql, 'GET', $bindparam));
+    $password = $_GET['password'];
+    $sql = "SELECT userid, username, password, usertype, lastLogin from login where username=:username LIMIT 1";
+    $bindparam = array("username"=> $_GET['username']);
+    $user = perform_query($sql, 'GET', $bindparam);
+    // if ( hash_equals($user->password, crypt($password, $user->password)) ) {
+    //     echo json_encode($user);
+    // }
+    echo json_encode($user);
+
 }
 #================================================================================================================#
 # School Years
@@ -288,6 +297,8 @@ function updateStudent($id) {
  * Creates a student record
  */
 function createStudent() {
+    $userid = createNewUser($firstname, $lastname, $usertype);
+
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
@@ -298,8 +309,10 @@ function createStudent() {
     :province, :country, :postalCode, :phoneNumber, :emailAddr, :allergies, :prevSchools, :parentFirstName, :parentLastName,
     :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
     :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
+
+    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
     $bindparams = array(
-        "userid" => $student->userid,
+        "userid" => $userid,
         "firstName" => $student->firstName,
         "lastName" => $student->lastName,
         "dateOfBirth" => $student->dateOfBirth,
@@ -348,6 +361,29 @@ function getTeacherById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
+
+function createTeacher() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $teacher = json_decode($body);
+    $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
+                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype))";
+
+    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
+    $bindparams = array(
+        "userid" => $userid,
+        "schoolid" => $teacher->schoolid,
+        "firstName" => $teacher->firstName,
+        "lastName" => $teacher->lastName,
+        "emailAddr" => $student->emailAddr,
+        "status" => $student->status,
+        "usertype" => 'T'
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+
+}
+
+
 #================================================================================================================#
 # Administrators
 #================================================================================================================#
@@ -359,7 +395,25 @@ function getAdministratorById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
+function createAdministrator() {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $admin = json_decode($body);
+    $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
+                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype))";
+    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
 
+    $bindparams = array(
+        "userid" => $userid,
+        "schoolid" => $admin->schoolid,
+        "firstName" => $admin->firstName,
+        "lastName" => $admin->lastName,
+        "emailAddr" => $admin->emailAddr,
+        "status" => $admin->status,
+        "usertype" => 'A'
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 #================================================================================================================#
 # Users
 #================================================================================================================#
@@ -466,8 +520,6 @@ function findSections(){
         $sql.= buildDayClause($day);
     }
     $sql.= " order by s.sectionCode asc";
-    echo $sql;
-    echo "***************testing***************";
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
     else {
@@ -475,78 +527,24 @@ function findSections(){
     }
 }
 
-#================================================================================================================#
-# Helpers
-#================================================================================================================#
+
 /*
-* wrapper to perform sql queries
+ Create new user in login table with generated login creds
 */
-function perform_query($sql, $querytype, $bindparams=array()) {
-    try {
-        $db = getConnection();
-        if (array_filter($bindparams)){
-            $stmt = $db->prepare($sql);
-            $stmt->execute($bindparams);
-        }
-        else{
-            $stmt = $db->query($sql);
-        }
-        if ($querytype == 'GET') {
-            $result = $stmt->fetchObject();
-        }
-        elseif ($querytype == 'GETALL') {
-            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        }
-        elseif ($querytype == 'POST'){
-            $result = $db->lastInsertId();
-        }
-        else {
-            $result = null;
-        }
-        $db = null;
-        return $result;
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-    }
-}
+function createNewUser($firstname, $lastname, $usertype){
+    $sql = "INSERT into login (userid, username, password, usertype)
+            VALUES (:userid, :username, :password, :usertype)";
+    $userid="";
+    $username="";
+    $password="";
+    list($userid, $username, $password) = generateLogin($firstname, $lastname);
 
-/*
- * TODO: put the credentials in a separate config file
- */
-function getConnection() {
-    $dbhost = "127.4.196.130";
-    $dbname = "testdb";
-    $dbuser = "adminpVaqD1a";
-    $dbpass = "GpFqpeavU2dT";
-    $dbname = "gobind";
-    //$dbname = "testdb";
-    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $dbh;
-}
+    $password = generatePasswordHash($password);
 
-function buildDayClause($days){
-    $clause= "";
-    $days = explode(',', $days);
-    foreach($days as $day) {
-        $clause.=" and find_in_set('".$day."',`day`)";
-    }
-    return $clause;
-}
-
-function buildWhereClause($fieldArray, $clause=""){
-    foreach ($fieldArray as $key => $value) {
-        $clause.= ($clause==''? "WHERE ": " AND ");
-        if(substr($key, -4) === 'Name'){
-            $value = "%".$value."%";
-            $clause.=$key." like '".$value."'";
-        }
-        else if ($key=='year'){
-            $clause.=$key."(dateOfBirth)".$value."'";
-        }
-        else {
-            $clause.=$key."='".$value."'";
-        }
-    }
-    return $clause;
+    $bindparams=array("userid" => $userid,
+                      "username"=> $username,
+                      "password"=> $password,
+                      "usertype" => $usertype);
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+    return $userid;
 }

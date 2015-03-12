@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `login` (
   `username` varchar(50) NOT NULL,
   `password` varchar(50)  NOT NULL,
   `usertype` char(2) NOT NULL,
-  `lastLogin` timestamp NOT NULL
+  `lastLogin` timestamp
 );
 
 CREATE TABLE IF NOT EXISTS `teacher` (
@@ -133,7 +133,6 @@ CREATE TABLE IF NOT EXISTS `section` (
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
 );
-
 
 CREATE TABLE IF NOT EXISTS `document` (
   `docid` int(11) PRIMARY KEY NOT NULL,
