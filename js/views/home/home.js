@@ -87,6 +87,7 @@ var SidebarView = Backbone.View.extend({
 				var option = $("<option></option>");
 				option.attr("id", object.schoolyearid);
 				option.attr("value", object.schoolyear);
+				option.attr("selected", object.schoolyear == app.currentSchoolYear);
 				option.text(object.schoolyear);
 				select.append(option);
 			});

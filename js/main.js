@@ -1,4 +1,6 @@
-var app = {};
+var app = {
+	currentSchoolYear: "2014-2015"
+};
 
 /** Object to hold all HTML templates (pre-loaded) */
 var html = {};
@@ -122,7 +124,7 @@ var Router = Backbone.Router.extend({
 
     viewStudent: function(id) {
     	this.loadHome();
-    	
+
 		$("#content").html(html["viewStudent.html"]);
 
 		var parent = $("#student-content");

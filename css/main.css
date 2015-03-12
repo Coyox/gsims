@@ -226,11 +226,13 @@ a {
 
 .btn:focus {
 	outline: none;
+	color: #fff;
 }
 
 .btn:hover {
 	background-color: #B0507B;
 	border-color: #B0507B;
+	color: #fff;
 }
 
 .property-table td:first-child {
