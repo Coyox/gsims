@@ -114,8 +114,6 @@ function buildWhereClause($fieldArray, $clause=""){
             $clause.=$key."='".$value."'";
         }
     }
-    echo "!!!!!!!!!!!!!!!!!!testing!!!!!!!!!!!!!";
-    echo $clause;
     return $clause;
 }
 
