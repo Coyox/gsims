@@ -1,6 +1,10 @@
 <?php
 
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
+define("less","<");
+define("equal","=");
+define("greater",">");
+
 
 function randomNumber($digits){
   return rand(pow(10, $digits - 1) - 1, pow(10, $digits) - 1);
