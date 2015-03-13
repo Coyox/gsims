@@ -18,6 +18,7 @@ $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->post('/teachers', 'createTeacher');
+$app->put('/teachers/:id', 'updateTeacher');
 
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
@@ -26,6 +27,7 @@ $app->post('/administrators', 'createAdministrator');
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
 $app->post('/superusers', 'createSuperuser');
+$app->put('/superusers/:id', 'updateSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
 
@@ -287,12 +289,41 @@ function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $sql = "UPDATE student set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, userid=:id WHERE userid=:id";
+
+    $sql = "UPDATE student
+    set
+    firstName=:firstName, lastName=:lastName, dateOfBirth=:dateOfBirth, gender=:gender, streetAddr1=:streetAddr1, streetAddr2=:streetAddr2, city=:city,
+    province=:province, country=:country, postalCode=:postalCode, phoneNumber=:phoneNumber, emailAddr=:emailAddr, allergies=:allergies, prevSchools=:prevSchools, parentFirstName=:parentFirstName, parentLastName=:parentLastName,
+    parentPhoneNumber=:parentPhoneNumber, parentEmailAddr=:parentEmailAddr, emergencyContactFirstName=:emergencyContactFirstName, emergencyContactLastName=:emergencyContactLastName, emergencyContactRelation=:emergencyContactRelation,
+    emergencyContactPhoneNumber=:emergencyContactPhoneNumber, schoolid=:schoolid, paid=:paid, status=:status
+    WHERE userid=:userid";
+
     $bindparams = array(
-        "firstName"=>$student->firstName,
+        "firstName" => $student->firstName,
         "lastName" => $student->lastName,
-        "email" => $student->email,
-        "id" => $student->userid,
+        "dateOfBirth" => $student->dateOfBirth,
+        "gender" => $student->gender,
+        "streetAddr1" => $student->streetAddr1,
+        "streetAddr2" => $student->streetAddr2,
+        "city" => $student->city,
+        "province" => $student->province,
+        "country" => $student->country,
+        "postalCode" => $student->postalCode,
+        "phoneNumber" => $student->phoneNumber,
+        "emailAddr" => $student->emailAddr,
+        "allergies" => $student->allergies,
+        "prevSchools" => $student->prevSchools,
+        "parentFirstName" => $student->parentFirstName,
+        "parentLastName" => $student->parentLastName,
+        "parentPhoneNumber" => $student->parentPhoneNumber,
+        "parentEmailAddr" => $student->parentEmailAddr,
+        "emergencyContactFirstName" => $student->emergencyContactFirstName,
+        "emergencyContactLastName" => $student->emergencyContactLastName,
+        "emergencyContactRelation" => $student->emergencyContactRelation,
+        "emergencyContactPhoneNumber" => $student->emergencyContactPhoneNumber,
+        "schoolid" => $student->schoolid,
+        "paid" => $student->paid,
+        "status" => $student->status,
     );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
@@ -379,14 +410,36 @@ function createTeacher() {
         "schoolid" => $teacher->schoolid,
         "firstName" => $teacher->firstName,
         "lastName" => $teacher->lastName,
-        "emailAddr" => $student->emailAddr,
-        "status" => $student->status,
+        "emailAddr" => $teacher->emailAddr,
+        "status" => $teacher->status,
         "usertype" => 'T'
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
 
 }
 
+/*
+ Update teacher/administrator record
+*/
+function updateTeacher($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $teacher = json_decode($body);
+
+    $sql = "UPDATE teacher
+    set schoolid=:schoolid, firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, status=:status, usertype=:usertype
+    WHERE userid=:userid";
+
+    $bindparams = array(
+        "schoolid" => $teacher->schoolid,
+        "firstName" => $teacher->firstName,
+        "lastName" => $teacher->lastName,
+        "emailAddr" => $teacher->emailAddr,
+        "status" => $teacher->status,
+        "usertype" => $teacher->usertype
+    );
+    echo json_encode(perform_query($sql,'',$bindparams));
+}
 
 #================================================================================================================#
 # Administrators
@@ -448,7 +501,23 @@ function createSuperuser() {
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
+function updateSuperuser($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $superuser = json_decode($body);
 
+    $sql = "UPDATE superuser
+    set firstName=:firstName, lastName=:lastName, emailAddr=:emailAddr, status=:status
+    WHERE userid=:userid";
+
+    $bindparams = array(
+        "firstName" => $superuser->firstName,
+        "lastName" => $superuser->lastName,
+        "emailAddr" => $superuser->emailAddr,
+        "status" => $superuser->status,
+    );
+    echo json_encode(perform_query($sql,'',$bindparams));
+}
 
 
 #================================================================================================================#
