@@ -599,7 +599,6 @@ function findUsers($usertype){
 }
 
 
-/* TODO: find by times*/
 function findSections(){
     //Non-filter options
     $schoolyear = $_GET['schoolyearid'];
@@ -616,23 +615,25 @@ function findSections(){
 
 
     if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
-    $params = array();
-    $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
-    $courseclause = " and c.schoolyearid=:schoolyear";
-    if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
-    if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
+        $params = array();
+        $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
+        $courseclause = " and c.schoolyearid=:schoolyear";
+        if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
+        if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
 
-    $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
+        $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
 
-    $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+        $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
-    if (isset($day)){
-        $sql.= buildDayClause($day);
-    }
-    $sql.= " order by s.sectionCode asc";
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+        if (isset($day)){
+            $sql.= buildDayClause($day);
+        }
+
+        if (isset($startTime)){ " and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
+        $sql.= " order by s.sectionCode asc";
+        echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
     else {
         return getSectionsBySchool($schoolyear, $schoolid);
