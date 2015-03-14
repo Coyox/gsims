@@ -114,4 +114,61 @@ VALUES (444444, 412312, "Gurmukhi", 100000, "active", CURRENT_TIMESTAMP),
 (444449, 412312, "Extra Help", 100000, "active", CURRENT_TIMESTAMP),
 (444450, 412312, "Dastar", 100000, "active", CURRENT_TIMESTAMP),
 (444451, 412312, "Girls Activity", 100000, "active", CURRENT_TIMESTAMP),
-(444452, 412312, "SSGS Pothi", 100000, "active", CURRENT_TIMESTAMP),
+(444452, 412312, "SSGS Pothi", 100000, "active", CURRENT_TIMESTAMP);
+
+
+-- INSERT COURSES --
+INSERT INTO `course`(`courseid`, `courseName`, `description`, `deptid`, `schoolyearid`, `status`, `lastAccessed`) 
+VALUES 
+(222220, "Little Khalsa Club Level 2", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
+(222221, "Little Khalsa Club Level 2", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
+(222222, "Gurmukhi Beg", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
+(222223, "Gurmukhi Beg Adult", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
+(222224, "Gurmukhi Intermediate", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
+(222225, "Tantee Saaj Advance", "", 444442, 100000, "active", CURRENT_TIMESTAMP),
+(222226, "Nitnem Santhiya Introduction Girls", "", 444443, 100000, "active", CURRENT_TIMESTAMP),
+(222227, "Nitnem Santhiya Introduction Boys", "", 444443, 100000, "active", CURRENT_TIMESTAMP),
+(222228, "Gurmukhi Advance", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
+(222229, "SSGS Pothi 1 Boys", "", 444452, 100000, "active", CURRENT_TIMESTAMP),
+(222230, "SSGS Pothi 1 Girls", "", 444452, 100000, "active", CURRENT_TIMESTAMP),
+(222240, "Waja Level 4/5 Boys", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(222250, "Waja Level 5 Girls", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(222260, "Tabla Level 1/2 Girls", "", 444446, 100000, "active", CURRENT_TIMESTAMP),
+(222270, "Gatka Level 1", "", 444447, 100000, "active", CURRENT_TIMESTAMP),
+(222280, "Little  Khalsa Club Level 3", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
+(222290, "Gurmukhi Advance Boys", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
+(222020, "Tabla Level 3 Boys", "", 444446, 100000, "active", CURRENT_TIMESTAMP),
+(222120, "Waja Level 4 Girls", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(223220, "Waja Level 3 Boys", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(222320, "Gatka Level 3 Boys", "", 444447, 100000, "active", CURRENT_TIMESTAMP),
+(222420, "Sikh History Girls 7-10", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(222520, "Sikh History Boys 7-10", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(222620, "Sikh History Girls 11-13", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(222720, "Sikh History Girls 14-17", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(222820, "Sikh History Boys 11-15", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(222920, "Sikh History Boys 16+", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(220220, "Sikh History Girls 18+", "", 444448, 100000, "active", CURRENT_TIMESTAMP),
+(221220, "Extra Help Gurmukhi", "", 444449, 100000, "active", CURRENT_TIMESTAMP),
+(224220, "Waja Level 1 Girls", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(223227, "Tabla Level 3 Girls", "", 444446, 100000, "active", CURRENT_TIMESTAMP),
+(224228, "Gatka Level 2 Boys", "", 444447, 100000, "active", CURRENT_TIMESTAMP),
+(225220, "Waja Level 5 Boys", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(226220, "Tabla Level 1 Boys", "", 444446, 100000, "active", CURRENT_TIMESTAMP),
+(227220, "Tantee Saaj Boys", "", 444442, 100000, "active", CURRENT_TIMESTAMP),
+(228220, "Waja Level 3 Girls", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(229220, "Waja 18+ Girls", "", 444445, 100000, "active", CURRENT_TIMESTAMP),
+(202220, "Dastar Class", "", 444450, 100000, "active", CURRENT_TIMESTAMP),
+(212220, "Girls Activity Class 12-16", "", 444451, 100000, "active", CURRENT_TIMESTAMP);
+
+
+
+
+
+
+
+
+
+
+
+
+
