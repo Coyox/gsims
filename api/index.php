@@ -47,28 +47,30 @@ $app->put('/departments/:id', 'updateDepartment');
 
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
-$app->post('/courses/:id/prereqs', 'addCoursePrereqs');
-$app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
+$app->post('/courses/:id/prereqs', 'addCoursePrereqs');
 $app->post('/courses/:id/:tid', 'assignCourseTeacher');
 $app->post('/courses', 'createCourse');
 $app->put('/courses/:id', 'updateCourse');
+$app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
-$app->delete('/sections/students/:id/:sid', 'dropStudent');
-$app->post('/sections/students/:id/:sid', 'enrollStudent');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 $app->post('/sections', 'createSection');
+$app->post('/sections/students/:id/:sid', 'enrollStudent');
+$app->post('/sections/:id/attendance/:userid', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
+$app->delete('/sections/students/:id/:sid', 'dropStudent');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
+$app->put('/login/:id', 'updateLogin');
 
 $app->run();
 
@@ -85,6 +87,24 @@ function validateCredentials() {
     //     echo json_encode($user);
     // }
     echo json_encode($user);
+}
+
+function updateLogin($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $user = json_decode($body);
+
+    $sql = "UPDATE login
+    set username=:username, password=:password
+    WHERE userid=:userid";
+
+    $hash = generatePasswordHash($user->password);
+    $bindparams = array(
+        "userid" => $id,
+        "username" => $user->username,
+        "password" => $hash
+    );
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 #================================================================================================================#
 # School Years
@@ -441,6 +461,11 @@ function updateSection($id) {
         "status" => $course->status
     );
     echo json_encode(perform_query($sql,'',$bindparams));
+}
+
+/*TODO*/
+function inputAttendance($id, $userid){
+    $date = $_POST["date"];
 }
 
 #================================================================================================================#
