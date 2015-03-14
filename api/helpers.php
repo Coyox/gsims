@@ -11,12 +11,9 @@ function randomNumber($digits){
 
 function generateLogin($firstname, $lastname){
     // 6 digit userid
-    $userid = randomNumber(6);
     $sql = "SELECT userid from login where userid=:userid";
     $bindparam = array("userid"=>$userid);
-    while (perform_query($sql, 'GET', $bindparam != FALSE)){
-        $userid = randomNumber(6);
-    }
+    $userid = generateUniqueID($sql, $bindparam, 6);
 
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
@@ -34,8 +31,15 @@ function generateLogin($firstname, $lastname){
      $password .= $chars[$index];
     }
 
-
     return array($userid, $username, $password);
+}
+
+function generateUniqueID($sql, $bindparam, $digit){
+    $id = randomNumber($digit);
+    while (perform_query($sql, 'GET', $bindparam)!= FALSE){
+        $id = randomNumber($digit);
+    }
+    return $id;
 }
 
 /*TODO*/

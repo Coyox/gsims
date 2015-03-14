@@ -33,6 +33,7 @@ $app->put('/superusers/:id', 'updateSuperuser');
 $app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
+$app->post('/schoolyears', 'createSchoolYear');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -84,6 +85,22 @@ function getSchoolYears(){
     echo json_encode(perform_query($sql,'GETALL'));
 }
 
+function createSchoolYear(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $schoolyear = json_decode($body);
+
+    // 6 digit schoolyearid
+    $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
+    $bindparam = array("schoolyearid"=>$schoolyearid);
+    $schoolyearid = generateUniqueID($sql, $bindparam, 6);
+
+    $sql = "INSERT into schoolyear (schoolyearid, schoolyear)
+            values (:schoolyearid, :schoolyear)";
+
+    $bindparam["schoolyear"] = $schoolyear->schoolyear;
+    echo json_encode(perform_query($sql,'POST',$bindparam));
+}
 #================================================================================================================#
 # Schools
 #================================================================================================================#

@@ -10,7 +10,6 @@ var School = Backbone.Model.extend({
 
 var SchoolYear = Backbone.Model.extend({
 	defaults: {
-		schoolyearid: "",
 		schoolyear: ""
 	},
 	urlRoot: "https://gobind-sarvar.rhcloud.com/api/schoolyears"
