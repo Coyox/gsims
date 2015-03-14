@@ -43,7 +43,7 @@ var Student = Backbone.Model.extend({
 
    	/** Student info properties */
    	studentProperties: [
-   		"firstName", "lastName", "dateOfBirth", "phoneNumber", "emailAddr", "allergies", 
+   		"firstName", "lastName", "dateOfBirth", "phoneNumber", "emailAddr", "allergies",
    		"gender", "prevAttendedGS", "paid", "schoolid", "status", "lastAccessed"
    	],
 
@@ -92,6 +92,8 @@ var Superuser = Backbone.Model.extend({
 
 var User = Backbone.Model.extend({
 	defaults: {
+		username: "",
+		password: ""
 	},
 
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",

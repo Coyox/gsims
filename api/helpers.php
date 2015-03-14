@@ -27,7 +27,6 @@ function generateLogin($firstname, $lastname){
     $count = strlen($chars);
     $desired_length = rand(8, 12);
     for($length = 0; $length < $desired_length; $length++) {
-     //Append a random ASCII character (including symbols)
      $index = rand(0, $count-1);
      $password .= $chars[$index];
     }
