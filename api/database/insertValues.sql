@@ -118,9 +118,10 @@ VALUES (444444, 412312, "Gurmukhi", 100000, "active", CURRENT_TIMESTAMP),
 
 
 -- INSERT COURSES --
+
 INSERT INTO `course`(`courseid`, `courseName`, `description`, `deptid`, `schoolyearid`, `status`, `lastAccessed`) 
 VALUES 
-(222220, "Little Khalsa Club Level 2", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
+(222220, "Little Khalsa Club Level 1", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
 (222221, "Little Khalsa Club Level 2", "", 444441, 100000, "active", CURRENT_TIMESTAMP),
 (222222, "Gurmukhi Beg", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
 (222223, "Gurmukhi Beg Adult", "", 444444, 100000, "active", CURRENT_TIMESTAMP),
@@ -161,11 +162,79 @@ VALUES
 (212220, "Girls Activity Class 12-16", "", 444451, 100000, "active", CURRENT_TIMESTAMP);
 
 
+-- INSERT SECTIONS --
 
+INSERT INTO `section`(`sectionid`, `courseid`, `sectionCode`, `day`, `startTime`, `endTime`, `roomCapacity`, `roomLocation`, `classSize`, `schoolyearid`, `status`, `lastAccessed`) 
+VALUES 
+(900000, 222220, "1B", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900001, 222221, "2B", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#2", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900002, 222222, "GB1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#1", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900003, 222223, "GBA1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#6", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900004, 222224, "GM1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900005, 222225, "TSA1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#10", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900006, 222226, "ISG1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#12", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900007, 222227, "ISB1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#7", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900008, 222228, "GA1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#4", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900009, 222229, "SPB1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#8", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900010, 222230, "SPG1", ("SAT, SUN"), "5:15:00", "6:15:00", "50", "#11", "43", 100000, "active", CURRENT_TIMESTAMP),
 
+(900011, 222220, "1A", ("MON, THU"), "6:15:00", "7:15:00", "50", "#1", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900012, 222221, "2A", ("MON, THU"), "6:15:00", "7:15:00", "50", "#6", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900013, 222228, "GA2", ("MON, THU"), "6:15:00", "7:15:00", "50", "#7", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900014, 222227, "ISB2", ("MON, THU"), "6:15:00", "7:15:00", "50", "#12", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900015, 222226, "ISG2", ("MON, THU"), "6:15:00", "7:15:00", "50", "#9", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900016, 222240, "WB4", ("MON, THU"), "6:15:00", "7:15:00", "50", "#10", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900017, 222250, "WG5", ("MON, THU"), "6:15:00", "7:15:00", "50", "#11", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900018, 222260, "TG12", ("MON, THU"), "6:15:00", "7:15:00", "50", "GYM", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900019, 222270, "GK1", ("MON, THU"), "6:15:00", "7:15:00", "50", "#2/3", "43", 100000, "active", CURRENT_TIMESTAMP),
 
+(900020, 222220, "1C", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900021, 222280, "3A", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900022, 222222, "GB3", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900023, 222223, "GBA3", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900024, 222224, "GI3", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900025, 222290, "GA3", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900026, 222020, "TB3", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900027, 223220, "WB2", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900028, 222120, "WG2", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900029, 227220, "TSIB", ("TUE, FRI"), "6:15:00", "7:15:00", "50", "#3", "43", 100000, "active", CURRENT_TIMESTAMP),
 
+(900030, 222224, "GI4", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900031, 222228, "GA4", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900032, 222020, "TB2", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900033, 222120, "WG4", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900034, 223220, "WB3", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900035, 222229, "SPB2", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900036, 222230, "SPG2", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900037, 222230, "SPG3", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900038, 222320, "GK3", ("WED, SAT"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
 
+(900039, 222420, "SHG7", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900040, 222520, "SHB7", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900041, 222620, "SHG11", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900042, 222720, "SHG14", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900043, 222820, "SHB11", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900044, 222920, "SHB16", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900045, 222320, "SHB18", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900046, 220220, "EHG1", ("SUN"), "6:15:00", "7:15:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+
+(900047, 224220, "WG1", ("MON, THU"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900048, 223227, "TG3", ("MON, THU"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900049, 224228, "GK2", ("MON, THU"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900050, 222224, "GI2", ("MON, THU"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900051, 225220, "WB5", ("MON, THU"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+
+(900052, 226220, "TB1", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900053, 227220, "TSB", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900054, 228220, "WG3", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900055, 229220, "WG18", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900056, 202220, "DC1", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900057, 212220, "GA12", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900058, 220220, "EHG2", ("TUE, FRI"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+
+(900059, 224220, "WB1", ("WED, SAT"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900060, 227220, "TSBG", ("WED, SAT"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP),
+(900061, 220220, "EHG3", ("WED, SAT"), "7:30:00", "8:30:00", "50", "#5", "43", 100000, "active", CURRENT_TIMESTAMP);
 
 
 
