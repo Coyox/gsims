@@ -19,15 +19,18 @@ $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->post('/teachers', 'createTeacher');
 $app->put('/teachers/:id', 'updateTeacher');
+$app->delete('/teachers/:id', 'deleteTeacher');
 
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
+$app->delete('/administrators/:id', 'deleteAdmininistrator');
 
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
 $app->post('/superusers', 'createSuperuser');
 $app->put('/superusers/:id', 'updateSuperuser');
+$app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
 
@@ -72,7 +75,6 @@ function validateCredentials() {
     //     echo json_encode($user);
     // }
     echo json_encode($user);
-
 }
 #================================================================================================================#
 # School Years
@@ -378,10 +380,11 @@ function createStudent() {
 }
 
 /*
- * Updates a student record
+ * mark student as inactive
  */
 function deleteStudent($id) {
-    $sql = "DELETE from student where userid=:id";
+    //$sql = "DELETE from student where userid=:id";
+    $sql = "UPDATE student set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
@@ -440,7 +443,13 @@ function updateTeacher($id) {
     );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
-
+/*
+ * mark teacher as inactive
+ */
+function deleteTeacher($id) {
+    $sql = "UPDATE teacher set status='inactive' where userid=:id";
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
 #================================================================================================================#
 # Administrators
 #================================================================================================================#
@@ -471,7 +480,10 @@ function createAdministrator() {
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
-
+function deleteAdministrator($id) {
+    $sql = "UPDATE teacher set status='inactive' where userid=:id";
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
 #================================================================================================================#
 # Superusers
 #================================================================================================================#
@@ -518,7 +530,10 @@ function updateSuperuser($id) {
     );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
-
+function deleteSuperuser($id) {
+    $sql = "UPDATE superuser set status='inactive' where userid=:id";
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
 
 #================================================================================================================#
 # Users
