@@ -52,7 +52,7 @@ $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->post('/courses/:id/:tid', 'assignCourseTeacher');
 $app->post('/courses', 'createCourse');
-$app->put('/courses/:id', 'updateCourses');
+$app->put('/courses/:id', 'updateCourse');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
