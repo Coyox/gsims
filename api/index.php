@@ -10,7 +10,6 @@ $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
-
 $app->post('/students', 'createStudent');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
@@ -38,14 +37,17 @@ $app->post('/schoolyears', 'createSchoolYear');
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/departments', 'getDepartments');
+$app->post('/schools', 'createSchool');
 
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
+$app->post('/departments', 'createDepartment');
 
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->post('/courses/:id/:tid', 'assignCourseTeacher');
+$app->post('/courses', 'createCourse');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/:id', 'getSectionById');
@@ -55,6 +57,7 @@ $app->delete('/sections/students/:id/:sid', 'dropStudent');
 $app->post('/sections/students/:id/:sid', 'enrollStudent');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
+$app->post('/sections', 'createSection');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -90,16 +93,13 @@ function createSchoolYear(){
     $body = $request->getBody();
     $schoolyear = json_decode($body);
 
-    // 6 digit schoolyearid
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
-    $bindparam = array("schoolyearid"=>$schoolyearid);
-    $schoolyearid = generateUniqueID($sql, $bindparam, 6);
+    $schoolyearid = generateUniqueID($sql, "schoolyearid");
 
     $sql = "INSERT into schoolyear (schoolyearid, schoolyear)
             values (:schoolyearid, :schoolyear)";
-
-    $bindparam["schoolyear"] = $schoolyear->schoolyear;
-    echo json_encode(perform_query($sql,'POST',$bindparam));
+    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear);
+    echo json_encode(perform_query($sql,'POST', $bindparam));
 }
 #================================================================================================================#
 # Schools
@@ -120,6 +120,26 @@ function getDepartments($id){
     $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
+function createSchool(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $school = json_decode($body);
+
+    $sql = "SELECT schoolid from school where schoolid=:schoolid";
+    $schoolid = generateUniqueID($sql, "schoolid");
+
+    $sql = "INSERT into school (schoolid, location, postalCode, yearOpened, status)
+            values (:schoolid, :location, :postalCode, :yearOpened, :status)";
+
+    $bindparams = array(
+        "schoolid" => $schoolid,
+        "location" => $school->location,
+        "postalCode" => $school->postalCode,
+        "yearOpened" => $school->yearOpened,
+        "status" => $school->status
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 #================================================================================================================#
 # Departments
 #================================================================================================================#
@@ -134,6 +154,25 @@ function getCourses($id){
     $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by courseName asc";
     $bindparam = array("id"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
+}
+function createDepartment(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $dept = json_decode($body);
+
+    $sql = "SELECT deptid from dept where deptid=:deptid";
+    $deptid = generateUniqueID($sql, "deptid");
+
+    $sql = "INSERT into department (schoolid, deptName, schoolyearid, status)
+            values (:schoolid, :deptName, :schoolyearid, :status)";
+
+    $bindparams = array(
+        "schoolid" => $deptid,
+        "deptName" => $dept->deptName,
+        "schoolyearid" => $dept->schoolyearid,
+        "status" => $dept->status
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 #================================================================================================================#
 # Courses
@@ -157,6 +196,27 @@ function assignCourseTeacher($id, $tid){
      $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
      $bindparams = array("tid"=>$tid, "id"=>$id);
      echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+function createCourse(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $course = json_decode($body);
+
+    $sql = "SELECT courseid from course where courseid=:courseid";
+    $courseid = generateUniqueID($sql, "courseid");
+
+    $sql = "INSERT into course (courseid, courseName, description, deptid, schoolyearid, status)
+            values (:courseid, :courseName, :description, :deptid, :schoolyearid, :status)";
+
+    $bindparams = array(
+        "courseid" => $courseid,
+        "courseName" => $course->courseName,
+        "description" => $course->description,
+        "deptid" => $course->deptid,
+        "schoolyearid" => $course->schoolyearid,
+        "status" => $course->status
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 #================================================================================================================#
 # Sections
@@ -244,8 +304,32 @@ function assignSectionTeacher($id, $tid){
     $bindparams = array("tid"=>$tid, "id"=>$id);
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
+function createSection(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $section = json_decode($body);
 
+    $sql = "SELECT sectionid from section where sectionid=:sectionid";
+    $sectionid = generateUniqueID($sql, "sectionid");
 
+    $sql = "INSERT into section (sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, schoolyearid, status)
+            values (:sectionid, :courseid, :sectionCode, :day, :startTime, :endTime, :roomCapacity, :roomLocation, :classSize, :schoolyearid, :status)";
+
+    $bindparams = array(
+        "sectionid" => $section->sectionid,
+        "courseid" => $section->courseid,
+        "sectionCode" => $section->sectionCode,
+        "day" => $section->day,
+        "startTime" => $section->startTime,
+        "endTime" => $section->endTime,
+        "roomCapacity" => $section->roomCapacity,
+        "roomLocation" => $section->roomLocation,
+        "classSize" => $section->classSize,
+        "schoolyearid" => $section->schoolyearid,
+        "status" => $section->status
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 #================================================================================================================#
 # Students
 #================================================================================================================#

@@ -41,7 +41,8 @@ var Section = Backbone.Model.extend({
 		courseid: "",
 		sectionCode: "",
 		day: "",
-		time:"",
+		startTime: "",
+		endTime:"",
 		roomCapacity: "",
 		roomLocation: "",
 		classSize: "",
@@ -49,4 +50,15 @@ var Section = Backbone.Model.extend({
 		status: ""
 	},
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/sections",
+});
+
+var Prereq = Backbone.Model.extend({
+	defaults: {
+		courseid: "",
+		prereq: ""
+	}
+});
+
+var Prereqs = Backbone.Collection.extend({
+	model: Prereq
 });

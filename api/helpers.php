@@ -1,5 +1,6 @@
 <?php
 
+define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
 define("less","<=");
 define("greater",">=");
@@ -13,7 +14,7 @@ function generateLogin($firstname, $lastname){
     // 6 digit userid
     $sql = "SELECT userid from login where userid=:userid";
     $bindparam = array("userid"=>$userid);
-    $userid = generateUniqueID($sql, $bindparam, 6);
+    $userid = generateUniqueID($sql, $bindparam);
 
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
@@ -22,7 +23,7 @@ function generateLogin($firstname, $lastname){
 
     // password to be hashed
     $password='';
-    $chars = constant("pwchars");
+    $chars = pwchars;
     $count = strlen($chars);
     $desired_length = rand(8, 12);
     for($length = 0; $length < $desired_length; $length++) {
@@ -34,8 +35,9 @@ function generateLogin($firstname, $lastname){
     return array($userid, $username, $password);
 }
 
-function generateUniqueID($sql, $bindparam, $digit){
+function generateUniqueID($sql, $param, $digit=IDdigits){
     $id = randomNumber($digit);
+    $bindparam = array($param=>$id);
     while (perform_query($sql, 'GET', $bindparam)!= FALSE){
         $id = randomNumber($digit);
     }
