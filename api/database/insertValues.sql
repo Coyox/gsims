@@ -8,6 +8,8 @@ VALUES(341231, 412312, "Harry", "Potter", "test@gmail.com", "active", "T"),
 
 ;
 
+-- INSERT STUDENTS/LOGIN --
+
 INSERT INTO `gobind`.`login` (`userid`, `username`, `password`, `usertype`, `lastLogin`) 
 VALUES ('1234567', 'KYLE@test.com', 'pass1', 'S', CURRENT_TIMESTAMP);
 
@@ -98,4 +100,18 @@ values(1234576, "Earl", "Thomas", "1980-03-12", "M", "1234 Rodeo Dr", "", "Vanco
     "7781234567", 412312, "T", "active", CURRENT_TIMESTAMP);
 
 
+-- INSERT DEPARTMENTS --
 
+INSERT INTO `department`(`deptid`, `schoolid`, `deptName`, `schoolyearid`, `status`, `lastAccessed`) 
+VALUES (444444, 412312, "Gurmukhi", 100000, "active", CURRENT_TIMESTAMP),
+(444441, 412312, "Little Khalsa Club", 100000, "active", CURRENT_TIMESTAMP),
+(444442, 412312, "Tantee Saaj", 100000, "active", CURRENT_TIMESTAMP),
+(444443, 412312, "Santhiya", 100000, "active", CURRENT_TIMESTAMP),
+(444445, 412312, "Waga", 100000, "active", CURRENT_TIMESTAMP),
+(444446, 412312, "Tabla", 100000, "active", CURRENT_TIMESTAMP),
+(444447, 412312, "Gatka", 100000, "active", CURRENT_TIMESTAMP),
+(444448, 412312, "Sikh History", 100000, "active", CURRENT_TIMESTAMP),
+(444449, 412312, "Extra Help", 100000, "active", CURRENT_TIMESTAMP),
+(444450, 412312, "Dastar", 100000, "active", CURRENT_TIMESTAMP),
+(444451, 412312, "Girls Activity", 100000, "active", CURRENT_TIMESTAMP),
+(444452, 412312, "SSGS Pothi", 100000, "active", CURRENT_TIMESTAMP),
