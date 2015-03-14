@@ -68,7 +68,7 @@ var SearchStudentsView = Backbone.View.extend({
 		if (city != "") {
 			data.city = city;
 		}
-		console.log(data);
+
 		var model = new Student();
 		model.fetch({
 			url: model.getSearchStudentsUrl(),
@@ -80,12 +80,12 @@ var SearchStudentsView = Backbone.View.extend({
 
 	changeRoute: function(data) {
 		storeContent();
-
-		app.Router.navigate("students", {trigger:true});
+		app.Router.navigate("students/search");
 		var view = new StudentsTableView({
-			el: $("#content")
+			el: $("#content"),
+			results: data
 		});
-		view.populateQueryResults(data);
+		//view.populateQueryResults(data);
 	},
 
 	populateYearMenu: function() {
@@ -119,12 +119,17 @@ var SearchStudentsView = Backbone.View.extend({
 
 var StudentsTableView = Backbone.View.extend({
 	initialize: function(options) {
+		this.results = options.results;
 		this.render();
 	},
 
 	render: function() {
-		var view = this;
 		this.$el.html(html["viewStudents.html"]);
+		if (this.results) {
+			this.populateQueryResults(this.results);
+		} else {
+			this.fetchAllResults();
+		}
 	},
 
 	events: {
@@ -140,6 +145,20 @@ var StudentsTableView = Backbone.View.extend({
 			});
 		}, this);
 		this.$el.find("table").dataTable();
+	},
+
+	fetchAllResults: function() {
+		var view = this;
+		new Student().fetch().then(function(data) {
+			_.each(data, function(object, index) {
+				var model = new Student(object, {parse:true});
+				new StudentTableRowView({
+					model: model,
+					el: view.addRow(".results")
+				});
+			}, view);
+			view.$el.find("table").dataTable();
+		});
 	},
 
 	refreshTable: function() {
@@ -177,7 +196,7 @@ var StudentTableRowView = Backbone.View.extend({
 	},
 
 	viewStudent: function(evt) {
-		storeContent($("#content").html(), "students");
+		//storeContent();
 
 		var id = $(evt.currentTarget).attr("id");
 		app.Router.navigate("students/" + id, {trigger:true});

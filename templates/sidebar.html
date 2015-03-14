@@ -9,78 +9,161 @@
 	</div>
 </div>
 <ul class="nav">
+	<!-- DASHBOARD -->
 	<li class="active">
 		<a class="sidebar-link" data-link="dashboard">
 			<span class="glyphicon glyphicon-dashboard"></span>
 			<span class="text"> Dashboard</span>
 		</a>
 	</li>
-	<li>
-		<a class="sidebar-link" data-link="students">
-			<span class="glyphicon glyphicon-user"></span>
-			<span class="text"> Students</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="teachers">
-			<span class="glyphicon glyphicon-user"></span>
-			<span class="text"> Teachers</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="admins">
-			<span class="glyphicon glyphicon-user"></span>
-			<span class="text"> Administrators</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="admins">
-			<span class="glyphicon glyphicon-user"></span>
-			<span class="text"> Superusers</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="courses">
-			<span class="glyphicon glyphicon-th-list"></span>
-			<span class="text"> Courses</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="school-year">
-			<span class="glyphicon glyphicon-calendar"></span>
-			<span class="text"> School Years</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="import">
-			<span class="glyphicon glyphicon-import"></span>
-			<span class="text"> Import</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="export">
-			<span class="glyphicon glyphicon-export"></span>
-			<span class="text"> Export</span>
-		</a>
-	</li>
-	<li>
-		<a class="sidebar-link" data-link="email">
-			<span class="glyphicon glyphicon-envelope"></span>
-			<span class="text"> Send Email</span>
-		</a>
-	</li>
+
+	<!-- NOTIFICATIONS -->
 	<li>
 		<a class="sidebar-link" data-link="notifications">
 			<span class="glyphicon glyphicon-bell"></span>
 			<span class="text"> Notifications</span>
 		</a>
 	</li>
+
+	<!-- STUDENTS -->
+	<li data-toggle="collapse" data-target="#students" class="collapsed">
+		<a class="sidebar-link">
+			<span class="glyphicon glyphicon-user"></span>
+			<span class="text"> Students</span>
+			<span class="caret"></span>
+		</a>
+	</li>
+	<ul class="sub-menu collapse" id="students">
+		<li>
+			<span class="glyphicon glyphicon-search"></span>
+			<a href="#filterStudents">Search Students</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-th-list"></span>
+			<a href="#students/all">View all Students</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-plus-sign"></span>
+			<a href="#home">Create a Student</a>
+		</li>
+	</ul>
+
+	<!-- TEACHERS -->
+	<li data-toggle="collapse" data-target="#teachers" class="collapsed">
+		<a class="sidebar-link" data-link="teachers">
+			<span class="glyphicon glyphicon-user"></span>
+			<span class="text"> Teachers</span>
+			<span class="caret"></span>
+		</a>
+	</li>
+	<ul class="sub-menu collapse" id="teachers">
+		<li>
+			<span class="glyphicon glyphicon-search"></span>
+			<a href="#home">Search Teachers</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-th-list"></span>
+			<a href="#home">View all Teachers</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-plus-sign"></span>
+			<a href="#home">Create a Teacher</a>
+		</li>
+	</ul>
+
+	<!-- ADMINISTRATORS -->
+	<li data-toggle="collapse" data-target="#admins" class="collapsed">
+		<a class="sidebar-link" data-link="admins">
+			<span class="glyphicon glyphicon-user"></span>
+			<span class="text"> Administrators</span>
+			<span class="caret"></span>
+		</a>
+	</li>
+	<ul class="sub-menu collapse" id="admins">
+		<li>
+			<span class="glyphicon glyphicon-th-list"></span>
+			<a href="#home">View all Administrators</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-plus-sign"></span>
+			<a href="#home">Create an Administrator</a>
+		</li>
+	</ul>
+
+	<!-- SUPERUSERS -->
+	<li data-toggle="collapse" data-target="#superusers" class="collapsed">
+		<a class="sidebar-link" data-link="superusers">
+			<span class="glyphicon glyphicon-user"></span>
+			<span class="text"> Superusers</span>
+			<span class="caret"></span>
+		</a>
+	</li>
+	<ul class="sub-menu collapse" id="superusers">
+		<li>
+			<span class="glyphicon glyphicon-th-list"></span>
+			<a href="#home">View All Superusers</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-plus-sign"></span>
+			<a href="#home">Create A Superuser</a>
+		</li>
+	</ul>
+
+	<!-- COURSES -->
+	<li>
+		<a class="sidebar-link" data-link="courses">
+			<span class="glyphicon glyphicon-th-list"></span>
+			<span class="text"> Courses</span>
+		</a>
+	</li>
+
+	<!-- ADMIN TOOLS -->
+	<li data-toggle="collapse" data-target="#admin-tools" class="collapsed">
+		<a class="sidebar-link" data-link="admin-tools">
+			<span class="glyphicon glyphicon-wrench"></span>
+			<span class="text"> Administrative Tools</span>
+			<span class="caret"></span>
+		</a>
+	</li>
+	<ul class="sub-menu collapse" id="admin-tools">
+		<li>
+			<span class="glyphicon glyphicon-hand-right"></span>
+			<a href="#home">Open/Close Registration</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-calendar"></span>
+			<a href="#home">Manage School Years</a>
+		</li>		
+		<li>
+			<span class="glyphicon glyphicon-education"></span>
+			<a href="#home">Manage Schools</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-export"></span>
+			<a href="#home">Export Data</a>
+		</li>
+		<li>
+			<span class="glyphicon glyphicon-import"></span>
+			<a href="#home">Import Data</a>
+		</li>	</ul>
+
+	<!-- EMAIL -->
+	<li>
+		<a class="sidebar-link" data-link="email">
+			<span class="glyphicon glyphicon-envelope"></span>
+			<span class="text"> Send Email</span>
+		</a>
+	</li>
+
+	<!-- SETTINGS -->
 	<li>
 		<a class="sidebar-link" data-link="settings">
 			<span class="glyphicon glyphicon-cog"></span>
 			<span class="text"> Settings</span>
 		</a>
 	</li>
+
+	<!-- HELP -->
 	<li>
 		<a class="sidebar-link" data-link="help">
 			<span class="glyphicon glyphicon-question-sign"></span>

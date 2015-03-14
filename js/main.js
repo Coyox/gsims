@@ -67,8 +67,9 @@ var Router = Backbone.Router.extend({
         "":             	"login",
         "forgotPassword": 	"forgotPassword",
         "home": 	    	"home",
-        "searchStudents": 	"searchStudents",
-        "students": 		"students",
+        "filterStudents": 	"filterStudents",
+        "students/search": 	"viewFilteredStudents",
+        "students/all": 	"viewAllStudents",
         "students/:id": 	"viewStudent"
     },
 
@@ -96,7 +97,7 @@ var Router = Backbone.Router.extend({
     	});
     },
 
-    searchStudents: function() {
+    filterStudents: function() {
     	this.loadHome();
 
     	var filterStudents = $("#hidden").find("#filter-students-container");
@@ -109,7 +110,20 @@ var Router = Backbone.Router.extend({
     	}
     },
 
-    students: function() {
+    viewFilteredStudents: function() {
+    	this.loadHome();
+
+    	var studentResults = $("#hidden").find("#students-table-container");
+    	if (studentResults.length) {
+    		studentResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new StudentsTableView({
+				el: $("#content")
+			});
+    	}
+    },
+
+    viewAllStudents: function() {
     	this.loadHome();
 
     	var studentResults = $("#hidden").find("#students-table-container");

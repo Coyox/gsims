@@ -56,11 +56,11 @@ var SidebarView = Backbone.View.extend({
 
 		var link = $(evt.currentTarget).data("link");
 		switch (link) {
-			case "students":
-				app.Router.navigate("searchStudents", {trigger:true});
-				break;
+			// case "students":
+			// 	app.Router.navigate("searchStudents", {trigger:true});
+			// 	break;
 			default:
-				app.Router.navigate("");
+				app.Router.navigate("home");
 				$("#content").html(html["tempContent.html"]);
 				break;
 		}

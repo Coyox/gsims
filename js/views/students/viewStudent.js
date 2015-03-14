@@ -130,7 +130,6 @@ var StudentRecordRowView = Backbone.View.extend({
 	updateModel: function(evt) {
 		var val = $(evt.currentTarget).val();
 		this.model.set(this.name, val);
-		console.log(this.model.toJSON());
 	},
 
 	simplifyName: function(str) {

@@ -83,7 +83,7 @@ a {
 	margin-right: 10px;
 }
 
-#sidebar > ul li {
+#sidebar > ul > li {
 	border-bottom: 1px solid #ddd;
 }
 
@@ -91,14 +91,36 @@ a {
 	cursor: pointer;
 }
 
-#sidebar li a:hover {
+#sidebar .sub-menu {
+	background-color: #fff;
+	border-bottom: 1px solid #ddd;
+	padding: 10px;
+	padding-left: 30px;
+}
+
+#sidebar .sub-menu > li {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	list-style: none;
+	border-bottom: 1px dotted #ddd;
+}
+
+#sidebar .sub-menu > li:last-child {
+	border-bottom: none;
+}
+
+#sidebar > .nav > li > a:hover {
 	background-color: #9d426b;
 	color: #fff;
 }
 
-#sidebar li.active {
+#sidebar > .nav > li.active {
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 14px;
+}
+
+#sidebar .sub-menu > li > a:hover {
+	color: #9d426b;
 }
 
 #options-container {
