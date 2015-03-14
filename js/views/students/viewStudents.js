@@ -196,7 +196,7 @@ var StudentTableRowView = Backbone.View.extend({
 	},
 
 	viewStudent: function(evt) {
-		//storeContent();
+		storeContent();
 
 		var id = $(evt.currentTarget).attr("id");
 		app.Router.navigate("students/" + id, {trigger:true});
