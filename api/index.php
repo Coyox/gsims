@@ -24,7 +24,7 @@ $app->delete('/teachers/:id', 'deleteTeacher');
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
-$app->delete('/administrators/:id', 'deleteAdmininistrator');
+$app->delete('/administrators/:id', 'deleteAdministrator');
 
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
