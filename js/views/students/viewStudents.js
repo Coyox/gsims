@@ -79,7 +79,8 @@ var SearchStudentsView = Backbone.View.extend({
 	},
 
 	changeRoute: function(data) {
-		storeContent();
+		//storeContent();
+
 		app.Router.navigate("students/search");
 		var view = new StudentsTableView({
 			el: $("#content"),
@@ -124,6 +125,8 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	render: function() {
+		storeContent();
+
 		this.$el.html(html["viewStudents.html"]);
 		if (this.results) {
 			this.populateQueryResults(this.results);
