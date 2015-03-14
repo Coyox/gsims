@@ -92,7 +92,18 @@ var Superuser = Backbone.Model.extend({
 
 var User = Backbone.Model.extend({
 	defaults: {
+		username: "",
+		//password: ""
 	},
 
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+
+    validation: {
+    	username: {
+    		required: true,
+    	},
+    	password: {
+    		required: true,
+    	}
+    }
 });
