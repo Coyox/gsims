@@ -504,7 +504,7 @@ function getAvgAttendance($id){
 
     $sql = "SELECT count(distinct `date`) from attendance";
     $numberofdays = (int) perform_query($sql, 'GETCOL');
-    if ($numberofdays == 0){
+    if ($numberofdays != 0){
         $sql = "SELECT `date`, count(userid) as present
             from attendance
             where userid in (SELECT userid from student)
