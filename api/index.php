@@ -392,7 +392,7 @@ function dropStudent($id, $sid){
 function enrollStudent($id, $sid){
     $schoolyearid = $_POST['schoolyearid'];
     if (!issert($schoolyearid)) { return ; }
-    $sql = "INSERT into student (userid, sectionid, schoolyearid, status)
+    $sql = "INSERT into enrollment (userid, sectionid, schoolyearid, status)
             values (:userid, :sectionid, :schoolyearid, :status )";
     $bindparams = array(
         "userid" => $sid,
