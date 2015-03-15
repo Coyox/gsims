@@ -36,7 +36,9 @@ function loadTemplates() {
 		"email.html",
 		"enrolledSections.html",
 		"tempContent.html",
-		"searchStudents.html"
+		"searchStudents.html",
+		"searchTeachers.html",
+		"viewTeachers.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -64,13 +66,17 @@ var Router = Backbone.Router.extend({
 	},
 
     routes: {
-        "":             	"login",
-        "forgotPassword": 	"forgotPassword",
-        "home": 	    	"home",
-        "filterStudents": 	"filterStudents",
-        "students/search": 	"viewFilteredStudents",
-        "students/all": 	"viewAllStudents",
-        "students/:id": 	"viewStudent"
+        "":             		"login",
+        "forgotPassword": 		"forgotPassword",
+        "home": 	    		"home",
+        "filterStudents": 		"filterStudents",
+        "students/search": 		"viewFilteredStudents",
+        "students/all": 		"viewAllStudents",
+        "students/:id": 		"viewStudent",
+        "filterTeachers": 		"filterTeachers",
+        "teachers/search": 		"viewFilteredTeachers",
+        "teachers/all": 		"viewAllTeachers",
+        "teachers/:id": 		"viewTeacher",
     },
 
     login: function() {
@@ -148,7 +154,46 @@ var Router = Backbone.Router.extend({
 			action: "view",
 			parentContainer: parent
 		});
-    }
+    },
+
+    filterTeachers: function() {
+    	this.loadHome();
+
+    	var filterTeachers = $("#hidden").find("#filter-teachers-container");
+    	if (filterTeachers.length) {
+    		filterTeachers.detach().appendTo($("#content").empty());
+    	} else {
+	    	new SearchTeachersView({
+	    		el: $("#content"),
+	    	});
+    	}
+    },
+
+    viewFilteredTeachers: function() {
+    	this.loadHome();
+
+    	var teacherResults = $("#hidden").find("#teachers-table-container");
+    	if (teacherResults.length) {
+    		teacherResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new TeachersTableView({
+				el: $("#content")
+			});
+    	}
+    },
+
+    viewAllTeachers: function() {
+    	this.loadHome();
+
+    	var teacherResults = $("#hidden").find("#teachers-table-container");
+    	if (teacherResults.length) {
+    		teacherResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new TeachersTableView({
+				el: $("#content")
+			});
+    	}
+    },
 });
 
 
