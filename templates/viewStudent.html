@@ -1,35 +1,51 @@
 <div id="student-content">
 	<ul id="student-tabs" class="nav nav-tabs nav-justified">
-		<li class="active"><a data-toggle="tab" data-target="#student-info"><span class="glyphicon glyphicon-user"></span> Student Information</a></li>
-		<li><a data-toggle="tab" data-target="#course-info"><span class="glyphicon glyphicon-th-list"></span> Courses</a></li>
-		<li><a data-toggle="tab" data-target="#attendance"><span class="glyphicon glyphicon-stats"></span> Attendance</a></li>
-		<li><a data-toggle="tab" data-target="#email"><span class="glyphicon glyphicon-envelope"></span> Email Student</a></li>
+		<li class="active">
+			<a data-toggle="tab" data-target="#student-info">
+				<span class="glyphicon glyphicon-user"></span> Student Information
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#course-info">
+				<span class="glyphicon glyphicon-th-list"></span> Courses
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#attendance">
+				<span class="glyphicon glyphicon-stats"></span> Attendance
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#email">
+				<span class="glyphicon glyphicon-envelope"></span> Email Student
+			</a>
+		</li>
 	</ul>
 	<div class="tab-content">
 		<div id="student-info" class="tab-pane active o-auto">
 			<div class="col-sm-12">
-				<div class="col-sm-6">
-					<h4>Student Information <button class="btn btn-primary btn-xs pull-right">Edit</button></h4>
+				<div class="student-component col-sm-6">
+					<h4>Student Information <button class="edit-btn btn btn-primary btn-xs pull-right">Edit</button></h4>
 					<table id="student-info-table" class="property-table table table-bordered">
 						<tbody class="results"></tbody>
 					</table>
 				</div>
-				<div class="col-sm-6">
-					<h4>Address <button class="btn btn-primary btn-xs pull-right">Edit</button></h4>
+				<div class="student-component col-sm-6">
+					<h4>Address <button class="edit-btn btn btn-primary btn-xs pull-right">Edit</button></h4>
 					<table id="address-table" class="property-table table table-bordered">
 						<tbody class="results"></tbody>
 					</table>
 				</div>
 			</div>
 			<div class="col-sm-12">
-				<div class="col-sm-6">
-					<h4>Parent/Guardian Information <button class="btn btn-primary btn-xs pull-right">Edit</button></h4>
+				<div class="student-component col-sm-6">
+					<h4>Parent/Guardian Information <button class="edit-btn btn btn-primary btn-xs pull-right">Edit</button></h4>
 					<table id="parent-table" class="property-table table table-bordered">
 						<tbody class="results"></tbody>
 					</table>
 				</div>
-				<div class="col-sm-6">
-					<h4>Emergency Contact Information <button class="btn btn-primary btn-xs pull-right">Edit</button></h4>
+				<div class="student-component col-sm-6">
+					<h4>Emergency Contact Information <button class="edit-btn btn btn-primary btn-xs pull-right">Edit</button></h4>
 					<table id="emergency-table" class="property-table table table-bordered">
 						<tbody class="results"></tbody>
 					</table>	
