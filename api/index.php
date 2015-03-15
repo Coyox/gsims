@@ -844,8 +844,8 @@ function findUsers($usertype){
     else if ($usertype=="A"|$usertype=="T"){
         if (array_key_exists('firstName', $param) || array_key_exists('lastName', $param)) {
             $clause = buildWhereClause($param);
-            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher ".$clause." order by firstName asc";
-            echo json_encode(perform_query($sql,'GETALL'));
+            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher ".$clause." and usertype=:usertype order by firstName asc";
+            echo json_encode(perform_query($sql,'GETALL', array("usertype"=>$usertype)));
         }
         else{
             return getUsers($usertype);
