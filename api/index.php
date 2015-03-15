@@ -502,22 +502,28 @@ function getAvgAttendance($id){
     $sql = "SELECT classSize from section where sectionid=:id";
     $classSize = (int) perform_query($sql, 'GETCOL', $bindparams);
 
-    $sql = "SELECT `date`, count(userid) as present
+    $sql = "SELECT count(distinct `date`) from attendance";
+    $numberofdays = (int) perform_query($sql, 'GETCOL');
+    if ($numberofdays == 0){
+        $sql = "SELECT `date`, count(userid) as present
             from attendance
             where userid in (SELECT userid from student)
             and sectionid=:id
             group by `date`";
 
-    $totalpresent = 0;
-    $results = perform_query($sql, 'GETASSO', $bindparams);
-    foreach ($results as $row){
-        $totalpresent += (int) $row['present'];
+        $totalpresent = 0;
+        $results = perform_query($sql, 'GETASSO', $bindparams);
+        foreach ($results as $row){
+            $totalpresent += (int) $row['present'];
+        }
+
+        $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
+        echo $avgAttendance."%";
+    }
+    else {
+        echo "N/A";
     }
 
-    $sql = "SELECT count(distinct `date`) from attendance";
-    $numberofdays = (int) perform_query($sql, 'GETCOL');
-    $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
-    return $avgAttendance."%";
 }
 
 #================================================================================================================#
