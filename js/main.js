@@ -15,6 +15,10 @@ $(function() {
 	        $('[data-toggle="popover"]').popover('hide');
 	    }
 	});
+
+	$("body").on("click", "#back-btn", function() {
+		history.back();
+	});
 });
 
 /** Pre-fetches the specified templates located in the /templates directory in an

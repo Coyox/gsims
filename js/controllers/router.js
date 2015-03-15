@@ -1,9 +1,21 @@
 var Router = Backbone.Router.extend({
 	initialize: function(options) {
 		this.el = $("#container");
-		var route = this;
-		Backbone.history.on("all", function(route, router) {
-	
+
+        /** Hide/show the back button depending on what the current page is (routeName). 
+            The back button should essentially be shown on all pages except for the
+            home page */
+		Backbone.history.on("all", function(route, router, routeName) {
+            switch (routeName) {
+                case "login":
+                case "forgotPassword":
+                case "home":
+                    $("#back-container").hide();
+                    break;
+                default:
+                    $("#back-container").removeClass("hide").show();
+                    break;
+           }
 		});
 	},
 
@@ -11,18 +23,25 @@ var Router = Backbone.Router.extend({
         "":             		"login",
         "forgotPassword": 		"forgotPassword",
         "home": 	    		"home",
+
         "filterStudents": 		"filterStudents",
         "students/search": 		"viewFilteredStudents",
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
+
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
         "teachers/all": 		"viewAllTeachers",
         "teachers/:id": 		"viewTeacher",
+
         "filterAdmins": 		"filterAdmins",
         "admins/search": 		"viewFilteredAdmins",
         "admins/all": 			"viewAllAdmins",
         "admins/:id": 			"viewAdmin",
+    },
+
+    updatePageBreadcrumb: function(text) {
+        $("#breadcrumb-text").html(text);
     },
 
     login: function() {
@@ -38,6 +57,8 @@ var Router = Backbone.Router.extend({
     },
 
     home: function() {
+        this.updatePageBreadcrumb("Home");
+
     	new HomePageView({
     		el: this.el
     	});
@@ -50,6 +71,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterStudents: function() {
+        this.updatePageBreadcrumb("Search Students");
+
     	this.loadHome();
 
     	var filterStudents = $("#hidden").find("#filter-students-container");
@@ -63,6 +86,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredStudents: function() {
+        this.updatePageBreadcrumb("Students");
+
     	this.loadHome();
 
     	var studentResults = $("#hidden").find("#students-table-container");
@@ -76,6 +101,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllStudents: function() {
+        this.updatePageBreadcrumb("Students");
+
     	this.loadHome();
 
     	var studentResults = $("#hidden").find("#students-table-container");
@@ -89,6 +116,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewStudent: function(id) {
+        this.updatePageBreadcrumb("View Student (" + id + ")");
+
     	this.loadHome();
 
 		$("#content").html(html["viewStudent.html"]);
@@ -103,6 +132,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterTeachers: function() {
+        this.updatePageBreadcrumb("Search Teachers");
+
     	this.loadHome();
 
     	var filterTeachers = $("#hidden").find("#filter-teachers-container");
@@ -116,6 +147,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredTeachers: function() {
+        this.updatePageBreadcrumb("Teachers");
+
     	this.loadHome();
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
@@ -129,6 +162,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllTeachers: function() {
+        this.updatePageBreadcrumb("Teachers");
+
     	this.loadHome();
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
@@ -142,6 +177,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterAdmins: function() {
+        this.updatePageBreadcrumb("Search Administrators");
+
     	this.loadHome();
 
     	var filterAdmins = $("#hidden").find("#filter-admins-container");
@@ -155,6 +192,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredAdmins: function() {
+        this.updatePageBreadcrumb("Administrators");
+
     	this.loadHome();
 
     	var adminResults = $("#hidden").find("#admins-table-container");
@@ -168,6 +207,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllAdmins: function() {
+        this.updatePageBreadcrumb("Administrators");
+
     	this.loadHome();
 
     	var adminResults = $("#hidden").find("#admins-table-container");

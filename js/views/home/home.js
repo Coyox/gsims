@@ -36,33 +36,14 @@ var SidebarView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .sidebar-link": "updateBreadcrumb",
+		"click .sidebar-link": "updateActiveLink",
 	},
 
-	updateBreadcrumb: function(evt) {
-
-	},
-
-	loadPage: function(evt) {
-		// Update the breadcrumb with the current sidebar link
-		var link = $(evt.currentTarget).html();
-		$("#breadcrumb-text").html(link);
-
+	updateActiveLink: function(evt) {
 		this.$el.find("li.active").removeAttr("class");
 
 		var li = $(evt.currentTarget).closest("li");
 		li.addClass("active");
-
-		var link = $(evt.currentTarget).data("link");
-		switch (link) {
-			// case "students":
-			// 	app.Router.navigate("searchStudents", {trigger:true});
-			// 	break;
-			default:
-				app.Router.navigate("home");
-				$("#content").html(html["tempContent.html"]);
-				break;
-		}
 	},
 
 	populateSchoolMenu: function() {

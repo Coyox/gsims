@@ -296,3 +296,7 @@ li.paginate_button.active a {
 .pagination>li>a, .pagination>li>span {
 	color: #9d426b;
 }
+
+#back-container {
+	margin-bottom: 10px;
+}
