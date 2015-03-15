@@ -504,7 +504,7 @@ function getAvgAttendance($id){
 
     $sql = "SELECT `date`, count(userid) as present
             from attendance
-            where userid=(SELECT userid from student)
+            where userid in (SELECT userid from student)
             and sectionid=:id
             group by `date`";
 
