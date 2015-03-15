@@ -71,6 +71,7 @@ $app->get('/search/sections', 'findSections');
 
 $app->get('/login', 'validateCredentials');
 $app->put('/login/:id', 'updateLogin');
+$app->get('/login/:id', 'getLoginById');
 
 $app->run();
 
@@ -80,13 +81,22 @@ $app->run();
 #================================================================================================================#
 function validateCredentials() {
     $password = $_GET['password'];
-    $sql = "SELECT userid, username, password, usertype, lastLogin from login where username=:username LIMIT 1";
-    $bindparam = array("username"=> $_GET['username']);
-    $user = perform_query($sql, 'GET', $bindparam);
-    // if ( hash_equals($user->password, crypt($password, $user->password)) ) {
-    //     echo json_encode($user);
-    // }
-    echo json_encode($user);
+    if (isset($password)){
+        $sql = "SELECT * from login where username=:username LIMIT 1";
+        $bindparam = array("username"=> $_GET['username']);
+        $user = perform_query($sql, 'GET', $bindparam);
+        // if ( hash_equals($user->password, crypt($password, $user->password)) ) {
+        //     echo json_encode($user);
+        // }
+        $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
+        perform_query($sql, '', $bindparam);
+
+        echo json_encode($user);
+    }
+    else {
+        $sql = "SELECT userid, username, usertype, lastLogin from login order by userid asc";
+        echo json_encode(perform_query($sql, 'GETALL'));
+    }
 }
 
 function updateLogin($id) {
@@ -106,6 +116,12 @@ function updateLogin($id) {
     );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
+
+function getLoginById($id){
+    $sql = "SELECT * from login where userid=:id";
+    echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
+}
+
 #================================================================================================================#
 # School Years
 #================================================================================================================#
