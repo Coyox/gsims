@@ -71,6 +71,12 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         elseif ($querytype == 'POST'){
             $result = $db->lastInsertId();
         }
+        elseif ($querytype == 'GETCOL'){
+            $result = $stmt->fetchColumn();
+        }
+        elseif ($querytype == 'GETASSO'){
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
         else {
             $result = null;
         }

@@ -16,6 +16,7 @@ $app->delete('/students/:id', 'deleteStudent');
 
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
+$app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->post('/teachers', 'createTeacher');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
@@ -59,6 +60,7 @@ $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
+$app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 $app->post('/sections', 'createSection');
 $app->post('/sections/students/:id/:sid', 'enrollStudent');
@@ -479,9 +481,43 @@ function updateSection($id) {
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 
-/*TODO*/
 function inputAttendance($id, $userid){
     $date = $_POST["date"];
+    $schoolyearid = $_POST["schoolyearid"];
+    $sql = "INSERT into attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `status`)
+            values (:classdate, :userid, :sectionid, :schoolyearid, :status)";
+
+    $bindparams = array(
+        "classdate" => $date,
+        "userid" => $userid,
+        "sectionid" => $id,
+        "schoolyearid" => $schoolyearid,
+        "status" => 'active'
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+function getAvgAttendance($id){
+    $bindparams = array("id"=>$id);
+    $sql = "SELECT classSize from section where sectionid=:id";
+    $classSize = (int) perform_query($sql, 'GETCOL', $bindparams);
+
+    $sql = "SELECT `date`, count(userid) as present
+            from attendance
+            where userid=(SELECT userid from student)
+            and sectionid=:id
+            group by `date`";
+
+    $totalpresent = 0;
+    $results = perform_query($sql, 'GETASSO', $bindparams);
+    foreach ($results as $row){
+        $totalpresent += (int) $row['present'];
+    }
+
+    $sql = "SELECT count(distinct `date`) from attendance";
+    $numberofdays = (int) perform_query($sql, 'GETCOL');
+    $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
+    return $avgAttendance."%";
 }
 
 #================================================================================================================#
@@ -706,6 +742,14 @@ function deleteTeacher($id) {
     $sql = "UPDATE teacher set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
+/*
+* Get the sections the teacher teaches
+*/
+function getTeachingSections($id){
+    $sql = "SELECT courseid, sectionid from teaching where userid=:id";
+    echo json_encode(perform_query($sql,'GETALL'), array("id"=>$id));
+}
+
 #================================================================================================================#
 # Administrators
 #================================================================================================================#
