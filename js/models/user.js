@@ -82,8 +82,10 @@ var Teacher = Backbone.Model.extend({
 
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/teachers",
 
-   	getSearchTeachersUrl: function() {
-   		return "https://gobind-sarvar.rhcloud.com/api/search/users/T";
+   	getSearchTeachersUrl: function(usertype) {
+   		console.log(usertype);
+   		usertype = usertype || "T";
+   		return "https://gobind-sarvar.rhcloud.com/api/search/users/" + usertype;
    	}
 });
 
