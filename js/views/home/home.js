@@ -37,7 +37,6 @@ var SidebarView = Backbone.View.extend({
 
 	events: {
 		"click .sidebar-link": "updateBreadcrumb",
-		"click .sidebar-link": "loadPage",
 	},
 
 	updateBreadcrumb: function(evt) {

@@ -38,7 +38,9 @@ function loadTemplates() {
 		"tempContent.html",
 		"searchStudents.html",
 		"searchTeachers.html",
-		"viewTeachers.html"
+		"viewTeachers.html",
+		"searchAdmins.html",
+		"viewAdmins.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -62,7 +64,11 @@ function init() {
 
 var Router = Backbone.Router.extend({
 	initialize: function(options) {
-		this.el = $("#container")
+		this.el = $("#container");
+		var route = this;
+		Backbone.history.on("all", function(route, router) {
+	
+		});
 	},
 
     routes: {
@@ -77,6 +83,10 @@ var Router = Backbone.Router.extend({
         "teachers/search": 		"viewFilteredTeachers",
         "teachers/all": 		"viewAllTeachers",
         "teachers/:id": 		"viewTeacher",
+        "filterAdmins": 		"filterAdmins",
+        "admins/search": 		"viewFilteredAdmins",
+        "admins/all": 			"viewAllAdmins",
+        "admins/:id": 			"viewAdmin",
     },
 
     login: function() {
@@ -190,6 +200,45 @@ var Router = Backbone.Router.extend({
     		teacherResults.detach().appendTo($("#content").empty());
     	} else {
 		   	new TeachersTableView({
+				el: $("#content")
+			});
+    	}
+    },
+
+    filterAdmins: function() {
+    	this.loadHome();
+
+    	var filterAdmins = $("#hidden").find("#filter-admins-container");
+    	if (filterAdmins.length) {
+    		filterAdmins.detach().appendTo($("#content").empty());
+    	} else {
+	    	new SearchAdminsView({
+	    		el: $("#content"),
+	    	});
+    	}
+    },
+
+    viewFilteredAdmins: function() {
+    	this.loadHome();
+
+    	var adminResults = $("#hidden").find("#admins-table-container");
+    	if (adminResults.length) {
+    		adminResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new AdminsTableView({
+				el: $("#content")
+			});
+    	}
+    },
+
+    viewAllAdmins: function() {
+    	this.loadHome();
+
+    	var adminResults = $("#hidden").find("#admins-table-container");
+    	if (adminResults.length) {
+    		adminResults.detach().appendTo($("#content").empty());
+    	} else {
+		   	new AdminsTableView({
 				el: $("#content")
 			});
     	}
