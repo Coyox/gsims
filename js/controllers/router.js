@@ -38,6 +38,8 @@ var Router = Backbone.Router.extend({
         "admins/search": 		"viewFilteredAdmins",
         "admins/all": 			"viewAllAdmins",
         "admins/:id": 			"viewAdmin",
+
+        "email" :               "email",
     },
 
     updatePageBreadcrumb: function(text) {
@@ -49,6 +51,7 @@ var Router = Backbone.Router.extend({
     		el: this.el
     	});
     },
+
 
     loadHome: function() {
       	if ($("#container").html() == "") {
@@ -62,6 +65,18 @@ var Router = Backbone.Router.extend({
     	new HomePageView({
     		el: this.el
     	});
+    },
+
+    email: function() {
+        this.updatePageBreadcrumb("Send Email");
+
+        this.loadHome();
+
+        //$("#content").html(html["email.html"]);
+
+        new EmailView({
+            el: $("#content"),
+        });
     },
 
     forgotPassword: function() {
