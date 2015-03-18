@@ -15,7 +15,9 @@ var SearchAdminsView = Backbone.View.extend({
 
 	searchAllAdmins: function(evt) {
 		var view = this;
-		new Teacher().fetch().then(function(data) {
+		new Teacher({
+			url: model.getSearchTeachersUrl("A"),
+		}).fetch().then(function(data) {
 			view.changeRoute(data);
 		});
 	},
