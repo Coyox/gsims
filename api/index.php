@@ -128,7 +128,7 @@ function getLoginById($id){
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT schoolyearid, schoolyear from schoolyear order by schoolyear desc";
+    $sql = "SELECT *from schoolyear order by schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL'));
 }
 
@@ -140,10 +140,13 @@ function createSchoolYear(){
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
     $schoolyearid = generateUniqueID($sql, "schoolyearid");
 
-    $sql = "INSERT into schoolyear (schoolyearid, schoolyear)
-            values (:schoolyearid, :schoolyear)";
-    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear);
+    $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status)
+            values (:schoolyearid, :schoolyear, :status)";
+    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>"active");
+
     echo json_encode(perform_query($sql,'POST', $bindparam));
+    $sql = "UPDATE schoolyear set status='inactive' WHERE schoolyearid!=:schoolyearid";
+    perform_query($sql, '', array("schoolyearid"=>$schoolyearid));
 }
 #================================================================================================================#
 # Schools
@@ -916,7 +919,6 @@ function findUsers($usertype){
         else{
             return getUsers($usertype);
         }
-
     }
 }
 
