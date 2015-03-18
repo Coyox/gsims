@@ -8,8 +8,8 @@ var EmailView = Backbone.View.extend({
 		this.$el.html(html["email.html"]);
 		//this.$el.find("#email-to").val(this.emailAddr);
 
-		//var userEmail = sessionStorage.getItem('gobind-email') ; // TODO: Get the email of the logged in user
-		//this.$el.find("#email-from").val(userEmail);
+		var userEmail = sessionStorage.getItem('gobind-email') ; // TODO: Get the email of the logged in user
+		this.$el.find("#email-from").val(userEmail);
 	},
 
 	events: {
@@ -29,7 +29,7 @@ var EmailView = Backbone.View.extend({
   		data: {
     	'key': apiKey,
     	'message': {
-      	'from_email': 'alloyd@Live.ca', // Todo: replace with user's email
+      	'from_email': from, // Todo: replace with user's email
       	'to': [
         	  {
            	 'email': 'adaml@Live.ca',
