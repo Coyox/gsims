@@ -22,7 +22,7 @@ var EmailView = Backbone.View.extend({
 		var body = this.$el.find("#email-message").val();
 		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
 		var from = this.$el.find("#email-from").val();
-
+	/*
 		$.ajax({
   		type: 'POST',
   		url: "https://mandrillapp.com/api/1.0/messages/send.json",
@@ -50,7 +50,8 @@ var EmailView = Backbone.View.extend({
  	}).done(function(response) {
    	console.log(response);
  	});
-
+ 	*/
+ 		console.log("No spam plz lol");
 		//console.log(recipient);
 		//console.log(body);
 		//console.log(subject);
