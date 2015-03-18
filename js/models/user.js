@@ -104,4 +104,7 @@ var User = Backbone.Model.extend({
 	},
 
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+   	getUsers: function(id, usertype) {
+   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + '/' + usertype;
+   	}
 });

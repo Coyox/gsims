@@ -75,6 +75,7 @@ $app->get('/login', 'validateCredentials');
 $app->put('/login/:id', 'updateLogin');
 $app->get('/login/:id', 'getLoginById');
 
+$app->get('/users/:id/:usertype', 'getUserById');
 $app->run();
 
 
@@ -858,7 +859,30 @@ function getUsers($type){
     else if ($type == "A"){
         return getAdministrators();
     }
+    else if ($type == "SU"){
+        return getSuperUsers();
+    }
 }
+
+function getUserById($id, $usertype){
+
+    if ($usertype == "T"){
+        return getTeacherById($id);
+    }
+    else if ($usertypeusertypeusertype == "S"){
+        return getStudentById($id);
+    }
+    else if ($usertypeusertype == "A"){
+        return getAdministratorById($id);
+    }
+    else if ($usertype == "SU"){
+        return getSuperUserById($id);
+    }
+}
+
+
+}
+
 #================================================================================================================#
 # Search
 #================================================================================================================#

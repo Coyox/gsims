@@ -29,7 +29,15 @@ var LoginView = Backbone.View.extend({
 				app.usertype = data.usertype;
 				sessionStorage.setItem("gobind-username", app.username);
 				sessionStorage.setItem("gobind-usertype", app.usertype);
-				app.Router.navigate("home", {trigger:true});
+
+				var user = new User();
+				user.fetch({
+					url: user.getUsers(data.userid, data.usertype)
+					}).then(function (data) {
+						sessionStorage.setItem("gobind-email", data.emailAddr);
+					});
+
+					app.Router.navigate("home", {trigger:true});
 			} else {
 				setTimeout(function() {
 					view.$el.find(".alert").removeClass("hide");
