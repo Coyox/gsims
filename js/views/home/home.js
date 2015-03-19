@@ -36,34 +36,14 @@ var SidebarView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .sidebar-link": "updateBreadcrumb",
-		"click .sidebar-link": "loadPage"
+		"click .sidebar-link": "updateActiveLink",
 	},
 
-	updateBreadcrumb: function(evt) {
-
-	},
-
-	loadPage: function(evt) {
-		// Update the breadcrumb with the current sidebar link
-		var link = $(evt.currentTarget).html();
-		$("#breadcrumb-text").html(link);
-
+	updateActiveLink: function(evt) {
 		this.$el.find("li.active").removeAttr("class");
 
 		var li = $(evt.currentTarget).closest("li");
 		li.addClass("active");
-
-		var link = $(evt.currentTarget).data("link");
-		switch (link) {
-			case "students":
-				app.Router.navigate("students", {trigger:true});
-				break;
-			default:
-				app.Router.navigate("");
-				$("#content").html(html["tempContent.html"]);
-				break;
-		}
 	},
 
 	populateSchoolMenu: function() {
@@ -82,10 +62,12 @@ var SidebarView = Backbone.View.extend({
 	populateSchoolYearMenu: function() {
 		var select = this.$el.find("#school-year-options");
 		new SchoolYear().fetch().then(function(data) {
+			data.reverse();
 			_.each(data, function(object, index) {
 				var option = $("<option></option>");
 				option.attr("id", object.schoolyearid);
 				option.attr("value", object.schoolyear);
+				option.attr("selected", object.schoolyear == app.currentSchoolYear);
 				option.text(object.schoolyear);
 				select.append(option);
 			});
@@ -122,11 +104,16 @@ var HeaderView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #logout": "logout"
+		"click #logout": "logout",
+		"click .notification-popover": "displayNotificationPopover"
 	},
 
 	logout: function(evt) {
 		app.Router.navigate("", {trigger:true});
+	},
+
+	displayNotifications: function(evt) {
+
 	}
 });
 

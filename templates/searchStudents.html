@@ -1,0 +1,78 @@
+<div id="filter-students-container">
+	<div class="form-horizontal col-sm-6">
+		<h5 class="col-offset-2">Search Students</h5>
+		<hr>
+		<div class="form-group">
+			<label class="control-label col-sm-3">First Name</label>
+			<div class="col-sm-9">
+				<input type="text" id="first-name" class="form-control input-sm">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Last Name</label>
+			<div class="col-sm-9">
+				<input type="text" id="last-name" class="form-control input-sm">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Gender</label>
+			<div class="col-sm-9">
+				<select id="gender-options" class="form-control input-sm">
+					<option selected disabled>-- Select an option --</option>
+					<option value="M">Male</option>
+					<option value="F">Female</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Status</label>
+			<div class="col-sm-9">
+				<select id="status-options" class="form-control input-sm">
+					<option selected disabled>-- Select an option --</option>
+					<option value="active">Active</option>
+					<option value="inactive">Inactive</option>
+					<option value="pending">Pending Registration Approval</option>
+					<option value="pending-test">Pending Proficiency Test</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Paid</label>
+			<div class="col-sm-9">
+				<select id="paid-options" class="form-control input-sm">
+					<option selected disabled>-- Select an option --</option>
+					<option value="1">Paid</option>
+					<option value="0">Unpaid</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Born</label>
+			<div class="col-sm-9 form-inline">
+				<select id="year-operator" class="form-control input-sm" style="width: 110px;">
+					<option selected disabled>-- Operator --</option>
+					<option value="less">Before</option>
+					<option value="greater">After</option>
+					<option value="between">Between</option>
+				</select>
+				<select id="year-option" class="lower year-option form-control input-sm" style="width: 80px;"></select>
+				<span class="between hide"> and </span>
+				<select class="upper year-option between form-control input-sm hide" style="width: 80px;"></select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">City</label>
+			<div class="col-sm-9">
+				<input type="text" id="city" class="form-control input-sm">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3"></label>
+			<div class="col-sm-9">
+				<button id="clear-fields" class="btn btn-sm">Clear</button>
+				<button id="search-students" class="btn btn-sm">Search</button>
+				<button id="search-all-students" class="btn btn-sm">View All Students</button>
+			</div>
+		</div>
+	</div>
+</div>

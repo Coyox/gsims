@@ -43,7 +43,7 @@ var Student = Backbone.Model.extend({
 
    	/** Student info properties */
    	studentProperties: [
-   		"firstName", "lastName", "dateOfBirth", "phoneNumber", "emailAddr", "allergies", 
+   		"firstName", "lastName", "dateOfBirth", "phoneNumber", "emailAddr", "allergies",
    		"gender", "prevAttendedGS", "paid", "schoolid", "status", "lastAccessed"
    	],
 
@@ -64,6 +64,10 @@ var Student = Backbone.Model.extend({
 
    	getEnrolledSectionsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/sections";
+   	},
+
+   	getSearchStudentsUrl: function() {
+   		return "https://gobind-sarvar.rhcloud.com/api/search/users/S";
    	}
 });
 
@@ -75,7 +79,14 @@ var Teacher = Backbone.Model.extend({
 		status: "",
 		usertype: ""
 	},
+
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/teachers",
+
+   	getSearchTeachersUrl: function(usertype) {
+   		console.log(usertype);
+   		usertype = usertype || "T";
+   		return "https://gobind-sarvar.rhcloud.com/api/search/users/" + usertype;
+   	}
 });
 
 var Superuser = Backbone.Model.extend({
@@ -88,7 +99,12 @@ var Superuser = Backbone.Model.extend({
 
 var User = Backbone.Model.extend({
 	defaults: {
+		username: "",
+		password: ""
 	},
 
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+   	getUsers: function(id, usertype) {
+   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + '/' + usertype;
+   	}
 });

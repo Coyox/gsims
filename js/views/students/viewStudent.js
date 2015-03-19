@@ -2,7 +2,6 @@ var StudentRecordView = Backbone.View.extend({
 	initialize: function(options) {
 		this.action = options.action;
 		this.id = options.id;
-		this.parentContainer = options.parentContainer;
 		this.render();
 	},
 
@@ -11,21 +10,19 @@ var StudentRecordView = Backbone.View.extend({
 
 		new Student({id: this.id}).fetch().then(function(data) {
 			var model = new Student(data, {parse:true});
+			view.model = model;
+			view.model.set("id", view.model.get("userid"));
 			view.studentInformationTab(data, model);
 			view.emailTab(data);
 			view.coursesTab(data, model);
 			view.reportCardTab(data, model);
-
-			// if (view.action == "edit") {
-			// 	view.addRow("#student-record-table tbody");
-			// 	view.$el.find("tr").last().append("<td></td><td><button class='btn btn-primary' id='save-student'>Save</button></td>");
-			// }
 		});
 	},
 
 	events: {
-		"click #save-student": "saveStudent",
-		"click .delete-student": "deleteStudent"
+		"click .delete-student": "deleteStudent",
+		"click .edit-btn": "editStudent",
+		"click .save-btn": "saveStudent"
 	},
 
 	addRow: function(model, attr) {
@@ -45,12 +42,72 @@ var StudentRecordView = Backbone.View.extend({
         return container;	
 	},
 
+	addEditRow: function(table) {
+		var container = $("<tr></tr>");
+		this.$el.find("#" + table).append(container);
+		return container;
+	},
+
+	editStudent: function(evt) {
+		var table = $(evt.currentTarget).closest(".student-component").find("table").attr("id");
+		this.$el.find("#" + table).empty();
+
+		$(evt.currentTarget).text("Save").removeClass("edit-btn").addClass("save-btn");
+
+		var props = this.getPropertiesByType(table);
+
+		_.each(this.model.toJSON(), function(value, attr) {
+			if (props.indexOf(attr) > -1 && this.model.nonEditable.indexOf(attr) == -1) {
+				new StudentRecordRowView({
+					el: this.addEditRow(table),
+					action: "edit",
+					name: attr,
+					value: value,
+					model: this.model,
+				});
+			}
+		}, this);
+	},
+
 	saveStudent: function(evt) {
+		var view = this;
 		this.model.save().then(function(data) {
 			new TransactionResponseView({
-				message: "Record successfully saved. Click the refresh button on the table to see your changes (or just refresh the page)."
+				message: "Record successfully saved."
 			});
+			var table = $(evt.currentTarget).closest(".student-component").find("table").attr("id");
+			view.$el.find("#" + table).empty();
+
+			$(evt.currentTarget).text("Edit").removeClass("save-btn").addClass("edit-btn");
+
+			var props = view.getPropertiesByType(table);
+
+			_.each(view.model.toJSON(), function(value, attr) {
+				if (props.indexOf(attr) > -1 && view.model.nonEditable.indexOf(attr) == -1) {
+					new StudentRecordRowView({
+						el: view.addEditRow(table),
+						action: "view",
+						name: attr,
+						value: value,
+						model: view.model,
+					});
+				}
+			}, view);
 		});
+	},
+
+	getPropertiesByType: function(type) {
+		var props;
+		if (type == "address-table") {
+			props = this.model.addressProperties;
+		} else if (type == "parent-table") {
+			props = this.model.parentProperties;
+		} else if (type == "emergency-table") {
+			props = this.model.emergencyProperties;
+		} else {
+			props = this.model.studentProperties;
+		}
+		return props;
 	},
 
 	deleteStudent: function(evt) {
@@ -62,17 +119,15 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	studentInformationTab: function(data, model) {
-		this.model = model;
 		_.each(data, function(value, attr) {
 			if (this.model.nonEditable.indexOf(attr) > -1) {
 				// ignore these attributes
-			} else if (this.action == "edit" && attr == "id") {
-				// don't allow editing of ids
 			} else {
 				new StudentRecordRowView({
 					el: this.addRow(model, attr),
 					action: this.action,
 					name: attr,
+					label: attr,
 					value: value,
 					model: model
 				});
@@ -93,52 +148,57 @@ var StudentRecordView = Backbone.View.extend({
 			model: model
 		});
 	},
-	
+
 	reportCardTab: function(data, model) {
 		new ReportCardView({
 			el: $("#report-card"),
 			model: model,
 		});
 	},
+
+	/** TODO: Attendance tab */
+	attendanceTab: function(data) {
+
+	}
 });
 
 var StudentRecordRowView = Backbone.View.extend({
 	viewTemplate: _.template("<td><%= name %></td><td><%= value %></td>"),
-	editTemplate: _.template("<td><%= name %></td><td><input type='text' class='form-control' value='<%= value %>'></td>"),
+	editTemplate: _.template("<td><%= name %></td><td><input type='text' class='form-control input-sm' value='<%= value %>'></td>"),
 
 	initialize: function(options) {
 		this.action = options.action;
 		this.name = options.name;
+		this.label = options.label;
 		this.value = options.value;
 		this.render();
 	},
 
 	render: function() {
-		this.name = capitalize(this.name);
-		this.name = splitChars(this.name);
-		this.name = this.simplifyName(this.name);
+		this.label = capitalize(this.name);
+		this.label = splitChars(this.label);
+		this.label = this.simplifyName(this.label);
 
 		if (this.action == "view") {
 			this.$el.html(this.viewTemplate({
-				name: this.name,
+				name: this.label,
 				value: this.value
 			}));
 		} else {
 			this.$el.html(this.editTemplate({
-				name: this.name,
+				name: this.label,
 				value: this.value
 			}));
 		}
 	},
 
 	events: {
-		"change input": "updateModel"
+		"keyup input": "updateModel"
 	},
 
 	updateModel: function(evt) {
 		var val = $(evt.currentTarget).val();
 		this.model.set(this.name, val);
-		console.log(this.model.toJSON());
 	},
 
 	simplifyName: function(str) {
@@ -157,16 +217,13 @@ var EnrolledSectionsView = Backbone.View.extend({
 	},
 
 	render: function() {
-		console.log("render");
 		this.$el.html(html["enrolledSections.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
 		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
-			console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				console.log(section);
 				new EnrolledSectionsRowView({
 					el: view.addRow(),
 					model: section
@@ -188,7 +245,7 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 		+	"<td><%= model.day %></td>"
 		+	"<td><%= model.startTime %></td>"
 		+	"<td><%= model.endTime %></td>"
-		+   "<td><button class='view-section btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Section</button></td>"),
+		+   "<td><button class='view-section btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Drop Section</button></td>"),
 
 	initialize: function(options) {
 		this.render();
