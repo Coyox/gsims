@@ -14,6 +14,7 @@ var StudentRecordView = Backbone.View.extend({
 			view.studentInformationTab(data, model);
 			view.emailTab(data);
 			view.coursesTab(data, model);
+			view.reportCardTab(data, model);
 
 			// if (view.action == "edit") {
 			// 	view.addRow("#student-record-table tbody");
@@ -91,7 +92,14 @@ var StudentRecordView = Backbone.View.extend({
 			el: $("#course-info"),
 			model: model
 		});
-	}
+	},
+	
+	reportCardTab: function(data, model) {
+		new ReportCardView({
+			el: $("#report-card"),
+			model: model,
+		});
+	},
 });
 
 var StudentRecordRowView = Backbone.View.extend({
@@ -181,6 +189,85 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 		+	"<td><%= model.startTime %></td>"
 		+	"<td><%= model.endTime %></td>"
 		+   "<td><button class='view-section btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Section</button></td>"),
+
+	initialize: function(options) {
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	events: {
+		"click .view-student": "viewStudent",
+		"click .edit-student": "editStudent",
+		"click .delete-student": "deleteStudent"
+	},
+
+	viewStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		app.Router.navigate("students/" + id, {trigger:true});
+	},
+
+	editStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new StudentRecordView({
+			id: id,
+			el: $("#update-container"),
+			action: "edit"
+		});		
+	},
+
+	deleteStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		new DeleteRecordView({
+			id: id,
+			el: $("#delete-container")
+		});		
+	}
+});
+
+// TODO: debug - copied from EnrolledSectionsView, etc, but not functioning fully yet
+var ReportCardView = Backbone.View.extend({
+	initialize: function(options) {
+		this.render();
+	},
+
+	render: function() {
+		console.log("render");
+		this.$el.html(html["reportCard.html"]);
+
+		var view = this;
+		var id = this.model.get("userid");
+		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
+			console.log(data);
+			_.each(data, function(object, index) {
+				var section = new Section(object, {parse:true});
+				console.log(section);
+				new ReportCardRowView({
+					el: view.addRow(),
+					model: section
+				});
+			});
+		});
+	},
+
+	addRow: function() {
+        var container = $("<tr></tr>");
+        this.$el.find("#report-card-table .results").first().append(container);
+        return container;
+	}
+});
+
+var ReportCardRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.courseName %></td>"
+		+	"<td><%= model.sectionCode %></td>"
+		// +	"<td><%= '[teacher name]' %></td>"
+		// +	"<td><%= '[student's grade]' %></td>"
+		+	"<td><%= model.day %></td>"
+		+	"<td><%= model.startTime %></td>"),
 
 	initialize: function(options) {
 		this.render();
