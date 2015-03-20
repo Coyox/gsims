@@ -8,7 +8,9 @@ var StudentRecordView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 
-		new Student({id: this.id}).fetch().then(function(data) {
+		var student = new Student();
+		student.set("id", this.id);
+		student.fetch().then(function(data) {
 			var model = new Student(data, {parse:true});
 			view.model = model;
 			Backbone.Validation.bind(view);	
@@ -22,7 +24,7 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .delete-student": "deleteStudent",
+		"click #delete-student": "deleteStudent",
 		"click .edit-btn": "editStudent",
 		"click .save-btn": "saveStudent",
 		"click .cancel-btn": "saveStudent"
@@ -132,10 +134,9 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	deleteStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
 		new DeleteRecordView({
-			id: id,
-			el: $("#delete-container")
+			id: this.model.get("id"),
+			el: $("#container")
 		});	
 	},
 
