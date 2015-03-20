@@ -103,8 +103,23 @@ var User = Backbone.Model.extend({
 		password: ""
 	},
 
+	validation: {
+		username: {
+			required: true,
+			msg: "Please enter a username"
+		},
+		password: {
+			required: true,
+			msg: "Please enter a password"
+		}
+	},
+
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+   	
    	getUsers: function(id, usertype) {
-   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + '/' + usertype;
+   		if (typeof id == undefined || typeof usertype == undefined) {
+   			return undefined;
+   		}
+   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + "/" + usertype;
    	}
 });

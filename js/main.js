@@ -1,9 +1,31 @@
+/** Global application object */
 var app = {
 	currentSchoolYear: "2014-2015"
 };
 
 /** Object to hold all HTML templates (pre-loaded) */
 var html = {};
+
+/** Override Backbone's default model validation with the Backbone.Validation plugin */
+_.extend(Backbone.Model.prototype, Backbone.Validation.mixin);
+
+/** Override Backbone's default validation callbacks. Use Bootstrap to highlight invalid fields */
+_.extend(Backbone.Validation.callbacks, {
+    valid: function (view, attr, selector) {
+        var $el = view.$('[name=' + attr + ']'), 
+            $group = $el.closest('.form-group');
+        
+        $group.removeClass('has-error');
+        $group.find('.help-block').html('').addClass('hidden');
+    },
+    invalid: function (view, attr, error, selector) {
+        var $el = view.$('[name=' + attr + ']'), 
+            $group = $el.closest('.form-group');
+        
+        $group.addClass('has-error');
+        $group.find('.help-block').html(error).removeClass('hidden');
+    }
+});
 
 /** On load function */
 $(function() {
@@ -44,7 +66,7 @@ function loadTemplates() {
 		"searchTeachers.html",
 		"viewTeachers.html",
 		"searchAdmins.html",
-		"viewAdmins.html"
+		"viewAdmins.html",
 	];
 
 	$.each(templates, function(i, name) {
