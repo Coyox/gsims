@@ -75,7 +75,7 @@ var EmailView = Backbone.View.extend({
 		body: 'test testestsetset'
 	});
 */
-function sendEmail(params) {
+function sendEmail(params, callback) {
 	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
 	var from = params.from || "info@gobindsarvar.com";
 	var to = params.to;
@@ -99,7 +99,20 @@ function sendEmail(params) {
 
 	$.when(xhr).then(function(data) {
 		// Response from mandrill
-		// validate response.. display some kind of message if it was successful or not
 		console.log(data);
+
+		if (callback && data.status == "sent") {
+			// Adam: see login.js around line 87 to see how I called this function.
+			// the "callback" param that I passed into sendEmail() is just a separate
+			// function that should be called after the emails have been successfully
+			// sent. The callback function is defined in login.js around line 96 and
+			// is executed here when you go callback.call(). 
+			// In the else case here, you can just write something general
+			// for when a callback isn't provided (probably just some kind of indication
+			// if the emails have been sent or not, many how many emails got sent, etc)
+			callback.call();
+		} else {
+			// display some kind of message if it was successful or not
+		} 
 	});
 }

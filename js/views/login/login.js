@@ -93,6 +93,10 @@ var ForgotPasswordView = Backbone.View.extend({
 						}],
 						subject: "Gobind Sarvar - Reset Account Password",
 						body: link
+					}, function() {
+						new TransactionResponseView({
+							message: "An email has been sent to: " + email + ". Please follow the link to reset your password."
+						});
 					});
 				} else {
 					// No user exists with the specified email
