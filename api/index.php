@@ -2,6 +2,8 @@
 require 'Slim/Slim.php';
 require_once 'helpers.php';
 
+header('Access-Control-Allow-Origin: http://gobind-sarvar.rhcloud.com');
+
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim();

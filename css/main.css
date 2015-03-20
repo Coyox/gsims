@@ -89,6 +89,7 @@ a {
 
 #sidebar > ul > li {
 	border-bottom: 1px solid #ddd;
+	background-color: #f5f5f5;
 }
 
 #sidebar a {
@@ -160,6 +161,11 @@ a {
 #main-content > .left {
 	width: 250px;
 	float: left;
+	top: 60px;
+	left: 0px;
+	bottom: 0px;
+	position: absolute;
+	border-right: 1px solid #ddd;
 }
 
 #main-content > .right {
