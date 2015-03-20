@@ -36,9 +36,13 @@ a {
 	margin-top: 1000px;
 }
 
+#forgot-container {
+	width: 400px;
+	margin: 30px;
+}
+
 #login-container {
 	width: 650px;
-	margin-top: 50px;
 }
 
 #login-panel {

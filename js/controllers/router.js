@@ -22,7 +22,7 @@ var Router = Backbone.Router.extend({
     routes: {
         "":             		"login",
         "forgotPassword": 		"forgotPassword",
-        "reset/:id":            "resetPassword",
+        "reset/:id/:name":      "resetPassword",
         "home": 	    		"home",
 
         "filterStudents": 		"filterStudents",
@@ -86,11 +86,11 @@ var Router = Backbone.Router.extend({
     	});
     },
 
-    resetPassword: function(id) {
-        console.log(id);
-        console.log("resetPassword");
+    resetPassword: function(id, username) {
         new ResetPasswordView({
-            id: id
+            id: id,
+            username: username,
+            el: $("#container")
         });
     },
 

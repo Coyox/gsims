@@ -12,7 +12,7 @@ var LoginView = Backbone.View.extend({
 	events: {
 		"click #login": "validateCredentials",
 		"keyup #password, #username": "loginOnEnter",
-		"click #forgot": "forgotPassword"
+		"click #forgot-password": "forgotPassword"
 	},
 
 	validateCredentials: function(evt) {
@@ -67,6 +67,71 @@ var ForgotPasswordView = Backbone.View.extend({
 	},
 
 	render: function() {
+		this.$el.html(html["forgotPassword.html"]);
+	},
 
+	events: {
+		"click #send-link": "sendPasswordLink"
+	},
+
+	sendPasswordLink: function(evt) {
+		var email = this.$el.find("#email").val();
+
+		var user = new User();
+		user.fetch({
+			url: user.getUsers("341231", "SU")
+		}).then(function(data) {
+			if (typeof data !== undefined) {
+				if (data.emailAddr == email) {
+					var link = "https://gobind-sarvar.rhcloud.com/#reset" + data.userid + "/username1";
+					sendEmail({
+						from: "info@gobindsarvar.com",
+						to: [{
+							email: email,
+							name: "Gobind Sarvar",
+							type: "to"
+						}],
+						subject: "Gobind Sarvar - Reset Account Password",
+						body: link
+					});
+				} else {
+					// No user exists with the specified email
+				}
+			} else {
+				// No user exists with the specified email
+			}
+		});
+	}
+});
+
+var ResetPasswordView = Backbone.View.extend({
+	initialize: function(options) {
+		this.id = options.id;
+		this.username = options.username;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(html["resetPassword.html"]);
+	},
+
+	events: {
+		"click #save-password": "savePassword"
+	},
+
+	savePassword: function(evt) {
+		var password1 = this.$el.find("#password1").val();
+		var password2 = this.$el.find("#password2").val();
+		if (password1 == password2) {
+			var user = new User();
+			user.set("username", this.username);
+			user.set("password", password1);
+			user.set("id", this.id);
+			user.set("userid", this.id);
+			user.save().then(function(data) {
+				console.log(data);
+			});
+		
+		}
 	}
 });

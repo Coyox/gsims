@@ -54,6 +54,8 @@ function loadTemplates() {
 		"confirmationModal.html",
 		"transactionResponse.html",
 		"login.html",
+		"forgotPassword.html",
+		"resetPassword.html",
 		"home.html",
 		"sidebar.html",
 		"header.html",
@@ -66,7 +68,7 @@ function loadTemplates() {
 		"searchTeachers.html",
 		"viewTeachers.html",
 		"searchAdmins.html",
-		"viewAdmins.html",
+		"viewAdmins.html"
 	];
 
 	$.each(templates, function(i, name) {

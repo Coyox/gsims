@@ -56,5 +56,50 @@ var EmailView = Backbone.View.extend({
 		//console.log(body);
 		//console.log(subject);
 	}
-
 });
+
+/** Common email function that can be used by any page to send an email (not 
+	just EmailView()). Expects a "params" object as the only parameter that 
+	contains the from email, to email(s), email subject, and email body. 
+
+	call the function as follows:
+
+	sendEmail({
+		from: "cbarretto7@gmail.com",
+		to: [{
+			email: "cbarretto7@gmail.com",
+			name: "Claire Barretto",
+			type: "to"
+		}],
+		subject: "test email",
+		body: 'test testestsetset'
+	});
+*/
+function sendEmail(params) {
+	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+	var from = params.from || "info@gobindsarvar.com";
+	var to = params.to;
+	var subject = params.subject || "Notice from Gobind Sarvar";
+	var body = params.body;
+	
+	var xhr = $.ajax({
+		type: "POST",
+		url: "https://mandrillapp.com/api/1.0/messages/send.json",
+		data: {
+			key: apiKey,
+			message: {
+				from_email: from,
+				to: to,
+				autotext: true,
+				subject: subject,
+				html: body
+			}
+		}
+	});
+
+	$.when(xhr).then(function(data) {
+		// Response from mandrill
+		// validate response.. display some kind of message if it was successful or not
+		console.log(data);
+	});
+}
