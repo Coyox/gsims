@@ -190,7 +190,7 @@ a {
 	border-bottom: 4px solid #9d426b;
 	padding-left: 20px;
 	padding-right: 20px;
-	color: #e8e8e8;
+	color: #e8e8e8 !important;
 }
 
 #header .header-title {
@@ -217,6 +217,14 @@ a {
 #navbar .logo-icon {
 	font-size: 30px;
 	padding-right: 5px;
+}
+
+.dropdown, #header, #home {
+	z-index: 1000;
+}
+
+.link:hover {
+	cursor: pointer;
 }
 
 .red {

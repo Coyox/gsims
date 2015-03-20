@@ -75,7 +75,7 @@ function loadTemplates() {
 		var promise = $.ajax("templates/" + name);
 		promises.push(promise);
 		$.when(promise).then(function(data) {
-			html[name] = data;
+			html[name] = _.template(data);
 		});
 	});
 

@@ -59,8 +59,10 @@ var EmailView = Backbone.View.extend({
 });
 
 /** Common email function that can be used by any page to send an email (not 
-	just EmailView()). Expects a "params" object as the only parameter that 
-	contains the from email, to email(s), email subject, and email body. 
+	just EmailView()). Expects a "params" object as the first parameter that 
+	contains the from email, to email(s), email subject, and email body. The
+	second parameter is an optional callback function that will be executed
+	after all emails have been successfully sent. 
 
 	call the function as follows:
 

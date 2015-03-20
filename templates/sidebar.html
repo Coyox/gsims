@@ -18,14 +18,17 @@
 	</li>
 
 	<!-- NOTIFICATIONS -->
+	<% if (usertype !== "S") { %> 
 	<li>
 		<a href="#home" class="sidebar-link" data-link="notifications">
 			<span class="glyphicon glyphicon-bell"></span>
 			<span class="text"> Notifications</span>
 		</a>
 	</li>
+	<% } %>
 
 	<!-- STUDENTS -->
+	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#students" class="collapsed">
 		<a class="sidebar-link">
 			<span class="glyphicon glyphicon-user"></span>
@@ -47,8 +50,10 @@
 			<a href="#home">Create a Student</a>
 		</li>
 	</ul>
+	<% } %>
 
 	<!-- TEACHERS -->
+	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#teachers" class="collapsed">
 		<a class="sidebar-link" data-link="teachers">
 			<span class="glyphicon glyphicon-user"></span>
@@ -70,8 +75,10 @@
 			<a href="#home">Create a Teacher</a>
 		</li>
 	</ul>
+	<% } %>
 
 	<!-- ADMINISTRATORS -->
+	<% if (usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#admins" class="collapsed">
 		<a class="sidebar-link" data-link="admins">
 			<span class="glyphicon glyphicon-user"></span>
@@ -93,8 +100,10 @@
 			<a href="#home">Create an Administrator</a>
 		</li>
 	</ul>
+	<% } %>
 
 	<!-- SUPERUSERS -->
+	<% if (usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#superusers" class="collapsed">
 		<a class="sidebar-link" data-link="superusers">
 			<span class="glyphicon glyphicon-user"></span>
@@ -112,6 +121,7 @@
 			<a href="#home">Create A Superuser</a>
 		</li>
 	</ul>
+	<% } %>
 
 	<!-- COURSES -->
 	<li>
@@ -122,6 +132,7 @@
 	</li>
 
 	<!-- ADMIN TOOLS -->
+	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#admin-tools" class="collapsed">
 		<a class="sidebar-link" data-link="admin-tools">
 			<span class="glyphicon glyphicon-wrench"></span>
@@ -151,6 +162,7 @@
 			<a href="#home">Import Data</a>
 		</li>	
 	</ul>
+	<% } %>
 
 	<!-- EMAIL -->
 	<li>

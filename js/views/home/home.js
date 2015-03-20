@@ -30,7 +30,11 @@ var SidebarView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["sidebar.html"]);
+		var template = html["sidebar.html"];
+		template = template({
+			usertype: sessionStorage.getItem("gobind-usertype")
+		});
+		this.$el.html(template);
 		this.populateSchoolMenu();
 		this.populateSchoolYearMenu();
 	},
