@@ -51,6 +51,10 @@ var Section = Backbone.Model.extend({
 		status: ""
 	},
     urlRoot: "https://gobind-sarvar.rhcloud.com/api/sections",
+
+    getDropStudentUrl: function(sectionid, studentid) {
+   		return "https://gobind-sarvar.rhcloud.com/api/sections/students/" + sectionid + "/" + studentid;
+    }
 });
 
 var Prereq = Backbone.Model.extend({

@@ -43,6 +43,7 @@ a {
 
 #login-container {
 	width: 650px;
+	margin-top: 50px;
 }
 
 #login-panel {
@@ -279,10 +280,8 @@ a {
 	color: #fff;
 }
 
-.property-table td:first-child {
-	font-weight: bold;
-	background-color: #f9f9f9;
-	width: 200px;
+.property-table {
+	margin-top: 20px;
 }
 
 #student-tabs {

@@ -31,6 +31,66 @@ var Student = Backbone.Model.extend({
 		lastAccessed: ""
 	},
 
+	validation: {
+		firstName: {
+			required: true
+		},
+		lastName: {
+			required: true
+		},
+		streetAddr1: {
+			required: true
+		},
+		city: {
+			required: true
+		},
+		province: {
+			required: true
+		},
+		country: {
+			required: true
+		},
+		postalCode: {
+			required: true
+		},
+		phoneNumber: {
+			required: true
+		},
+		emailAddr: [{
+			required: true
+		}, {
+			pattern: "email",
+			msg: "Please provide a valid email address."
+		}],
+		gender: {
+			required: true
+		},
+		parentFirstName: {
+			required: true
+		},
+		parentLastName: {
+			required: true
+		},
+		parentPhoneNumber: {
+			required: true
+		},
+		parentEmailAddr: {
+			required: true
+		},
+		emergencyContactFirstName: {
+			required: true,
+		},
+		emergencyContactLastName: {
+			required: true,
+		},
+		emergencyContactPhoneNumber: {
+			required: true
+		},
+		emergencyContactRelation: {
+			required: true
+		}
+	},
+
     /** We will assume that a field is required unless otherwise stated below */
     required: [
     	"allergies", "prevAttendedGS", "streetAddr2"
