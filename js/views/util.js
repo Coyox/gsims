@@ -1,6 +1,8 @@
 var TransactionResponseView = Backbone.View.extend({
 	initialize: function(options) {
 		this.message = options.message;
+		this.title = options.title;
+		this.status = options.status;
 		this.render();
 	},
 
@@ -8,6 +10,14 @@ var TransactionResponseView = Backbone.View.extend({
 		$("#container").append(html["transactionResponse.html"]);
 
 		$("#transaction-modal .modal-body").html(this.message);
+
+		if (this.title) {
+			$("#transaction-modal .modal-title").html(this.title);
+		}
+
+		if (this.status == "error") {
+			$("#transaction-modal .modal-title").addClass("red");
+		}
 
 		$("#transaction-modal").modal({
 			show: true

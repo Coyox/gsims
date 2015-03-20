@@ -219,6 +219,10 @@ a {
 	padding-right: 5px;
 }
 
+.red {
+	color: #CB0000;
+}
+
 .red-badge {
 	background-color: #CB0000;
 	color: #fff;

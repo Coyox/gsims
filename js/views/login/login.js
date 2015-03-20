@@ -100,9 +100,19 @@ var ForgotPasswordView = Backbone.View.extend({
 					});
 				} else {
 					// No user exists with the specified email
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "No user exists with the email address: " + email + ". Please provide a valid email address."
+					});
 				}
 			} else {
 				// No user exists with the specified email
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "No user exists with the email address: " + email + ". Please provide a valid email address."
+				});
 			}
 		});
 	}
