@@ -22,7 +22,6 @@ var Router = Backbone.Router.extend({
     routes: {
         "":             		"login",
         "forgotPassword": 		"forgotPassword",
-        "reset":                "resetPassword",
         "reset/:id":            "resetPassword",
         "home": 	    		"home",
 
