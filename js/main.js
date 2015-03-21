@@ -32,6 +32,7 @@ _.extend(Backbone.Validation.callbacks, {
 
 /** On load function */
 $(function() {
+	loadLoginTemplate();
 	loadTemplates();
 
 	$("body").on("click", function(e) {
@@ -46,6 +47,15 @@ $(function() {
 	});
 });
 
+function loadLoginTemplate() {
+	var name = "login.html";
+	var xhr = $.ajax("templates/" + name);
+	$.when(xhr).then(function(data) {
+		html[name] = data;
+		init();
+	});
+}
+
 /** Pre-fetches the specified templates located in the /templates directory in an
 	html object (to be used by the views later) */
 function loadTemplates() {
@@ -56,7 +66,6 @@ function loadTemplates() {
 		"createStudent.html",
 		"confirmationModal.html",
 		"transactionResponse.html",
-		"login.html",
 		"forgotPassword.html",
 		"resetPassword.html",
 		"home.html",
@@ -84,9 +93,9 @@ function loadTemplates() {
 		});
 	});
 
-	$.when.apply($, promises).then(function() {
-		init();
-	});
+	// $.when.apply($, promises).then(function() {
+	// 	init();
+	// });
 }
 
 /** Initialization function */

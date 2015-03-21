@@ -235,7 +235,6 @@ var SectionTableRowView = Backbone.View.extend({
 	},
 
 	enrollInSection: function(evt) {
-		console.log(this.model);
 		this.parentView.enrolledTable.row.add([
 			this.model.get("courseName"),
 			this.model.get("sectionCode"),
@@ -244,5 +243,6 @@ var SectionTableRowView = Backbone.View.extend({
 			this.model.get("endTime"),
 			"un-register"
 		]).draw();
+		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
 	}
 });
