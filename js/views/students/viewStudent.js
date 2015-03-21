@@ -286,7 +286,6 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 	}
 });
 
-// TODO: debug - copied from EnrolledSectionsView, etc, but not functioning fully yet
 var ReportCardView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -321,10 +320,8 @@ var ReportCardView = Backbone.View.extend({
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
-		// +	"<td><%= '[teacher name]' %></td>"
-		// +	"<td><%= '[student's grade]' %></td>"
-		+	"<td><%= model.day %></td>"
-		+	"<td><%= model.startTime %></td>"),
+		+	"<td>[teacher name]</td>" // TODO: get these fields
+		+	"<td>[student's grade]</td>"),
 
 	initialize: function(options) {
 		this.render();

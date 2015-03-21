@@ -44,7 +44,8 @@ function loadTemplates() {
 		"searchTeachers.html",
 		"viewTeachers.html",
 		"searchAdmins.html",
-		"viewAdmins.html"
+		"viewAdmins.html",
+		"reportCard.html",
 	];
 
 	$.each(templates, function(i, name) {
