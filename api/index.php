@@ -78,6 +78,7 @@ $app->put('/login/:id', 'updateLogin');
 $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
+$app->get('/users/:emailAddr', 'getUserByEmailAddr');
 $app->run();
 
 
@@ -886,6 +887,16 @@ function getUserById($id, $usertype){
     }
 }
 
+function getUserByEmailAddr($emailAddr){
+    $usertypes = array("student", "teacher", "administrator", "superuser");
+    foreach($usertypes as $type){
+        $sql = "SELECT userid from ".$type." where emailAddr=:emailAddr";
+        $userid = perform_query($sql,'GETCOL', array("emailAddr"=>$emailAddr));
+        if ($userid) { break; }
+    }
+    $sql = "SELECT userid, username, usertype, lastLogin from login where userid=:userid";
+    echo json_encode(perform_query($sql,'GET', array("userid"=>$userid)));
+}
 
 
 #================================================================================================================#
