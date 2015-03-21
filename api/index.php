@@ -916,6 +916,7 @@ function findUsers($usertype){
         $province = $_GET['province'];
         $country = $_GET['country'];
         $status = $_GET['status'];
+        $dob = $_GET['dateOfBirth'];
         if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
@@ -928,6 +929,7 @@ function findUsers($usertype){
             if (isset($province)){ $param['province'] = $province; }
             if (isset($country)){ $param['country'] = $country; }
             if (isset($status)){ $param['status'] = $country; }
+            if (isset($dob)){ $param['dateOfBirth'] = $dob; }
 
             $clause = buildWhereClause($param);
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
