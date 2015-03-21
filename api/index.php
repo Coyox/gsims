@@ -415,7 +415,7 @@ function getSectionTeachers($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function dropStudent($id, $sid){
-    $sql = "DELETE from enrollment where sectionid=:id, userid=:sid";
+    $sql = "DELETE from enrollment where sectionid=:id and userid=:sid";
     echo json_encode(perform_query($sql,'', array("id"=>$id, "sid"=>$sid)));
 }
 function enrollStudent($id, $sid){
@@ -642,11 +642,12 @@ function updateStudent($id) {
  * Creates a student record
  */
 function createStudent() {
-    $userid = createNewUser($firstname, $lastname, $usertype);
 
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
+    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
+
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -655,7 +656,7 @@ function createStudent() {
     :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
     :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
 
-    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
+
     $bindparams = array(
         "userid" => $userid,
         "firstName" => $student->firstName,
@@ -712,10 +713,10 @@ function createTeacher() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
+    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
 
-    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
     $bindparams = array(
         "userid" => $userid,
         "schoolid" => $teacher->schoolid,
@@ -782,10 +783,9 @@ function createAdministrator() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $admin = json_decode($body);
+    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
-    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
-
     $bindparams = array(
         "userid" => $userid,
         "schoolid" => $admin->schoolid,
@@ -816,10 +816,9 @@ function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $superuser = json_decode($body);
+    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
                          values (:userid, :firstName, :lastName, :emailAddr, :status)";
-    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
-
     $bindparams = array(
         "userid" => $userid,
         "firstName" => $superuser->firstName,
