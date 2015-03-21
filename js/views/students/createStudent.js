@@ -12,6 +12,7 @@ var CreateStudentView = Backbone.View.extend({
 		"click #clear": "clearForm",
 		"click .view-student": "viewStudent",
 		"click #save-student": "saveStudent",
+		"click #skip": "skipSearchCheck"
 	},
 
 	searchExistingStudent: function(evt) {
@@ -40,11 +41,7 @@ var CreateStudentView = Backbone.View.extend({
 				message += " has not registered for the school yet.";
 				message += " Fill out the following form to register them into the school.";
 				
-				var formTemplate = html["viewStudent.html"]();
-				formTemplate = $(formTemplate).find("#student-info").html();
-				elem.parent().append(formTemplate);
-				elem.parent().find(".form-buttons").remove();
-				elem.parent().find(".delete").remove();
+				view.createFormTemplate(elem.parent());
 				view.populateForm(elem.parent(), {
 					firstName: firstName, 
 					lastName: lastName,
@@ -57,6 +54,25 @@ var CreateStudentView = Backbone.View.extend({
 		});
 	},
 
+	skipSearchCheck: function() {
+		this.$el.find("#quick-search").hide();
+		
+		var parent = this.$el.find("#create-form");
+		parent.find("#create-message").hide();
+		parent.removeClass("hide");
+
+		this.createFormTemplate(parent);
+		this.populateForm(parent);
+	},
+
+	createFormTemplate: function(elem) {
+		var formTemplate = html["viewStudent.html"]();
+		formTemplate = $(formTemplate).find("#student-info").html();
+		elem.append(formTemplate);
+		elem.find(".form-buttons").remove();
+		elem.find(".delete").remove();
+	},
+
 	viewStudent: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
 		app.Router.navigate("students/" + id, {trigger:true});
@@ -66,7 +82,7 @@ var CreateStudentView = Backbone.View.extend({
 		this.model = new Student();
 		_.each(this.model.toJSON(), function(value, attr) {
 			if (this.model.nonEditable.indexOf(attr) == -1) {
-				var filled = prefilled[attr];
+				var filled = prefilled ? prefilled[attr] : undefined;
 				var value;
 				if (filled) {
 					value = filled;
