@@ -34,6 +34,7 @@ $app->put('/superusers/:id', 'updateSuperuser');
 $app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
+$app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 
 $app->get('/schools', 'getSchools');
@@ -130,8 +131,13 @@ function getLoginById($id){
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT *from schoolyear order by schoolyear desc";
+    $sql = "SELECT * from schoolyear order by schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL'));
+}
+
+function getActiveSchoolYear(){
+    $sql = "SELECT schoolyearid, schoolyear from schoolyear where status='active' limit 1 ";
+    echo json_encode(perform_query($sql, 'GET'));
 }
 
 function createSchoolYear(){
