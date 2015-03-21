@@ -29,6 +29,7 @@ var Router = Backbone.Router.extend({
         "students/search": 		"viewFilteredStudents",
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
+        "createStudent":        "createStudent",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
@@ -153,6 +154,18 @@ var Router = Backbone.Router.extend({
 			action: "view",
 			parentContainer: parent
 		});
+    },
+
+    createStudent: function(id) {
+        this.updatePageBreadcrumb("Create Student");
+
+        this.loadHome();
+
+        $("#content").html("<div id='create-student-container'></div>");
+
+        new CreateStudentView({
+            el: $("#create-student-container")
+        });
     },
 
     filterTeachers: function() {

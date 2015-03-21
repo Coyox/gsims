@@ -79,14 +79,11 @@ var SearchStudentsView = Backbone.View.extend({
 	},
 
 	changeRoute: function(data) {
-		//storeContent();
-
 		app.Router.navigate("students/search");
 		var view = new StudentsTableView({
 			el: $("#content"),
 			results: data
 		});
-		//view.populateQueryResults(data);
 	},
 
 	populateYearMenu: function() {
@@ -193,9 +190,7 @@ var StudentTableRowView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .view-student": "viewStudent",
-		"click .edit-student": "editStudent",
-		"click .delete-student": "deleteStudent"
+		"click .view-student": "viewStudent"
 	},
 
 	viewStudent: function(evt) {
@@ -203,23 +198,6 @@ var StudentTableRowView = Backbone.View.extend({
 
 		var id = $(evt.currentTarget).attr("id");
 		app.Router.navigate("students/" + id, {trigger:true});
-	},
-
-	editStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new StudentRecordView({
-			id: id,
-			el: $("#update-container"),
-			action: "edit"
-		});		
-	},
-
-	deleteStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new DeleteRecordView({
-			id: id,
-			el: $("#delete-container")
-		});		
 	}
 });
 

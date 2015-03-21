@@ -1,5 +1,5 @@
 var Student = Backbone.Model.extend({
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/students",
+    urlRoot: app.serverUrl + "api/students",
 
 	defaults: {
 		userid: "",
@@ -36,6 +36,9 @@ var Student = Backbone.Model.extend({
 			required: true
 		},
 		lastName: {
+			required: true
+		},
+		dateOfBirth: {
 			required: true
 		},
 		streetAddr1: {
@@ -127,7 +130,7 @@ var Student = Backbone.Model.extend({
    	},
 
    	getSearchStudentsUrl: function() {
-   		return "https://gobind-sarvar.rhcloud.com/api/search/users/S";
+   		return app.serverUrl + "api/search/users/S";
    	}
 });
 
@@ -140,12 +143,11 @@ var Teacher = Backbone.Model.extend({
 		usertype: ""
 	},
 
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/teachers",
+    urlRoot: app.serverUrl + "api/teachers",
 
    	getSearchTeachersUrl: function(usertype) {
-   		console.log(usertype);
    		usertype = usertype || "T";
-   		return "https://gobind-sarvar.rhcloud.com/api/search/users/" + usertype;
+   		return app.serverUrl + "api/search/users/" + usertype;
    	}
 });
 
@@ -154,7 +156,7 @@ var Superuser = Backbone.Model.extend({
 		emailAddr: "",
 		status: ""
 	},
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/superusers",
+    urlRoot: app.serverUrl + "api/superusers",
 });
 
 var User = Backbone.Model.extend({
@@ -174,12 +176,12 @@ var User = Backbone.Model.extend({
 		}
 	},
 
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+    urlRoot: app.serverUrl + "api/login",
    	
    	getUsers: function(id, usertype) {
    		if (typeof id == undefined || typeof usertype == undefined) {
    			return undefined;
    		}
-   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + "/" + usertype;
+   		return app.serverUrl + "api/users/" + id + "/" + usertype;
    	}
 });

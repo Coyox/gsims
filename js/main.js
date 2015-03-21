@@ -1,5 +1,6 @@
 /** Global application object */
 var app = {
+	serverUrl: "https://gobind-sarvar.rhcloud.com/",
 	currentSchoolYear: "2014-2015"
 };
 

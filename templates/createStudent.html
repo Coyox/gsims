@@ -1,1 +1,44 @@
-<div class='form-horizontal'></div>
+<div id="quick-search" class="o-auto">
+	<div class="form-horizontal col-sm-6">
+		<h4>Search Student
+			<br/>
+			<small>Provide the student's first name, last name, and birthday to check if the student is already registered.</small>
+		</h4>
+		<hr>
+		<div class="form-group">
+			<label class="control-label col-sm-3">First Name</label>
+			<div class="col-sm-9">
+				<input type="text" id="first-name" class="form-control input-sm">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Last Name</label>
+			<div class="col-sm-9">
+				<input type="text" id="last-name" class="form-control input-sm">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3">Birthday</label>
+			<div class="col-sm-9 form-inline">
+				<select id="year-operator" class="form-control input-sm" style="width: 110px;">
+					<option selected disabled>-- Operator --</option>
+					<option value="less">Before</option>
+					<option value="greater">After</option>
+					<option value="between">Between</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-3"></label>
+			<div class="col-sm-9">
+				<button id="search" class="btn btn-primary btn-sm">Search</button>
+				<button class="btn btn-primary btn-sm">Skip this step</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="create-form" class="hide">
+	<div id="create-message" class="well"></div>
+	<button id="save-student" class="btn btn-primary btn-sm pull-right">Save</button>
+<!-- 	<button id="to-enrollment" class="btn btn-primary btn-sm pull-right">Proceed to Enrollment</button> -->
+</div>
