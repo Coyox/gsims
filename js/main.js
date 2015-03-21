@@ -1,7 +1,9 @@
 /** Global application object */
 var app = {
 	serverUrl: "https://gobind-sarvar.rhcloud.com/",
-	currentSchoolYear: "2014-2015"
+	currentSchoolYear: "2014-2015",
+	selectedSchoolYearId: "100000",
+	selectedSchoolId: "412312"
 };
 
 /** Object to hold all HTML templates (pre-loaded) */
@@ -69,7 +71,9 @@ function loadTemplates() {
 		"searchTeachers.html",
 		"viewTeachers.html",
 		"searchAdmins.html",
-		"viewAdmins.html"
+		"viewAdmins.html",
+		"courseEnrollment.html",
+		"viewSections.html"
 	];
 
 	$.each(templates, function(i, name) {

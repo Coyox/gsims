@@ -321,3 +321,42 @@ li.paginate_button.active a {
 #back-container {
 	margin-bottom: 10px;
 }
+
+#department-list {
+
+}
+
+#department-list .list-group-item:hover {
+	background-color: #f2f2f2;
+	cursor: pointer;
+}
+
+#course-list {
+
+}
+
+#sections-container {
+	margin-left: 30px;
+}
+
+#sections-list li {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+td.details-control {
+    background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+}
+
+.font-16 {
+	font-size: 16px;
+}
+
+.enroll-link {
+	color: #9d426b;
+	font-weight: bold;
+}

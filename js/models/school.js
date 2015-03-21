@@ -6,6 +6,10 @@ var School = Backbone.Model.extend({
 		status: ""
 	},
     urlRoot: app.serverUrl + "api/schools",
+
+    getDepartmentsUrl: function(id) {
+   		return app.serverUrl + "api/schools/" + id + "/departments";
+    }
 });
 
 var SchoolYear = Backbone.Model.extend({
@@ -24,6 +28,10 @@ var Dept = Backbone.Model.extend({
 		status: ""
 	},
     urlRoot: app.serverUrl + "api/departments",
+
+    getCoursesUrl: function(id) {
+    	return app.serverUrl + "api/departments/" + id + "/courses"; 
+    }
 });
 
 var Course = Backbone.Model.extend({
@@ -54,6 +62,10 @@ var Section = Backbone.Model.extend({
 
     getDropStudentUrl: function(sectionid, studentid) {
    		return app.serverUrl + "api/sections/students/" + sectionid + "/" + studentid;
+    },
+
+    getSearchSectionsUrl: function() {
+    	return app.serverUrl + "api/search/sections";
     }
 });
 

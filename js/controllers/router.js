@@ -30,6 +30,7 @@ var Router = Backbone.Router.extend({
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
         "createStudent":        "createStudent",
+        "courseEnrollment":     "courseEnrollment",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
@@ -168,6 +169,16 @@ var Router = Backbone.Router.extend({
         });
     },
 
+    courseEnrollment: function() {
+        this.updatePageBreadcrumb("Course Enrollment");
+
+        this.loadHome();
+
+        new CourseEnrollmentView({
+            el: $("#content")
+        });
+    },
+
     filterTeachers: function() {
         this.updatePageBreadcrumb("Search Teachers");
 
@@ -257,4 +268,8 @@ var Router = Backbone.Router.extend({
 			});
     	}
     },
+
+    courses: function() {
+
+    }
 });

@@ -41,6 +41,7 @@ var SidebarView = Backbone.View.extend({
 
 	events: {
 		"click .sidebar-link": "updateActiveLink",
+		"change #school-year-options": "updateSelectedSchoolYear"
 	},
 
 	updateActiveLink: function(evt) {
@@ -76,6 +77,11 @@ var SidebarView = Backbone.View.extend({
 				select.append(option);
 			});
 		});
+	},
+
+	updateSelectedSchoolYear: function(evt) {
+		var selected = $(evt.currentTarget).find("option:selected").attr("id");
+		app.selectedSchoolYaarId = selected;
 	}
 });
 

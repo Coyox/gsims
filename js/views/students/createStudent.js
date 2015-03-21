@@ -12,7 +12,8 @@ var CreateStudentView = Backbone.View.extend({
 		"click #clear": "clearForm",
 		"click .view-student": "viewStudent",
 		"click #save-student": "saveStudent",
-		"click #skip": "skipSearchCheck"
+		"click #skip": "skipSearchCheck",
+		"click #to-enrollment": "loadCourseEnrollment"
 	},
 
 	searchExistingStudent: function(evt) {
@@ -149,6 +150,23 @@ var CreateStudentView = Backbone.View.extend({
         this.$el.find(parent + ".form-horizontal").append(container);
         return container;	
 	},
+
+	loadCourseEnrollment: function() {
+		Backbone.Validation.bind(this);	
+
+		if (this.model.isValid(true)) {
+			app.Router.navigate("courseEnrollment", {trigger:true});
+			// this.model.save().then(function(data) {
+			// 	console.log(data);
+			// }).fail(function(data) {
+			// 	new TransactionResponseView({
+			// 		title: "ERROR",
+			// 		status: "error",
+			// 		message: "TODO"
+			// 	})
+			// });
+		}
+	}
 });
 
 var CreateStudentRowView = Backbone.View.extend({
