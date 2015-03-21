@@ -15,7 +15,8 @@ var School = Backbone.Model.extend({
 var SchoolYear = Backbone.Model.extend({
 	defaults: {
 		schoolyear: "",
-		status: ""
+		status: "",
+		openForReg: ""
 	},
 	urlRoot: app.serverUrl + "api/schoolyears"
 });
@@ -30,7 +31,7 @@ var Dept = Backbone.Model.extend({
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
-    	return app.serverUrl + "api/departments/" + id + "/courses"; 
+    	return app.serverUrl + "api/departments/" + id + "/courses";
     }
 });
 

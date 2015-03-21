@@ -8,7 +8,8 @@ USE gobind;
 CREATE TABLE IF NOT EXISTS `schoolyear` (
   `schoolyearid` int(11) PRIMARY KEY NOT NULL,
   `schoolyear` char(9) NOT NULL,
-  `status` char(8) NOT NULL
+  `status` char(8) NOT NULL,
+  `openForReg` tinyint(1) NOT NULL
 );
 
 

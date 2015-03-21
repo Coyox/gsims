@@ -36,6 +36,8 @@ $app->delete('/superusers/:id', 'deleteSuperuser');
 $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
+$app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
+$app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -137,7 +139,7 @@ function getSchoolYears(){
 }
 
 function getActiveSchoolYear(){
-    $sql = "SELECT schoolyearid, schoolyear from schoolyear where status='active' limit 1 ";
+    $sql = "SELECT schoolyearid, schoolyear, openForReg from schoolyear where status='active' limit 1 ";
     echo json_encode(perform_query($sql, 'GET'));
 }
 
@@ -149,14 +151,25 @@ function createSchoolYear(){
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
     $schoolyearid = generateUniqueID($sql, "schoolyearid");
 
-    $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status)
-            values (:schoolyearid, :schoolyear, :status)";
-    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>"active");
-
+    $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status, openForReg)
+            values (:schoolyearid, :schoolyear, :status, :openForReg)";
+    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>$schoolyear->status, "openForReg"=>$schoolyear->openForReg);
     echo json_encode(perform_query($sql,'POST', $bindparam));
-    $sql = "UPDATE schoolyear set status='inactive' WHERE schoolyearid!=:schoolyearid";
-    perform_query($sql, '', array("schoolyearid"=>$schoolyearid));
+
 }
+
+function updateActiveSchoolYear($schoolyearid){
+    // set current as active and all other as inactive
+    $sql = "UPDATE schoolyear set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end";
+    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid)));
+}
+
+function updateOpenRegistration($schoolyearid){
+    $openForReg = $_PUT['openReg'];
+    $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
+    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$openForReg)));
+}
+
 #================================================================================================================#
 # Schools
 #================================================================================================================#
