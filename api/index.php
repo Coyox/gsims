@@ -165,7 +165,7 @@ function updateActiveSchoolYear($schoolyearid){
 }
 
 function updateOpenRegistration($schoolyearid){
-    $openForReg = $_PUT['openReg'];
+    $openForReg = $_PUT['openForReg'];
     $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
     echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$openForReg)));
 }
@@ -940,7 +940,7 @@ function findUsers($usertype){
         $country = $_GET['country'];
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
-        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
