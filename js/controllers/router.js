@@ -22,12 +22,15 @@ var Router = Backbone.Router.extend({
     routes: {
         "":             		"login",
         "forgotPassword": 		"forgotPassword",
+        "reset/:id/:name":      "resetPassword",
         "home": 	    		"home",
 
         "filterStudents": 		"filterStudents",
         "students/search": 		"viewFilteredStudents",
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
+        "createStudent":        "createStudent",
+        "courseEnrollment":     "courseEnrollment",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
@@ -83,6 +86,14 @@ var Router = Backbone.Router.extend({
     	new ForgotPasswordView({
     		el: this.el
     	});
+    },
+
+    resetPassword: function(id, username) {
+        new ResetPasswordView({
+            id: id,
+            username: username,
+            el: $("#container")
+        });
     },
 
     filterStudents: function() {
@@ -144,6 +155,28 @@ var Router = Backbone.Router.extend({
 			action: "view",
 			parentContainer: parent
 		});
+    },
+
+    createStudent: function(id) {
+        this.updatePageBreadcrumb("Create Student");
+
+        this.loadHome();
+
+        $("#content").html("<div id='create-student-container'></div>");
+
+        new CreateStudentView({
+            el: $("#create-student-container")
+        });
+    },
+
+    courseEnrollment: function() {
+        this.updatePageBreadcrumb("Course Enrollment");
+
+        this.loadHome();
+
+        new CourseEnrollmentView({
+            el: $("#content")
+        });
     },
 
     filterTeachers: function() {
@@ -235,4 +268,8 @@ var Router = Backbone.Router.extend({
 			});
     	}
     },
+
+    courses: function() {
+
+    }
 });

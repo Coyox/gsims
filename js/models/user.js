@@ -1,5 +1,5 @@
 var Student = Backbone.Model.extend({
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/students",
+    urlRoot: app.serverUrl + "api/students",
 
 	defaults: {
 		userid: "",
@@ -29,6 +29,69 @@ var Student = Backbone.Model.extend({
 		schoolid: "",
 		status: "",
 		lastAccessed: ""
+	},
+
+	validation: {
+		firstName: {
+			required: true
+		},
+		lastName: {
+			required: true
+		},
+		dateOfBirth: {
+			required: true
+		},
+		streetAddr1: {
+			required: true
+		},
+		city: {
+			required: true
+		},
+		province: {
+			required: true
+		},
+		country: {
+			required: true
+		},
+		postalCode: {
+			required: true
+		},
+		phoneNumber: {
+			required: true
+		},
+		emailAddr: [{
+			required: true
+		}, {
+			pattern: "email",
+			msg: "Please provide a valid email address."
+		}],
+		gender: {
+			required: true
+		},
+		parentFirstName: {
+			required: true
+		},
+		parentLastName: {
+			required: true
+		},
+		parentPhoneNumber: {
+			required: true
+		},
+		parentEmailAddr: {
+			required: true
+		},
+		emergencyContactFirstName: {
+			required: true,
+		},
+		emergencyContactLastName: {
+			required: true,
+		},
+		emergencyContactPhoneNumber: {
+			required: true
+		},
+		emergencyContactRelation: {
+			required: true
+		}
 	},
 
     /** We will assume that a field is required unless otherwise stated below */
@@ -67,7 +130,7 @@ var Student = Backbone.Model.extend({
    	},
 
    	getSearchStudentsUrl: function() {
-   		return "https://gobind-sarvar.rhcloud.com/api/search/users/S";
+   		return app.serverUrl + "api/search/users/S";
    	}
 });
 
@@ -80,12 +143,11 @@ var Teacher = Backbone.Model.extend({
 		usertype: ""
 	},
 
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/teachers",
+    urlRoot: app.serverUrl + "api/teachers",
 
    	getSearchTeachersUrl: function(usertype) {
-   		console.log(usertype);
    		usertype = usertype || "T";
-   		return "https://gobind-sarvar.rhcloud.com/api/search/users/" + usertype;
+   		return app.serverUrl + "api/search/users/" + usertype;
    	}
 });
 
@@ -94,7 +156,7 @@ var Superuser = Backbone.Model.extend({
 		emailAddr: "",
 		status: ""
 	},
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/superusers",
+    urlRoot: app.serverUrl + "api/superusers",
 });
 
 var User = Backbone.Model.extend({
@@ -103,8 +165,23 @@ var User = Backbone.Model.extend({
 		password: ""
 	},
 
-    urlRoot: "https://gobind-sarvar.rhcloud.com/api/login",
+	validation: {
+		username: {
+			required: true,
+			msg: "Please enter a username"
+		},
+		password: {
+			required: true,
+			msg: "Please enter a password"
+		}
+	},
+
+    urlRoot: app.serverUrl + "api/login",
+   	
    	getUsers: function(id, usertype) {
-   		return "https://gobind-sarvar.rhcloud.com/api/users/" + id + '/' + usertype;
+   		if (typeof id == undefined || typeof usertype == undefined) {
+   			return undefined;
+   		}
+   		return app.serverUrl + "api/users/" + id + "/" + usertype;
    	}
 });

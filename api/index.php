@@ -1,6 +1,7 @@
 <?php
 require 'Slim/Slim.php';
 require_once 'helpers.php';
+require_once 'crossdomain.php';
 
 \Slim\Slim::registerAutoloader();
 
@@ -33,7 +34,10 @@ $app->put('/superusers/:id', 'updateSuperuser');
 $app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
+$app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
+$app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
+$app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -76,6 +80,7 @@ $app->put('/login/:id', 'updateLogin');
 $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
+$app->get('/users/:emailAddr', 'getUserByEmailAddr');
 $app->run();
 
 
@@ -129,8 +134,13 @@ function getLoginById($id){
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT *from schoolyear order by schoolyear desc";
+    $sql = "SELECT * from schoolyear order by schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL'));
+}
+
+function getActiveSchoolYear(){
+    $sql = "SELECT schoolyearid, schoolyear, openForReg from schoolyear where status='active' limit 1 ";
+    echo json_encode(perform_query($sql, 'GET'));
 }
 
 function createSchoolYear(){
@@ -141,14 +151,25 @@ function createSchoolYear(){
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
     $schoolyearid = generateUniqueID($sql, "schoolyearid");
 
-    $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status)
-            values (:schoolyearid, :schoolyear, :status)";
-    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>"active");
-
+    $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status, openForReg)
+            values (:schoolyearid, :schoolyear, :status, :openForReg)";
+    $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>$schoolyear->status, "openForReg"=>$schoolyear->openForReg);
     echo json_encode(perform_query($sql,'POST', $bindparam));
-    $sql = "UPDATE schoolyear set status='inactive' WHERE schoolyearid!=:schoolyearid";
-    perform_query($sql, '', array("schoolyearid"=>$schoolyearid));
+
 }
+
+function updateActiveSchoolYear($schoolyearid){
+    // set current as active and all other as inactive
+    $sql = "UPDATE schoolyear set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end";
+    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid)));
+}
+
+function updateOpenRegistration($schoolyearid){
+    $openForReg = $_PUT['openForReg'];
+    $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
+    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$openForReg)));
+}
+
 #================================================================================================================#
 # Schools
 #================================================================================================================#
@@ -408,7 +429,7 @@ function getSectionTeachers($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function dropStudent($id, $sid){
-    $sql = "DELETE from enrollment where sectionid=:id, userid=:sid";
+    $sql = "DELETE from enrollment where sectionid=:id and userid=:sid";
     echo json_encode(perform_query($sql,'', array("id"=>$id, "sid"=>$sid)));
 }
 function enrollStudent($id, $sid){
@@ -635,11 +656,12 @@ function updateStudent($id) {
  * Creates a student record
  */
 function createStudent() {
-    $userid = createNewUser($firstname, $lastname, $usertype);
 
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
+    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
+
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -648,7 +670,7 @@ function createStudent() {
     :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
     :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
 
-    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
+
     $bindparams = array(
         "userid" => $userid,
         "firstName" => $student->firstName,
@@ -705,10 +727,10 @@ function createTeacher() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
+    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
 
-    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
     $bindparams = array(
         "userid" => $userid,
         "schoolid" => $teacher->schoolid,
@@ -775,10 +797,9 @@ function createAdministrator() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $admin = json_decode($body);
+    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
-    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
-
     $bindparams = array(
         "userid" => $userid,
         "schoolid" => $admin->schoolid,
@@ -809,10 +830,9 @@ function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $superuser = json_decode($body);
+    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
                          values (:userid, :firstName, :lastName, :emailAddr, :status)";
-    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
-
     $bindparams = array(
         "userid" => $userid,
         "firstName" => $superuser->firstName,
@@ -880,6 +900,16 @@ function getUserById($id, $usertype){
     }
 }
 
+function getUserByEmailAddr($emailAddr){
+    $usertypes = array("student", "teacher", "administrator", "superuser");
+    foreach($usertypes as $type){
+        $sql = "SELECT userid from ".$type." where emailAddr=:emailAddr";
+        $userid = perform_query($sql,'GETCOL', array("emailAddr"=>$emailAddr));
+        if ($userid) { break; }
+    }
+    $sql = "SELECT userid, username, usertype, lastLogin from login where userid=:userid";
+    echo json_encode(perform_query($sql,'GET', array("userid"=>$userid)));
+}
 
 
 #================================================================================================================#
@@ -909,7 +939,8 @@ function findUsers($usertype){
         $province = $_GET['province'];
         $country = $_GET['country'];
         $status = $_GET['status'];
-        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+        $dob = $_GET['dateOfBirth'];
+        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
@@ -921,6 +952,7 @@ function findUsers($usertype){
             if (isset($province)){ $param['province'] = $province; }
             if (isset($country)){ $param['country'] = $country; }
             if (isset($status)){ $param['status'] = $country; }
+            if (isset($dob)){ $param['dateOfBirth'] = $dob; }
 
             $clause = buildWhereClause($param);
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,

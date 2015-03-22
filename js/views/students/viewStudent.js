@@ -8,9 +8,13 @@ var StudentRecordView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 
-		new Student({id: this.id}).fetch().then(function(data) {
+		var student = new Student();
+		student.set("id", this.id);
+		student.fetch().then(function(data) {
 			var model = new Student(data, {parse:true});
 			view.model = model;
+			Backbone.Validation.bind(view);	
+
 			view.model.set("id", view.model.get("userid"));
 			view.studentInformationTab(data, model);
 			view.emailTab(data);
@@ -20,13 +24,14 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .delete-student": "deleteStudent",
+		"click #delete-student": "deleteStudent",
 		"click .edit-btn": "editStudent",
-		"click .save-btn": "saveStudent"
+		"click .save-btn": "saveStudent",
+		"click .cancel-btn": "saveStudent"
 	},
 
 	addRow: function(model, attr) {
-        var container = $("<tr></tr>");
+        var container = $("<div class='form-group'></div>");
         var parent;
 		if (model.addressProperties.indexOf(attr) > -1) {
 			parent = "#address-table";
@@ -37,22 +42,24 @@ var StudentRecordView = Backbone.View.extend({
         } else {
         	parent = "#student-info-table";
         }
-        parent = parent + " .results";
-        this.$el.find(parent).append(container);
+        this.$el.find(parent + ".form-horizontal").append(container);
         return container;	
 	},
 
 	addEditRow: function(table) {
-		var container = $("<tr></tr>");
+		var container = $("<div class='form-group'></div>");
 		this.$el.find("#" + table).append(container);
 		return container;
 	},
 
 	editStudent: function(evt) {
-		var table = $(evt.currentTarget).closest(".student-component").find("table").attr("id");
+		this.model.untouched = JSON.stringify(this.model.toJSON());
+
+		var table = $(evt.currentTarget).closest(".student-component").find(".form-horizontal").attr("id");
 		this.$el.find("#" + table).empty();
 
-		$(evt.currentTarget).text("Save").removeClass("edit-btn").addClass("save-btn");
+		$(evt.currentTarget).hide()
+		$(evt.currentTarget).parent().find(".save-btn, .cancel-btn").removeClass("hide").show();
 
 		var props = this.getPropertiesByType(table);
 
@@ -71,14 +78,30 @@ var StudentRecordView = Backbone.View.extend({
 
 	saveStudent: function(evt) {
 		var view = this;
-		this.model.save().then(function(data) {
-			new TransactionResponseView({
-				message: "Record successfully saved."
-			});
-			var table = $(evt.currentTarget).closest(".student-component").find("table").attr("id");
+		var def = $.Deferred();
+		
+		if ($(evt.currentTarget).hasClass("cancel-btn")) {
+			this.model.attributes = JSON.parse(this.model.untouched);
+			def.resolve();
+		} else {
+			if (this.model.isValid(true)) {
+				if ($(evt.currentTarget).hasClass("save-btn")) {
+					this.model.save().then(function(data) {
+						new TransactionResponseView({
+							message: "Record successfully saved."
+						});
+						def.resolve();
+					});
+				} 
+			}
+		}
+
+		$.when(def).then(function() {
+			var table = $(evt.currentTarget).closest(".student-component").find(".form-horizontal").attr("id");
 			view.$el.find("#" + table).empty();
 
-			$(evt.currentTarget).text("Edit").removeClass("save-btn").addClass("edit-btn");
+			$(evt.currentTarget).parent().find(".save-btn, .cancel-btn").hide();
+			$(evt.currentTarget).parent().find(".edit-btn").removeClass("hide").show();
 
 			var props = view.getPropertiesByType(table);
 
@@ -111,10 +134,9 @@ var StudentRecordView = Backbone.View.extend({
 	},
 
 	deleteStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
 		new DeleteRecordView({
-			id: id,
-			el: $("#delete-container")
+			id: this.model.get("id"),
+			el: $("#container")
 		});	
 	},
 
@@ -163,8 +185,15 @@ var StudentRecordView = Backbone.View.extend({
 });
 
 var StudentRecordRowView = Backbone.View.extend({
-	viewTemplate: _.template("<td><%= name %></td><td><%= value %></td>"),
-	editTemplate: _.template("<td><%= name %></td><td><input type='text' class='form-control input-sm' value='<%= value %>'></td>"),
+	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<span><%= value %></span>"
+		+	"</div>"),
+	editTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<input type='text' class='form-control input-sm' value='<%= value %>' name='<%= name %>'>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
 
 	initialize: function(options) {
 		this.action = options.action;
@@ -181,12 +210,14 @@ var StudentRecordRowView = Backbone.View.extend({
 
 		if (this.action == "view") {
 			this.$el.html(this.viewTemplate({
-				name: this.label,
+				name: this.name,
+				label: this.label,
 				value: this.value
 			}));
 		} else {
 			this.$el.html(this.editTemplate({
-				name: this.label,
+				name: this.name,
+				label: this.label,
 				value: this.value
 			}));
 		}
@@ -226,8 +257,12 @@ var EnrolledSectionsView = Backbone.View.extend({
 				var section = new Section(object, {parse:true});
 				new EnrolledSectionsRowView({
 					el: view.addRow(),
-					model: section
+					model: section,
+					studentid: id
 				});
+			});
+			view.$el.find("table").dataTable({
+				dom: "t"
 			});
 		});
 	},
@@ -245,9 +280,10 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 		+	"<td><%= model.day %></td>"
 		+	"<td><%= model.startTime %></td>"
 		+	"<td><%= model.endTime %></td>"
-		+   "<td><button class='view-section btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Drop Section</button></td>"),
+		+   "<td><button class='drop-section btn btn-xs btn-primary center-block' id='<%= model.sectionid %>'>Drop Section</button></td>"),
 
 	initialize: function(options) {
+		this.studentid = options.studentid;
 		this.render();
 	},
 
@@ -258,31 +294,17 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .view-student": "viewStudent",
-		"click .edit-student": "editStudent",
-		"click .delete-student": "deleteStudent"
+		"click .drop-section": "dropSection"
 	},
 
-	viewStudent: function(evt) {
+	dropSection: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
-		app.Router.navigate("students/" + id, {trigger:true});
-	},
-
-	editStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new StudentRecordView({
-			id: id,
-			el: $("#update-container"),
-			action: "edit"
-		});		
-	},
-
-	deleteStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new DeleteRecordView({
-			id: id,
-			el: $("#delete-container")
-		});		
+		this.model.set("id", id);
+		this.model.destroy({
+			url: this.model.getDropStudentUrl(id, this.studentid)
+		}).then(function(data) {
+			console.log(data);
+		});
 	}
 });
 

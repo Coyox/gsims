@@ -24,11 +24,24 @@ var DeleteRecordView = Backbone.View.extend({
 			$(".modal-backdrop").remove();
 
 			new Student({id: view.id}).destroy({dataType: "text"}).then(function(data) {
-				new TransactionResponseView({
-					message: "The record has been successfully deleted. Click the refresh button on the table to see your changes (or just refresh the page)"
-				});
+				if (data != "null") {
+					console.log("yay");
+					new TransactionResponseView({
+						message: "The record has been successfully deleted."
+					});
+				} else {
+					new TransactionResponseView({
+						message: "The record could not be deleted. Please try again",
+						title: "ERROR",
+						status: "error"
+					});					
+				}
 			}).fail(function(data) {
-				console.log("FAILED");
+				new TransactionResponseView({
+					message: "The record could not be deleted. Please try again",
+					title: "ERROR",
+					status: "error"
+				});
 			});
 		});
 	},	

@@ -30,13 +30,18 @@ var SidebarView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["sidebar.html"]);
+		var template = html["sidebar.html"];
+		template = template({
+			usertype: sessionStorage.getItem("gobind-usertype")
+		});
+		this.$el.html(template);
 		this.populateSchoolMenu();
 		this.populateSchoolYearMenu();
 	},
 
 	events: {
 		"click .sidebar-link": "updateActiveLink",
+		"change #school-year-options": "updateSelectedSchoolYear"
 	},
 
 	updateActiveLink: function(evt) {
@@ -72,6 +77,11 @@ var SidebarView = Backbone.View.extend({
 				select.append(option);
 			});
 		});
+	},
+
+	updateSelectedSchoolYear: function(evt) {
+		var selected = $(evt.currentTarget).find("option:selected").attr("id");
+		app.selectedSchoolYaarId = selected;
 	}
 });
 
