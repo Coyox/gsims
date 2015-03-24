@@ -1,6 +1,6 @@
 <?php
-require_once 'mandrill-api-php/src/Mandrill.php'; //Not required with Composer
-$mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+// require_once 'mandrill-api-php/src/Mandrill.php'; //Not required with Composer
+// $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
 
 define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
