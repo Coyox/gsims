@@ -17,44 +17,47 @@ var EmailView = Backbone.View.extend({
 	},
 
 	sendEmail: function(evt){
-		var recipient = this.$el.find("#email-to").val();
+		var recipientInput = this.$el.find("#email-to").val();
+		var recipients = []; // array where each index contains an email
+		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
 		var body = this.$el.find("#email-message").val();
 		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
 		var from = this.$el.find("#email-from").val();
-	/*
+		
+		//Build the JSON request
+		//request.type = 'POST'
+		//request.url = "https://mandrillapp.com/api/1.0/messages/send.json"
+		request.data = {};
+		request.data.key = apiKey;
+		request.data.message = {};
+		request.data.message.from_email = from;
+		request.data.message.to = [];
+		request.data.message.autotext = 'true'
+		request.data.message.subject = subject;
+		request.data.message.html = body;
+
+		// Get recipients
+		recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
+		// Push each recipient's data to JSON object
+		recipients.forEach(function(entry){
+    		var to = {
+        		'email': entry,
+        		'name':"",
+        		'type': 'to'        
+    		}
+    	request.data.message.to.push(to);
+		})
+		// JSONify final request
+		//console.log(JSON.stringify(request.data));
+		// Send using mandrill API and read response
 		$.ajax({
-  		type: 'POST',
-  		url: "https://mandrillapp.com/api/1.0/messages/send.json",
-  		data: {
-    	'key': apiKey,
-    	'message': {
-      	'from_email': from, // Todo: replace with user's email
-      	'to': [
-        	  {
-           	 'email': 'adaml@Live.ca',
-           	 'name': 'Adam Lloyd',
-           	 'type': 'to'
-          	},
-          	//{
-           	// 'email': 'alloudsounds@gmail.com',
-           	// 'name': 'Adam Lloyd',
-           	// 'type': 'to'
-          	//}
-        	],
-      	'autotext': 'true',
-      	'subject': subject,
-      	'html': body,
-    	}
-  	}
- 	}).done(function(response) {
-   	console.log(response);
- 	});
- 	*/
- 		console.log("No spam plz lol");
-		//console.log(recipient);
-		//console.log(body);
-		//console.log(subject);
+			type: 'POST',
+  			url: "https://mandrillapp.com/api/1.0/messages/send.json",
+  			data: JSON.stringify(request.data),
+		}).done(function(response) {
+   		console.log(response);
+ 		});
 	}
 });
 
