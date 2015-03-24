@@ -213,7 +213,7 @@ function createSchoolYear(){
 
 // Updates school year and all other related records
 function updateActiveSchoolYear($schoolyearid){
-    $tables = array("schoolyear", "department", "course", "section", "document", "attendance", "enrollment", "marks");
+    $tables = array("`schoolyear`", "`department`", "`course`", "`section`", "`document`", "`attendance`", "`enrollment`", "`marks`");
     foreach ($tables as $table) {
         $sql = "UPDATE :table set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end";
         echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "table"=>$table)));
@@ -998,7 +998,7 @@ function findUsers($usertype){
         $country = $_GET['country'];
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
-        if (isset($firstname)||isset($lastname)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+        if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
@@ -1009,7 +1009,7 @@ function findUsers($usertype){
             if (isset($city)){ $param['city'] = $city; }
             if (isset($province)){ $param['province'] = $province; }
             if (isset($country)){ $param['country'] = $country; }
-            if (isset($status)){ $param['status'] = $country; }
+            if (isset($status)){ $param['status'] = $status; }
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
 
             $clause = buildWhereClause($param);
