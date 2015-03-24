@@ -12,6 +12,7 @@ $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->post('/students', 'createStudent');
+$app->post('/students/:id/sections', 'enrollStudentIntoSections');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
@@ -493,12 +494,12 @@ function dropStudent($id, $sid){
 }
 function enrollStudent($id, $sid){
     $schoolyearid = $_POST['schoolyearid'];
-    if (!issert($schoolyearid)) { return ; }
+    if (!isset($schoolyearid)) { return ; }
     $sql = "INSERT into enrollment (userid, sectionid, schoolyearid, status)
             values (:userid, :sectionid, :schoolyearid, :status )";
     $bindparams = array(
         "userid" => $sid,
-        "userid" => $id,
+        "sectionid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => "active",
     );
@@ -768,6 +769,29 @@ function deleteStudent($id) {
     //$sql = "DELETE from student where userid=:id";
     $sql = "UPDATE student set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
+
+
+function enrollStudentIntoSections($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $schoolyearid = $student->schoolyearid;
+    $sectionids = $student->sectionids;
+
+    $bindparams = array(
+        "userid" => $id,
+        "schoolyearid" => $schoolyearid,
+        "status" => $student->$status,
+    );
+    $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
+    foreach (array_values($sectionids) as $i => $sectionid) {
+        $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
+        $bindparams["sectionid".$i] = $sectionid;
+    }
+    $sql = rtrim($sql, ",");
+
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
 #================================================================================================================#
