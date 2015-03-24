@@ -117,6 +117,7 @@ var SearchStudentsView = Backbone.View.extend({
 
 var StudentsTableView = Backbone.View.extend({
 	initialize: function(options) {
+		this.template = options.template;
 		this.results = options.results;
 		this.render();
 	},
@@ -124,7 +125,12 @@ var StudentsTableView = Backbone.View.extend({
 	render: function() {
 		storeContent();
 
-		this.$el.html(html["viewStudents.html"]);
+		if (this.template) {
+			this.$el.html(html[this.template]);
+		} else { 
+			this.$el.html(html["viewStudents.html"]);
+		}
+
 		if (this.results) {
 			this.populateQueryResults(this.results);
 		} else {

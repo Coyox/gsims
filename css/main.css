@@ -326,8 +326,15 @@ li.paginate_button.active a {
 
 }
 
-#department-list .list-group-item:hover {
-	background-color: #f2f2f2;
+#department-list button {
+	background: #fff;
+	border: 1px solid #ddd;
+	color: #666;
+}
+
+#department-list button:hover {
+	background-color: #9d426b;
+	color: #fff;
 	cursor: pointer;
 }
 
@@ -356,7 +363,7 @@ tr.shown td.details-control {
 	font-size: 16px;
 }
 
-.enroll-link {
+.enroll-link, .remove-section {
 	color: #9d426b;
 	font-weight: bold;
 }

@@ -32,7 +32,6 @@ _.extend(Backbone.Validation.callbacks, {
 
 /** On load function */
 $(function() {
-	console.log(window.location.pathname);
 	loadLoginTemplate();
 	loadTemplates();
 
@@ -88,7 +87,9 @@ function loadTemplates() {
 		"courseEnrollment.html",
 		"viewSections.html",
 		"viewSchoolYear.html",
-		"createSchoolYear.html"
+		"createSchoolYear.html",
+		"createStudentSearch.html",
+		"enrollmentForm.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -120,7 +121,4 @@ function setActiveSchoolYear() {
 		app.currentSchoolYearId = data.schoolyearid;
 	});
 }
-
-
-
 

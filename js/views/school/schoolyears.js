@@ -11,7 +11,6 @@ var SchoolYearView = Backbone.View.extend({
 		var schoolyear = new SchoolYear();
 		schoolyear.fetch().then(function(data) {
 			_.each(data, function(object, index) {
-				console.log(object);
 				var year = new SchoolYear(object, {parse: true});
 				new SchoolYearRowView({
 					el: view.addRow(),

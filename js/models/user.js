@@ -15,8 +15,8 @@ var Student = Backbone.Model.extend({
 		phoneNumber: "",
 		emailAddr: "",
 		gender: "",
-		allergies: false,
-		prevAttendedGS: false,
+		allergies: "",
+		prevAttendedGS: "",
 		parentFirstName: "",
 		parentLastName: "",
 		parentPhoneNumber: "",
@@ -25,9 +25,9 @@ var Student = Backbone.Model.extend({
 		emergencyContactLastName: "",
 		emergencyContactRelation: "",
 		emergencyContactPhoneNumber: "",
-		paid: false,
+		paid: 0,
 		schoolid: "",
-		status: "",
+		status: "active",
 		lastAccessed: ""
 	},
 
@@ -91,17 +91,18 @@ var Student = Backbone.Model.extend({
 		},
 		emergencyContactRelation: {
 			required: true
+		},
+		paid: {
+			required: true
+		},
+		status: {
+			required: true
 		}
 	},
 
     /** We will assume that a field is required unless otherwise stated below */
-    required: [
-    	"allergies", "prevAttendedGS", "streetAddr2"
-    ],
-
-    /** We will assume that a field is required unless otherwise stated below */
    	nonEditable: [
-   		"paid", "schoolid", "status", "lastAccessed", "userid"
+   		"schoolid", "lastAccessed", "userid"
    	],
 
    	/** Student info properties */
@@ -131,7 +132,14 @@ var Student = Backbone.Model.extend({
 
    	getSearchStudentsUrl: function() {
    		return app.serverUrl + "api/search/users/S";
-   	}
+   	},
+
+   	studentStatuses: [
+   		"active",
+   		"inactive",
+   		"pending",
+   		"pending-test"
+   	]
 });
 
 var Teacher = Backbone.Model.extend({

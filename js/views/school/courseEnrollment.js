@@ -23,6 +23,10 @@ var CourseEnrollmentView = Backbone.View.extend({
 		});
 	},
 
+	events: {
+		"click #save-sections": "saveEnrolledSections"
+	},
+
 	populateDepartments: function() {
 		var view = this;
 		var schoolid = $("#school-options").find("option:selected").attr("id");
@@ -46,15 +50,27 @@ var CourseEnrollmentView = Backbone.View.extend({
 	},
 
 	addDepartmentListItem: function() {
-		var container = $("<li></li>");
-		container.addClass("list-group-item");
+		var container = $("<div></div>");
 		this.$el.find("#department-list").append(container);
 		return container;
+	},
+
+	saveEnrolledSections: function() {
+		var rows = this.$el.find("#enrolled-list tbody tr");
+		var ids = [];
+		_.each(rows, function(row, index) {
+			ids.push($(row).attr("id"));
+		}, this);
+		console.log(ids);
+		// Send the list of section ids, and the user id to the server
+		new TransactionResponseView({
+			message: "still todo ...."
+		});
 	}
 });
 
 var DepartmentListItem = Backbone.View.extend({
-	template: _.template("<div id='<%= model.deptid %>' class='department' data-name='<%= model.deptName %>'><%= model.deptName %></div>"),
+	template: _.template("<button id='<%= model.deptid %>' class='department btn btn-default btn-sm btn-block' data-name='<%= model.deptName %>'><%= model.deptName %></button>"),
 
 	initialize: function(options) {
 		this.parent = options.parent;
@@ -231,18 +247,27 @@ var SectionTableRowView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .enroll-link": "enrollInSection"
+		"click .enroll-link": "enrollInSection",
+		"click span.remove-section": "removeSection"
 	},
 
 	enrollInSection: function(evt) {
-		this.parentView.enrolledTable.row.add([
+		var row = this.parentView.enrolledTable.row.add([
 			this.model.get("courseName"),
 			this.model.get("sectionCode"),
 			this.model.get("day"),
 			this.model.get("startTime"),
 			this.model.get("endTime"),
-			"un-register"
-		]).draw();
+			"<span class='remove-section link'>Remove</span>"
+		]).draw().node();
 		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
+		$(row).attr("id", this.model.get("sectionid"));
+	},
+
+	removeSection: function(evt) {
+		this.parentView.enrolledTable
+			.row($(evt.currentTarget).parents("tr"))
+			.remove()
+			.draw();
 	}
 });

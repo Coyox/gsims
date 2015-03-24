@@ -52,7 +52,7 @@ var Dept = Backbone.Model.extend({
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
-    	return this.urlRoot + id + "/courses";
+    	return this.urlRoot + "/" + id + "/courses";
     }
 });
 

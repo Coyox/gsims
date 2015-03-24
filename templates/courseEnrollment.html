@@ -2,10 +2,29 @@
 	<div class="col-sm-3">
 		<h4>Select a Department</h4>
 		<hr>
-		<ul id="department-list" class="list-group"></ul>
+		<div id="department-list"></div>
 	</div>
 	<div class="col-sm-9">
-		<h4>Enrolled Sections</h4>
+		<h4>Showing courses for: <strong class="department-name">[ none selected ]</strong>
+			<br>
+		</h4>
+		<hr>
+		<table id="course-list" class="table table-striped table-bordered">
+			<thead>
+				<th>View Sections</th>
+				<th>Course Name</th>
+				<th>Description</th>
+			</thead>
+			<tbody class="results"></tbody>
+		</table>
+
+		<br><br>
+
+		<h4>Enrolled Sections 
+			<button  id="save-sections" class="btn btn-primary btn-sm pull-right">Enroll in Sections</button>
+			<br>
+			<small>You will be enrolled in each of the following sections</small>
+		</h4>
 		<hr>
 		<table id="enrolled-list" class="table table-striped table-bordered">
 			<thead>
@@ -17,19 +36,6 @@
 					<th>End Time</th>
 					<th>Drop</th>
 				</tr>
-			</thead>
-			<tbody class="results"></tbody>
-		</table>
-
-		<br><br>
-
-		<h4>Showing courses for: <strong class="department-name"></strong></h4>
-		<hr>
-		<table id="course-list" class="table table-striped table-bordered">
-			<thead>
-				<th>View Sections</th>
-				<th>Course Name</th>
-				<th>Description</th>
 			</thead>
 			<tbody class="results"></tbody>
 		</table>

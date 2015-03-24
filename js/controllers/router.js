@@ -12,6 +12,7 @@ var LoginRouter = Backbone.Router.extend({
 
 var Router = Backbone.Router.extend({
 	initialize: function(options) {
+        var view = this;
 		this.el = $("#container");
 
         /** Hide/show the back button depending on what the current page is (routeName). 
@@ -42,6 +43,7 @@ var Router = Backbone.Router.extend({
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
         "createStudent":        "createStudent",
+        "enrollmentForm":       "studentEnrollmentForm",
         "courseEnrollment":     "courseEnrollment",
 
         "filterTeachers": 		"filterTeachers",
@@ -74,6 +76,10 @@ var Router = Backbone.Router.extend({
       	if ($("#container").html() == "") {
     		this.home();
     	}
+    },
+
+    createChild: function() {
+        $("#content").html("<div id='child'></div>");
     },
 
     home: function() {
@@ -176,10 +182,20 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
-        $("#content").html("<div id='create-student-container'></div>");
-
+        // temp fix
+        $("#content").html("<div id='child'></div>");
         new CreateStudentView({
-            el: $("#create-student-container")
+            el: $("#child")
+        });
+    },
+
+    studentEnrollmentForm: function() {
+        this.updatePageBreadcrumb("Create Student");
+
+        this.loadHome();
+
+        app.enrollmentFormView = new EnrollmentFormView({
+            el: $("#content")
         });
     },
 
