@@ -165,9 +165,11 @@ function updateActiveSchoolYear($schoolyearid){
 }
 
 function updateOpenRegistration($schoolyearid){
-    $openForReg = $_PUT['openForReg'];
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $schoolyear = json_decode($body);
     $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
-    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$openForReg)));
+    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$schoolyear->openForReg)));
 }
 
 #================================================================================================================#
@@ -543,10 +545,10 @@ function getAvgAttendance($id){
         }
 
         $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
-        echo $avgAttendance."%";
+        echo json_encode(array("avgAttendance"=>$avgAttendance."%"));
     }
     else {
-        echo "N/A";
+        echo json_encode(array("avgAttendance"=>"N/A"));
     }
 
 }
@@ -741,7 +743,6 @@ function createTeacher() {
         "usertype" => 'T'
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
-
 }
 
 /*

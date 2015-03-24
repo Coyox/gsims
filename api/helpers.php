@@ -62,14 +62,12 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         else{
             $stmt = $db->query($sql);
         }
+
         if ($querytype == 'GET') {
             $result = $stmt->fetchObject();
         }
         elseif ($querytype == 'GETALL') {
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        }
-        elseif ($querytype == 'POST'){
-            $result = $db->lastInsertId();
         }
         elseif ($querytype == 'GETCOL'){
             $result = $stmt->fetchColumn();
@@ -78,12 +76,13 @@ function perform_query($sql, $querytype, $bindparams=array()) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         else {
-            $result = null;
+            $result = array("status"=>"success");
         }
         $db = null;
         return $result;
     } catch(PDOException $e) {
         echo $e->getMessage();
+        return array("status"=>"failure");
     }
 }
 
