@@ -211,11 +211,13 @@ function createSchoolYear(){
     }
 }
 
-
+// Updates school year and all other related records
 function updateActiveSchoolYear($schoolyearid){
-    // set current as active and all other as inactive
-    $sql = "UPDATE schoolyear set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end";
-    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid)));
+    $tables = array("schoolyear", "department", "course", "section", "document", "attendance", "enrollment", "marks");
+    foreach ($tables as $table) {
+        $sql = "UPDATE :table set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end";
+        echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "table"=>$table)));
+    }
 }
 
 function updateOpenRegistration($schoolyearid){
@@ -223,7 +225,7 @@ function updateOpenRegistration($schoolyearid){
     $body = $request->getBody();
     $schoolyear = json_decode($body);
     $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
-    echo json_encode(perform_query($sql, '', array("schoolyearid"=>$schoolyearid, "openForReg"=>$schoolyear->openForReg)));
+    echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "openForReg"=>$schoolyear->openForReg)));
 }
 
 #================================================================================================================#
