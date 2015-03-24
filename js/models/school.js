@@ -5,6 +5,7 @@ var School = Backbone.Model.extend({
 		yearOpened: "",
 		status: ""
 	},
+    
     urlRoot: app.serverUrl + "api/schools",
 
     getDepartmentsUrl: function(id) {
@@ -15,10 +16,29 @@ var School = Backbone.Model.extend({
 var SchoolYear = Backbone.Model.extend({
 	defaults: {
 		schoolyear: "",
-		status: "",
-		openForReg: ""
+		status: "inactive",
+		openForReg: 0
 	},
-	urlRoot: app.serverUrl + "api/schoolyears"
+
+	validation: {
+		schoolyear: {
+			required: true,
+		}
+	},
+
+	urlRoot: app.serverUrl + "api/schoolyears",
+
+	getActiveSchoolYearUrl: function() {
+		return this.urlRoot + "/active";
+	},
+
+	updateRegistrationUrl: function(id) {
+		return this.urlRoot + "/reg/" + id;
+	},
+
+	updateActiveYearUrl: function(id) {
+		return this.urlRoot + "/active/" + id;
+	}
 });
 
 var Dept = Backbone.Model.extend({
@@ -28,10 +48,11 @@ var Dept = Backbone.Model.extend({
 		schoolyearid: "",
 		status: ""
 	},
+    
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
-    	return app.serverUrl + "api/departments/" + id + "/courses";
+    	return this.urlRoot + id + "/courses";
     }
 });
 
@@ -43,6 +64,7 @@ var Course = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
+    
     urlRoot: app.serverUrl + "api/courses",
 });
 
@@ -59,10 +81,11 @@ var Section = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
+    
     urlRoot: app.serverUrl + "api/sections",
 
     getDropStudentUrl: function(sectionid, studentid) {
-   		return app.serverUrl + "api/sections/students/" + sectionid + "/" + studentid;
+   		return this.urlRoot + "/students/" + sectionid + "/" + studentid;
     },
 
     getSearchSectionsUrl: function() {

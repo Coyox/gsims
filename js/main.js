@@ -33,7 +33,8 @@ _.extend(Backbone.Validation.callbacks, {
 /** On load function */
 $(function() {
 	loadLoginTemplate();
-	loadTemplates();
+
+	setActiveSchoolYear();
 
 	$("body").on("click", function(e) {
 	    if ($(e.target).data('toggle') !== 'popover'
@@ -52,7 +53,8 @@ function loadLoginTemplate() {
 	var xhr = $.ajax("templates/" + name);
 	$.when(xhr).then(function(data) {
 		html[name] = data;
-		init();
+		//init();
+		loadTemplates();
 	});
 }
 
@@ -84,6 +86,8 @@ function loadTemplates() {
 		"reportCard.html",
 		"courseEnrollment.html",
 		"viewSections.html",
+		"viewSchoolYear.html",
+		"createSchoolYear.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -94,9 +98,9 @@ function loadTemplates() {
 		});
 	});
 
-	// $.when.apply($, promises).then(function() {
-	// 	init();
-	// });
+	$.when.apply($, promises).then(function() {
+		init();
+	});
 }
 
 /** Initialization function */
@@ -105,7 +109,16 @@ function init() {
 	Backbone.history.start();
 }
 
-
+/** Set the current school year (for all requests) */
+function setActiveSchoolYear() {
+	var schoolyear = new SchoolYear();
+	schoolyear.fetch({
+		url: schoolyear.getActiveSchoolYearUrl()
+	}).then(function(data) {
+		app.currentSchoolYear = data.schoolyear;
+		app.currentSchoolYearId = data.schoolyearid;
+	});
+}
 
 
 

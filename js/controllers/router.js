@@ -43,6 +43,8 @@ var Router = Backbone.Router.extend({
         "admins/:id": 			"viewAdmin",
 
         "email" :               "email",
+
+        "schoolyears":          "viewSchoolYears"
     },
 
     updatePageBreadcrumb: function(text) {
@@ -271,5 +273,15 @@ var Router = Backbone.Router.extend({
 
     courses: function() {
 
+    },
+
+    viewSchoolYears: function() {
+        this.updatePageBreadcrumb("School Years");
+
+        this.loadHome();
+
+        new SchoolYearView({
+            el: $("#content")
+        });
     }
 });

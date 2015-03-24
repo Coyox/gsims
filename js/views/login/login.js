@@ -6,7 +6,19 @@ var LoginView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["login.html"]);  
+		var view = this;
+		var schoolyear = new SchoolYear();
+		schoolyear.fetch({
+			url: schoolyear.getActiveSchoolYearUrl()
+		}).then(function(data) {
+			view.$el.html(html["login.html"]);  
+			if (data.openForReg == 1) {
+				view.$el.find("#reg-open").removeClass("hide").show();
+			} else {
+				view.$el.find("#reg-closed").removeClass("hide").show();
+			}
+			app.openForReg = data.openForReg;
+		});
 	},
 
 	events: {
