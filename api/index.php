@@ -156,7 +156,61 @@ function createSchoolYear(){
     $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>$schoolyear->status, "openForReg"=>$schoolyear->openForReg);
     echo json_encode(perform_query($sql,'POST', $bindparam));
 
+    if ($schoolyear->duplicate == 1){
+        $current_schoolyear = $schoolyear->currentSchoolYear;
+
+        // create a row for each department
+        $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
+        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        $idsql = "SELECT deptid from dept where deptid=:deptid";
+
+        $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
+                SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+                AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
+
+        $bindparams = array(
+            "schoolyearid" => $schoolyearid,
+            "activeschoolyear" => $current_schoolyear,
+            "status" => $schoolyear->status
+        );
+        for ($i=0 ; $i<$rowcount; $i++){
+            $id = generateUniqueID($idsql, "deptid");
+            $bindparams["deptid"] = $id;
+            echo json_encode(perform_query($sql,'POST',$bindparams));
+        }
+
+        //create row for each course
+        $sql = "SELECT count(*) from course where schoolyearid=:activeschoolyear";
+        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        $idsql = "SELECT courseid from course where courseid=:courseid";
+
+        $sql = "INSERT into course (courseid, courseName, description, deptid, schoolyearid, status)
+                SELECT :courseid, courseName, description, deptid, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+                AND (courseName not in (SELECT courseName from course where schoolyearid=:schoolyearid)) LIMIT 1";
+
+        for ($i=0 ; $i<$rowcount; $i++){
+            $id = generateUniqueID($idsql, "courseid");
+            $bindparams["courseid"] = $id;
+            echo json_encode(perform_query($sql,'POST',$bindparams));
+        }
+
+        //create row for each section
+        $sql = "SELECT count(*) from section where schoolyearid=:activeschoolyear";
+        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        $idsql = "SELECT sectionid from section where sectionid=:sectionid";
+
+        $sql = "INSERT into section (sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, schoolyearid, status)
+                SELECT :sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, :schoolyearid, :status FROM section where schoolyearid=:activeschoolyear
+                AND (sectionCode not in (SELECT sectionCode from section where schoolyearid=:schoolyearid)) LIMIT 1";
+
+        for ($i=0 ; $i<$rowcount; $i++){
+            $id = generateUniqueID($idsql, "sectionid");
+            $bindparams["sectionid"] = $id;
+            echo json_encode(perform_query($sql,'POST',$bindparams));
+        }
+    }
 }
+
 
 function updateActiveSchoolYear($schoolyearid){
     // set current as active and all other as inactive
@@ -253,11 +307,12 @@ function createDepartment(){
     $sql = "SELECT deptid from dept where deptid=:deptid";
     $deptid = generateUniqueID($sql, "deptid");
 
-    $sql = "INSERT into department (schoolid, deptName, schoolyearid, status)
-            values (:schoolid, :deptName, :schoolyearid, :status)";
+    $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
+            values (:deptid, :schoolid, :deptName, :schoolyearid, :status)";
 
     $bindparams = array(
-        "schoolid" => $deptid,
+        "deptid" => $deptid,
+        "schoolid" => $dept->schoolid,
         "deptName" => $dept->deptName,
         "schoolyearid" => $dept->schoolyearid,
         "status" => $dept->status
@@ -467,7 +522,7 @@ function createSection(){
             values (:sectionid, :courseid, :sectionCode, :day, :startTime, :endTime, :roomCapacity, :roomLocation, :classSize, :schoolyearid, :status)";
 
     $bindparams = array(
-        "sectionid" => $section->sectionid,
+        "sectionid" => $sectionid,
         "courseid" => $section->courseid,
         "sectionCode" => $section->sectionCode,
         "day" => $section->day,
