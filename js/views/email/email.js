@@ -17,11 +17,33 @@ var EmailView = Backbone.View.extend({
 	},
 
 	sendEmail: function(evt){
-		var recipient = this.$el.find("#email-to").val();
+		var recipientInput = this.$el.find("#email-to").val();
+		var recipients = []; // array where each index contains an email
+		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
 		var body = this.$el.find("#email-message").val();
 		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
 		var from = this.$el.find("#email-from").val();
+
+		request.to = recipients;
+		recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
+
+		recipients.forEach(function(entry){
+    		var to = {
+        		'email': entry,
+        		'name':"",
+        		'type': 'to'        
+    		}
+    	request.to.push(to);
+    	console.log(entry);
+		})
+
+		console.log(JSON.stringify(request));
+
+
+
+
+
 	/*
 		$.ajax({
   		type: 'POST',
@@ -51,10 +73,6 @@ var EmailView = Backbone.View.extend({
    	console.log(response);
  	});
  	*/
- 		console.log("No spam plz lol");
-		//console.log(recipient);
-		//console.log(body);
-		//console.log(subject);
 	}
 });
 
