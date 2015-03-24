@@ -88,6 +88,7 @@ function loadTemplates() {
 		"viewSections.html",
 		"viewSchoolYear.html",
 		"createSchoolYear.html",
+        "viewSchools.html",
 		"createStudentSearch.html",
 		"enrollmentForm.html",
 		"dashboard.html",
