@@ -76,6 +76,9 @@ $app->post('/sections/:id/attendance/:userid', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
 
+$app->get('/documents', 'getDocuments');
+
+
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
 
@@ -248,7 +251,6 @@ function getSchoolById($id) {
 /* Get all departments for a school */
 function getDepartments($id){
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) { return; }
     $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
     $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
@@ -302,7 +304,6 @@ function getDepartmentById($id) {
 /* Get all courses for a department */
 function getCourses($id){
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) { return; }
     $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by courseName asc";
     $bindparam = array("id"=>$id,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
@@ -437,7 +438,6 @@ function updateCourse($id) {
 #================================================================================================================#
 function getSections(){
     $schoolyear = $_GET['schoolyearid'];
-    if (!isset($schoolyear)) { return; }
     $courseid = $_GET['courseid'];
     $schoolid = $_GET['schoolid'];
     if (isset($schoolid)) {
@@ -499,7 +499,6 @@ function dropStudent($id, $sid){
 }
 function enrollStudent($id, $sid){
     $schoolyearid = $_POST['schoolyearid'];
-    if (!isset($schoolyearid)) { return ; }
     $sql = "INSERT into enrollment (userid, sectionid, schoolyearid, status)
             values (:userid, :sectionid, :schoolyearid, :status )";
     $bindparams = array(
@@ -614,6 +613,22 @@ function getAvgAttendance($id){
         echo json_encode(array("avgAttendance"=>"N/A"));
     }
 
+}
+
+#================================================================================================================#
+# Documents
+#================================================================================================================#
+//TODO
+function getDocuments(){
+    $schoolyear = $_GET['schoolyearid'];
+    $sectionid = $_GET['sectionid'];
+    $schoolid = $_GET['schoolid'];
+    if (isset($schoolid)) {
+        return getSectionsBySchool($schoolyear, $schoolid);
+    }
+    if (isset($courseid)) {
+        return getSectionsByCourse($schoolyear, $courseid);
+    }
 }
 
 #================================================================================================================#
@@ -779,8 +794,15 @@ function createStudent() {
  * mark student as inactive
  */
 function deleteStudent($id) {
-    //$sql = "DELETE from student where userid=:id";
-    $sql = "UPDATE student set status='inactive' where userid=:id";
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    if ($option->purge == 1){
+        $sql = "DELETE from student where userid=:id";
+    }
+    else {
+        $sql = "UPDATE student set status='inactive' where userid=:id";
+    }
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
@@ -896,7 +918,15 @@ function updateTeacher($id) {
  * mark teacher as inactive
  */
 function deleteTeacher($id) {
-    $sql = "UPDATE teacher set status='inactive' where userid=:id";
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    if ($option->purge == 1){
+        $sql = "DELETE from teacher where userid=:id";
+    }
+    else {
+        $sql = "UPDATE teacher set status='inactive' where userid=:id";
+    }
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 /*
@@ -937,8 +967,7 @@ function createAdministrator() {
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 function deleteAdministrator($id) {
-    $sql = "UPDATE teacher set status='inactive' where userid=:id";
-    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+    return deleteTeacher($id);
 }
 #================================================================================================================#
 # Superusers
@@ -987,7 +1016,15 @@ function updateSuperuser($id) {
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 function deleteSuperuser($id) {
-    $sql = "UPDATE superuser set status='inactive' where userid=:id";
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    if ($option->purge == 1){
+        $sql = "DELETE from superuser where userid=:id";
+    }
+    else {
+        $sql = "UPDATE superuser set status='inactive' where userid=:id";
+    }
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
@@ -1107,8 +1144,6 @@ function findSections(){
     //Non-filter options
     $schoolyear = $_GET['schoolyearid'];
     $schoolid = $_GET['schoolid'];
-    if (!isset($schoolyear) || (!isset($schoolid))) { return; }
-
 
     //Find options
     $deptname = $_GET['deptName'];
