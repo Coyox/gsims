@@ -1,3 +1,15 @@
+var LoginRouter = Backbone.Router.extend({
+    routes: {
+        "": "login"
+    },
+
+    login: function() {
+        new LoginView({
+            el: $("#container")
+        });
+    },
+});
+
 var Router = Backbone.Router.extend({
 	initialize: function(options) {
 		this.el = $("#container");

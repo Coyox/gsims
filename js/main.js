@@ -32,7 +32,9 @@ _.extend(Backbone.Validation.callbacks, {
 
 /** On load function */
 $(function() {
+	console.log(window.location.pathname);
 	loadLoginTemplate();
+	loadTemplates();
 
 	setActiveSchoolYear();
 
@@ -53,8 +55,7 @@ function loadLoginTemplate() {
 	var xhr = $.ajax("templates/" + name);
 	$.when(xhr).then(function(data) {
 		html[name] = data;
-		//init();
-		loadTemplates();
+		app.LoginRouter = new LoginRouter();
 	});
 }
 
