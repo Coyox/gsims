@@ -11,8 +11,11 @@ $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
+$app->get('/students/:id/tests', 'getEnrolledTests');
 $app->post('/students', 'createStudent');
-$app->post('/students/:id/sections', 'enrollStudentIntoSections');
+$app->post('/students/:id/sections', 'enrollStudentInSections');
+$app->post('/students/:id/tests', 'enrollStudentInTests');
+$app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
@@ -82,6 +85,8 @@ $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
+
+
 $app->run();
 
 
@@ -646,6 +651,14 @@ function getEnrolledSections($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
+function getEnrolledTests($id){
+    $sql = "SELECT c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
+    FROM course c, department d, studentCompetencyTest t
+    WHERE t.userid = :id and c.courseid = t.courseid and c.deptid = d.deptid";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+
+
 /*
  * provide schoolyear string instead of schoolyearid
  */
@@ -772,7 +785,7 @@ function deleteStudent($id) {
 }
 
 
-function enrollStudentIntoSections($id){
+function enrollStudentInSections($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
@@ -792,6 +805,36 @@ function enrollStudentIntoSections($id){
     $sql = rtrim($sql, ",");
 
     echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+function enrollStudentInTests($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $courseids = $student->courseids;
+
+    $bindparams = array("userid" => $id);
+    $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
+    foreach (array_values($courseids) as $i => $courseid) {
+        $sql.= "(:userid, :courseid".$i."),";
+        $bindparams["courseid".$i] = $courseid;
+    }
+    $sql = rtrim($sql, ",");
+
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+function updateStudentTestScores($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $results = json_decode($body);
+    $bindparams = array("userid" => $id);
+    foreach ($results as $result){
+        $bindparams["courseid"] = $result->courseid;
+        $bindparams["mark"] = $result->mark;
+        $sql = "UPDATE studentCompetencyTest set mark=:mark where userid=:userid and courseid=:courseid";
+        echo json_encode(perform_query($sql,'PUT',$bindparams));
+    }
 }
 
 #================================================================================================================#
