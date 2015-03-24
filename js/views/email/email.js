@@ -1,6 +1,7 @@
 var EmailView = Backbone.View.extend({
 	initialize: function(options) {
 		this.emailAddr = options.emailAddr;
+		//this.emails = options.emails; //STUBBED
 		this.render();
 	},
 
@@ -17,7 +18,7 @@ var EmailView = Backbone.View.extend({
 	},
 
 	sendEmail: function(evt){
-		var recipientInput = this.$el.find("#email-to").val();
+		var recipientInput = this.$el.find("#email-to").val(); // Input from the "to" form
 		var recipients = []; // array where each index contains an email
 		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
@@ -37,8 +38,12 @@ var EmailView = Backbone.View.extend({
 		request.data.message.subject = subject;
 		request.data.message.html = body;
 
-		// Get recipients
-		recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
+		// Get recipients. Check if we've been passed any.
+		if (recipients.length == 0){
+			recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
+		}
+
+		//recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
 		// Push each recipient's data to JSON object
 		recipients.forEach(function(entry){
     		var to = {
