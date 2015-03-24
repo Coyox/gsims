@@ -1,6 +1,6 @@
 var SchoolView = Backbone.View.extend({
 	initialize: function(options) {
-		this.model = new SchoolYear();
+		this.model = new School();
 		this.render();
 	},
 
@@ -37,28 +37,30 @@ var SchoolView = Backbone.View.extend({
 		var view = this;
 		Backbone.Validation.bind(this);	
 		
-		this.$el.append(html["createSchoolYear.html"]);
-
-		$("#create-year-modal").modal({
+		this.$el.append(html["createSchool.html"]);
+        console.log("asdf");
+		$("#create-school-modal").modal({
 			show: true
 		});
 		
-		$("#create-year-modal").on("hidden.bs.modal", function() {
-			$("#create-year-modal").remove();
+		$("#create-school-modal").on("hidden.bs.modal", function() {
+			$("#create-school-modal").remove();
 			$(".modal-backdrop").remove();
 		});
 		
-		$("#create-year-modal").on("click", "#save", function() {
-			view.model.set("schoolyear", $("#school-year").val());
+		$("#create-school-modal").on("click", "#save", function() {
+			view.model.set("location", $("#location").val());
+            view.model.set("postalCode", $("#postalCode").val());
+            view.model.set("yearOpened", $("#yearOpened").val());
 			if (view.model.isValid(true)) {
-				$("#create-year-modal").remove();
+				$("#create-school-modal").remove();
 				$(".modal-backdrop").remove();
-				view.model.save({
-					dataType: "text"
-				}).then(function(data) {
+                console.log(view.model.toJSON());
+				
+                view.model.save().then(function(data) {
 					if (data) {
 						new TransactionResponseView({
-							message: "New school year successfully created."
+							message: "New school successfully created."
 						});
 						view.render();
 					}
@@ -66,9 +68,10 @@ var SchoolView = Backbone.View.extend({
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
-						message: "Could not create a new school year."
+						message: "Could not create a new school."
 					});
 				});
+                
 			}
 		});
 	},
