@@ -34,7 +34,7 @@ $app->put('/superusers/:id', 'updateSuperuser');
 $app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
-//$app->get('/schoolyears/active', 'getActiveSchoolYear');
+$app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 $app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
 $app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
