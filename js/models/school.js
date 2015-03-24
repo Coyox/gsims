@@ -3,7 +3,19 @@ var School = Backbone.Model.extend({
 		location: "",
 		postalCode: "",
 		yearOpened: "",
-		status: ""
+		status: "inactive"
+	},
+
+    	validation: {
+		location: {
+			required: true,
+		},
+		postalCode: {
+			required: true,
+		},
+		yearOpened: {
+			required: true,
+		}
 	},
      
     urlRoot: app.serverUrl + "api/schools",
