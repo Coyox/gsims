@@ -5,7 +5,7 @@ var School = Backbone.Model.extend({
 		yearOpened: "",
 		status: ""
 	},
-    
+     
     urlRoot: app.serverUrl + "api/schools",
 
     getDepartmentsUrl: function(id) {
