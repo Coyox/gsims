@@ -89,7 +89,8 @@ function loadTemplates() {
 		"viewSchoolYear.html",
 		"createSchoolYear.html",
 		"createStudentSearch.html",
-		"enrollmentForm.html"
+		"enrollmentForm.html",
+		"dashboard.html"
 	];
 
 	$.each(templates, function(i, name) {

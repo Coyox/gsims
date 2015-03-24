@@ -88,6 +88,10 @@ var Router = Backbone.Router.extend({
     	new HomePageView({
     		el: this.el
     	});
+
+        new DashboardView({
+            el: $("#content")
+        });
     },
 
     email: function() {
