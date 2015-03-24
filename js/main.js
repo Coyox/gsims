@@ -90,7 +90,10 @@ function loadTemplates() {
 		"createSchoolYear.html",
 		"createStudentSearch.html",
 		"enrollmentForm.html",
-		"dashboard.html"
+		"dashboard.html",
+		"notifications.html",
+		"pendingRegistration.html",
+		"pendingTest.html"
 	];
 
 	$.each(templates, function(i, name) {
