@@ -1328,10 +1328,10 @@ function createNewUser($firstname, $lastname, $usertype){
 }
 
 function getCount($usertype){
-    $table=($usertype=='S')? "`student`" : (($usertype=="A"|$usertype=="T")? "`teacher`" : "`superuser`");
+    $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
     $status = $_GET['status'];
-    $sql = "SELECT count(*) from :table";
-    $bindparams = array("table"=>$table);
+    $sql = "SELECT count(*) from ".$table;
+    $bindparams = array();
     if (isset($status)){
         $sql.=" where status=:status";
         $bindparams["status"] = $status;
