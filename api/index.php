@@ -17,6 +17,8 @@ $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
+$app->put('/students', 'approveStudents');
+$app->delete('/students', 'rejectStudents');
 $app->delete('/students/:id', 'deleteStudent');
 
 $app->get('/teachers', 'getTeachers');
@@ -29,7 +31,7 @@ $app->delete('/teachers/:id', 'deleteTeacher');
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
-$app->delete('/administrators/:id', 'deleteAdministrator');
+$app->delete('/administrators/:id', 'deleteTeacher');
 
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
@@ -398,15 +400,13 @@ function addCoursePrereqs($id){
     $body = $request->getBody();
     $prereqs = json_decode($body, true);
     $bindparams = array("courseid"=>$id);
-    $sql = "INSERT into prereqs (courseid, prereq) values";
+    $sql = "INSERT into prereqs (courseid, prereq) values ";
 
-    $count = 0;
-    foreach($prereqs as $prereq){
-        $sql.= "(:courseid, :prereq".$count.")";
-        $key = "prereq".$count;
-        $bindparams[$key] = $prereq['prereq'];
-        $count++;
+    foreach (array_values($prereqs) as $i => $prereq) {
+        $sql.= "(:courseid, :prereq".$i.")";
+        $bindparams["prereq".$i] = $prereq;
     }
+    $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql, 'POST', $bindparams));
 }
 
@@ -856,6 +856,7 @@ function createStudent() {
         "status" => $student->status,
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
+    echo json_encode(array("userid"=>$userid));
 }
 
 /*
@@ -866,14 +867,11 @@ function deleteStudent($id) {
     $body = $request->getBody();
     $option = json_decode($body);
     if ($option->purge == 1){
-        $sql = "DELETE from student where userid=:id";
+        return purgeUser($id);
     }
-    else {
-        $sql = "UPDATE student set status='inactive' where userid=:id";
-    }
+    $sql = "UPDATE student set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
-
 
 function enrollStudentInSections($id){
     $request = \Slim\Slim::getInstance()->request();
@@ -927,6 +925,41 @@ function updateStudentTestScores($id){
     }
 }
 
+
+function approveStudents(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $students = json_decode($body);
+    $bindparams = array();
+    $sql = "UPDATE student set status='active' where userid in (";
+
+    foreach (array_values($students) as $i => $student) {
+        $sql.= ":id".$i.",";
+        $bindparams["id".$i] = $student->userid;
+    }
+    $sql = rtrim($sql, ",");
+    $sql.= ")";
+
+    echo json_encode(perform_query($sql,'PUT',$bindparams));
+}
+
+function rejectStudents(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $students = json_decode($body);
+    $bindparams = array();
+    $sql = "DELETE from login where userid in (";
+
+    foreach (array_values($students) as $i => $student) {
+        $sql.= ":id".$i.",";
+        $bindparams["id".$i] = $student->userid;
+    }
+    $sql = rtrim($sql, ",");
+    $sql.= ")";
+
+    echo json_encode(perform_query($sql,'PUT',$bindparams));
+}
+
 #================================================================================================================#
 # Teachers
 #================================================================================================================#
@@ -957,6 +990,7 @@ function createTeacher() {
         "usertype" => 'T'
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
+    echo json_encode(array("userid"=>$userid));
 }
 
 /*
@@ -990,11 +1024,9 @@ function deleteTeacher($id) {
     $body = $request->getBody();
     $option = json_decode($body);
     if ($option->purge == 1){
-        $sql = "DELETE from teacher where userid=:id";
+        return purgeUser($id);
     }
-    else {
-        $sql = "UPDATE teacher set status='inactive' where userid=:id";
-    }
+    $sql = "UPDATE teacher set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 /*
@@ -1033,9 +1065,7 @@ function createAdministrator() {
         "usertype" => 'A'
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
-}
-function deleteAdministrator($id) {
-    return deleteTeacher($id);
+    echo json_encode(array("userid"=>$userid));
 }
 #================================================================================================================#
 # Superusers
@@ -1063,6 +1093,7 @@ function createSuperuser() {
         "status" => $superuser->status,
     );
     echo json_encode(perform_query($sql,'POST',$bindparams));
+    echo json_encode(array("userid"=>$userid));
 }
 
 function updateSuperuser($id) {
@@ -1088,11 +1119,9 @@ function deleteSuperuser($id) {
     $body = $request->getBody();
     $option = json_decode($body);
     if ($option->purge == 1){
-        $sql = "DELETE from superuser where userid=:id";
+        return purgeUser($id);
     }
-    else {
-        $sql = "UPDATE superuser set status='inactive' where userid=:id";
-    }
+    $sql = "UPDATE superuser set status='inactive' where userid=:id";
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
@@ -1141,6 +1170,10 @@ function getUserByEmailAddr($emailAddr){
     echo json_encode(perform_query($sql,'GET', array("userid"=>$userid)));
 }
 
+function purgeUser($id){
+    $sql = "DELETE from login where userid=:id";
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
 
 #================================================================================================================#
 # Search
