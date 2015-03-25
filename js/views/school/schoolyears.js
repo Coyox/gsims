@@ -1,30 +1,45 @@
 var SchoolYearView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model = new SchoolYear();
+		this.action = options.action || "view";
 		this.render();
 	},
 
 	render: function() {
+		this.list = [];
 		this.$el.html(html["viewSchoolYear.html"]);
+
+		if (this.action == "view") {
+			this.$el.find("#edit-year").removeClass("hide").show();
+		} else {
+			this.$el.find("#save-year").removeClass("hide").show();
+		}
 
 		var view = this;
 		var schoolyear = new SchoolYear();
 		schoolyear.fetch().then(function(data) {
 			_.each(data, function(object, index) {
 				var year = new SchoolYear(object, {parse: true});
+				view.list.push(year);
 				new SchoolYearRowView({
 					el: view.addRow(),
-					model: year
+					model: year,
+					action: view.action
 				});
 			});
 			view.$el.find("table").dataTable({
-				dom: "t"
+				dom: "t",
+		      	aoColumnDefs: [
+		          	{ bSortable: false, aTargets: [ 1,2 ] }
+		       	]
 			});
 		});
 	},
 
 	events: {
 		"click #create-year": "createSchoolYear",
+		"click #edit-year": "editSchoolYear",
+		"click #save-year": "saveSchoolYear"
 	},
 
 	addRow: function() {
@@ -39,20 +54,23 @@ var SchoolYearView = Backbone.View.extend({
 		
 		this.$el.append(html["createSchoolYear.html"]);
 
-		$("#create-year-modal").modal({
+		var elem = $("#create-year-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.modal({
 			show: true
 		});
 		
-		$("#create-year-modal").on("hidden.bs.modal", function() {
-			$("#create-year-modal").remove();
-			$(".modal-backdrop").remove();
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
 		});
 		
-		$("#create-year-modal").on("click", "#save", function() {
+		elem.on("click", "#save", function() {
 			view.model.set("schoolyear", $("#school-year").val());
 			if (view.model.isValid(true)) {
-				$("#create-year-modal").remove();
-				$(".modal-backdrop").remove();
+				elem.remove();
+				backdrop.remove();
 				view.model.save({
 					dataType: "text"
 				}).then(function(data) {
@@ -73,76 +91,103 @@ var SchoolYearView = Backbone.View.extend({
 		});
 	},
 
+	editSchoolYear: function(evt) {
+		this.action = "edit";
+		this.render();
+	},
+
+	saveSchoolYear: function(evt) {
+		var view = this;
+		var promises = [];
+		_.each(this.list, function(model, index) {
+			var id = model.get("schoolyearid");
+			if (model.hasChanged("status")) {
+				var promise = model.save(null, {
+					url: this.model.updateActiveYearUrl(id)
+				});
+				promises.push(promise);
+			} else if (model.hasChanged("openForReg")) {
+				var promise = model.save(null, {
+					url: this.model.updateRegistrationUrl(id)
+				});
+				promises.push(promise);	
+			}
+		}, this);	
+
+		// Wait for both queries to return
+		$.when.apply($, promises).then(function() {
+			new TransactionResponseView({
+				message: "School year(s) successfully updated."
+			});
+			view.action = "view";
+			view.render();
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				error: "error",
+				message: "School year(s) could not be updated."
+			});
+		});
+	},
+
 	refresh: function() {
 		this.render();
 	}
 });
 
 var SchoolYearRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.schoolyear %></td>"
+	viewTemplate: _.template("<td><%= model.schoolyear %></td>" 
+		+	"<td><%= status %></td>"
+		+	"<td><%= openForReg %></td>"),
+
+	editTemplate: _.template("<td><%= model.schoolyear %></td>"
 		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='active-switch' checked></td>"
 		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='reg-switch' checked></td>"),
 
 	initialize: function(options) {
+		this.action = options.action;
 		this.render();
 	},
 
 	render: function() {
 		var view = this; 
 
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
+		if (this.action == "view") {
+			this.$el.html(this.viewTemplate({
+				model: this.model.toJSON(),
+				status: capitalize(this.model.get("status")),
+				openForReg: this.model.get("openForReg") == 1 ? "Yes" : "No"
+			}));
+		} else {
+			this.$el.html(this.editTemplate({
+				model: this.model.toJSON()
+			}));
+		
+			// active school year switch
+			this.$el.find("[name='active-switch']").bootstrapSwitch({
+				size: "mini",
+				onText: "active",
+				offText: "inactive",
+				state: this.model.get("status") == "active" ? true : false,
+				onSwitchChange: function(event, state) {
+					var schoolyearid = $(event.currentTarget).attr("id");
+					view.model.set("id", schoolyearid);
+					view.model.set("status", state == true ? "active" : "inactive");
+				}
+			});
 
-		// active school year switch
-		this.$el.find("[name='active-switch']").bootstrapSwitch({
-			size: "mini",
-			onText: "active",
-			offText: "inactive",
-			state: this.model.get("status") == "active" ? true : false,
-			onSwitchChange: function(event, state) {
-				var schoolyearid = $(event.currentTarget).attr("id");
-				view.model.set("id", schoolyearid);
-				view.model.set("status", state == true ? "active" : "inactive");
-				view.model.save(null, {
-					url: view.model.updateActiveYearUrl(schoolyearid)
-				}).then(function(data) {
-					console.log(data);
-				}).fail(function(data) {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Could not update active school year."
-					});
-				});
-			}
-		});
-
-		// registration switch
-		this.$el.find("[name='reg-switch']").bootstrapSwitch({
-			size: "mini",
-			onText: "open",
-			offText: "closed",
-			state: this.model.get("openForReg") == 1 ? true : false,
-			onSwitchChange: function(event, state) {
-				var schoolyearid = $(event.currentTarget).attr("id");
-				view.model.set("id", schoolyearid);
-				view.model.set("openForReg", state == true ? 1 : 0);
-				view.model.save(null, {
-					url: view.model.updateRegistrationUrl(schoolyearid)
-				}).then(function(data) {
-					console.log(data);
-					new TransactionResponseView({
-						message: "School year successfully updated."
-					});
-				}).fail(function(data) {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Could not update registration status."
-					});
-				});
-			}
-		});
+			// registration switch
+			this.$el.find("[name='reg-switch']").bootstrapSwitch({
+				size: "mini",
+				onText: "open",
+				offText: "closed",
+				state: this.model.get("openForReg") == 1 ? true : false,
+				onSwitchChange: function(event, state) {
+					var schoolyearid = $(event.currentTarget).attr("id");
+					view.model.set("id", schoolyearid);
+					view.model.set("openForReg", state == true ? 1 : 0);
+				}
+			});
+		}
 	}
 });

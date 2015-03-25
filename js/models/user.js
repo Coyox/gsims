@@ -134,6 +134,14 @@ var Student = Backbone.Model.extend({
    		return app.serverUrl + "api/search/users/S";
    	},
 
+   	getPendingTestsUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/tests";
+   	},
+
+   	updatePendingUrl: function() {
+   		return this.urlRoot + "/pending";
+   	},
+
    	studentStatuses: [
    		"active",
    		"inactive",

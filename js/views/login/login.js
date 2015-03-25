@@ -46,11 +46,12 @@ var LoginView = Backbone.View.extend({
 					app.usertype = data.usertype;
 					sessionStorage.setItem("gobind-username", app.username);
 					sessionStorage.setItem("gobind-usertype", app.usertype);
-
+					sessionStorage.setItem("gobind-login", JSON.stringify(data));
 					view.model.fetch({
 						url: view.model.getUsers(data.userid, data.usertype)
 					}).then(function (data) {
 						sessionStorage.setItem("gobind-email", data.emailAddr);
+						sessionStorage.setItem("gobind-user", JSON.stringify(data));
 						app.Router.navigate("home", {trigger:true});
 					});
 				} else {

@@ -62,9 +62,14 @@ var CourseEnrollmentView = Backbone.View.extend({
 			ids.push($(row).attr("id"));
 		}, this);
 		console.log(ids);
-		// Send the list of section ids, and the user id to the server
-		new TransactionResponseView({
-			message: "still todo ...."
+
+		var student = new Student();
+		student.save(null, {
+			url: getEnrolledSectionsUrl(id)
+		}).then(function(data) {
+			new TransactionResponseView({
+				message: "still todo ...."
+			});
 		});
 	}
 });
