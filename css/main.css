@@ -47,20 +47,41 @@ a {
 }
 
 #login-panel {
+	background-color: #f2f2f2;
 	overflow: auto;
 	margin-top: 20px;
+}
+
+.login-text {
+	font-size: 24px;
+	color: #666;
+	margin-bottom: 20px;
+	font-weight: normal;
+}
+
+.register-text {
+	font-size: 20px;
+	color: #666;
+	margin-bottom: 20px;
+	font-weight: normal;
+}
+
+#register {
+	color: #9d426b;
 }
 
 .login-left {
 	float: left;
 	width: 50%;
 	padding-right: 20px;
-	border-right: 1px dotted #ccc;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 5px;
 }
 
 .login-right {
 	float: right;
-	width: 47%;
+	width: 49%;
 }
 
 .login-right .login-background {
@@ -71,10 +92,6 @@ a {
 
 #forgot-password {
 	margin-top: 3px;
-}
-
-#register, #register-icon {
-	color: #9d426b;
 }
 
 #sidebar {
@@ -357,6 +374,10 @@ td.details-control {
 }
 tr.shown td.details-control {
     background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+}
+
+.font-14 {
+	font-size: 14px;
 }
 
 .font-16 {
