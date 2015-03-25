@@ -912,14 +912,16 @@ function enrollStudentInTests($id){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
+// expecting
+// '{"data": {"scores": [{"courseid":"test", "mark":"123"}]}}'
 function updateStudentTestScores($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $results = json_decode($body);
+    $results = json_decode($body,true);
     $bindparams = array("userid" => $id);
-    foreach ($results as $result){
-        $bindparams["courseid"] = $result->courseid;
-        $bindparams["mark"] = $result->mark;
+    foreach ($results['data']['scores'] as $test){
+        $bindparams["courseid"] = $test['courseid'];
+        $bindparams["mark"] = $test['mark'];
         $sql = "UPDATE studentCompetencyTest set mark=:mark where userid=:userid and courseid=:courseid";
         echo json_encode(perform_query($sql,'PUT',$bindparams));
     }
@@ -929,13 +931,13 @@ function updateStudentTestScores($id){
 function approveStudents(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $students = json_decode($body);
+    $data = json_decode($body);
     $bindparams = array();
     $sql = "UPDATE student set status='active' where userid in (";
 
-    foreach (array_values($students) as $i => $student) {
+    foreach (array_values($data->students) as $i => $userid) {
         $sql.= ":id".$i.",";
-        $bindparams["id".$i] = $student->userid;
+        $bindparams["id".$i] = $userid;
     }
     $sql = rtrim($sql, ",");
     $sql.= ")";
@@ -946,13 +948,13 @@ function approveStudents(){
 function rejectStudents(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $students = json_decode($body);
+    $data = json_decode($body);
     $bindparams = array();
     $sql = "DELETE from login where userid in (";
 
-    foreach (array_values($students) as $i => $student) {
+    foreach (array_values($data->students) as $i => $userid) {
         $sql.= ":id".$i.",";
-        $bindparams["id".$i] = $student->userid;
+        $bindparams["id".$i] = $userid;
     }
     $sql = rtrim($sql, ",");
     $sql.= ")";
