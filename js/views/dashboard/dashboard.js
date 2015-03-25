@@ -4,20 +4,52 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	render: function() {
-		// TODO: dashboard based on user type
 		this.$el.html(html["dashboard.html"]);
-		this.populateStats();
-		this.populateNotifications();
+
+		var usertype = sessionStorage.getItem("gobind-usertype");
+
+		if (usertype == "SU" || usertype == "A") {
+			this.populateStats();
+			this.populateNotifications();
+		}
+
 		this.populateUser();
 	},
 
+	events: {
+		"click .view-notification": "viewNotification"
+	},
+
 	populateNotifications: function() {
-		var parent = this.$el.find("#stats-panel");
+		var view = this;
 		var count = new Count();
 		count.fetch({
-			url: count.getCountUrl("S")
+			url: count.getCountUrl("S"),
+			data: {
+				status: "pending"
+			}
 		}).then(function(data) {
-			parent.find(".students").text(data);
+			var parent = view.$el.find("#pending-stats");
+			parent.find(".count").text(data);
+			if (data != "0") {
+				parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
+			} else {
+				parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
+			}
+		});
+		count.fetch({
+			url: count.getCountUrl("S"),
+			data: {
+				status: "pending-test"
+			}
+		}).then(function(data) {
+			var parent = view.$el.find("#pending-test-stats");
+			parent.find(".count").text(data);
+			if (data != "0") {
+				parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
+			} else {
+				parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
+			}
 		});
 	},
 
@@ -51,5 +83,9 @@ var DashboardView = Backbone.View.extend({
 		}).then(function(data) {
 			parent.find(".superusers").text(data);
 		});
+	},
+
+	viewNotification: function() {
+		app.Router.navigate("notifications", {trigger:true});
 	}
 });
