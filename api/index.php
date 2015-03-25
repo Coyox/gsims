@@ -16,9 +16,9 @@ $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
+$app->post('/students/pending', 'handlePendingStudents');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
-$app->put('/students', 'handlePendingStudents');
 $app->delete('/students/:id', 'deleteStudent');
 
 
@@ -96,7 +96,9 @@ $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
-$app->get('/users/count/:usertype', 'getUserCount');
+
+$app->get('/count/:usertype', 'getUserCount');
+
 
 $app->run();
 
@@ -1207,7 +1209,7 @@ function getUserById($id, $usertype){
 }
 
 function getUserByEmailAddr($emailAddr){
-    $usertypes = array("student", "teacher", "administrator", "superuser");
+    $usertypes = array("student", "teacher", "superuser");
     foreach($usertypes as $type){
         $sql = "SELECT userid from ".$type." where emailAddr=:emailAddr";
         $userid = perform_query($sql,'GETCOL', array("emailAddr"=>$emailAddr));
