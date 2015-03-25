@@ -17,7 +17,7 @@ var School = Backbone.Model.extend({
 			required: true,
 		}
 	},
-     
+
     urlRoot: app.serverUrl + "api/schools",
 
     getDepartmentsUrl: function(id) {
@@ -60,7 +60,7 @@ var Dept = Backbone.Model.extend({
 		schoolyearid: "",
 		status: ""
 	},
-    
+
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
@@ -76,7 +76,7 @@ var Course = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    
+
     urlRoot: app.serverUrl + "api/courses",
 });
 
@@ -93,7 +93,7 @@ var Section = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    
+
     urlRoot: app.serverUrl + "api/sections",
 
     getDropStudentUrl: function(sectionid, studentid) {
@@ -111,6 +111,21 @@ var Prereq = Backbone.Model.extend({
 		prereq: ""
 	}
 });
+
+var Document = Backbone.Model.extend({
+	defaults: {
+		docName: "",
+		description: "",
+		link: "",
+		sectionid: "",
+		userid: "",
+		fullmark: "",
+		schoolyearid: "",
+		status: ""
+	}
+});
+
+
 
 var Prereqs = Backbone.Collection.extend({
 	model: Prereq

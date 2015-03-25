@@ -77,7 +77,9 @@ $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
 
 $app->get('/documents', 'getDocuments');
-
+$app->get('/documents/:id', 'getDocumentById');
+$app->post('/documents', 'createDocument');
+$app->put('/documents/:id', 'updateDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -618,18 +620,84 @@ function getAvgAttendance($id){
 #================================================================================================================#
 # Documents
 #================================================================================================================#
-//TODO
+// TODO get section information
 function getDocuments(){
     $schoolyear = $_GET['schoolyearid'];
     $sectionid = $_GET['sectionid'];
-    $schoolid = $_GET['schoolid'];
-    if (isset($schoolid)) {
-        return getSectionsBySchool($schoolyear, $schoolid);
+    if (isset($schoolyearid)) {
+        return getDocumentsBySchoolYear($schoolyearid);
     }
-    if (isset($courseid)) {
-        return getSectionsByCourse($schoolyear, $courseid);
+    if (isset($sectionid)) {
+        return getDocumentsBySection($sectionid);
     }
+    $sql = "SELECT * from document order by lastAccessed desc";
+    echo json_encode(perform_query($sql, 'GETALL'));
 }
+
+function getDocumentById($id){
+    $sql = "SELECT * from document where docid=:id";
+    echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
+}
+
+function getDocumentsBySchoolYear($schoolyearid){
+     $sql = "SELECT * from document where schoolyearid=:schoolyearid order by lastAccessed desc";
+     echo json_encode(perform_query($sql,'GETALL', array("schoolyearid"=>$schoolyearid)));
+}
+
+function getDocumentsBySection($sectionid){
+    $sql = "SELECT * from document where sectionid=:sectionid order by lastAccessed desc";
+    echo json_encode(perform_query($sql,'GETALL', array("sectionid"=>$sectionid)));
+}
+
+function updateDocument($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $doc = json_decode($body);
+
+    $sql = "UPDATE document set
+    docName=:docName, description=:description, link=:link, sectionid=:sectionid,
+    userid=:userid, fullmark=:fullmark, schoolyearid=:schoolyearid, status=:status  WHERE docid=:docid";
+
+    $bindparams = array(
+        "docid" => $id,
+        "docName" => $doc->docName,
+        "description" => $doc->description,
+        "link" => $docdoc->link,
+        "sectionid" => $doc->sectionid,
+        "userid" => $doc->userid,
+        "fullmark" => $doc->fullmark,
+        "schoolyearid" => $doc->schoolyearid,
+        "status" => $doc->status
+    );
+    echo json_encode(perform_query($sql,'PUT',$bindparams));
+}
+
+function createDocument(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $doc = json_decode($body);
+
+    $sql = "SELECT docid from document where docid=:docid";
+    $docid = generateUniqueID($sql, "docid");
+
+    $sql = "INSERT into section (docid, docName, description, link, sectionid, userid, fullmark, schoolyearid, status)
+            values (:docid, :docName, :description, :link, :sectionid, :userid, fullmark, :schoolyearid, :status)";
+
+    $bindparams = array(
+        "docid" => $docid,
+        "docName" => $doc->docName,
+        "description" => $doc->description,
+        "link" => $docdoc->link,
+        "sectionid" => $doc->sectionid,
+        "userid" => $doc->userid,
+        "fullmark" => $doc->fullmark,
+        "schoolyearid" => $doc->schoolyearid,
+        "status" => $doc->status
+    );
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+
 
 #================================================================================================================#
 # Students
