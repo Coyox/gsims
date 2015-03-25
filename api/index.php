@@ -18,8 +18,7 @@ $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
-$app->put('/students', 'approveStudents');
-$app->delete('/students', 'rejectStudents');
+$app->put('/students', 'handlePendingStudents');
 $app->delete('/students/:id', 'deleteStudent');
 
 
@@ -50,11 +49,13 @@ $app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/departments', 'getDepartments');
+$app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
 $app->put('/schools/:id', 'updateSchool');
 
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
+$app->get('/departments/:id/courses/count', 'getCourseCount');
 $app->post('/departments', 'createDepartment');
 $app->put('/departments/:id', 'updateDepartment');
 
@@ -68,6 +69,7 @@ $app->put('/courses/:id', 'updateCourse');
 $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 
 $app->get('/sections', 'getSections');
+$app->get('/sections/count', 'getSectionCount');
 $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
@@ -94,8 +96,7 @@ $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
-
-$app->get('/count/:usertype', 'getCount');
+$app->get('/users/count/:usertype', 'getUserCount');
 
 $app->run();
 
@@ -259,9 +260,15 @@ function getSchoolById($id) {
 function getDepartments($id){
     $schoolyear = $_GET['schoolyearid'];
     $sql = "SELECT deptid, deptName, status from department where schoolid=:schoolid and schoolyearid=:schoolyear order by deptName asc";
-    $bindparam = array("schoolid"=>$id,"schoolyear"=>$schoolyear);
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    echo json_encode(perform_query($sql,'GETALL', array("schoolid"=>$id,"schoolyear"=>$schoolyear)));
 }
+
+function getDepartmentCount($id){
+    $schoolyear = $_GET['schoolyearid'];
+    $sql = "SELECT count(*) from department where schoolid=:schoolid and schoolyearid=:schoolyear";
+    echo json_encode(perform_query($sql,'GETCOL', array("schoolid"=>$id,"schoolyear"=>$schoolyear)));
+}
+
 function createSchool(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -312,9 +319,15 @@ function getDepartmentById($id) {
 function getCourses($id){
     $schoolyear = $_GET['schoolyearid'];
     $sql = "SELECT courseid, courseName, description, status from course where deptid=:id and schoolyearid=:schoolyear order by courseName asc";
-    $bindparam = array("id"=>$id,"schoolyear"=>$schoolyear);
-    echo json_encode(perform_query($sql,'GETALL',$bindparam));
+    echo json_encode(perform_query($sql,'GETALL', array("id"=>$id,"schoolyear"=>$schoolyear)));
 }
+
+function getCourseCount($id){
+    $schoolyear = $_GET['schoolyearid'];
+    $sql = "SELECT count(*) from course where deptid=:id and schoolyearid=:schoolyear";
+    echo json_encode(perform_query($sql,'GETCOL', array("id"=>$id,"schoolyear"=>$schoolyear)));
+}
+
 function createDepartment(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -482,7 +495,16 @@ function getSectionsByDay($schoolyear, $day){
     $bindparam = array("day"=>$day,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
-
+function getSectionCount($schoolyear, $schoolid){
+$sql = "SELECT count(*)
+            from section s
+            where s.courseid in (select c.courseid from course c
+                where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
+                and c.schoolyearid=:schoolyear)
+            and s.schoolyearid=:schoolyear";
+    $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
+    echo json_encode(perform_query($sql,'GETCOL',$bindparam));
+}
 
 function getSectionById($id){
     $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
@@ -757,7 +779,6 @@ function getEnrolledTests($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
-//TODO
 function getAllEnrolledTests(){
     $sql = "SELECT s.userid, s.firstName, s.lastName, s.status, s.emailAddr, c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
     FROM course c, department d, studentCompetencyTest t, student s
@@ -920,8 +941,7 @@ function enrollStudentInSections($id){
 function enrollStudentInTests($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $student = json_decode($body);
-    $courseids = $student->courseids;
+    $courseids = json_decode($_POST["courseids"]);
 
     $bindparams = array("userid" => $id);
     $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
@@ -950,41 +970,42 @@ function updateStudentTestScores($id){
 }
 
 
-function approveStudents(){
+function handlePendingStudents(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $data = json_decode($body);
-    $bindparams = array();
-    $sql = "UPDATE student set status='active' where userid in (";
+    $approveList = json_decode($_POST['approvedList']);
+    $rejectList = json_decode($_POST['deniedList']);
 
-    foreach (array_values($data->data->students) as $i => $userid) {
-        $sql.= ":id".$i.",";
-        $bindparams["id".$i] = $userid;
+    if (array_filter($approveList)){
+        $bindparams = array();
+        $sql = "UPDATE student set status='active' where userid in (";
+        foreach (array_values($students) as $i => $userid) {
+            $sql.= ":id".$i.",";
+            $bindparams["id".$i] = $userid;
+        }
+        $sql = rtrim($sql, ",");
+        $sql.= ")";
+        echo json_encode(perform_query($sql,'PUT',$bindparams));
     }
-    $sql = rtrim($sql, ",");
-    $sql.= ")";
-    echo "********TEST******";
-    echo $sql;
+    if (array_filter($rejectList)){
+        $bindparams = array();
+        $request = \Slim\Slim::getInstance()->request();
+        $body = $request->getBody();
+        $students = json_decode($_POST['students']);
+        $bindparams = array();
+        $sql = "DELETE from login where userid in (";
 
-    echo json_encode(perform_query($sql,'PUT',$bindparams));
+        foreach (array_values($students) as $i => $userid) {
+            $sql.= ":id".$i.",";
+            $bindparams["id".$i] = $userid;
+        }
+        $sql = rtrim($sql, ",");
+        $sql.= ")";
+        echo json_encode(perform_query($sql,'PUT',$bindparams));
+    }
 }
 
-function rejectStudents(){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $data = json_decode($body);
-    $bindparams = array();
-    $sql = "DELETE from login where userid in (";
 
-    foreach (array_values($data->students) as $i => $userid) {
-        $sql.= ":id".$i.",";
-        $bindparams["id".$i] = $userid;
-    }
-    $sql = rtrim($sql, ",");
-    $sql.= ")";
-
-    echo json_encode(perform_query($sql,'PUT',$bindparams));
-}
 
 #================================================================================================================#
 # Teachers
@@ -1327,7 +1348,7 @@ function createNewUser($firstname, $lastname, $usertype){
     return $userid;
 }
 
-function getCount($usertype){
+function getUserCount($usertype){
     $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
     $status = $_GET['status'];
     $sql = "SELECT count(*) from ".$table;
