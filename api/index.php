@@ -973,12 +973,8 @@ function updateStudentTestScores($id){
 
 
 function handlePendingStudents(){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $approveList = json_decode($_POST['approvedList']);
-    $rejectList = json_decode($_POST['deniedList']);
-
-    if (array_filter($approveList)){
+    if (isset($_POST['approvedList'])){
+        $approveList = json_decode($_POST['approvedList']);
         $bindparams = array();
         $sql = "UPDATE student set status='active' where userid in (";
         foreach (array_values($approveList) as $i => $userid) {
@@ -989,10 +985,8 @@ function handlePendingStudents(){
         $sql.= ")";
         echo json_encode(perform_query($sql,'PUT',$bindparams));
     }
-    if (array_filter($rejectList)){
-        $bindparams = array();
-        $request = \Slim\Slim::getInstance()->request();
-        $body = $request->getBody();
+    if (isset($_POST['deniedList'])){
+        $rejectList = json_decode($_POST['deniedList']);
         $bindparams = array();
         $sql = "DELETE from login where userid in (";
 
