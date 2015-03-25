@@ -1337,7 +1337,7 @@ function getCount($usertype){
         $bindparams["status"] = $status;
     }
     if ($usertype=="T"|$usertype=="A"){
-        $sql.= (isset($status)? " where ": " and ");
+        $sql.= (isset($status)? " and ": " where ");
         $sql.= "usertype=:usertype";
         $bindparams["usertype"] = $usertype;
     }
