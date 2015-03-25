@@ -12,6 +12,7 @@ $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->get('/students/:id/tests', 'getEnrolledTests');
+$app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
@@ -20,6 +21,7 @@ $app->put('/students/:id', 'updateStudent');
 $app->put('/students', 'approveStudents');
 $app->delete('/students', 'rejectStudents');
 $app->delete('/students/:id', 'deleteStudent');
+
 
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
@@ -442,11 +444,15 @@ function getSections(){
     $schoolyear = $_GET['schoolyearid'];
     $courseid = $_GET['courseid'];
     $schoolid = $_GET['schoolid'];
+    $day = $_GET['day'];
     if (isset($schoolid)) {
         return getSectionsBySchool($schoolyear, $schoolid);
     }
     if (isset($courseid)) {
         return getSectionsByCourse($schoolyear, $courseid);
+    }
+    if (isset($day)){
+        return getSectionsByDay($schoolyear, $day);
     }
 }
 function getSectionsBySchool($schoolyear, $schoolid){
@@ -468,6 +474,13 @@ function getSectionsByCourse($schoolyear, $courseid){
     $bindparam = array("courseid"=>$courseid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
+function getSectionsByDay($schoolyear, $day){
+
+    //TODO
+
+}
+
+
 function getSectionById($id){
     $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c
@@ -741,7 +754,13 @@ function getEnrolledTests($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
-
+//TODO
+function getAllEnrolledTests(){
+    $sql = "SELECT s.userid, s.firstName, s.lastName, s.status, s.emailAddr, c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
+    FROM course c, department d, studentCompetencyTest t, student s
+    WHERE t.userid = s.userid and c.courseid = t.courseid and c.deptid = d.deptid and s.status='pending-test'";
+    echo json_encode(perform_query($sql, 'GETALL'));
+}
 /*
  * provide schoolyear string instead of schoolyearid
  */
@@ -935,12 +954,14 @@ function approveStudents(){
     $bindparams = array();
     $sql = "UPDATE student set status='active' where userid in (";
 
-    foreach (array_values($data->students) as $i => $userid) {
+    foreach (array_values($data->data->students) as $i => $userid) {
         $sql.= ":id".$i.",";
         $bindparams["id".$i] = $userid;
     }
     $sql = rtrim($sql, ",");
     $sql.= ")";
+    echo "********TEST******";
+    echo $sql;
 
     echo json_encode(perform_query($sql,'PUT',$bindparams));
 }
