@@ -981,7 +981,7 @@ function handlePendingStudents(){
     if (array_filter($approveList)){
         $bindparams = array();
         $sql = "UPDATE student set status='active' where userid in (";
-        foreach (array_values($students) as $i => $userid) {
+        foreach (array_values($approveList) as $i => $userid) {
             $sql.= ":id".$i.",";
             $bindparams["id".$i] = $userid;
         }
@@ -993,11 +993,10 @@ function handlePendingStudents(){
         $bindparams = array();
         $request = \Slim\Slim::getInstance()->request();
         $body = $request->getBody();
-        $students = json_decode($_POST['students']);
         $bindparams = array();
         $sql = "DELETE from login where userid in (";
 
-        foreach (array_values($students) as $i => $userid) {
+        foreach (array_values($rejectList) as $i => $userid) {
             $sql.= ":id".$i.",";
             $bindparams["id".$i] = $userid;
         }
@@ -1215,8 +1214,13 @@ function getUserByEmailAddr($emailAddr){
         $userid = perform_query($sql,'GETCOL', array("emailAddr"=>$emailAddr));
         if ($userid) { break; }
     }
-    $sql = "SELECT userid, username, usertype, lastLogin from login where userid=:userid";
-    echo json_encode(perform_query($sql,'GET', array("userid"=>$userid)));
+    if($userid){
+        $sql = "SELECT userid, username, usertype, lastLogin from login where userid=:userid";
+        echo json_encode(perform_query($sql,'GET', array("userid"=>$userid)));
+    }
+    else {
+        echo json_encode($userid);
+    }
 }
 
 function purgeUser($id){
