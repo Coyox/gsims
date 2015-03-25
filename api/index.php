@@ -95,6 +95,7 @@ $app->get('/login/:id', 'getLoginById');
 $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
 
+$app->get('/count/:usertype', 'getCount');
 
 $app->run();
 
@@ -475,9 +476,11 @@ function getSectionsByCourse($schoolyear, $courseid){
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionsByDay($schoolyear, $day){
-
-    //TODO
-
+    $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s, course c
+            where s.day=:day and s.courseid=c.courseid order by s.startTime asc";
+    $bindparam = array("day"=>$day,"schoolyear"=>$schoolyear);
+    echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 
 
@@ -1322,4 +1325,21 @@ function createNewUser($firstname, $lastname, $usertype){
                       "usertype" => $usertype);
     echo json_encode(perform_query($sql,'POST',$bindparams));
     return $userid;
+}
+
+function getCount($usertype){
+    $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
+    $status = $_GET['status'];
+    $sql = "SELECT count(*) from :table";
+    $bindparams = array("table"=>$table);
+    if (isset($status)){
+        $sql.=" where status=:status";
+        $bindparams["status"] = $status;
+    }
+    if ($usertype=="T"|$usertype=="A"){
+        $sql.= (isset($status)? " where ": " and ");
+        $sql.= "usertype=:usertype";
+        $bindparams["usertype"] = $usertype;
+    }
+    echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
 }
