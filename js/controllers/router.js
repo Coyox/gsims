@@ -75,7 +75,7 @@ var Router = Backbone.Router.extend({
     	});
     },
 
-
+     
     loadHome: function() {
       	if ($("#container").html() == "") {
     		this.home();
