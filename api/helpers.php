@@ -45,7 +45,7 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
     return $id;
 }
 
-function emailLogin(){
+function emailLogin($emailAdd, $username, $password, $firstname, $lastname){
     try {
         $message = array(
         'text' => 'hello',
