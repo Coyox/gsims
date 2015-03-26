@@ -3,7 +3,7 @@ var SchoolView = Backbone.View.extend({
         this.model = new School();
         this.render();
     },
-
+     
     render: function () {
         this.$el.html(html["viewSchools.html"]);
 
