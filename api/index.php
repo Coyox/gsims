@@ -137,12 +137,10 @@ function validateCredentials() {
         // }
         $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
         perform_query($sql, '', $bindparam);
-        emailLogin();
         echo json_encode($user);
 
     }
     else {
-        emailLogin();
         $sql = "SELECT userid, username, usertype, lastLogin from login order by userid asc";
         echo json_encode(perform_query($sql, 'GETALL'));
     }
