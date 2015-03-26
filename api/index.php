@@ -498,7 +498,9 @@ function getSectionsByDay($schoolyear, $day){
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionCount($schoolyear, $schoolid){
-$sql = "SELECT count(*)
+    $schoolyear = $_GET['schoolyearid'];
+    $schoolid = $_GET['schoolid'];
+    $sql = "SELECT count(*)
             from section s
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
@@ -507,7 +509,6 @@ $sql = "SELECT count(*)
     $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETCOL',$bindparam));
 }
-
 function getSectionById($id){
     $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c
