@@ -971,7 +971,7 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $userid = createNewUser($student->firstName, $student->$lastName, 'S');
+    $userid = createNewUser($student->firstName, $student->$lastName, $student->emailAddr, 'S');
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1124,7 +1124,7 @@ function createTeacher() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
-    $userid = createNewUser($teacher->firstName, $teacher->$lastName, 'T');
+    $userid = createNewUser($teacher->firstName, $teacher->lastName, $teacher->emailAddr, 'T');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
 
@@ -1201,7 +1201,7 @@ function createAdministrator() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $admin = json_decode($body);
-    $userid = createNewUser($admin->firstName, $admin->$lastName, 'A');
+    $userid = createNewUser($admin->firstName, $admin->lastName, $admin->emailAddr, 'A');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
     $bindparams = array(
@@ -1231,7 +1231,7 @@ function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $superuser = json_decode($body);
-    $userid = createNewUser($superuser->firstName, $superuser->$lastName, 'SU');
+    $userid = createNewUser($superuser->firstName, $superuser->lastName, $superuser->emailAddr,'SU');
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
                          values (:userid, :firstName, :lastName, :emailAddr, :status)";
     $bindparams = array(
@@ -1432,7 +1432,7 @@ function findSections(){
 /*
  Create new user in login table with generated login creds
 */
-function createNewUser($firstname, $lastname, $usertype){
+function createNewUser($firstname, $lastname, $emailAddr, $usertype){
     $sql = "INSERT into login (userid, username, password, usertype)
             VALUES (:userid, :username, :password, :usertype)";
     $userid="";
@@ -1440,13 +1440,14 @@ function createNewUser($firstname, $lastname, $usertype){
     $password="";
     list($userid, $username, $password) = generateLogin($firstname, $lastname);
 
-    $password = generatePasswordHash($password);
+    $passwordhash = generatePasswordHash($password);
 
     $bindparams=array("userid" => $userid,
                       "username"=> $username,
-                      "password"=> $password,
+                      "password"=> $passwordhash,
                       "usertype" => $usertype);
     echo json_encode(perform_query($sql,'POST',$bindparams));
+    emailLogin($emailAddr, $username, $password, $firstname, $lastname);
     return $userid;
 }
 
