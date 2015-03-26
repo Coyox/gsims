@@ -45,6 +45,7 @@ var Router = Backbone.Router.extend({
         "createStudent":        "createStudent",
         "enrollmentForm":       "studentEnrollmentForm",
         "courseEnrollment":     "courseEnrollment",
+        "registrationForm":     "registrationForm",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
@@ -212,7 +213,7 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
-        new CourseEnrollmentView({
+        app.courseEnrollmentView = new CourseEnrollmentView({
             el: $("#content")
         });
     },
@@ -348,6 +349,12 @@ var Router = Backbone.Router.extend({
         
         new NotificationsView({
             el: $("#content")
+        });
+    },
+
+    registrationForm: function() {
+        new RegistrationFormView({
+            el: $("#container")
         });
     }
 });

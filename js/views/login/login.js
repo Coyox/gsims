@@ -24,7 +24,8 @@ var LoginView = Backbone.View.extend({
 	events: {
 		"click #login": "validateCredentials",
 		"keyup #password, #username": "loginOnEnter",
-		"click #forgot-password": "forgotPassword"
+		"click #forgot-password": "forgotPassword",
+		"click #register": "registerPage"
 	},
 
 	validateCredentials: function(evt) {
@@ -71,6 +72,10 @@ var LoginView = Backbone.View.extend({
 		if (evt.keyCode == 13) {
 			this.validateCredentials();
 		}
+	},
+
+	registerPage: function(evt) {
+		app.Router.navigate("registrationForm", {trigger:true});
 	}
 });
 

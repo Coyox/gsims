@@ -104,28 +104,12 @@ var CreateStudentView = Backbone.View.extend({
 
 	clearForm: function(evt) {
 		this.$el.find("input").val("");
-	},
-
-	// loadCourseEnrollment: function() {
-	// 	Backbone.Validation.bind(this);	
-
-	// 	if (this.model.isValid(true)) {
-	// 		app.Router.navigate("courseEnrollment", {trigger:true});
-	// 		// this.model.save().then(function(data) {
-	// 		// 	console.log(data);
-	// 		// }).fail(function(data) {
-	// 		// 	new TransactionResponseView({
-	// 		// 		title: "ERROR",
-	// 		// 		status: "error",
-	// 		// 		message: "TODO"
-	// 		// 	})
-	// 		// });
-	// 	}
-	// }
+	}
 });
 
 var EnrollmentFormView = Backbone.View.extend({
 	initialize: function(options) {
+		this.onlineReg = options.onlineReg;
 		this.render();
 	},
 
@@ -142,11 +126,17 @@ var EnrollmentFormView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #to-enrollment": "loadCourseEnrollment"
+		"click #to-enrollment": "validateModel"
 	},
 
 	populateForm: function(prefilled) {
 		this.model = new Student();
+
+		if (this.onlineReg == true) {
+			this.model.nonEditable.push("paid");
+			this.model.nonEditable.push("status");
+		}
+
 		_.each(this.model.toJSON(), function(value, attr) {
 			if (this.model.nonEditable.indexOf(attr) == -1) {
 				var filled = prefilled ? prefilled[attr] : undefined;
@@ -154,7 +144,6 @@ var EnrollmentFormView = Backbone.View.extend({
 					value = filled;
 					this.model.set(attr, value);
 				} 
-				console.log(attr, value);
 				new StudentRecordRowView({
 					el: this.addRow(this.model, attr),
 					action: "edit",
@@ -182,21 +171,26 @@ var EnrollmentFormView = Backbone.View.extend({
         return container;	
 	},
 
-	loadCourseEnrollment: function() {
+	validateModel: function() {
 		Backbone.Validation.bind(this);	
 
+		setDateOfBirth(this.model);
 		if (this.model.isValid(true)) {
-			app.Router.navigate("courseEnrollment", {trigger:true});
-			// this.model.save().then(function(data) {
-			// 	console.log(data);
-			// }).fail(function(data) {
-			// 	new TransactionResponseView({
-			// 		title: "ERROR",
-			// 		status: "error",
-			// 		message: "TODO"
-			// 	})
-			// });
-		}	
+			console.log("VALID");
+			// app.Router.navigate("registrationEnrollment", {trigger:true});			
+			// app.regEnrollmentView.studentModel = this.model;
+
+			// if (this.onlineReg) {
+			// 	app.regEnrollmentView.el = $("#container");
+			// 	app.regEnrollmentView.render();
+			// 	app.regEnrollmentView.studentModel.set("status", "pending");
+			// 	app.regEnrollmentView.onlineReg = true;
+			// }
+
+			// app.regEnrollmentView.displayForm();
+		} else {
+			console.log("INVALID");
+		}
 	}
 });
 
