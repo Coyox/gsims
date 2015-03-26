@@ -78,13 +78,14 @@ $app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 $app->post('/sections', 'createSection');
 $app->post('/sections/students/:id/:sid', 'enrollStudent');
-$app->post('/sections/:id/attendance/:userid', 'inputAttendance');
+$app->post('/sections/:id/attendance', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
 
 $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
+$app->post('/documents/:id/marks', 'inputMarks');
 $app->put('/documents/:id', 'updateDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
@@ -98,6 +99,8 @@ $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
 
 $app->get('/count/:usertype', 'getUserCount');
+
+$app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
 
 $app->run();
@@ -498,7 +501,9 @@ function getSectionsByDay($schoolyear, $day){
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
 }
 function getSectionCount($schoolyear, $schoolid){
-$sql = "SELECT count(*)
+    $schoolyear = $_GET['schoolyearid'];
+    $schoolid = $_GET['schoolid'];
+    $sql = "SELECT count(*)
             from section s
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
@@ -507,7 +512,6 @@ $sql = "SELECT count(*)
     $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETCOL',$bindparam));
 }
-
 function getSectionById($id){
     $sql = "SELECT s.courseid, s.sectionCode, c.courseName, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c
@@ -612,19 +616,24 @@ function updateSection($id) {
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 
-function inputAttendance($id, $userid){
+function inputAttendance($id){
     $date = $_POST["date"];
     $schoolyearid = $_POST["schoolyearid"];
-    $sql = "INSERT into attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `status`)
-            values (:classdate, :userid, :sectionid, :schoolyearid, :status)";
+    $userids = json_decode($_POST["userids"]);
 
     $bindparams = array(
         "classdate" => $date,
-        "userid" => $userid,
         "sectionid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => 'active'
     );
+
+    $sql = "INSERT INTO attendance(`date`, `userid`, `sectionid`, `schoolyearid`, `status`) values ";
+    foreach (array_values($userids) as $i => $userid) {
+        $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :status),";
+        $bindparams["userid".$i] = $userid;
+    }
+    $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
@@ -660,15 +669,18 @@ function getAvgAttendance($id){
 #================================================================================================================#
 # Documents
 #================================================================================================================#
-// TODO get section information
 function getDocuments(){
     $schoolyear = $_GET['schoolyearid'];
     $sectionid = $_GET['sectionid'];
+    $courseid = $_GET['courseid'];
     if (isset($schoolyearid)) {
         return getDocumentsBySchoolYear($schoolyearid);
     }
     if (isset($sectionid)) {
         return getDocumentsBySection($sectionid);
+    }
+    if (isset($courseid)) {
+        return getDocumentsByCourse($courseid);
     }
     $sql = "SELECT * from document order by lastAccessed desc";
     echo json_encode(perform_query($sql, 'GETALL'));
@@ -687,6 +699,12 @@ function getDocumentsBySchoolYear($schoolyearid){
 function getDocumentsBySection($sectionid){
     $sql = "SELECT * from document where sectionid=:sectionid order by lastAccessed desc";
     echo json_encode(perform_query($sql,'GETALL', array("sectionid"=>$sectionid)));
+}
+
+function getDocumentsByCourse($courseid){
+    $sql = "SELECT * from document where sectionid in (SELECT s.sectionid from section where s.courseid=:courseid)
+            order by lastAccessed desc";
+    echo json_encode(perform_query($sql,'GETALL', array("courseid"=>$courseid)));
 }
 
 function updateDocument($id){
@@ -737,6 +755,37 @@ function createDocument(){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
+function deleteDocument($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    $bindparams = array("id"=>$id);
+    $sql = ($option->purge == 1)? "DELETE from document where docid=:id" : "UPDATE document set status='inactive' where docid=:id";
+    echo json_encode(perform_query($sql,'', $bindparams));
+}
+
+function inputMarks($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $students = json_decode($body);
+
+    $schoolyearid = $students->schoolyearid;
+
+    $bindparams = array(
+        "assignmentid" => $id,
+        "schoolyearid" => $schoolyearid,
+        "status" => 'active'
+    );
+
+    $sql = "INSERT INTO marks(assignmentid, userid, mark, schoolyearid, status) values ";
+     foreach (array_values($students) as $i => $student) {
+        $sql.= "(:assignmentid, :userid".$i.", :mark".$i.", :schoolyearid, :status),";
+        $bindparams["userid".$i] = $student->userid;
+        $bindparams["mark".$i] = $student->mark;
+    }
+    $sql = rtrim($sql, ",");
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 
 
 #================================================================================================================#
@@ -923,7 +972,7 @@ function enrollStudentInSections($id){
     $body = $request->getBody();
     $student = json_decode($body);
     $schoolyearid = $student->schoolyearid;
-    $sectionids = $student->sectionids;
+    $sectionids = json_decode($_POST["sectionids"]);
 
     $bindparams = array(
         "userid" => $id,
@@ -956,21 +1005,18 @@ function enrollStudentInTests($id){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
-// expecting
-// '{"data": {"scores": [{"courseid":"test", "mark":"123"}]}}'
 function updateStudentTestScores($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $results = json_decode($body,true);
+    $results = json_decode($body);
     $bindparams = array("userid" => $id);
-    foreach ($results['data']['scores'] as $test){
-        $bindparams["courseid"] = $test['courseid'];
-        $bindparams["mark"] = $test['mark'];
+    foreach ($results as $result){
+        $bindparams["courseid"] = $result->courseid;
+        $bindparams["mark"] = $result->mark;
         $sql = "UPDATE studentCompetencyTest set mark=:mark where userid=:userid and courseid=:courseid";
         echo json_encode(perform_query($sql,'PUT',$bindparams));
     }
 }
-
 
 function handlePendingStudents(){
     if (isset($_POST['approvedList'])){
@@ -1076,8 +1122,9 @@ function deleteTeacher($id) {
 */
 function getTeachingSections($id){
     $sql = "SELECT courseid, sectionid from teaching where userid=:id";
-    echo json_encode(perform_query($sql,'GETALL'), array("id"=>$id));
+    echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
+
 
 #================================================================================================================#
 # Administrators
@@ -1363,4 +1410,25 @@ function getUserCount($usertype){
         $bindparams["usertype"] = $usertype;
     }
     echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
+}
+
+#================================================================================================================#
+# Notifications
+#================================================================================================================#
+//find the teachers who have not inputted attendance in the last X days
+function getTeachersWithMissingInputAttendance(){
+    $numdays = $_GET['numdays'];
+    $today = $_GET['today'];
+    $schoolyearid = $_GET['schoolyearid'];
+    $sql = "SELECT t.userid, t.firstName, t.lastName, t.emailAddr, a.maxdate, a.sectionid
+            from teacher t,
+                    (select userid, max(`date`) as maxdate, sectionid from attendance
+                        where datediff(:today, `date`) >= :numdays and schoolyearid=:schoolyearid group by userid) a
+            where t.userid = a.userid";
+    $bindparams = array(
+        "today"  => $today,
+        "numdays" => $numdays,
+        "schoolyearid" => $schoolyearid
+    );
+    echo json_encode(perform_query($sql,'GETALL', $bindparams));
 }
