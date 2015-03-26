@@ -206,8 +206,8 @@ var StudentRecordRowView = Backbone.View.extend({
 
 	genderTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8 form-inline'>"
-		+		"<input type='radio' class='form-control input-sm' name='<%= name %>' value='M'> Male"
-		+		"<input type='radio' class='form-control input-sm' name='<%= name %>' value='F'> Female"
+		+   	"<label class='radio-inline'><input type='radio' name='<%= name %>' value='M'> Male</label>"
+		+		"<label class='radio-inline'><input type='radio' name='<%= name %>' value='F'> Female</label>"
 		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 
@@ -219,8 +219,8 @@ var StudentRecordRowView = Backbone.View.extend({
 
 	paidTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8 form-inline'>"
-		+		"<input type='radio' class='form-control input-sm' name='<%= name %>' value='1'> Paid"
-		+		"<input type='radio' class='form-control input-sm' name='<%= name %>' value='0'> Unpaid"
+		+   	"<label class='radio-inline'><input type='radio' name='<%= name %>' value='1'> Paid</label>"
+		+		"<label class='radio-inline'><input type='radio' name='<%= name %>' value='0'> Unpaid</label>"
 		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 

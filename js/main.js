@@ -24,7 +24,7 @@ _.extend(Backbone.Validation.callbacks, {
     invalid: function (view, attr, error, selector) {
         var $el = view.$('[name=' + attr + ']'), 
             $group = $el.closest('.form-group');
-        
+    
         $group.addClass('has-error');
         $group.find('.help-block').html(error).removeClass('hidden');
     }
@@ -96,7 +96,9 @@ function loadTemplates() {
 		"notifications.html",
 		"pendingRegistration.html",
 		"pendingTest.html",
-		"emailModal.html"
+		"emailModal.html",
+		"registrationPage.html",
+		"termsAndConditions.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -126,6 +128,6 @@ function setActiveSchoolYear() {
 	}).then(function(data) {
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;
+		sessionStorage.setItem("gobind-activeSchoolYear", app.currentSchoolYearId);
 	});
 }
-
