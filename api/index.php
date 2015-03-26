@@ -25,6 +25,7 @@ $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
+$app->get('/teachers/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 $app->post('/teachers', 'createTeacher');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
@@ -924,7 +925,7 @@ function enrollStudentInSections($id){
     $body = $request->getBody();
     $student = json_decode($body);
     $schoolyearid = $student->schoolyearid;
-    $sectionids = $student->sectionids;
+    $sectionids = json_decode($_POST["sectionids"]);
 
     $bindparams = array(
         "userid" => $id,
@@ -1078,6 +1079,24 @@ function deleteTeacher($id) {
 function getTeachingSections($id){
     $sql = "SELECT courseid, sectionid from teaching where userid=:id";
     echo json_encode(perform_query($sql,'GETALL'), array("id"=>$id));
+}
+
+//find the teachers who have not inputted attendance in the last X days
+function getTeachersWithMissingInputAttendance(){
+    $numdays = $_GET['numdays'];
+    $today = $_GET['today'];
+    $schoolyearid = $_GET['schoolyearid'];
+    $sql - "SELECT t.userid, t.firstName, t.lastName, t.emailAddr, a.maxdate, a.sectionid
+            from teacher t,
+                    (select userid, max(`date`) as maxdate, sectionid from attendance
+                        where datediff(:today, `date`) >= :numdays and schoolyearid=:schoolyearid group by userid) a
+            where t.userid = a.userid";
+    $bindparams = array(
+        "today"  => $today,
+        "numdays" => $numdays,
+        "schoolyearid" => $schoolyearid
+    );
+    echo json_encode(perform_query($sql,'GETALL'), $bindparams);
 }
 
 #================================================================================================================#
