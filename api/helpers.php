@@ -1,5 +1,5 @@
 <?php
-require_once 'vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
+require_once '/vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
 $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
 
 define("IDdigits", 6);
