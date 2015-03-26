@@ -1096,7 +1096,7 @@ function getTeachersWithMissingInputAttendance(){
         "numdays" => $numdays,
         "schoolyearid" => $schoolyearid
     );
-    echo json_encode(perform_query($sql,'GETALL'), $bindparams);
+    echo json_encode(perform_query($sql,'GETALL', $bindparams));
 }
 
 #================================================================================================================#
