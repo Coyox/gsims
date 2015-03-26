@@ -109,8 +109,6 @@ $app->get('/count/:usertype', 'getUserCount');
 
 $app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
-//test
-$app->get('/email', 'emailLogin()');
 // $app->post('/purge/attendance', 'purgeAttendance');
 // $app->post('/purge/waitlist', 'purgeWaitlist');
 // $app->post('/purge/user', 'purgeUsers');
