@@ -115,3 +115,9 @@ var Prereq = Backbone.Model.extend({
 var Prereqs = Backbone.Collection.extend({
 	model: Prereq
 });
+
+var Count = Backbone.Model.extend({
+	getCountUrl: function(usertype) {
+		return app.serverUrl + "api/count/" + usertype;
+	}
+});
