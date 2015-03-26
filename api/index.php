@@ -25,7 +25,6 @@ $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
-$app->get('/teachers/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 $app->post('/teachers', 'createTeacher');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
@@ -99,6 +98,8 @@ $app->get('/users/:id/:usertype', 'getUserById');
 $app->get('/users/:emailAddr', 'getUserByEmailAddr');
 
 $app->get('/count/:usertype', 'getUserCount');
+
+$app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
 
 $app->run();
@@ -1078,7 +1079,7 @@ function deleteTeacher($id) {
 */
 function getTeachingSections($id){
     $sql = "SELECT courseid, sectionid from teaching where userid=:id";
-    echo json_encode(perform_query($sql,'GETALL'), array("id"=>$id));
+    echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
 //find the teachers who have not inputted attendance in the last X days
