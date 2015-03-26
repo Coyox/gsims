@@ -137,10 +137,12 @@ function validateCredentials() {
         // }
         $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
         perform_query($sql, '', $bindparam);
-
+        emailLogin();
         echo json_encode($user);
+
     }
     else {
+        emailLogin();
         $sql = "SELECT userid, username, usertype, lastLogin from login order by userid asc";
         echo json_encode(perform_query($sql, 'GETALL'));
     }
@@ -330,7 +332,7 @@ function updateSchool($id) {
 
     $bindparams = array(
         "schoolid" => $id,
-        "location" => $school->firstName,
+        "location" => $school->location,
         "postalCode" => $school->postalCode,
         "yearOpened" => $school->yearOpened,
         "status" => $school->status
@@ -613,10 +615,7 @@ function enrollStudent($id, $sid){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 function assignSectionTeacher($id, $tid){
-    $sql = "INSERT into teaching
-            SELECT :tid, courseid , :id
-            FROM section
-            WHERE sectionid=id";
+    $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
     $bindparams = array("tid"=>$tid, "id"=>$id);
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
