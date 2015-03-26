@@ -17,7 +17,7 @@ $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
-$app->put('/students/:id/tests', 'updateStudentTestScores');
+//$app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
@@ -87,6 +87,7 @@ $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
 $app->post('/documents/:id/marks', 'inputMarks');
 $app->put('/documents/:id', 'updateDocument');
+$app->delete('/documents/:id', 'deleteDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -102,6 +103,10 @@ $app->get('/count/:usertype', 'getUserCount');
 
 $app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
+$app->post('/purge/attendance', 'purgeAttendance');
+$app->post('/purge/user', 'purgeUsers');
+$app->post('/purge/document', 'purgeDocuments');
+$app->delete('/purge/inactive', 'purgeInactive');
 
 $app->run();
 
@@ -1009,43 +1014,42 @@ function updateStudentTestScores($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $results = json_decode($body);
-    $bindparams = array("userid" => $id);
-    foreach ($results as $result){
-        $bindparams["courseid"] = $result->courseid;
-        $bindparams["mark"] = $result->mark;
-        $sql = "UPDATE studentCompetencyTest set mark=:mark where userid=:userid and courseid=:courseid";
-        echo json_encode(perform_query($sql,'PUT',$bindparams));
+    $queries = array();
+    $bindparams = array();
+    foreach (array_values($results) as $i => $result){
+        $bindparams[$i] = array("userid" => $id, "courseid".$i=>$result->courseid, "mark".$i=>$result->mark);
+        $sql = "UPDATE studentCompetencyTest set mark=:mark".$i." where userid=:userid and courseid=:courseid".$i;
+        array_push($queries, $sql);
     }
+    echo json_encode(perform_transaction($sql, $bindparams));
 }
 
 function handlePendingStudents(){
+    $queries = array();
+    $bindparams = array();
     if (isset($_POST['approvedList'])){
-        $approveList = json_decode($_POST['approvedList']);
-        $bindparams = array();
-        $sql = "UPDATE student set status='active' where userid in (";
-        foreach (array_values($approveList) as $i => $userid) {
-            $sql.= ":id".$i.",";
-            $bindparams["id".$i] = $userid;
-        }
-        $sql = rtrim($sql, ",");
-        $sql.= ")";
-        echo json_encode(perform_query($sql,'PUT',$bindparams));
+        $ids = json_decode($_POST['approvedList']);
+        $sql = "UPDATE student set status='active' where userid in ";
+        $ret = parenthesisList($ids);
+        $sql.=$ret[0];
+        array_push($queries, $sql);
+        $bindparams[0] = $ret[1];
+
+        $sql = "DELETE from studentCompetencyTest where userid in ";
+        $sql.=$ret[0];
+        array_push($queries, $sql);
+        $bindparams[1] = $ret[1];
     }
     if (isset($_POST['deniedList'])){
-        $rejectList = json_decode($_POST['deniedList']);
-        $bindparams = array();
-        $sql = "DELETE from login where userid in (";
-
-        foreach (array_values($rejectList) as $i => $userid) {
-            $sql.= ":id".$i.",";
-            $bindparams["id".$i] = $userid;
-        }
-        $sql = rtrim($sql, ",");
-        $sql.= ")";
-        echo json_encode(perform_query($sql,'PUT',$bindparams));
+        $ids = json_decode($_POST['deniedList']);
+        $sql = "DELETE from login where userid in ";
+        $ret = parenthesisList($ids);
+        $sql.=$ret[0];
+        array_push($queries, $sql);
+        $bindparams[2] = $ret[1];
     }
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
-
 
 
 #================================================================================================================#
@@ -1264,11 +1268,6 @@ function getUserByEmailAddr($emailAddr){
     }
 }
 
-function purgeUser($id){
-    $sql = "DELETE from login where userid=:id";
-    echo json_encode(perform_query($sql,'', array("id"=>$id)));
-}
-
 #================================================================================================================#
 # Search
 #================================================================================================================#
@@ -1431,4 +1430,99 @@ function getTeachersWithMissingInputAttendance(){
         "schoolyearid" => $schoolyearid
     );
     echo json_encode(perform_query($sql,'GETALL', $bindparams));
+}
+
+#================================================================================================================#
+# Purge
+#================================================================================================================#
+function purgeUser($id){
+    $sql = "DELETE from login where userid=:id";
+    echo json_encode(perform_query($sql,'', array("id"=>$id)));
+}
+
+function purgeAttendance(){
+    $schoolyearids = json_decode($_POST['schoolyearids']);
+    $sql = "DELETE from attendance where schoolyearid in ";
+    $ret = parenthesisList($ids);
+    $sql.=$ret[0];
+    echo json_encode(perform_query($sql,'',$ret[1]));
+}
+
+function purgeUsers(){
+    $ids = json_decode($_POST['userids']);
+    $sql = "DELETE from login where userid in ";
+    $ret = parenthesisList($ids);
+    $sql.=$ret[0];
+    echo json_encode(perform_query($sql,'',$ret[1]));
+}
+
+function purgeDocuments(){
+    $ids = json_decode($_POST['docids']);
+    $sql = "DELETE from document where docid in ";
+    $ret = parenthesisList($ids);
+    $sql.=$ret[0];
+    echo json_encode(perform_query($sql,'',$ret[1]));
+}
+
+function purgeInactive(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    $queries = array();
+    $bindparams = array();
+    if ($option->schoolyear == 1){
+        $sql = "DELETE from schoolyear where status='inactive'";
+        array_push($queries, $sql);
+    }
+    if ($option->school == 1) {
+        $sql = "DELETE from school where status='inactive'";
+        array_push($queries, $sql);
+    }
+    else {
+        if ($option->dept == 1) {
+            $sql = "DELETE from department where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->course == 1) {
+            $sql = "DELETE from course where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->section == 1) {
+            $sql = "DELETE from document where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->doc == 1) {
+            $sql = "DELETE from document where status='inactive'";
+            array_push($queries, $sql);
+        }
+    }
+
+    if ($option->years != 0){
+        foreach($queries as $query){
+            $query.= " and timestampdiff(year, lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+    }
+
+    if ($option->student == 1) {
+        $sql = "DELETE from student s , login l where s.status='inactive' and l.userid=s.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, s.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    if ($option->teacher == 1) {
+        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='T' and l.userid=t.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    if ($option->admin == 1) {
+        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='A' and l.userid=t.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    echo json_encode(perform_transaction($queries));
 }

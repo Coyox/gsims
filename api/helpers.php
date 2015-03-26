@@ -148,8 +148,6 @@ function emailLogin($emailAddr, $username, $password){
 }
 
 
-
-
 /*
 * wrapper to perform sql queries
 */
@@ -183,6 +181,29 @@ function perform_query($sql, $querytype, $bindparams=array()) {
         return $result;
     } catch(PDOException $e) {
         echo $e->getMessage();
+        return array("status"=>"failure");
+    }
+}
+
+function perform_transaction($queries, $bindparams=array()){
+    try {
+        $db = getConnection();
+        $db->beginTransaction();
+
+        foreach($queries as $i => $query){
+            if (array_filter($bindparams)){
+                $stmt = $db->prepare($query);
+                $stmt->execute($bindparams[$i]);
+            }
+            else{
+                $stmt = $db->query($query);
+            }
+        }
+        $db->commit();
+        return array("status"=>"success");
+    } catch (Exception $e) {
+    echo $e->getMessage();
+        $db->rollback();
         return array("status"=>"failure");
     }
 }
@@ -234,4 +255,16 @@ function generatePasswordHash($password){
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
     $salt = sprintf("$2a$%02d$", $cost).$salt;
     return crypt($password, $salt);
+}
+
+function parenthesisList($ids){
+    $bindparams = array();
+    $sql = "(";
+    foreach (array_values($ids) as $i => $id) {
+        $sql.= ":id".$i.",";
+        $bindparams["id".$i] = $id;
+    }
+    $sql = rtrim($sql, ",");
+    $sql.= ")";
+    return array($sql, $bindparams);
 }
