@@ -19,7 +19,7 @@ $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
-$app->delete('/students/:id', 'deleteStudent');
+// $app->delete('/students/:id', 'deleteStudent');
 
 
 $app->get('/teachers', 'getTeachers');
@@ -27,25 +27,25 @@ $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->post('/teachers', 'createTeacher');
 $app->put('/teachers/:id', 'updateTeacher');
-$app->delete('/teachers/:id', 'deleteTeacher');
+// $app->delete('/teachers/:id', 'deleteTeacher');
 
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
-$app->delete('/administrators/:id', 'deleteTeacher');
+// $app->delete('/administrators/:id', 'deleteTeacher');
 
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
 $app->post('/superusers', 'createSuperuser');
 $app->put('/superusers/:id', 'updateSuperuser');
-$app->delete('/superusers/:id', 'deleteSuperuser');
+// $app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 $app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
 $app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
-$app->delete('/schoolyears/:id', 'deleteSchoolYear');
+// $app->delete('/schoolyears/:id', 'deleteSchoolYear');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -53,24 +53,25 @@ $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
 $app->put('/schools/:id', 'updateSchool');
-$app->delete('/schools/:id', 'deleteSchool');
+// $app->delete('/schools/:id', 'deleteSchool');
 
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/departments/:id/courses/count', 'getCourseCount');
 $app->post('/departments', 'createDepartment');
 $app->put('/departments/:id', 'updateDepartment');
-$app->delete('/departments/:id', 'deleteDepartment');
+// $app->delete('/departments/:id', 'deleteDepartment');
 
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->post('/courses/:id/prereqs', 'addCoursePrereqs');
 $app->post('/courses/:id/:tid', 'assignCourseTeacher');
+$app->post('/courses/:id', 'waitlistStudent');
 $app->post('/courses', 'createCourse');
 $app->put('/courses/:id', 'updateCourse');
 $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
-$app->delete('/courses/:id', 'deleteCourse');
+// $app->delete('/courses/:id', 'deleteCourse');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');
@@ -85,14 +86,14 @@ $app->post('/sections/students/:id/:sid', 'enrollStudent');
 $app->post('/sections/:id/attendance', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
-$app->delete('/sections/:id', 'deleteSection');
+// $app->delete('/sections/:id', 'deleteSection');
 
 $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
 $app->post('/documents/:id/marks', 'inputMarks');
 $app->put('/documents/:id', 'updateDocument');
-$app->delete('/documents/:id', 'deleteDocument');
+// $app->delete('/documents/:id', 'deleteDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -108,15 +109,16 @@ $app->get('/count/:usertype', 'getUserCount');
 
 $app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
-$app->post('/purge/attendance', 'purgeAttendance');
-$app->post('/purge/user', 'purgeUsers');
-$app->post('/purge/schoolyear', 'purgeSchoolYears');
-$app->post('/purge/school', 'purgeSchools');
-$app->post('/purge/department', 'purgeDepartments');
-$app->post('/purge/course', 'purgeCourses');
-$app->post('/purge/section', 'purgeSections');
-$app->post('/purge/document', 'purgeDocuments');
-$app->delete('/purge/inactive', 'purgeInactive');
+// $app->post('/purge/attendance', 'purgeAttendance');
+// $app->post('/purge/waitlist', 'purgeWaitlist');
+// $app->post('/purge/user', 'purgeUsers');
+// $app->post('/purge/schoolyear', 'purgeSchoolYears');
+// $app->post('/purge/school', 'purgeSchools');
+// $app->post('/purge/department', 'purgeDepartments');
+// $app->post('/purge/course', 'purgeCourses');
+// $app->post('/purge/section', 'purgeSections');
+// $app->post('/purge/document', 'purgeDocuments');
+// $app->delete('/purge/inactive', 'purgeInactive');
 
 $app->run();
 
@@ -432,6 +434,14 @@ function assignCourseTeacher($id, $tid){
      $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
      $bindparams = array("tid"=>$tid, "id"=>$id);
      echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+function waitlistStudent($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $student = json_decode($body);
+    $sql = "INSERT into waitlisted (userid, waitlistid) values (:userid, :id)";
+    $bindparams = array("userid"=>$student->userid, "id"=>$id);
+    echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 function createCourse(){
     $request = \Slim\Slim::getInstance()->request();
@@ -1484,125 +1494,145 @@ function getTeachersWithMissingInputAttendance(){
 #================================================================================================================#
 # Purge
 #================================================================================================================#
-function purge($ids, $sql){
-    $ret = parenthesisList($ids);
-    $sql.=$ret[0];
-    echo json_encode(perform_query($sql,'',$ret[1]));
-}
+// function purge($ids, $sql){
+//     $ret = parenthesisList($ids);
+//     $sql.=$ret[0];
+//     echo json_encode(perform_query($sql,'',$ret[1]));
+// }
 
-function purgeAttendance($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['schoolyearids']);
-    }
-    $sql = "DELETE from attendance where schoolyearid in ";
-    return purge($ids, $sql);
-}
+// function purgeAttendance(){
+//     if (isset($_POST['schoolyearids'])||isset($POST_['userids'])) {
+//         if (isset($_POST['schoolyearids'])){
+//             $ids = json_decode($_POST['schoolyearids']);
+//             $sql = "DELETE from attendance where schoolyearid in ";
+//         }
+//         else if (isset($_POST['userids'])){
+//             $ids = json_decode($_POST['userids']);
+//             $sql = "DELETE from attendance where userid in ";
+//         }
+//         return purge($ids, $sql);
+//     }
+//     else {
+//         $sql = "truncate attendance";
+//         echo json_encode(perform_query($sql,''));
+//     }
+// }
+// function purgeWaitlist(){
+//     if (isset($_POST['waitlistids'])){
+//         $ids = json_decode($_POST['waitlistids']);
+//         $sql = "DELETE from waitlisted where waitlistid in ";
+//         return purge($ids, $sql);
+//     }
+//     else {
+//         $sql = "truncate waitlisted";
+//         echo json_encode(perform_query($sql,''));
+//     }
+// }
+// function purgeUsers($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['userids']);
+//     }
+//     $sql = "DELETE from login where userid in ";
+//     return purge($ids, $sql);
+// }
 
-function purgeUsers($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['userids']);
-    }
-    $sql = "DELETE from login where userid in ";
-    return purge($ids, $sql);
-}
+// function purgeSchools($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['schoolids']);
+//     }
+//     $sql = "DELETE from school where schoolid in ";
+//     return purge($ids, $sql);
+// }
+// function purgeSchoolYears($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['schoolyearids']);
+//     }
+//     $sql = "DELETE from schoolyear where schoolyearid in ";
+//     return purge($ids, $sql);
+// }
+// function purgeDepartments($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['docids']);
+//     }
+//     $sql = "DELETE from department where deptid in ";
+//     return purge($ids, $sql);
+// }
 
-function purgeSchools($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['schoolids']);
-    }
-    $sql = "DELETE from school where schoolid in ";
-    return purge($ids, $sql);
-}
-function purgeSchoolYears($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['schoolyearids']);
-    }
-    $sql = "DELETE from schoolyear where schoolyearid in ";
-    return purge($ids, $sql);
-}
-function purgeDepartments($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['docids']);
-    }
-    $sql = "DELETE from department where deptid in ";
-    return purge($ids, $sql);
-}
+// function purgeCourses($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['courseids']);
+//     }
+//     $sql = "DELETE from course where courseid in ";
+//     return purge($ids, $sql);
+// }
 
-function purgeCourses($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['courseids']);
-    }
-    $sql = "DELETE from course where courseid in ";
-    return purge($ids, $sql);
-}
+// function purgeSections($ids=array()){
+//     if (!array_filter($ids)){
+//         $ids = json_decode($_POST['sectionids']);
+//     }
+//     $sql = "DELETE from section where sectionid in ";
+//     return purge($ids, $sql);
+// }
 
-function purgeSections($ids=array()){
-    if (!array_filter($ids)){
-        $ids = json_decode($_POST['sectionids']);
-    }
-    $sql = "DELETE from section where sectionid in ";
-    return purge($ids, $sql);
-}
+// function purgeInactive(){
+//     $request = \Slim\Slim::getInstance()->request();
+//     $body = $request->getBody();
+//     $option = json_decode($body);
+//     $queries = array();
+//     $bindparams = array();
+//     if ($option->schoolyear == 1){
+//         $sql = "DELETE from schoolyear where status='inactive'";
+//         array_push($queries, $sql);
+//     }
+//     if ($option->school == 1) {
+//         $sql = "DELETE from school where status='inactive'";
+//         array_push($queries, $sql);
+//     }
+//     else {
+//         if ($option->dept == 1) {
+//             $sql = "DELETE from department where status='inactive'";
+//             array_push($queries, $sql);
+//         }
+//         if ($option->course == 1) {
+//             $sql = "DELETE from course where status='inactive'";
+//             array_push($queries, $sql);
+//         }
+//         if ($option->section == 1) {
+//             $sql = "DELETE from document where status='inactive'";
+//             array_push($queries, $sql);
+//         }
+//         if ($option->doc == 1) {
+//             $sql = "DELETE from document where status='inactive'";
+//             array_push($queries, $sql);
+//         }
+//     }
 
-function purgeInactive(){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $option = json_decode($body);
-    $queries = array();
-    $bindparams = array();
-    if ($option->schoolyear == 1){
-        $sql = "DELETE from schoolyear where status='inactive'";
-        array_push($queries, $sql);
-    }
-    if ($option->school == 1) {
-        $sql = "DELETE from school where status='inactive'";
-        array_push($queries, $sql);
-    }
-    else {
-        if ($option->dept == 1) {
-            $sql = "DELETE from department where status='inactive'";
-            array_push($queries, $sql);
-        }
-        if ($option->course == 1) {
-            $sql = "DELETE from course where status='inactive'";
-            array_push($queries, $sql);
-        }
-        if ($option->section == 1) {
-            $sql = "DELETE from document where status='inactive'";
-            array_push($queries, $sql);
-        }
-        if ($option->doc == 1) {
-            $sql = "DELETE from document where status='inactive'";
-            array_push($queries, $sql);
-        }
-    }
+//     if ($option->years != 0){
+//         foreach($queries as $query){
+//             $query.= " and timestampdiff(year, lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+//         }
+//     }
 
-    if ($option->years != 0){
-        foreach($queries as $query){
-            $query.= " and timestampdiff(year, lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-        }
-    }
-
-    if ($option->student == 1) {
-        $sql = "DELETE from student s , login l where s.status='inactive' and l.userid=s.userid";
-        if ($option->years != 0){
-            $query.= " and timestampdiff(year, s.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-        }
-        array_push($queries, $sql);
-    }
-    if ($option->teacher == 1) {
-        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='T' and l.userid=t.userid";
-        if ($option->years != 0){
-            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-        }
-        array_push($queries, $sql);
-    }
-    if ($option->admin == 1) {
-        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='A' and l.userid=t.userid";
-        if ($option->years != 0){
-            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-        }
-        array_push($queries, $sql);
-    }
-    echo json_encode(perform_transaction($queries));
-}
+//     if ($option->student == 1) {
+//         $sql = "DELETE from student s , login l where s.status='inactive' and l.userid=s.userid";
+//         if ($option->years != 0){
+//             $query.= " and timestampdiff(year, s.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+//         }
+//         array_push($queries, $sql);
+//     }
+//     if ($option->teacher == 1) {
+//         $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='T' and l.userid=t.userid";
+//         if ($option->years != 0){
+//             $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+//         }
+//         array_push($queries, $sql);
+//     }
+//     if ($option->admin == 1) {
+//         $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='A' and l.userid=t.userid";
+//         if ($option->years != 0){
+//             $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+//         }
+//         array_push($queries, $sql);
+//     }
+//     echo json_encode(perform_transaction($queries));
+// }
