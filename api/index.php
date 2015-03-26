@@ -109,6 +109,8 @@ $app->get('/count/:usertype', 'getUserCount');
 
 $app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
+//test
+$app->get('/email', 'emailLogin()');
 // $app->post('/purge/attendance', 'purgeAttendance');
 // $app->post('/purge/waitlist', 'purgeWaitlist');
 // $app->post('/purge/user', 'purgeUsers');
@@ -137,12 +139,10 @@ function validateCredentials() {
         // }
         $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
         perform_query($sql, '', $bindparam);
-        emailLogin();
         echo json_encode($user);
 
     }
     else {
-        emailLogin();
         $sql = "SELECT userid, username, usertype, lastLogin from login order by userid asc";
         echo json_encode(perform_query($sql, 'GETALL'));
     }
