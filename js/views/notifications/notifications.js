@@ -159,14 +159,15 @@ var PendingTestView = Backbone.View.extend({
 			});
 			view.$el.find("table").dataTable({
 		      	aoColumnDefs: [
-		          	{ bSortable: false, aTargets: [ 6 ] }
+		          	{ bSortable: false, aTargets: [ 5 ] }
 		       	]				
 			});
 		});
 	},
 
 	events: {
-		"click input[name='all']": "toggleCheckAll"
+		"change .toggle-checkboxes": "toggleCheckAll",
+		"click #email-students": "emailStudents"
 	},
 
 	addRow: function() {
@@ -175,8 +176,25 @@ var PendingTestView = Backbone.View.extend({
 		return container;
 	},
 
-	toggleCheckAll: function() {
+	toggleCheckAll: function(evt) {
+		var checked = $(evt.currentTarget).is(":checked");
+		var rows = this.$el.find("table tbody tr");
+		_.each(rows, function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			checkbox.prop("checked", checked);
+		}, this);
+	},
 
+	emailStudents: function() {
+		var recipients = [];
+		var rows = this.$el.find("table tbody tr");
+		_.each(rows, function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			if ($(checkbox).is(":checked")) {
+				recipients.push($(checkbox).closest("tr").data("email"));
+			}
+		}, this);	
+		openEmailModal(recipients);
 	}
 });
 
@@ -184,7 +202,6 @@ var PendingTestRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.userid %></td>"
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+	"<td><%= model.status %></td>"
 		+   "<td><%= model.emailAddr %></td>"
 		+   "<td><%= model.courses %></td>"
 		+   "<td><input type='checkbox' name='email' id='<%= model.userid %>'/></td>"),
@@ -197,5 +214,6 @@ var PendingTestRowView = Backbone.View.extend({
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
+		this.$el.data("email", this.model.get("emailAddr"));
 	}
 });

@@ -109,21 +109,48 @@ function sendEmail(params, callback) {
 	});
 
 	$.when(xhr).then(function(data) {
-		// Response from mandrill
 		console.log(data);
 
 		if (callback && data.status == "sent") {
-			// Adam: see login.js around line 87 to see how I called this function.
-			// the "callback" param that I passed into sendEmail() is just a separate
-			// function that should be called after the emails have been successfully
-			// sent. The callback function is defined in login.js around line 96 and
-			// is executed here when you go callback.call(). 
-			// In the else case here, you can just write something general
-			// for when a callback isn't provided (probably just some kind of indication
-			// if the emails have been sent or not, many how many emails got sent, etc)
 			callback.call();
 		} else {
 			// display some kind of message if it was successful or not
 		} 
 	});
+}
+
+// Adam: this function will create a popup email interface. The first chunk of
+// code is creating the actual pop up (its called a modal in Bootstrap), and 
+// it eventually calls your EmailView to add the actual email interface.
+// The recipients are sent in the "emails" property as an array of strings
+// (ie. an array of emails). To see an example of this, go to the notifications page,
+// and under pending-test students, select a couple students and click on the email button
+function openEmailModal(recipients) {
+	$("#container").append(html["emailModal.html"]);
+
+	var elem = $("#email-modal");
+	var backdrop = $(".modal-backdrop");
+
+	elem.find(".modal-body").html(html["email.html"]);
+
+	elem.modal({
+		show: true
+	});
+
+	elem.on("hidden.bs.modal", function() {
+		elem.remove();
+		backdrop.remove();
+	});
+
+	var emailView = new EmailView({
+		el: elem.find(".modal-body"),
+		emails: recipients
+	});
+
+	var form = elem.find(".form-horizontal");
+	form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
+	form.parent().addClass("o-auto");
+
+	// Populate the "to" input field (comma separated string)
+	form.find("#email-to").val(recipients.join(", "))
 }

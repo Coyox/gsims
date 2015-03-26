@@ -95,7 +95,8 @@ function loadTemplates() {
 		"dashboard.html",
 		"notifications.html",
 		"pendingRegistration.html",
-		"pendingTest.html"
+		"pendingTest.html",
+		"emailModal.html"
 	];
 
 	$.each(templates, function(i, name) {
