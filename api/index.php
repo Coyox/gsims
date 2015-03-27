@@ -25,6 +25,7 @@ $app->delete('/students/:id', 'deleteStudent');
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
+$app->get('/teachers/:id/competency', 'getCourseCompetencies');
 $app->post('/teachers', 'createTeacher');
 $app->post('/teachers/:id', 'addCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
@@ -1251,6 +1252,11 @@ function deleteTeacher($id) {
 function getTeachingSections($id){
     $sql = "SELECT courseid, sectionid from teaching where userid=:id";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
+}
+
+function getCourseCompetencies($id) {
+    $sql = "SELECT deptid, status from teacherCourseCompetency where userid:id";
+    echo json_encode((perform_query($sql, 'GETALL', array("id"=>$id))));
 }
 
 
