@@ -1530,7 +1530,7 @@ function createNewUser($firstname, $lastname, $emailAddr, $usertype){
                       "password"=> $passwordhash,
                       "usertype" => $usertype);
     echo json_encode(perform_query($sql,'POST',$bindparams));
-    emailLogin($emailAddr, $username, $password, $firstname, $lastname);
+    //emailLogin($emailAddr, $username, $password, $firstname, $lastname);
     return $userid;
 }
 
