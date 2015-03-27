@@ -1288,6 +1288,7 @@ function updateCourseCompetencies($id) {
         $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
         array_push($queries, $sql);
     }
+    echo $sql;
     echo json_encode(perform_transaction($sql, $bindparams));
 }
 
