@@ -1434,7 +1434,7 @@ function findUsers($usertype){
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
         $email = $_GET['emailAddr'];
-        if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
+        if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $param['year'] = $yearop."'".$year;
@@ -1447,6 +1447,7 @@ function findUsers($usertype){
             if (isset($country)){ $param['country'] = $country; }
             if (isset($status)){ $param['status'] = $status; }
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
+            if (isset($email)){ $param['emailAddr'] = $email; }
 
             $clause = buildWhereClause($param);
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
