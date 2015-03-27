@@ -21,7 +21,6 @@ $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
-
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
@@ -78,6 +77,7 @@ $app->delete('/courses/:id/:tid', 'unassignCourseTeacher');
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');
 $app->get('/sections/:id', 'getSectionById');
+$app->get('/sections/:id/students/:userid', 'getStudentAvgGradeForSection');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
@@ -396,7 +396,7 @@ function updateDepartment($id) {
     $dept = json_decode($body);
 
     $sql = "UPDATE department
-    set schoolid=:schoolid, deptName=:deptName, schoolyearid=:schoolyearid, yearOpened=:yearOpened, status=:status
+    set schoolid=:schoolid, deptName=:deptName, schoolyearid=:schoolyearid, status=:status
     WHERE deptid=:deptid";
 
     $bindparams = array(
@@ -736,6 +736,26 @@ function deleteSection($id) {
     $sql = ($option->purge == 1)? "DELETE from section where sectionid=:id" : "UPDATE section set status='inactive' where sectionid=:id";
     echo json_encode(perform_query($sql,'', $bindparams));
 }
+function getStudentAvgGradeForSection($id, $userid){
+    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
+    $bindparams = array("sectionid"=>$id);
+    $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
+
+    if ($totalmarks==0) {
+        echo json_encode(array("avgGradeForSection"=>"N/A"));
+        return;
+    }
+    $sql = "SELECT coalesce(sum(mark),0) from marks
+            where assignmentid in
+                (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
+            and userid=:userid";
+    $bindparams["userid"]=$userid;
+    $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
+
+    $avgGrade = ($attainedmarks/$totalmarks)*100;
+    echo json_encode(array("avgGradeForSection"=>$avgGrade."%"));
+}
+
 #================================================================================================================#
 # Documents
 #================================================================================================================#
