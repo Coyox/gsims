@@ -77,7 +77,6 @@ function loadTemplates() {
 		"footer.html",
 		"email.html",
 		"enrolledSections.html",
-		"tempContent.html",
 		"searchStudents.html",
 		"searchTeachers.html",
 		"viewTeachers.html",
@@ -102,7 +101,8 @@ function loadTemplates() {
 		"pendingTest.html",
 		"emailModal.html",
 		"registrationPage.html",
-		"termsAndConditions.html"
+		"termsAndConditions.html",
+		"settings.html"
 	];
 
 	$.each(templates, function(i, name) {

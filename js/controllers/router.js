@@ -64,7 +64,9 @@ var Router = Backbone.Router.extend({
         "schools":              "schools",
         "departments":          "departments",
 
-        "notifications":        "notifications"
+        "notifications":        "notifications",
+
+        "settings":             "settings"
     },
 
     updatePageBreadcrumb: function(text) {
@@ -379,6 +381,16 @@ var Router = Backbone.Router.extend({
     registrationForm: function() {
         new RegistrationFormView({
             el: $("#container")
+        });
+    },
+
+    settings: function() {
+        this.updatePageBreadcrumb("Settings");
+
+        this.loadHome();
+
+        new UserSettingsView({
+            el: $("#content")
         });
     }
 });
