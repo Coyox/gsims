@@ -360,7 +360,7 @@ var Router = Backbone.Router.extend({
         });
     },
 
-        departments: function() {
+    departments: function() {
         this.updatePageBreadcrumb("Departments");
 
         this.loadHome();

@@ -145,7 +145,7 @@ var SchoolRowView = Backbone.View.extend({
         console.log(this.model);
         this.model.save().then(function(data){
             if(data){
-                view.untouchedModel = JSON.stringify(this.model.toJSON());
+                view.untouchedModel = JSON.stringify(view.model.toJSON());
                 new TransactionResponseView({
                     message: "School was successfully saved."
                 });
