@@ -1,3 +1,153 @@
+var TeacherRecordView = Backbone.View.extend({
+	initialize: function(options) {
+		this.id = options.id;
+		this.action = "view";
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+
+		this.$el.find("#teacher-info-table").empty();
+		this.$el.find("#comp-info, #comp2-info").empty();
+
+		if (this.action == "view") {
+			this.$el.find("#edit-teacher").removeClass("hide").show();
+			this.$el.find("#save-teacher").hide();
+		} else {
+			this.$el.find("#save-teacher").removeClass("hide").show();
+			this.$el.find("#edit-teacher").hide();
+		}
+
+		var teacher = new Teacher();
+		this.model = teacher;
+		this.model.set("id", this.id);
+		this.model.fetch().then(function(data) {
+			var teacher = new Teacher(data, {parse:true});
+			view.model = teacher;
+
+			view.teacherInformationTab(teacher);
+		});
+	},
+
+	events: {
+		"click #edit-teacher": "editTeacher",
+		"click #save-teacher": "saveTeacher",
+		"click #set-admin": "setAsAdmin"
+	},
+
+	teacherInformationTab: function() {
+		_.each(this.model.toJSON(), function(value, name) {
+			if (this.model.nonEditable.indexOf(name) == -1) {
+				new CreateTeacherRowView({
+					el: this.addRow(),
+					model: this.model,
+					name: name,
+					value: value,
+					action: this.action
+				});
+			}
+		}, this);
+
+		var view = this;
+		var t = new Teacher();
+		t.fetch({
+			url: t.getCourseCompetencyUrl(view.model.get("userid"))
+		}).then(function(data) {
+			var existingLevels = [];
+			_.each(data, function(course, index) {
+				existingLevels.push(course);
+			});
+			view.comptencyView = new TeacherCompetencyView({
+				el: view.$el,
+				model: view.model,
+				action: view.action,
+				existingLevels: existingLevels
+			});
+		});
+	},
+
+	addRow: function() {
+		var container = $("<div class='form-group'></div>");
+		this.$el.find("#teacher-info-table").append(container);
+		return container;
+	},	
+
+	editTeacher: function(evt) {
+		this.action = "edit";
+		this.render();
+	},
+
+	saveTeacher: function() {
+		Backbone.Validation.bind(this);
+		console.log(this.model);
+		var view = this;
+		if (this.model.isValid(true)) {
+			view.model.set("id", view.model.get("userid"));
+			view.model.save().then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Teacher successfully saved."
+					});		
+					view.action = "view";
+					view.render();			
+				} else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Sorry, there was a problem saving this teacher. Please try again."
+					});		
+				}
+			});
+		}
+	},
+
+	setAsAdmin: function() {
+		var view = this;
+
+		this.$el.append(html["confirmationModal.html"]);
+
+		$("#confirmation-modal .modal-body p").text("Are you sure you want to set this teacher as an administrator? He/she will have full access to the school.");
+		$("#confirmation-modal .modal-title").text("Confirmation");
+
+		$("#confirmation-modal").modal({
+			show: true
+		});
+		
+		$("#confirmation-modal").on("hidden.bs.modal", function() {
+			$("#confirmation-modal").remove();
+			$(".modal-backdrop").remove();
+		});
+		
+		$("#confirmation-modal").on("click", "#confirm-yes", function() {
+			$("#confirmation-modal").remove();
+			$(".modal-backdrop").remove();
+
+			view.model.set("usertype", "A");
+			view.model.set("id", view.model.get("userid"));
+			view.model.save().then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "This teacher is now an administrator."
+					});					
+				} else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Sorry, there was a problem setting this teacher as an administrator. Please try again."
+					});		
+				}
+			});
+		});
+	}
+});
+
 // var TeacherRecordView = Backbone.View.extend({
 // 	initialize: function(options) {
 // 		this.action = options.action;

@@ -21,8 +21,7 @@ var CreateTeacherView = Backbone.View.extend({
 			}
 		}, this);
 
-		this.model.competency = [];
-		new TeacherCompetencyView({
+		this.competencyView = new TeacherCompetencyView({
 			el: this.$el,
 			model: this.model
 		});
@@ -40,11 +39,34 @@ var CreateTeacherView = Backbone.View.extend({
 
 	saveTeacher: function() {
 		Backbone.Validation.bind(this);
+
+		this.model.set("usertype", "T");
+		this.model.set("schoolid", "412312");
+		this.model.set("status",  "active");
 		console.log(this.model);
+
 		if (this.model.isValid(true)) {
 			new TransactionResponseView({
-				message: "todo.."
+				message: "todo..."
 			});
+			// this.model.save({
+			// 	dataType: "json"
+			// }).then(function(data) {
+			// 	console.log(data);
+			// 	if (typeof data == "string") {
+			// 		data = JSON.parse(data);
+			// 	}
+			// 	if (data.status == "success") {
+			// 		new TransactionResponseView({
+			// 			message: "Teacher successfully created."
+			// 		});
+			// 		console.log(data);
+			// 	}
+			// }).fail(function(jqXHR) {
+			// 	console.log(jqXHR.responseJSON);
+			// });
+		} else {
+
 		}
 	}
 });
@@ -58,6 +80,12 @@ var CreateTeacherRowView = Backbone.View.extend({
 	editTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
 		+		"<input type='text' class='form-control input-sm' value='<%= value %>' name='<%= name %>'>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	statusTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<select id='status-menu' class='form-control input-sm' name='status'></select>"
 		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 
@@ -77,19 +105,35 @@ var CreateTeacherRowView = Backbone.View.extend({
 		}
 
 		if (this.action == "view") {
-
-		} else {
-			this.$el.html(this.editTemplate({
+			if (this.name == "status") {
+				this.value = capitalize(this.value);
+			}
+			this.$el.html(this.viewTemplate({
 				model: this.model.toJSON(),
 				label: this.label,
 				name: this.name,
 				value: this.value
 			}));
+		} else {
+
+			var params = {
+				model: this.model.toJSON(),
+				label: this.label,
+				name: this.name,
+				value: this.value
+			}
+			if (this.name == "status") {
+				this.$el.html(this.statusTemplate(params));
+				populateStatusMenu(this.$el.find("#status-menu"), this.model.teacherStatuses, this.value);
+			} else {
+				this.$el.html(this.editTemplate(params));
+			}
 		}
 	},
 
 	events: {
 		"keyup input": "updateModel",
+		"change select": "updateSelect"
 	},
 
 	updateModel: function(evt) {
@@ -97,10 +141,19 @@ var CreateTeacherRowView = Backbone.View.extend({
 		var val = $(evt.currentTarget).val();
 		this.model.set(name, val);
 	},
+
+	updateSelect: function(evt) {
+		var name = $(evt.currentTarget).attr("name");
+		var val = $(evt.currentTarget).find("option:selected").val();
+		this.model.set(name, val);
+	}
 });
 
 var TeacherCompetencyView = Backbone.View.extend({
-	initialize: function() {
+	initialize: function(options) {
+		this.model.competency = [];
+		this.action = options.action;
+		this.existingLevels = options.existingLevels;
 		this.render();
 	},
 
@@ -116,19 +169,25 @@ var TeacherCompetencyView = Backbone.View.extend({
 			}
 		}).then(function(data) {
 			_.each(data, function(dept, index) {
+				var level = 0;
+				_.each(view.existingLevels, function(existing, index) {
+					if (existing.deptid == dept.deptid) {
+						level = existing.level;
+					}
+				});
 				view.model.competency.push({
 					deptName: dept.deptName,
-					level: 0
+					level: level
 				});
 				new TeacherCompetencyRowView({
 					el: view.addRow(index),
 					model: view.model,
 					index: index,
 					deptModel: dept,
-					action: "edit"
+					action: view.action,
+					level: level
 				});
 			});
-
 		});
 	},
 
@@ -142,6 +201,12 @@ var TeacherCompetencyView = Backbone.View.extend({
 
 var TeacherCompetencyRowView = Backbone.View.extend({
 
+	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<span><%= level %></span>"
+		+	"</div>"),
+
+
 	editTemplate: _.template("<label class='control-label col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
 		+		"<label class='radio-inline'><input type='radio' name='tcomp<%= index %>' value='0' data-name='<%= label %>' checked> 0 </label>"
@@ -154,16 +219,24 @@ var TeacherCompetencyRowView = Backbone.View.extend({
 	initialize: function(options) {
 		this.index = options.index;
 		this.action = options.action;
+		this.level = options.level;
 		this.deptModel = options.deptModel;
 		this.render();
 	},
 
 	render: function() {
-		if (this.action == "edit") {	
+		if (this.action == "view") {
+			var level = this.level || "0 / Not specified";
+			this.$el.html(this.viewTemplate({
+				label: this.deptModel.deptName,
+				level: level
+			}));			
+		} else {	
 			this.$el.html(this.editTemplate({
 				label: this.deptModel.deptName,
 				index: this.index
 			}));
+			this.$el.find("input[type='radio'][value='" + this.level + "']").prop("checked", true);
 		}
 	},
 

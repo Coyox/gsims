@@ -199,6 +199,10 @@ var Teacher = Backbone.Model.extend({
    		return this.urlRoot + "/" + id + "/sections";
    	},
 
+   	getCourseCompetencyUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/competency";
+   	},
+
    	teacherStatuses:[
    		"active",
    		"inactive"
