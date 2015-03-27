@@ -185,14 +185,16 @@ var Teacher = Backbone.Model.extend({
 	},
 
 	nonEditable: [
-   		"schoolid", "lastAccessed", "userid"
+   		"schoolid", "lastAccessed", "userid", "usertype"
    	],
+
     urlRoot: app.serverUrl + "api/teachers",
 
    	getSearchTeachersUrl: function(usertype) {
    		usertype = usertype || "T";
    		return app.serverUrl + "api/search/users/" + usertype;
    	},
+
    	getTeachingSectionsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/sections";
    	},

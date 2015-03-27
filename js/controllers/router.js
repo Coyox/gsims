@@ -281,15 +281,13 @@ var Router = Backbone.Router.extend({
         });
     },
 
-    createTeacher: function(id) {
+    createTeacher: function() {
         this.updatePageBreadcrumb("Create Teacher");
 
         this.loadHome();
 
-        // temp fix
-        $("#content").html("<div id='child'></div>");
         new CreateTeacherView({
-            el: $("#child")
+            el: $("#content").html("")
         });
     },
 

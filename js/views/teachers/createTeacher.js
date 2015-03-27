@@ -1,220 +1,183 @@
 var CreateTeacherView = Backbone.View.extend({
 	initialize: function(options) {
+		this.model = new Teacher();
 		this.render();
 	},
 
 	render: function() {
 		this.$el.html(html["createTeacher.html"]);
-	},
 
-	events: {
-		"click #search": "searchExistingStudent",
-		"click #clear": "clearForm",
-		"click #skip": "skipSearchCheck",
-	},
+		this.model.nonEditable.push("status");
 
-	searchExistingStudent: function(evt) {
-		var view = this;
-		var params = {};
-		var parent = this.$el.find("#quick-search");
-
-		var firstName = parent.find("#first-name").val();
-		if (firstName != "") {
-			params.firstName = firstName;
-		}
-
-		var lastName = parent.find("#last-name").val();
-		if (lastName != "") {
-			params.lastName = lastName;
-		}
-
-		var month = this.$el.find("#month-menu option:selected");
-		var day = this.$el.find("#day-menu option:selected");
-		var year = this.$el.find("#year-menu option:selected");
-
-		if (!month.is(":disabled") && !day.is(":disabled") && !year.is(":disabled")) {
-			params.dateOfBirth = year.val() + "-" + month.val() + "-" + day.val();
-		}
-
-		var student = new Student();
-		student.fetch({
-			url: student.getSearchStudentsUrl(),
-			data: params
-		}).then(function(data) {
-			// STUDENT MAY EXIST
-			if (data.length) {
-				app.Router.navigate("students/search");
-				new StudentsTableView({
-					el: $("#content"),
-					results: data,
-					template: "createStudentSearch.html"
+		_.each(this.model.toJSON(), function(value, name) {
+			if (this.model.nonEditable.indexOf(name) == -1) {
+				new CreateTeacherRowView({
+					el: this.addRow(),
+					model: this.model,
+					name: name,
+					value: value,
+					action: "edit"
 				});
 			}
-			// STUDENT DOESNT EXIST
-			else {
-				view.enrollmentForm({
-					firstName: firstName,
-					lastName: lastName,
-					month: month.val(),
-					day: day.val(),
-					year: year.val()
-				});
-			}
+		}, this);
+
+		this.model.competency = [];
+		new TeacherCompetencyView({
+			el: this.$el,
+			model: this.model
 		});
 	},
 
-	skipSearchCheck: function() {
-		this.enrollmentForm();
-	},
-
-	enrollmentForm: function(params) {
-		app.Router.navigate("enrollmentForm", {trigger:true});
-
-		var el = app.enrollmentFormView.el;
-		_.each(params, function(value, name) {
-			if (name == "firstName" || name == "lastName") {
-				$(el).find("[name='" + name + "']").val(value);
-			} else {
-				console.log("#" + name + "-menu option[value='" + value + "']");
-				$(el).find("#" + name + "-menu option[value='" + value + "']").prop("selected", true);
-			}
-		}, this);
-		//app.enrollmentFormView.populateForm(params);
-	},
-
-	// saveStudent: function(evt) {
-	// 	Backbone.Validation.bind(this);
-
-	// 	if (this.model.isValid(true)) {
-	// 		this.model.save().then(function(data) {
-	// 			console.log(data);
-	// 		}).fail(function(data) {
-	// 			new TransactionResponseView({
-	// 				title: "ERROR",
-	// 				status: "error",
-	// 				message: "TODO"
-	// 			});
-	// 		});
-	// 	}
-	// },
-
-	clearForm: function(evt) {
-		this.$el.find("input").val("");
-	}
-});
-
-var EnrollmentFormView = Backbone.View.extend({
-	initialize: function(options) {
-		this.onlineReg = options.onlineReg;
-		this.render();
-	},
-
-	render: function() {
-		this.$el.html(html["enrollmentForm.html"]);
-
-		var formTemplate = html["viewStudent.html"]();
-		formTemplate = $(formTemplate).find("#student-info").html();
-
-		this.$el.find("#form").html(formTemplate);
-		this.$el.find(".form-buttons").remove();
-		this.$el.find(".delete").remove();
-		this.populateForm();
-	},
-
 	events: {
-		"click #to-enrollment": "validateModel"
+		"click #save-teacher": "saveTeacher"
 	},
 
-	populateForm: function(prefilled) {
-		this.model = new Student();
-
-		if (this.onlineReg == true) {
-			this.model.nonEditable.push("paid");
-			this.model.nonEditable.push("status");
-		}
-
-		_.each(this.model.toJSON(), function(value, attr) {
-			if (this.model.nonEditable.indexOf(attr) == -1) {
-				var filled = prefilled ? prefilled[attr] : undefined;
-				if (filled) {
-					value = filled;
-					this.model.set(attr, value);
-				}
-				new StudentRecordRowView({
-					el: this.addRow(this.model, attr),
-					action: "edit",
-					name: attr,
-					value: value,
-					model: this.model,
-				});
-			}
-		}, this);
+	addRow: function() {
+		var container = $("<div class='form-group'></div>");
+		this.$el.find("#teacher-info").append(container);
+		return container;
 	},
 
-	addRow: function(model, attr) {
-        var container = $("<div class='form-group'></div>");
-        var parent;
-		if (model.addressProperties.indexOf(attr) > -1) {
-			parent = "#address-table";
-        } else if (model.parentProperties.indexOf(attr) > -1) {
-        	parent = "#parent-table";
-        } else if (model.emergencyProperties.indexOf(attr) > -1) {
-        	parent = "#emergency-table";
-        } else {
-        	parent = "#student-info-table";
-        }
-        this.$el.find(parent + ".form-horizontal").append(container);
-        return container;
-	},
-
-	validateModel: function() {
+	saveTeacher: function() {
 		Backbone.Validation.bind(this);
-
-		setDateOfBirth(this.model);
+		console.log(this.model);
 		if (this.model.isValid(true)) {
-			console.log("VALID");
-			// app.Router.navigate("registrationEnrollment", {trigger:true});
-			// app.regEnrollmentView.studentModel = this.model;
-
-			// if (this.onlineReg) {
-			// 	app.regEnrollmentView.el = $("#container");
-			// 	app.regEnrollmentView.render();
-			// 	app.regEnrollmentView.studentModel.set("status", "pending");
-			// 	app.regEnrollmentView.onlineReg = true;
-			// }
-
-			// app.regEnrollmentView.displayForm();
-		} else {
-			console.log("INVALID");
+			new TransactionResponseView({
+				message: "todo.."
+			});
 		}
 	}
 });
 
-var CreateStudentRowView = Backbone.View.extend({
-	template: _.template("<label class='control-label col-sm-2'><%= name %></label>"
-		+	"<div class='col-sm-10'>"
-		+		"<input type='text' class='form-control <%= name %>'"
+var CreateTeacherRowView = Backbone.View.extend({
+	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<span><%= value %></span>"
+		+	"</div>"),
+
+	editTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<input type='text' class='form-control input-sm' value='<%= value %>' name='<%= name %>'>"
+		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 
 	initialize: function(options) {
 		this.name = options.name;
 		this.value = options.value;
+		this.action = options.action;
 		this.render();
 	},
 
 	render: function() {
-		this.$el.html(this.template({
-			name: this.name,
-			value: ""
-		}));
+		this.label = capitalize(this.name);
+		this.label = splitChars(this.label);
+
+		if (this.name == "emailAddr") {
+			this.label = "Email Address";
+		}
+
+		if (this.action == "view") {
+
+		} else {
+			this.$el.html(this.editTemplate({
+				model: this.model.toJSON(),
+				label: this.label,
+				name: this.name,
+				value: this.value
+			}));
+		}
 	},
 
 	events: {
-		"keyup input": "updateModel"
+		"keyup input": "updateModel",
 	},
 
 	updateModel: function(evt) {
+		var name = $(evt.currentTarget).attr("name");
 		var val = $(evt.currentTarget).val();
-		this.model.set(this.name, val);
+		this.model.set(name, val);
+	},
+});
+
+var TeacherCompetencyView = Backbone.View.extend({
+	initialize: function() {
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+		var schoolid = $("#school-options option:selected").attr("id");
+		var school = new School();
+		school.fetch({
+			url: school.getDepartmentsUrl("412312"),
+			//url: school.getDepartmentsUrl(schoolid),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
+		}).then(function(data) {
+			_.each(data, function(dept, index) {
+				view.model.competency.push({
+					deptName: dept.deptName,
+					level: 0
+				});
+				new TeacherCompetencyRowView({
+					el: view.addRow(index),
+					model: view.model,
+					index: index,
+					deptModel: dept,
+					action: "edit"
+				});
+			});
+
+		});
+	},
+
+	addRow: function(index) {
+		var parent = index % 2 == 0 ? "#comp-info" : "#comp2-info";
+		var container = $("<div class='form-group'></div>");
+		this.$el.find(parent).append(container);
+		return container;
+	}
+});
+
+var TeacherCompetencyRowView = Backbone.View.extend({
+
+	editTemplate: _.template("<label class='control-label col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<label class='radio-inline'><input type='radio' name='tcomp<%= index %>' value='0' data-name='<%= label %>' checked> 0 </label>"
+		+		"<label class='radio-inline'><input type='radio' name='tcomp<%= index %>' value='1' data-name='<%= label %>'> 1 </label>"
+		+		"<label class='radio-inline'><input type='radio' name='tcomp<%= index %>' value='2' data-name='<%= label %>'> 2 </label>"
+		+		"<label class='radio-inline'><input type='radio' name='tcomp<%= index %>' value='3' data-name='<%= label %>'> 3 </label>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	initialize: function(options) {
+		this.index = options.index;
+		this.action = options.action;
+		this.deptModel = options.deptModel;
+		this.render();
+	},
+
+	render: function() {
+		if (this.action == "edit") {	
+			this.$el.html(this.editTemplate({
+				label: this.deptModel.deptName,
+				index: this.index
+			}));
+		}
+	},
+
+	events: {
+		"change input[type='radio']": "updateLevel"
+	},
+
+	updateLevel: function(evt) {
+		var level = $(evt.currentTarget).attr("value");
+		var name = $(evt.currentTarget).data("name");
+		_.each(this.model.competency, function(dept, index) {
+			if (dept.deptName == name) {
+				dept.level = level;
+			}
+		}, this);
 	}
 });

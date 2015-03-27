@@ -1,30 +1,28 @@
-<div id="create-teacher-container">
-	<div id="quick-search" class="o-auto">
-		<div class="form-horizontal col-sm-6">
-			<h4>Search Teacher
-				<br/>
-				<small>Provide the teacher's first name and last name, and birthday to check if the teacher already exists.</small>
-			</h4>
-			<hr>
-			<div class="form-group">
-				<label class="control-label col-sm-3">First Name</label>
-				<div class="col-sm-9">
-					<input type="text" id="first-name" class="form-control input-sm">
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-sm-3">Last Name</label>
-				<div class="col-sm-9">
-					<input type="text" id="last-name" class="form-control input-sm">
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label col-sm-3"></label>
-				<div class="col-sm-9">
-					<button id="search" class="btn btn-primary btn-sm">Search</button>
-					<button id="skip" class="btn btn-primary btn-sm">Skip this step</button>
-				</div>
-			</div>
+<div class="col-sm-12">
+	<div class="col-sm-6">
+		<h4>Teacher Information</h4>
+		<hr>
+		<div id="teacher-info" class="form-horizontal"></div>
+	</div>
+	<br>
+	<div class="col-sm-12">
+		<br>
+		<br>
+		<h4>Optional: Course Competency
+			<br>
+			<small>Provide the competency level of the teacher below on a scale of 0 to 3 for each department. A value of '3' indicates that a teacher is highly competent in that subject.</small>
+		</h4>
+		<hr>
+		<div class="col-sm-6">
+			<div id="comp-info" class="form-horizontal"></div>
 		</div>
+		<div class="col-sm-6">
+			<div id="comp2-info" class="form-horizontal"></div>
+		</div>
+	</div>
+	<div class="col-sm-12">
+		<br>
+		<br>
+		<button id="save-teacher" class="btn btn-primary btn-sm">Save Teacher</button>
 	</div>
 </div>
