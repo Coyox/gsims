@@ -78,7 +78,7 @@ $app->delete('/courses/:id/:tid', 'unassignCourseTeacher');
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');
 $app->get('/sections/:id', 'getSectionById');
-$app->get('/sections/:id/students/:userid', 'getStudentAvgGradeForSection');
+$app->get('/sections/:id/students/:userid', 'getStudentGradeForSection');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
@@ -737,14 +737,23 @@ function deleteSection($id) {
     $sql = ($option->purge == 1)? "DELETE from section where sectionid=:id" : "UPDATE section set status='inactive' where sectionid=:id";
     echo json_encode(perform_query($sql,'', $bindparams));
 }
-function getStudentAvgGradeForSection($id, $userid){
+function getStudentGradeForSection($id, $userid){
+    $grade = getStudentSectionGrade($id, $userid);
+    if ($grade==-1){
+        echo json_encode(array("studentGrade"=>"N/A"));
+    }
+    else {
+        echo json_encode(array("studentGrade"=>$grade."%"));
+    }
+}
+/*wrapper for getStudentGradeForSection*/
+function getStudentSectionGrade($sectionid, $userid){
     $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
-    $bindparams = array("sectionid"=>$id);
+    $bindparams = array("sectionid"=>$sectionid);
     $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
 
     if ($totalmarks==0) {
-        echo json_encode(array("avgGradeForSection"=>"N/A"));
-        return;
+        return -1;
     }
     $sql = "SELECT coalesce(sum(mark),0) from marks
             where assignmentid in
@@ -752,10 +761,9 @@ function getStudentAvgGradeForSection($id, $userid){
             and userid=:userid";
     $bindparams["userid"]=$userid;
     $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
-
-    $avgGrade = ($attainedmarks/$totalmarks)*100;
-    echo json_encode(array("avgGradeForSection"=>$avgGrade."%"));
+    return ($attainedmarks/$totalmarks)*100;
 }
+
 
 #================================================================================================================#
 # Documents
@@ -917,11 +925,16 @@ function getStudentById($id) {
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
-function getEnrolledSections($id){
+// flag=1: return array
+// flag=0: echo json
+function getEnrolledSections($id, $flag=0){
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
     FROM section s, course c
     WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id)
     and s.courseid = c.courseid";
+    if ($flag==1){
+        return perform_query($sql,'GETASSO',array("id"=>$id));
+    }
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
@@ -1146,23 +1159,18 @@ function handlePendingStudents(){
 }
 
 function getAvgGrade($id){
-    // $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
-    // $bindparams = array("sectionid"=>$id);
-    // $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
-
-    // if ($totalmarks==0) {
-    //     echo json_encode(array("avgGradeForSection"=>"N/A"));
-    //     return;
-    // }
-    // $sql = "SELECT coalesce(sum(mark),0) from marks
-    //         where assignmentid in
-    //             (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
-    //         and userid=:userid";
-    // $bindparams["userid"]=$userid;
-    // $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
-
-    // $avgGrade = ($attainedmarks/$totalmarks)*100;
-    // echo json_encode(array("avgGradeForSection"=>$avgGrade."%"));
+    $totalgrade = 0;
+    $sections = getEnrolledSections($id, 1);
+    $numsections = count($sections);
+    if ($numsections == 0){
+        echo json_encode(array("avgGrade"=>"N/A"));
+        return;
+    }
+    foreach ($sections as $row){
+        $totalgrade += getStudentSectionGrade((int) $row['sectionid']);
+    }
+    $grade = ($totalgrade/$numsections)*100;
+    echo json_encode(array("avgGrade"=>$grade."%"));
 }
 
 #================================================================================================================#
