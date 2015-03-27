@@ -39,7 +39,7 @@ function generateLogin($firstname, $lastname){
 function generateUniqueID($sql, $param, $digit=IDdigits){
     $id = randomNumber($digit);
     $bindparam = array($param=>$id);
-    while (perform_query($sql, 'GET', $bindparam)!= false){
+    while (perform_query($sql, 'GET', $bindparam)!= FALSE){
         $id = randomNumber($digit);
     }
     return $id;
