@@ -1433,6 +1433,7 @@ function findUsers($usertype){
         $country = $_GET['country'];
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
+        $email = $_GET['emailAddr'];
         if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
