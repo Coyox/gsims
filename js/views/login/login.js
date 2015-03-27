@@ -97,33 +97,24 @@ var ForgotPasswordView = Backbone.View.extend({
 
 		var user = new User();
 		user.fetch({
-			url: user.getUsers("341231", "SU")
+			url: user.getUserByEmail(email)
 		}).then(function(data) {
-			if (typeof data !== undefined) {
-				if (data.emailAddr == email) {
-					var link = "https://gobind-sarvar.rhcloud.com/#reset" + data.userid + "/username1";
-					sendEmail({
-						from: "info@gobindsarvar.com",
-						to: [{
-							email: email,
-							name: "Gobind Sarvar",
-							type: "to"
-						}],
-						subject: "Gobind Sarvar - Reset Account Password",
-						body: link
-					}, function() {
-						new TransactionResponseView({
-							message: "An email has been sent to: " + email + ". Please follow the link to reset your password."
-						});
-					});
-				} else {
-					// No user exists with the specified email
+			if (data) {
+				var link = "https://gobind-sarvar.rhcloud.com/#reset/" + data.userid + "/" + data.username;
+				sendEmail({
+					from: "info@gobindsarvar.com",
+					to: [{
+						email: email,
+						name: "Gobind Sarvar",
+						type: "to"
+					}],
+					subject: "Gobind Sarvar - Reset Account Password",
+					body: link
+				}, function() {
 					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "No user exists with the email address: " + email + ". Please provide a valid email address."
+						message: "An email has been sent to: " + email + ". Please follow the link to reset your password."
 					});
-				}
+				});
 			} else {
 				// No user exists with the specified email
 				new TransactionResponseView({
@@ -161,9 +152,16 @@ var ResetPasswordView = Backbone.View.extend({
 			user.set("id", this.id);
 			user.set("userid", this.id);
 			user.save().then(function(data) {
-				console.log(data);
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Password succsesfully reset. Please try logging in again."
+					});
+				} else {
+					new TransactionResponseView({
+						message: "Password could not be reset. Please refresh the page and try again."
+					});
+				}
 			});
-		
 		}
 	}
 });

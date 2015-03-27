@@ -235,5 +235,9 @@ var User = Backbone.Model.extend({
    			return undefined;
    		}
    		return app.serverUrl + "api/users/" + id + "/" + usertype;
+   	},
+
+   	getUserByEmail: function(email) {
+   		return app.serverUrl + "api/users/" + email;
    	}
 });

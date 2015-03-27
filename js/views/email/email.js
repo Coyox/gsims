@@ -110,8 +110,7 @@ function sendEmail(params, callback) {
 
 	$.when(xhr).then(function(data) {
 		console.log(data);
-
-		if (callback && data.status == "sent") {
+		if (callback && data[0] && data[0].status == "sent") {
 			callback.call();
 		} else {
 			// display some kind of message if it was successful or not

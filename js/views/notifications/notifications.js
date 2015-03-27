@@ -67,15 +67,20 @@ var PendingRegistrationView = Backbone.View.extend({
 	},
 
 	saveStatuses: function(evt) {
+		var view = this;
 		var approved = [];
+		var approvedEmails = [];
 		var denied = [];
+		var deniedEmails = [];
 		_.each(this.list, function(model, index) {
 			if (model.hasChanged("status")) {
 				var status = model.get("status");
 				if (status == "active") {
 					approved.push(model.get("userid"));
+					approvedEmails.push(model.get("emailAddr"));
 				} else if (status == "inactive") {
 					denied.push(model.get("userid"));
+					deniedEmails.push(model.get("emailAddr"));
 				}
 			}
 		});
@@ -88,16 +93,56 @@ var PendingRegistrationView = Backbone.View.extend({
 			params.deniedList = JSON.stringify(denied);
 		}
 
+		console.log(approvedEmails);
+		console.log(deniedEmails);
+
 		var student = new Student();
 		var xhr = $.ajax({
 			type: "POST",
 			url: student.updatePendingUrl(),
 			data: params,
 			success: function(data) {
-				if (data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					var to = [];
+					_.each(approvedEmails, function(email, index) {
+						to.push({
+							email: email,
+							name: "",
+							type: "to"
+						});
+					});
+
+					sendEmail({
+						from: "info@gobindsarvar.com",
+						to: to,
+						subject: "Gobind Sarvar - Approved!",
+						body: "Your student account at Gobind Sarvar has been approved."
+					});
+
+					var deniedTo = [];
+					_.each(deniedEmails, function(email, index) {
+						deniedTo.push({
+							email: email,
+							name: "",
+							type: "to"
+						});
+					});					
+
+					sendEmail({
+						from: "info@gobindsarvar.com",
+						to: deniedTo,
+						subject: "Gobind Sarvar - Denied",
+						body: "Your student account at Gobind Sarvar has been denied. Please contact us at info@gobindsarvar.com if you believe this is an error."
+					});
+
 					new TransactionResponseView({
-						message: "Students successfully approved and/or denied"
+						message: "Students successfully approved and/or denied. An email has been sent to notify the student of their status change."
 					});	
+
+					view.render();
 				}
 			}
 		});
