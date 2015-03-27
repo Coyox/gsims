@@ -1,37 +1,31 @@
 var CourseEnrollmentView = Backbone.View.extend({
 	initialize: function(options) {
 		var view = this;
-		this.school = options.school;
 		this.results = options.results;
-
-		// TODO: fix this.. event not binding properly
-		$("#container").on("change", "#school-menu", function() {
-			var id = $(this).find("option:selected").attr("value");
-			view.populateDepartments(id);
-		});
-
 		this.render();
 	},
 
 	render: function() {
 		var view = this;
-		this.$el.html(html["courseEnrollment.html"]);
 
 		if (this.onlineReg) {
 			this.$el.find("#save-sections").remove();
 		}
 
-		if (this.school) {
+		if (this.results) {
 			var school = new School();
-			var menu = view.$el.find("#school-menu");
-			menu.append($("<option selected disabled>-- Select a School --</option>"));
-			_.each(view.results, function(object, index) {
-				var option = $("<option></option>");
-				option.attr("value", object.schoolid);
-				option.text(object.location);
-				menu.append(option);
-			});			
+			school.fetch().then(function(data) {
+				var menu = view.$el.find("#school-menu");
+				menu.append($("<option selected disabled>-- Select a School --</option>"));
+				_.each(data, function(object, index) {
+					var option = $("<option></option>");
+					option.attr("value", object.schoolid);
+					option.text(object.location);
+					menu.append(option);
+				});
+			});	
 		} else {
+			this.$el.html(html["courseEnrollment.html"]);
 			this.populateDepartments();
 		}
 
@@ -55,14 +49,11 @@ var CourseEnrollmentView = Backbone.View.extend({
 		"change #school-menu": "populateDepartments"
 	},
 
-	populateDepartments: function(id) {
+	populateDepartments: function(evt) {
 		var view = this;
-		var schoolid; 
-		if (id) {
-			schoolid = id;
-		} else {
-			schoolid = $("#school-options").find("option:selected").attr("id");
-		}
+		var schoolid = $(evt.currentTarget).find("option:selected").attr("value");
+		this.schoolid = schoolid;
+		
 		var school = new School();
 		school.fetch({
 			url: school.getDepartmentsUrl(schoolid),
@@ -70,7 +61,6 @@ var CourseEnrollmentView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
-			console.log(data);
 			_.each(data, function(object, index) {
 				var dept = new Dept(object, {parse:true});
 				new DepartmentListItem({
@@ -80,16 +70,12 @@ var CourseEnrollmentView = Backbone.View.extend({
 					parentView: view
 				});
 			});
-
-			// fix this
-	    	var height = $("#course-selection").height() + 60;
-	    	$('.wizard .content').css("height", height);
 		});
 	},
 
 	addDepartmentListItem: function() {
-		var container = $("<div></div>");
-		$("#department-list").append(container);
+		var container = $("<span></span>");
+		this.$el.find("#department-list").append(container);
 		return container;
 	},
 
@@ -103,21 +89,11 @@ var CourseEnrollmentView = Backbone.View.extend({
 				message: "still todo ...."
 			});
 		});
-	},
-
-	getSections: function() {
-		var rows = this.$el.find("#enrolled-list tbody tr");
-		var ids = [];
-		_.each(rows, function(row, index) {
-			ids.push($(row).attr("id"));
-		}, this);
-		console.log(ids);
-		return ids;		
 	}
 });
 
 var DepartmentListItem = Backbone.View.extend({
-	template: _.template("<button id='<%= model.deptid %>' class='department btn btn-default btn-sm btn-block' data-name='<%= model.deptName %>'><%= model.deptName %></button>"),
+	template: _.template("<span id='<%= model.deptid %>' href='#' class='department btn btn-default btn-sm' data-name='<%= model.deptName %>'><%= model.deptName %></span>"),
 
 	initialize: function(options) {
 		var view = this;
@@ -161,10 +137,6 @@ var DepartmentListItem = Backbone.View.extend({
 					parentView: view.parentView
 				});
 			});
-
-			// fix this
-	    	var height = $("#course-selection").height() + 60;
-	    	$('.wizard .content').css("height", height);
 		});
 	},
 
@@ -258,10 +230,6 @@ var SectionTableView = Backbone.View.extend({
 					parentView: this.parentView
 				});
 			}, this);
-
-			// fix this
-	    	var height = $("#course-selection").height() + 60;
-	    	$('.wizard .content').css("height", height);
 		}
 	},
 
@@ -295,7 +263,7 @@ var SectionTableRowView = Backbone.View.extend({
 
 	events: {
 		"click .enroll-link": "enrollInSection",
-		"click span.remove-section": "removeSection"
+		"click .remove-section": "removeSection"
 	},
 
 	enrollInSection: function(evt) {
@@ -307,8 +275,10 @@ var SectionTableRowView = Backbone.View.extend({
 			this.model.get("endTime"),
 			"<span class='remove-section link'>Remove</span>"
 		]).draw().node();
+
 		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
-		$(row).attr("id", this.model.get("sectionid"));
+		$(row).attr("id", this.model.get("sectionid"))
+			.data("section", this.model.toJSON());
 	},
 
 	removeSection: function(evt) {

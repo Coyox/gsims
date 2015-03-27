@@ -116,11 +116,13 @@ function populateStatusMenu(elem, statuses, selected) {
 }
 
 function setDateOfBirth(model) {
+	console.log(model.get("dateOfBirth"));
 	if (model.get("dateOfBirth") == "") {
 		var month = model.get("month");
 		var day = model.get("day");
 		var year = model.get("year");
 		var dob;
+		console.log(month,day,year);
 		if (month !== undefined && day !== undefined && year != undefined) {
 			dob = year + "-" + month + "-" + day;
 		} else {

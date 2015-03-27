@@ -1,13 +1,154 @@
-<div id="registration-page" class="center-block o-auto">
-	<h1>Registration Form</h1>
-	<section id="info-form">reg form</section>
+<form id="registration-page" class="center-block o-auto">
+	<section id="info-form" class="step" data-step-title="Registration Form">
+		<div class="col-sm-12">
+			<div class="student-component col-sm-6">
+				<h4>Student Information </h4>
+				<div id="student-info-table" class="form-horizontal well property-table"></div>
+			</div>
+			<div class="student-component col-sm-6">
+				<h4>Address </h4>	
+				<div id="address-table" class="form-horizontal well property-table"></div>
+			</div>
+		</div>
+		<div class="col-sm-12">
+			<div class="student-component col-sm-6">
+				<h4>Parent/Guardian Information </h4>
+				<div id="parent-table" class="form-horizontal well property-table"></div>
+			</div>
+			<div class="student-component col-sm-6">
+				<h4>Emergency Contact Information </h4>					
+				<div id="emergency-table" class="form-horizontal well property-table"></div>	
+			</div>
+		</div>
+	</section>
 
-	<h1>Course Selection</h1>
-	<section id="sections-form">course selection</section>
+	<section id="sections-form" class="step o-auto" data-step-title="Course Selection">
+		<div id="course-selection" class="o-auto">
+			<div class="course-selection-component o-auto">
+				<div class="col-sm-3">
+					<div id="school-options">
+						<h4>1. Select a School</h4>
+						<select id="school-menu" class="form-control"></select>
+					</div>
+				</div>
+				<div class="col-sm-9">
+					<div>
+						<h4>2. Select a Department</h4>
+						<div id="department-list"></div>
+					</div>
+				</div>
+			</div>
+			<div class="divider"></div>
 
-	<h1>Terms and Conditions</h1>
-	<section id="terms-form">t&c</section>
 
-	<h1>Finish</h1>
-	<section id="finish">done</section>
-</div>
+			<div class="col-sm-12 course-selection-component o-auto">
+				<h4>3. Showing courses for: <strong class="department-name">[ none selected ]</strong>
+					<br>
+				</h4>
+				<table id="course-list" class="table table-striped table-bordered">
+					<thead>
+						<th>View Sections</th>
+						<th>Course Name</th>
+						<th>Description</th>
+					</thead>
+					<tbody class="results"></tbody>
+				</table>
+			</div>
+			<div class="divider"></div>
+
+			<div class="col-sm-12 course-selection-component o-auto">
+				<h4>4. Enrolled Sections 
+					<br>
+					<small>You will be enrolled in each of the following sections</small>
+				</h4>
+				<table id="enrolled-list" class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>Course Name</th>
+							<th>Section Code</th>
+							<th>Day</th>
+							<th>Start Time</th>
+							<th>End Time</th>
+							<th>Drop</th>
+						</tr>
+					</thead>
+					<tbody class="results"></tbody>
+				</table>
+			</div>
+		</div> 
+	</section>
+
+	<section id="terms-form" class="step" data-step-title="Terms and Conditions">
+		<div id="terms-and-conditions" class="col-sm-12">
+			<span class="login-text">Terms and Conditions</span>
+			<br>
+			<br>
+			<p class="well">
+				<strong>ATTENDANCE & PUNCTUALITY</strong> - In order to ensure a consistent and stable learning environment for both students and teachers, regular attendance in all registered classes is mandatory. Students should aim to be at least 5 minutes early for their classes. If a student has five (5) or more unexcused absences or lates from any class they will be removed from the class attendance list. If the student wishes to return to the class they will be required to speak with Gobind Sarvar administrators and pay a $50 re-enrollment penalty. If the student misses a total of 10+ classes in a school year or is regularly late, their enrollment will be terminated and they will be required to pay a $150 re-enrollment penalty.
+
+				<br><br>
+
+				<strong>ATTIRE</strong> - Gobind Sarvar students are required to wear the following uniforms to classes:
+				Boys: White/blue/orange kurta/chola (top) with white pajama (bottom) and Blue dastar/patka/ramal (head covering)
+				Girls: White/blue/orange kameez/suit (top) with white salwar (bottom) and Blue kaaski/chuni/ramal (head covering)
+				On Youth Days and special events students must wear their uniform and can supplement it with a blue sweater/full sleeve shirt/vest or jacket.
+
+				<br><br>
+
+				<strong>LIABILITY DISCLAIMER</strong> - I hereby waive and forever discharge Gobind Sarvar, Gobind Marg Charitable Trust Society, its employees and volunteers from all claims, damages, costs and expenses with respect to injury or damage to my/their person or property, however caused, which may occur as a result of my/their participation in the program in any location where the program is being held (e.g. school, field trips, organized gatherings, etc).
+
+				<br><br>
+
+				<strong>MEDIA RECORDING</strong> - I acknowledge and agree that Gobind Sarvar may use photographs/video/audio recordings of my child in Gobind Sarvar related activities, programs, and events for publishing purposes including, but not limited to, promotional, educational, fundraising, online services, magazine (Mera Saho Te Rang Ratare) and monthly newsletters.
+				I hereby certify that the information I have provided on this form is accurate, and I have read and agree to the terms and conditions of registration.
+			</p>
+			<br>
+			<br>
+			<div id="toc-agreement" class="pull-right">
+				<label class="radio-inline">
+					<input type="radio" name="toc" value="1"> Agree
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="toc" value="0"> Disagree
+				</label>
+			</div>
+			<br>
+			<br>
+		</div>
+	</section>
+
+	<section id="finish-form" class="step" data-step-title="Finish">
+		<div class="alert alert-success">Please verify that the following information is correct. If there are any errors, use the "Previous" button to make any changes.</div>
+		<div id="final-student-model">
+			<div class="col-sm-12">
+				<div class="student-component col-sm-6">
+					<h4>Student Information </h4>
+					<div id="student-info-table" class="form-horizontal well property-table"></div>
+				</div>
+				<div class="student-component col-sm-6">
+					<h4>Address </h4>	
+					<div id="address-table" class="form-horizontal well property-table"></div>
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<div class="student-component col-sm-6">
+					<h4>Parent/Guardian Information </h4>
+					<div id="parent-table" class="form-horizontal well property-table"></div>
+				</div>
+				<div class="student-component col-sm-6">
+					<h4>Emergency Contact Information </h4>					
+					<div id="emergency-table" class="form-horizontal well property-table"></div>	
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<div class="student-component col-sm-6">
+					<h4>Selected Sections </h4>
+					<div id="final-sections" class="form-horizontal well property-table"></div>
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<span id="finish-registration" class="btn btn-primary btn-sm pull-right">FINISH</span>
+			</div>
+		</div>
+	</section>
+</form>

@@ -292,7 +292,7 @@ var StudentRecordRowView = Backbone.View.extend({
 	},
 
 	events: {
-		"keyup input": "updateInput",
+		"change input": "updateInput",
 		"change select": "updateSelect",
 		"change input[type='radio']": "updateRadio"
 	},

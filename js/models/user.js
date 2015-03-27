@@ -142,6 +142,10 @@ var Student = Backbone.Model.extend({
    		return this.urlRoot + "/pending";
    	},
 
+   	enrollStudentInSections: function(id) {
+   		return this.urlRoot + "/" + id + "/sections";
+   	},
+
    	studentStatuses: [
    		"active",
    		"inactive",
