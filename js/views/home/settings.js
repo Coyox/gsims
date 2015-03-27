@@ -19,22 +19,24 @@ var UserSettingsView = Backbone.View.extend({
 	saveUser: function() {
 		Backbone.Validation.bind(this);
 		this.model.set("id", this.model.get("userid"));
-		this.model.save().then(function(data) {
-			if (typeof data == "string") {
-				data = JSON.parse(data);
-			}
-			if (data.status == "success") {
-				new TransactionResponseView({
-					message: "Account successfully updated."
-				});
-			} else {
-				new TransactionResponseView({
-					message: "Account could not be updated.",
-					title: "ERROR",
-					status: "error"
-				});				
-			}
-		});
+		if (this.model.isValid(true)) {
+			this.model.save().then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Account successfully updated."
+					});
+				} else {
+					new TransactionResponseView({
+						message: "Account could not be updated.",
+						title: "ERROR",
+						status: "error"
+					});				
+				}
+			});
+		}
 	},
 
 	updateModel: function(evt) {
