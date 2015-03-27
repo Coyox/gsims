@@ -376,9 +376,8 @@ function createDepartment(){
     $body = $request->getBody();
     $dept = json_decode($body);
 
-    $sql = "SELECT deptid from dept where deptid=:deptid";
+    $sql = "SELECT deptid from department where deptid=:deptid";
     $deptid = generateUniqueID($sql, "deptid");
-    echo $deptid;
 
     $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
             values (:deptid, :schoolid, :deptName, :schoolyearid, :status)";
