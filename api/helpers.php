@@ -1,6 +1,5 @@
 <?php
 require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
-$mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
 
 define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
@@ -46,25 +45,24 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 }
 
 function emailLogin($emailAdd, $username, $password, $firstname, $lastname){
+    $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
     try {
         $message = array(
+        'html' => '<p>Example HTML content</p>',
         'text' => 'hello',
         'subject' => 'Welcome to Gobind Sarvar School',
         'from_email'=>'shaniferseit@hotmail.com',
         'from_name' => 'Gobind Sarvar School',
         'to' => array(
             array(
-                'email' => 'shanifer@example.com',
+                'email' => 'shanifer@gmail.com',
                 'name' => 'Shanifer',
                 'type' => 'to'
             )
         ),
-
         );
     $async = false;
-    $ip_pool = 'Main Pool';
-    $send_at = 'example send_at';
-    $result = $mandrill->messages->send($message, $async, $ip_pool, $send_at);
+    $result = $mandrill->messages->send($message, $async);
     print_r($result);
 } catch(Mandrill_Error $e) {
     // Mandrill errors are thrown as exceptions
@@ -72,7 +70,6 @@ function emailLogin($emailAdd, $username, $password, $firstname, $lastname){
     // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     throw $e;
 }
-
 }
 
 
