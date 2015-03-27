@@ -51,7 +51,15 @@ var CourseEnrollmentView = Backbone.View.extend({
 
 	populateDepartments: function(evt) {
 		var view = this;
-		var schoolid = $(evt.currentTarget).find("option:selected").attr("value");
+		var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
+			$("#school-options").find("option:selected").attr("id");
+			console.log(schoolid);
+
+		// temp fix
+		if (!schoolid) {
+			schoolid = "412312";
+		}
+
 		this.schoolid = schoolid;
 		
 		var school = new School();
@@ -80,15 +88,29 @@ var CourseEnrollmentView = Backbone.View.extend({
 	},
 
 	saveEnrolledSections: function() {
-		var ids = this.getSections();
-		var student = new Student();
-		student.save(null, {
-			url: getEnrolledSectionsUrl(id)
-		}).then(function(data) {
+		var sections = [];
+		var rows = this.$el.find("#enrolled-list tbody tr");
+		var valid = false;
+		_.each(rows, function(row, index) {
+			if ($(row).find(".dataTables_empty").length) {
+				valid = false;
+			} else {
+				valid = true;
+				sections.push($(row).data("section"));
+			}
+		}, this);
+		
+		if (!valid) {
 			new TransactionResponseView({
-				message: "still todo ...."
+				title: "Course Selection",
+				message: "Please select at least one section before proceeding."
 			});
-		});
+		} else {
+			new TransactionResponseView({
+				title: "Course Selection",
+				message: "todo.."
+			});	
+		}
 	}
 });
 
