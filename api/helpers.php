@@ -180,7 +180,8 @@ function generatePasswordHash($password){
 	$cost = 10;
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
     $salt = sprintf("$2a$%02d$", $cost).$salt;
-    return crypt($password, $salt);
+    return $password;
+    //return crypt($password, $salt);
 }
 
 function parenthesisList($ids){
