@@ -1,6 +1,6 @@
 <?php
-require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
-
+//require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
+ini_set('display_errors', 1);
 define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
 define("less","<=");
@@ -14,8 +14,7 @@ function randomNumber($digits){
 function generateLogin($firstname, $lastname){
     // 6 digit userid
     $sql = "SELECT userid from login where userid=:userid";
-    $bindparam = array("userid"=>$userid);
-    $userid = generateUniqueID($sql, $bindparam);
+    $userid = generateUniqueID($sql, array("userid"=>$userid));
 
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
@@ -31,6 +30,9 @@ function generateLogin($firstname, $lastname){
      $index = rand(0, $count-1);
      $password .= $chars[$index];
     }
+    echo "userid: ".$userid;
+    echo "username: ".$username;
+    echo "password: ".$password;
 
     return array($userid, $username, $password);
 }

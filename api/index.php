@@ -1,7 +1,10 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require 'Slim/Slim.php';
 require_once 'helpers.php';
 require_once 'crossdomain.php';
+
 
 \Slim\Slim::registerAutoloader();
 
@@ -1025,7 +1028,10 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
+    echo $student->firstName;
     $userid = createNewUser($student->firstName, $student->$lastName, $student->emailAddr, 'S');
+
+    echo "**********TEST**************";
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1515,6 +1521,7 @@ function findSections(){
 /*
  Create new user in login table with generated login creds
 */
+
 function createNewUser($firstname, $lastname, $emailAddr, $usertype){
     $sql = "INSERT into login (userid, username, password, usertype)
             VALUES (:userid, :username, :password, :usertype)";
