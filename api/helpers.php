@@ -13,7 +13,7 @@ function randomNumber($digits){
 function generateLogin($firstname, $lastname){
     // 6 digit userid
     $sql = "SELECT userid from login where userid=:userid";
-    $userid = generateUniqueID($sql, array("userid"=>$userid));
+    $userid = generateUniqueID($sql, "userid");
 
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
@@ -180,8 +180,8 @@ function generatePasswordHash($password){
 	$cost = 10;
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
     $salt = sprintf("$2a$%02d$", $cost).$salt;
-    return $password;
-    //return crypt($password, $salt);
+    //return $password;
+    return crypt($password, $salt);
 }
 
 function parenthesisList($ids){
