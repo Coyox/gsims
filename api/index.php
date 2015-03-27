@@ -26,6 +26,7 @@ $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->get('/teachers/:id/competency', 'getCourseCompetencies');
+$app->put('/teachers/:id/competency', 'updateCourseCompetencies');
 $app->post('/teachers', 'createTeacher');
 $app->post('/teachers/:id', 'addCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
@@ -1274,6 +1275,20 @@ function addCourseCompetencies($id){
     }
     $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+function updateCourseCompetencies($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $results = json_decode($body);
+    $queries = array();
+    $bindparams = array();
+    foreach (array_values($results) as $i => $result){
+        $bindparams[$i] = array("userid" => $id, "deptid".$i=>$result->deptid, "level".$i=>$result->level);
+        $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
+        array_push($queries, $sql);
+    }
+    echo json_encode(perform_transaction($sql, $bindparams));
 }
 
 #================================================================================================================#
