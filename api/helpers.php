@@ -1,5 +1,6 @@
 <?php
 //require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
+error_reporting(E_ALL);
 ini_set('display_errors', 1);
 define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");

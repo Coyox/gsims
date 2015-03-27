@@ -1,10 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require 'Slim/Slim.php';
 require_once 'helpers.php';
 require_once 'crossdomain.php';
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 \Slim\Slim::registerAutoloader();
 
