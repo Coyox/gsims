@@ -82,7 +82,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 	},
 
 	addDepartmentListItem: function() {
-		var container = $("<span></span>");
+		var container = $("<li class='dept-item pull-left'></li>");
 		this.$el.find("#department-list").append(container);
 		return container;
 	},

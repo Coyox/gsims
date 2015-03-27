@@ -340,12 +340,13 @@ li.paginate_button.active a {
 }
 
 #department-list {
-
+	overflow: auto;
+	margin-bottom: 20px;
 }
 
 #department-list span {
 	background: #fff;
-	border: 1px solid #ddd;
+	border: 2px solid #ddd;
 	color: #666;
     margin: 5px;
 }
@@ -354,6 +355,10 @@ li.paginate_button.active a {
 	background-color: #9d426b;
 	color: #fff;
 	cursor: pointer;
+}
+
+.dept-item {
+	list-style: none;
 }
 
 #course-list {
@@ -421,8 +426,8 @@ tr.shown td.details-control {
 .divider {
     border: 1px dashed #ddd;
     height: 1px;
-    margin-top: 25px;
-    margin-bottom: 25px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     overflow: auto;
 }
 
