@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `document` (
   `docid` int(11) PRIMARY KEY NOT NULL,
   `docName` varchar(50)  NOT NULL,
   `description` varchar(50) NOT NULL,
-  `link` varchar(255) NOT NULL,
+  `link` varchar(255),
   `sectionid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `fullmark` smallint(5),

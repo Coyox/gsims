@@ -1,148 +1,164 @@
-var SchoolYearView = Backbone.View.extend({
-	initialize: function(options) {
-		this.model = new SchoolYear();
-		this.render();
-	},
+var DepartmentView = Backbone.View.extend({
+    initialize: function (options) {
+        this.model = new Dept();
+        this.render();
+    },
+     
+    render: function () {
+        this.$el.html(html["viewDepartments.html"]);
+        var view = this;
+        var department = new Dept();
+        var school = new School();
+        school.fetch({
+            url: school.getDepartmentsUrl("412312"),
+            data: {
+            schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")}}).then(function(data) {
+                _.each(data, function (object, index) {
+                    var dept1 = new Dept(object, { parse: true });
+                    console.log("creating deptrowview");
+                    new DepartmentRowView({
+                        el: view.addRow(),
+                        model: dept1,
+                        untouchedModel: JSON.stringify(dept1.toJSON()),
+                    });
+            });
+            view.$el.find("table").dataTable({
+                dom: "t"
+            });
+        });
+    },
 
-	render: function() {
-		this.$el.html(html["viewSchoolYear.html"]);
+    events: {
+        "click #create-dept": "createDept",
+    },
 
-		var view = this;
-		var schoolyear = new SchoolYear();
-		schoolyear.fetch().then(function(data) {
-			_.each(data, function(object, index) {
-				var year = new SchoolYear(object, {parse: true});
-				new SchoolYearRowView({
-					el: view.addRow(),
-					model: year
-				});
-			});
-			view.$el.find("table").dataTable({
-				dom: "t"
-			});
-		});
-	},
+    addRow: function () {
+        var container = $("<tr></tr>");
+        this.$el.find(".results").append(container);
+        return container;
+    },
 
-	events: {
-		"click #create-year": "createSchoolYear",
-	},
+    createDept: function (evt) {
+        console.log("in create dept");
+        var view = this;
+        Backbone.Validation.bind(this);
 
-	addRow: function() {
-		var container = $("<tr></tr>");
-		this.$el.find(".results").append(container);
-		return container;
-	},
+        this.$el.append(html["createDepartment.html"]);
+        $("#create-dept-modal").modal({
+            show: true
+        });
 
-	createSchoolYear: function(evt) {
-		var view = this;
-		Backbone.Validation.bind(this);	
-		
-		this.$el.append(html["createSchoolYear.html"]);
+        $("#create-dept-modal").on("hidden.bs.modal", function () {
+            $("#create-dept-modal").remove();
+            $(".modal-backdrop").remove();
+        });
 
-		$("#create-year-modal").modal({
-			show: true
-		});
-		
-		$("#create-year-modal").on("hidden.bs.modal", function() {
-			$("#create-year-modal").remove();
-			$(".modal-backdrop").remove();
-		});
-		
-		$("#create-year-modal").on("click", "#save", function() {
-			view.model.set("schoolyear", $("#school-year").val());
-			if (view.model.isValid(true)) {
-				$("#create-year-modal").remove();
-				$(".modal-backdrop").remove();
-				view.model.save({
-					dataType: "text"
-				}).then(function(data) {
-					if (data) {
-						new TransactionResponseView({
-							message: "New school year successfully created."
-						});
-						view.render();
-					}
-				}).fail(function(data) {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Could not create a new school year."
-					});
-				});
-			}
-		});
-	},
+        $("#create-dept-modal").on("click", "#save", function () {
+            view.model.set("deptName", $("#deptName").val());
+            view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
+            view.model.set("schoolid", "412312");
 
-	refresh: function() {
-		this.render();
-	}
+            if (view.model.isValid(true)) {
+                console.log("model is valid");
+                $("#create-dept-modal").remove();
+                $(".modal-backdrop").remove();
+                console.log(view.model.toJSON());
+
+                view.model.save().then(function (data) {
+                    if (data) {
+                        new TransactionResponseView({
+                            message: "New department successfully created."
+                        });
+                        view.render();
+                    }
+                }).fail(function (data) {
+                    new TransactionResponseView({
+                        title: "ERROR",
+                        status: "error",
+                        message: "Could not create a new department."
+                    });
+                });
+
+            }
+        });
+    },
+
+    refresh: function () {
+        this.render();
+    }
 });
 
-var SchoolYearRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.schoolyear %></td>"
-		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='active-switch' checked></td>"
-		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='reg-switch' checked></td>"),
+var DepartmentRowView = Backbone.View.extend({
+    template: _.template("<td><%= model.deptName %></td>"
+        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Delete Department</button></td>"),
 
-	initialize: function(options) {
-		this.render();
-	},
+    edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.deptName %>' name='deptName'></td>"
+		+ "<td> <button class='save-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Save Department</button> <button class='cancel-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Cancel Edit</button></td>"),
 
-	render: function() {
-		var view = this; 
+    initialize: function (options) {
+        this.action = "view";
+        this.untouchedModel = options.untouchedModel;
+        this.render();
+        
+    },
 
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
+    render: function () {
+        var view = this;
+        var template;
+        if (this.action == "view") {
+            template = this.template;
+        }
+        else {
+            template = this.edittemplate;
+        }
+        this.$el.html(template({
+            model: this.model.toJSON()
+        }));
+    },
 
-		// active school year switch
-		this.$el.find("[name='active-switch']").bootstrapSwitch({
-			size: "mini",
-			onText: "active",
-			offText: "inactive",
-			state: this.model.get("status") == "active" ? true : false,
-			onSwitchChange: function(event, state) {
-				var schoolyearid = $(event.currentTarget).attr("id");
-				view.model.set("id", schoolyearid);
-				view.model.set("status", state == true ? "active" : "inactive");
-				view.model.save(null, {
-					url: view.model.updateActiveYearUrl(schoolyearid)
-				}).then(function(data) {
-					console.log(data);
-				}).fail(function(data) {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Could not update active school year."
-					});
-				});
-			}
-		});
+    events: {
+        "click .edit-dept": "editDept",
+        "click .save-dept": "saveDept",
+        "click .cancel-dept": "cancelDept",
+        "keyup input": "updateModel"
+    },
+    
+    cancelDept: function(evt) {
+        console.log("cancelled dept change");
+        this.model.attributes = JSON.parse(this.untouchedModel);
+        this.action = "view";
+        this.render();
+    },
 
-		// registration switch
-		this.$el.find("[name='reg-switch']").bootstrapSwitch({
-			size: "mini",
-			onText: "open",
-			offText: "closed",
-			state: this.model.get("openForReg") == 1 ? true : false,
-			onSwitchChange: function(event, state) {
-				var schoolyearid = $(event.currentTarget).attr("id");
-				view.model.set("id", schoolyearid);
-				view.model.set("openForReg", state == true ? 1 : 0);
-				view.model.save(null, {
-					url: view.model.updateRegistrationUrl(schoolyearid)
-				}).then(function(data) {
-					console.log(data);
-					new TransactionResponseView({
-						message: "School year successfully updated."
-					});
-				}).fail(function(data) {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Could not update registration status."
-					});
-				});
-			}
-		});
-	}
+    updateModel: function(evt) {
+        var name = $(evt.currentTarget).attr("name");  
+        var value = $(evt.currentTarget).val();   
+        this.model.set(name, value);
+    },
+
+    editDept: function (evt) {
+        this.action = "edit";
+        this.render();
+    },
+
+    saveDept: function (evt) {
+        var view = this;
+        var id = $(evt.currentTarget).attr("id");
+        this.model.set("id", id);
+        this.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
+        this.model.set("schoolid", "412312");
+        console.log(this.model);
+
+        this.model.save().then(function(data){
+            if(data){
+                console.log("savedmodel");
+                view.untouchedModel = JSON.stringify(view.model.toJSON());
+                new TransactionResponseView({
+                    message: "Department was successfully saved."
+                });
+            }
+            view.action = "view";
+            view.render(); 
+        });
+    }
 });

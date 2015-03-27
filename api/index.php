@@ -12,6 +12,7 @@ $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->get('/students/:id/tests', 'getEnrolledTests');
+$app->get('/students/:id/avgGrade', 'getAvgGrade');
 $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
@@ -19,33 +20,33 @@ $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
-// $app->delete('/students/:id', 'deleteStudent');
-
+$app->delete('/students/:id', 'deleteStudent');
 
 $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->post('/teachers', 'createTeacher');
+$app->post('/teachers/:id', 'addCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
-// $app->delete('/teachers/:id', 'deleteTeacher');
+$app->delete('/teachers/:id', 'deleteTeacher');
 
 $app->get('/administrators', 'getAdministrators');
 $app->get('/administrators/:id', 'getAdministratorById');
 $app->post('/administrators', 'createAdministrator');
-// $app->delete('/administrators/:id', 'deleteTeacher');
+$app->delete('/administrators/:id', 'deleteTeacher');
 
 $app->get('/superusers', 'getSuperusers');
 $app->get('/superusers/:id', 'getSuperuserById');
 $app->post('/superusers', 'createSuperuser');
 $app->put('/superusers/:id', 'updateSuperuser');
-// $app->delete('/superusers/:id', 'deleteSuperuser');
+$app->delete('/superusers/:id', 'deleteSuperuser');
 
 $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 $app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
 $app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
-// $app->delete('/schoolyears/:id', 'deleteSchoolYear');
+$app->delete('/schoolyears/:id', 'deleteSchoolYear');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -53,14 +54,14 @@ $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
 $app->put('/schools/:id', 'updateSchool');
-// $app->delete('/schools/:id', 'deleteSchool');
+$app->delete('/schools/:id', 'deleteSchool');
 
 $app->get('/departments/:id', 'getDepartmentById');
 $app->get('/departments/:id/courses', 'getCourses');
 $app->get('/departments/:id/courses/count', 'getCourseCount');
 $app->post('/departments', 'createDepartment');
 $app->put('/departments/:id', 'updateDepartment');
-// $app->delete('/departments/:id', 'deleteDepartment');
+$app->delete('/departments/:id', 'deleteDepartment');
 
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
@@ -71,11 +72,13 @@ $app->post('/courses/:id', 'waitlistStudent');
 $app->post('/courses', 'createCourse');
 $app->put('/courses/:id', 'updateCourse');
 $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
-// $app->delete('/courses/:id', 'deleteCourse');
+$app->delete('/courses/:id', 'deleteCourse');
+$app->delete('/courses/:id/:tid', 'unassignCourseTeacher');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');
 $app->get('/sections/:id', 'getSectionById');
+$app->get('/sections/:id/students/:userid', 'getStudentGradeForSection');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
@@ -86,14 +89,16 @@ $app->post('/sections/students/:id/:sid', 'enrollStudent');
 $app->post('/sections/:id/attendance', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
-// $app->delete('/sections/:id', 'deleteSection');
+$app->delete('/sections/:id', 'deleteSection');
+$app->delete('/sections/:id/teachers/:tid', 'unassignSectionTeacher');
 
 $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
 $app->post('/documents/:id/marks', 'inputMarks');
+$app->put('/documents/:id/marks', 'updateMarks');
 $app->put('/documents/:id', 'updateDocument');
-// $app->delete('/documents/:id', 'deleteDocument');
+$app->delete('/documents/:id', 'deleteDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
@@ -109,16 +114,16 @@ $app->get('/count/:usertype', 'getUserCount');
 
 $app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
-// $app->post('/purge/attendance', 'purgeAttendance');
-// $app->post('/purge/waitlist', 'purgeWaitlist');
-// $app->post('/purge/user', 'purgeUsers');
-// $app->post('/purge/schoolyear', 'purgeSchoolYears');
-// $app->post('/purge/school', 'purgeSchools');
-// $app->post('/purge/department', 'purgeDepartments');
-// $app->post('/purge/course', 'purgeCourses');
-// $app->post('/purge/section', 'purgeSections');
-// $app->post('/purge/document', 'purgeDocuments');
-// $app->delete('/purge/inactive', 'purgeInactive');
+$app->post('/purge/attendance', 'purgeAttendance');
+$app->post('/purge/waitlist', 'purgeWaitlist');
+$app->post('/purge/user', 'purgeUsers');
+$app->post('/purge/schoolyear', 'purgeSchoolYears');
+$app->post('/purge/school', 'purgeSchools');
+$app->post('/purge/department', 'purgeDepartments');
+$app->post('/purge/course', 'purgeCourses');
+$app->post('/purge/section', 'purgeSections');
+$app->post('/purge/document', 'purgeDocuments');
+$app->delete('/purge/inactive', 'purgeInactive');
 
 $app->run();
 
@@ -371,7 +376,7 @@ function createDepartment(){
     $body = $request->getBody();
     $dept = json_decode($body);
 
-    $sql = "SELECT deptid from dept where deptid=:deptid";
+    $sql = "SELECT deptid from department where deptid=:deptid";
     $deptid = generateUniqueID($sql, "deptid");
 
     $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
@@ -392,7 +397,7 @@ function updateDepartment($id) {
     $dept = json_decode($body);
 
     $sql = "UPDATE department
-    set schoolid=:schoolid, deptName=:deptName, schoolyearid=:schoolyearid, yearOpened=:yearOpened, status=:status
+    set schoolid=:schoolid, deptName=:deptName, schoolyearid=:schoolyearid, status=:status
     WHERE deptid=:deptid";
 
     $bindparams = array(
@@ -432,8 +437,11 @@ function getCoursePrereqs($id){
 }
 function assignCourseTeacher($id, $tid){
      $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
-     $bindparams = array("tid"=>$tid, "id"=>$id);
-     echo json_encode(perform_query($sql,'POST',$bindparams));
+     echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
+}
+function unassignCourseTeacher($id, $tid){
+    $sql = "DELETE from teaching where userid=:tid and courseid=:id";
+    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function waitlistStudent($id){
     $request = \Slim\Slim::getInstance()->request();
@@ -504,7 +512,6 @@ function deleteCoursePrereq($id, $preq){
     $bindparams = array("courseid"=>$id, "prereq"=>$preq);
     echo json_encode(perform_query($sql, '', $bindparams));
 }
-
 function deleteCourse($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -614,8 +621,11 @@ function enrollStudent($id, $sid){
 }
 function assignSectionTeacher($id, $tid){
     $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
-    $bindparams = array("tid"=>$tid, "id"=>$id);
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
+}
+function unassignSectionTeacher($id, $tid){
+    $sql = "DELETE from teaching where userid=:tid and sectionid=:id";
+    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function createSection(){
     $request = \Slim\Slim::getInstance()->request();
@@ -727,6 +737,34 @@ function deleteSection($id) {
     $sql = ($option->purge == 1)? "DELETE from section where sectionid=:id" : "UPDATE section set status='inactive' where sectionid=:id";
     echo json_encode(perform_query($sql,'', $bindparams));
 }
+function getStudentGradeForSection($id, $userid){
+    $grade = getStudentSectionGrade($id, $userid);
+    if ($grade==-1){
+        echo json_encode(array("studentGrade"=>"N/A"));
+    }
+    else {
+        echo json_encode(array("studentGrade"=>$grade."%"));
+    }
+}
+/*wrapper for getStudentGradeForSection*/
+function getStudentSectionGrade($sectionid, $userid){
+    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
+    $bindparams = array("sectionid"=>$sectionid);
+    $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
+
+    if ($totalmarks==0) {
+        return -1;
+    }
+    $sql = "SELECT coalesce(sum(mark),0) from marks
+            where assignmentid in
+                (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
+            and userid=:userid";
+    $bindparams["userid"]=$userid;
+    $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
+    return ($attainedmarks/$totalmarks)*100;
+}
+
+
 #================================================================================================================#
 # Documents
 #================================================================================================================#
@@ -829,8 +867,7 @@ function inputMarks($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $students = json_decode($body);
-
-    $schoolyearid = $students->schoolyearid;
+    $schoolyearid = $_POST["schoolyearid"];
 
     $bindparams = array(
         "assignmentid" => $id,
@@ -848,7 +885,19 @@ function inputMarks($id){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
-
+function updateMarks($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $results = json_decode($body);
+    $queries = array();
+    $bindparams = array();
+    foreach (array_values($results) as $i => $result){
+        $bindparams[$i] = array("assignmentid" => $id, "userid".$i=>$result->userid, "mark".$i=>$result->mark);
+        $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and assignmentid=:assignmentid";
+        array_push($queries, $sql);
+    }
+    echo json_encode(perform_transaction($sql, $bindparams));
+}
 #================================================================================================================#
 # Students
 #================================================================================================================#
@@ -876,11 +925,16 @@ function getStudentById($id) {
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
-function getEnrolledSections($id){
+// flag=1: return array
+// flag=0: echo json
+function getEnrolledSections($id, $flag=0){
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
     FROM section s, course c
     WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id)
     and s.courseid = c.courseid";
+    if ($flag==1){
+        return perform_query($sql,'GETASSO',array("id"=>$id));
+    }
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
@@ -1029,16 +1083,13 @@ function deleteStudent($id) {
 }
 
 function enrollStudentInSections($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $student = json_decode($body);
-    $schoolyearid = $student->schoolyearid;
+    $schoolyearid = $_POST["schoolyearid"];
     $sectionids = json_decode($_POST["sectionids"]);
 
     $bindparams = array(
         "userid" => $id,
         "schoolyearid" => $schoolyearid,
-        "status" => $student->$status,
+        "status" => "active",
     );
     $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
@@ -1107,6 +1158,20 @@ function handlePendingStudents(){
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+function getAvgGrade($id){
+    $totalgrade = 0;
+    $sections = getEnrolledSections($id, 1);
+    $numsections = count($sections);
+    if ($numsections == 0){
+        echo json_encode(array("avgGrade"=>"N/A"));
+        return;
+    }
+    foreach ($sections as $row){
+        $totalgrade += getStudentSectionGrade((int) $row['sectionid']);
+    }
+    $grade = ($totalgrade/$numsections)*100;
+    echo json_encode(array("avgGrade"=>$grade."%"));
+}
 
 #================================================================================================================#
 # Teachers
@@ -1185,6 +1250,22 @@ function getTeachingSections($id){
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
+
+function addCourseCompetencies($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+     $results = json_decode($body);
+
+    $bindparams = array("userid" => $id);
+    $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
+    foreach (array_values($results) as $i => $result) {
+        $sql.= "(:userid, :deptid".$i.", :level".$i.", 'active'),";
+        $bindparams["deptid".$i] = $result->deptid;
+        $bindparams["level".$i] = $result->level;
+    }
+    $sql = rtrim($sql, ",");
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 
 #================================================================================================================#
 # Administrators
@@ -1492,145 +1573,148 @@ function getTeachersWithMissingInputAttendance(){
 #================================================================================================================#
 # Purge
 #================================================================================================================#
-// function purge($ids, $sql){
-//     $ret = parenthesisList($ids);
-//     $sql.=$ret[0];
-//     echo json_encode(perform_query($sql,'',$ret[1]));
-// }
+function purge($ids, $sql){
+    $ret = parenthesisList($ids);
+    $sql.=$ret[0];
+    echo json_encode(perform_query($sql,'',$ret[1]));
+}
+function purgeAttendance(){
+    if (isset($_POST['schoolyearids'])||isset($POST_['userids'])) {
+        if (isset($_POST['schoolyearids'])){
+            $ids = json_decode($_POST['schoolyearids']);
+            $sql = "DELETE from attendance where schoolyearid in ";
+        }
+        else if (isset($_POST['userids'])){
+            $ids = json_decode($_POST['userids']);
+            $sql = "DELETE from attendance where userid in ";
+        }
+        return purge($ids, $sql);
+    }
+    else {
+        $sql = "truncate attendance";
+        echo json_encode(perform_query($sql,''));
+    }
+}
+function purgeWaitlist(){
+    if (isset($_POST['waitlistids'])){
+        $ids = json_decode($_POST['waitlistids']);
+        $sql = "DELETE from waitlisted where waitlistid in ";
+        return purge($ids, $sql);
+    }
+    else {
+        $sql = "truncate waitlisted";
+        echo json_encode(perform_query($sql,''));
+    }
+}
+function purgeUsers($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['userids']);
+    }
+    $sql = "DELETE from login where userid in ";
+    return purge($ids, $sql);
+}
 
-// function purgeAttendance(){
-//     if (isset($_POST['schoolyearids'])||isset($POST_['userids'])) {
-//         if (isset($_POST['schoolyearids'])){
-//             $ids = json_decode($_POST['schoolyearids']);
-//             $sql = "DELETE from attendance where schoolyearid in ";
-//         }
-//         else if (isset($_POST['userids'])){
-//             $ids = json_decode($_POST['userids']);
-//             $sql = "DELETE from attendance where userid in ";
-//         }
-//         return purge($ids, $sql);
-//     }
-//     else {
-//         $sql = "truncate attendance";
-//         echo json_encode(perform_query($sql,''));
-//     }
-// }
-// function purgeWaitlist(){
-//     if (isset($_POST['waitlistids'])){
-//         $ids = json_decode($_POST['waitlistids']);
-//         $sql = "DELETE from waitlisted where waitlistid in ";
-//         return purge($ids, $sql);
-//     }
-//     else {
-//         $sql = "truncate waitlisted";
-//         echo json_encode(perform_query($sql,''));
-//     }
-// }
-// function purgeUsers($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['userids']);
-//     }
-//     $sql = "DELETE from login where userid in ";
-//     return purge($ids, $sql);
-// }
+function purgeSchools($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['schoolids']);
+    }
+    $sql = "DELETE from school where schoolid in ";
+    return purge($ids, $sql);
+}
+function purgeSchoolYears($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['schoolyearids']);
+    }
+    $sql = "DELETE from schoolyear where schoolyearid in ";
+    return purge($ids, $sql);
+}
+function purgeDepartments($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['docids']);
+    }
+    $sql = "DELETE from department where deptid in ";
+    return purge($ids, $sql);
+}
+function purgeCourses($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['courseids']);
+    }
+    $sql = "DELETE from course where courseid in ";
+    return purge($ids, $sql);
+}
+function purgeSections($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['sectionids']);
+    }
+    $sql = "DELETE from section where sectionid in ";
+    return purge($ids, $sql);
+}
+function purgeDocuments($ids=array()){
+    if (!array_filter($ids)){
+        $ids = json_decode($_POST['docid']);
+    }
+    $sql = "DELETE from document where docid in ";
+    return purge($ids, $sql);
+}
+function purgeInactive(){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $option = json_decode($body);
+    $queries = array();
+    $bindparams = array();
+    if ($option->schoolyear == 1){
+        $sql = "DELETE from schoolyear where status='inactive'";
+        array_push($queries, $sql);
+    }
+    if ($option->school == 1) {
+        $sql = "DELETE from school where status='inactive'";
+        array_push($queries, $sql);
+    }
+    else {
+        if ($option->dept == 1) {
+            $sql = "DELETE from department where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->course == 1) {
+            $sql = "DELETE from course where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->section == 1) {
+            $sql = "DELETE from document where status='inactive'";
+            array_push($queries, $sql);
+        }
+        if ($option->doc == 1) {
+            $sql = "DELETE from document where status='inactive'";
+            array_push($queries, $sql);
+        }
+    }
 
-// function purgeSchools($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['schoolids']);
-//     }
-//     $sql = "DELETE from school where schoolid in ";
-//     return purge($ids, $sql);
-// }
-// function purgeSchoolYears($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['schoolyearids']);
-//     }
-//     $sql = "DELETE from schoolyear where schoolyearid in ";
-//     return purge($ids, $sql);
-// }
-// function purgeDepartments($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['docids']);
-//     }
-//     $sql = "DELETE from department where deptid in ";
-//     return purge($ids, $sql);
-// }
+    if ($option->years != 0){
+        foreach($queries as $query){
+            $query.= " and timestampdiff(year, lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+    }
 
-// function purgeCourses($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['courseids']);
-//     }
-//     $sql = "DELETE from course where courseid in ";
-//     return purge($ids, $sql);
-// }
-
-// function purgeSections($ids=array()){
-//     if (!array_filter($ids)){
-//         $ids = json_decode($_POST['sectionids']);
-//     }
-//     $sql = "DELETE from section where sectionid in ";
-//     return purge($ids, $sql);
-// }
-
-// function purgeInactive(){
-//     $request = \Slim\Slim::getInstance()->request();
-//     $body = $request->getBody();
-//     $option = json_decode($body);
-//     $queries = array();
-//     $bindparams = array();
-//     if ($option->schoolyear == 1){
-//         $sql = "DELETE from schoolyear where status='inactive'";
-//         array_push($queries, $sql);
-//     }
-//     if ($option->school == 1) {
-//         $sql = "DELETE from school where status='inactive'";
-//         array_push($queries, $sql);
-//     }
-//     else {
-//         if ($option->dept == 1) {
-//             $sql = "DELETE from department where status='inactive'";
-//             array_push($queries, $sql);
-//         }
-//         if ($option->course == 1) {
-//             $sql = "DELETE from course where status='inactive'";
-//             array_push($queries, $sql);
-//         }
-//         if ($option->section == 1) {
-//             $sql = "DELETE from document where status='inactive'";
-//             array_push($queries, $sql);
-//         }
-//         if ($option->doc == 1) {
-//             $sql = "DELETE from document where status='inactive'";
-//             array_push($queries, $sql);
-//         }
-//     }
-
-//     if ($option->years != 0){
-//         foreach($queries as $query){
-//             $query.= " and timestampdiff(year, lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-//         }
-//     }
-
-//     if ($option->student == 1) {
-//         $sql = "DELETE from student s , login l where s.status='inactive' and l.userid=s.userid";
-//         if ($option->years != 0){
-//             $query.= " and timestampdiff(year, s.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-//         }
-//         array_push($queries, $sql);
-//     }
-//     if ($option->teacher == 1) {
-//         $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='T' and l.userid=t.userid";
-//         if ($option->years != 0){
-//             $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-//         }
-//         array_push($queries, $sql);
-//     }
-//     if ($option->admin == 1) {
-//         $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='A' and l.userid=t.userid";
-//         if ($option->years != 0){
-//             $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
-//         }
-//         array_push($queries, $sql);
-//     }
-//     echo json_encode(perform_transaction($queries));
-// }
+    if ($option->student == 1) {
+        $sql = "DELETE from student s , login l where s.status='inactive' and l.userid=s.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, s.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    if ($option->teacher == 1) {
+        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='T' and l.userid=t.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    if ($option->admin == 1) {
+        $sql = "DELETE from teacher t , login l where t.status='inactive' and t.usertype='A' and l.userid=t.userid";
+        if ($option->years != 0){
+            $query.= " and timestampdiff(year, t.lastAccessed, CURRENT_TIMESTAMP) >=".$option->year;
+        }
+        array_push($queries, $sql);
+    }
+    echo json_encode(perform_transaction($queries));
+}

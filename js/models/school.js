@@ -58,7 +58,7 @@ var Dept = Backbone.Model.extend({
 		schoolid: "",
 		deptName: "",
 		schoolyearid: "",
-		status: ""
+		status: "inactive"
 	},
     
     urlRoot: app.serverUrl + "api/departments",
