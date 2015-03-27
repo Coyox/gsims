@@ -26,6 +26,7 @@ $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->post('/teachers', 'createTeacher');
+$app->post('/teachers/:id', 'addCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
 
@@ -72,6 +73,7 @@ $app->post('/courses', 'createCourse');
 $app->put('/courses/:id', 'updateCourse');
 $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 $app->delete('/courses/:id', 'deleteCourse');
+$app->delete('/courses/:id/:tid', 'unassignCourseTeacher');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');
@@ -87,11 +89,13 @@ $app->post('/sections/:id/attendance', 'inputAttendance');
 $app->put('/sections/:id', 'updateSection');
 $app->delete('/sections/students/:id/:sid', 'dropStudent');
 $app->delete('/sections/:id', 'deleteSection');
+$app->delete('/sections/:id/teachers/:tid', 'unassignSectionTeacher');
 
 $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
 $app->post('/documents/:id/marks', 'inputMarks');
+$app->put('/documents/:id/marks', 'updateMarks');
 $app->put('/documents/:id', 'updateDocument');
 $app->delete('/documents/:id', 'deleteDocument');
 
@@ -432,8 +436,11 @@ function getCoursePrereqs($id){
 }
 function assignCourseTeacher($id, $tid){
      $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
-     $bindparams = array("tid"=>$tid, "id"=>$id);
-     echo json_encode(perform_query($sql,'POST',$bindparams));
+     echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
+}
+function unassignCourseTeacher($id, $tid){
+    $sql = "DELETE from teaching where userid=:tid and courseid=:id";
+    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function waitlistStudent($id){
     $request = \Slim\Slim::getInstance()->request();
@@ -504,7 +511,6 @@ function deleteCoursePrereq($id, $preq){
     $bindparams = array("courseid"=>$id, "prereq"=>$preq);
     echo json_encode(perform_query($sql, '', $bindparams));
 }
-
 function deleteCourse($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -614,8 +620,11 @@ function enrollStudent($id, $sid){
 }
 function assignSectionTeacher($id, $tid){
     $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
-    $bindparams = array("tid"=>$tid, "id"=>$id);
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
+}
+function unassignSectionTeacher($id, $tid){
+    $sql = "DELETE from teaching where userid=:tid and sectionid=:id";
+    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function createSection(){
     $request = \Slim\Slim::getInstance()->request();
@@ -829,8 +838,7 @@ function inputMarks($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $students = json_decode($body);
-
-    $schoolyearid = $students->schoolyearid;
+    $schoolyearid = $_POST["schoolyearid"];
 
     $bindparams = array(
         "assignmentid" => $id,
@@ -848,7 +856,19 @@ function inputMarks($id){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
-
+function updateMarks($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $results = json_decode($body);
+    $queries = array();
+    $bindparams = array();
+    foreach (array_values($results) as $i => $result){
+        $bindparams[$i] = array("assignmentid" => $id, "userid".$i=>$result->userid, "mark".$i=>$result->mark);
+        $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and assignmentid=:assignmentid";
+        array_push($queries, $sql);
+    }
+    echo json_encode(perform_transaction($sql, $bindparams));
+}
 #================================================================================================================#
 # Students
 #================================================================================================================#
@@ -1029,16 +1049,13 @@ function deleteStudent($id) {
 }
 
 function enrollStudentInSections($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $student = json_decode($body);
-    $schoolyearid = $student->schoolyearid;
+    $schoolyearid = $_POST["schoolyearid"];
     $sectionids = json_decode($_POST["sectionids"]);
 
     $bindparams = array(
         "userid" => $id,
         "schoolyearid" => $schoolyearid,
-        "status" => $student->$status,
+        "status" => "active",
     );
     $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
@@ -1185,6 +1202,22 @@ function getTeachingSections($id){
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
+
+function addCourseCompetencies($id){
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+     $results = json_decode($body);
+
+    $bindparams = array("userid" => $id);
+    $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
+    foreach (array_values($results) as $i => $result) {
+        $sql.= "(:userid, :deptid".$i.", :level".$i.", 'active'),";
+        $bindparams["deptid".$i] = $result->deptid;
+        $bindparams["level".$i] = $result->level;
+    }
+    $sql = rtrim($sql, ",");
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
 
 #================================================================================================================#
 # Administrators
