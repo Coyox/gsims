@@ -118,6 +118,7 @@ var DepartmentRowView = Backbone.View.extend({
 
     events: {
         "click .edit-dept": "editDept",
+        "click .delete-dept": "deleteDept",
         "click .save-dept": "saveDept",
         "click .cancel-dept": "cancelDept",
         "keyup input": "updateModel"
@@ -139,6 +140,20 @@ var DepartmentRowView = Backbone.View.extend({
     editDept: function (evt) {
         this.action = "edit";
         this.render();
+    },
+
+    deleteDept: function(evt) {
+        var usertype = sessionStorage.getItem("gobind-usertype");
+        var view = this;
+        var id = $(evt.currentTarget).attr("id");
+        this.model.set("id", id);
+        if (usertype == "SU") {
+           this.model.destroy({data:{"purge":1}});
+        }
+        else{
+           this.model.destroy();
+        }
+        view.render();
     },
 
     saveDept: function (evt) {

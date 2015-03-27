@@ -117,6 +117,7 @@ var SchoolRowView = Backbone.View.extend({
     events: {
         "click .edit-school": "editSchool",
         "click .save-school": "saveSchool",
+        "click .delete-school": "deleteSchool",
         "click .cancel-school": "cancelSchool",
         "keyup input": "updateModel"
     },
@@ -136,6 +137,20 @@ var SchoolRowView = Backbone.View.extend({
     editSchool: function (evt) {
         this.action = "edit";
         this.render();
+    },
+
+    deleteSchool: function(evt) {
+        var usertype = sessionStorage.getItem("gobind-usertype");
+        var view = this;
+        var id = $(evt.currentTarget).attr("id");
+        this.model.set("id", id);
+        if (usertype == "SU") {
+           this.model.destroy({data:{"purge":1}});
+        }
+        else{
+           this.model.destroy();
+        }
+        view.render();
     },
 
     saveSchool: function (evt) {
