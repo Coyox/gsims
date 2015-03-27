@@ -2,13 +2,13 @@
 require 'Slim/Slim.php';
 require_once 'helpers.php';
 require_once 'crossdomain.php';
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 
 \Slim\Slim::registerAutoloader();
 
-$app = new \Slim\Slim();
-
+$app = new \Slim\Slim(array(
+    'debug' => true
+));
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
