@@ -12,6 +12,7 @@ $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->get('/students/:id/tests', 'getEnrolledTests');
+$app->get('/students/:id/avgGrade', 'getAvgGrade');
 $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
@@ -377,6 +378,7 @@ function createDepartment(){
 
     $sql = "SELECT deptid from dept where deptid=:deptid";
     $deptid = generateUniqueID($sql, "deptid");
+    echo $deptid;
 
     $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
             values (:deptid, :schoolid, :deptName, :schoolyearid, :status)";
@@ -1144,6 +1146,25 @@ function handlePendingStudents(){
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+function getAvgGrade($id){
+    // $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
+    // $bindparams = array("sectionid"=>$id);
+    // $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
+
+    // if ($totalmarks==0) {
+    //     echo json_encode(array("avgGradeForSection"=>"N/A"));
+    //     return;
+    // }
+    // $sql = "SELECT coalesce(sum(mark),0) from marks
+    //         where assignmentid in
+    //             (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
+    //         and userid=:userid";
+    // $bindparams["userid"]=$userid;
+    // $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
+
+    // $avgGrade = ($attainedmarks/$totalmarks)*100;
+    // echo json_encode(array("avgGradeForSection"=>$avgGrade."%"));
+}
 
 #================================================================================================================#
 # Teachers
