@@ -1255,7 +1255,7 @@ function getTeachingSections($id){
 }
 
 function getCourseCompetencies($id) {
-    $sql = "SELECT deptid, status from teacherCourseCompetency where userid=:id";
+    $sql = "SELECT userid, deptid, level, status from teacherCourseCompetency where userid=:id";
     echo json_encode((perform_query($sql, 'GETALL', array("id"=>$id))));
 }
 
