@@ -90,9 +90,11 @@ var DepartmentView = Backbone.View.extend({
 
 var DepartmentRowView = Backbone.View.extend({
     template: _.template("<td><%= model.deptName %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Delete Department</button></td>"),
+        + "<td><%= model.status %></td>"
+        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Set Inactive</button></td>"),
 
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.deptName %>' name='deptName'></td>"
+        + "<td><%= model.deptName %></td>"
 		+ "<td> <button class='save-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Save Department</button> <button class='cancel-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Cancel Edit</button></td>"),
 
     initialize: function (options) {
@@ -148,12 +150,18 @@ var DepartmentRowView = Backbone.View.extend({
         var id = $(evt.currentTarget).attr("id");
         this.model.set("id", id);
         if (usertype == "SU") {
-           this.model.destroy({data:{"purge":1}});
+           this.model.destroy({data:{"purge":1}}).then(function(data){
+                    view.action = "view";
+                    view.render();
+        });
+        }else{
+           this.model.destroy().then(function(data){
+                    view.action = "view";
+                    view.render();
+            }
+        );
         }
-        else{
-           this.model.destroy();
-        }
-        view.render();
+
     },
 
     saveDept: function (evt) {
