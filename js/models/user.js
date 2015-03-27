@@ -152,19 +152,51 @@ var Student = Backbone.Model.extend({
 
 var Teacher = Backbone.Model.extend({
 	defaults: {
+		userid: "",
+		firstName: "",
+		lastName: "",
 		emailAddr: "",
 		schoolid: "",
-		paid: "",
 		status: "",
-		usertype: ""
+		usertype: "",
+		lastAccessed: ""
 	},
 
+	validation: {
+		firstName: {
+			required: true
+		},
+		lastName: {
+			required: true
+		},
+		emailAddr: [{
+			required: true
+		}, {
+			pattern: "email",
+			msg: "Please provide a valid email address."
+		}],
+		status: {
+			required: true
+		}
+	},
+
+	nonEditable: [
+   		"schoolid", "lastAccessed", "userid"
+   	],
     urlRoot: app.serverUrl + "api/teachers",
 
    	getSearchTeachersUrl: function(usertype) {
    		usertype = usertype || "T";
    		return app.serverUrl + "api/search/users/" + usertype;
-   	}
+   	},
+   	getTeachingSectionsUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/sections";
+   	},
+
+   	teacherStatuses:[
+   		"active",
+   		"inactive"
+   	]
 });
 
 var Superuser = Backbone.Model.extend({
@@ -193,7 +225,7 @@ var User = Backbone.Model.extend({
 	},
 
     urlRoot: app.serverUrl + "api/login",
-   	
+
    	getUsers: function(id, usertype) {
    		if (typeof id == undefined || typeof usertype == undefined) {
    			return undefined;

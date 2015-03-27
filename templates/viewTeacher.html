@@ -1,0 +1,42 @@
+<div id="teacher-content">
+	<ul id="teacher-tabs" class="nav nav-tabs nav-justified">
+		<li class="active">
+			<a data-toggle="tab" data-target="#teacher-info">
+				<span class="glyphicon glyphicon-user"></span> Teacher Information
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#course-info">
+				<span class="glyphicon glyphicon-th-list"></span> Teaching Courses
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#email">
+				<span class="glyphicon glyphicon-envelope"></span> Email Teacher
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div id="teacher-info" class="tab-pane active o-auto">
+			<div class="col-sm-12">
+				<div class="teacher-component col-sm-6">
+					<h4>Teacher Information
+						<span class="form-buttons pull-right">
+							<button class="edit-btn btn btn-primary btn-xs">Edit</button>
+							<button class="save-btn btn btn-success btn-xs hide">Save</button>
+							<button class="cancel-btn btn btn-info btn-xs hide">Cancel</button>
+						</span>
+					</h4>
+					<div id="teacher-info-table" class="form-horizontal well property-table"></div>
+				</div>
+			</div>
+			<div class="delete col-sm-12">
+				<div class="col-sm-6">
+					<button id="delete-teacher" class="btn btn-primary btn-sm">Delete Teacher</button>
+				</div>
+			</div>
+		</div>
+		<div id="course-info" class="tab-pane"></div>
+		<div id="email" class="tab-pane"></div>
+	</div>
+</div>

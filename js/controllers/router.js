@@ -15,7 +15,7 @@ var Router = Backbone.Router.extend({
         var view = this;
 		this.el = $("#container");
 
-        /** Hide/show the back button depending on what the current page is (routeName). 
+        /** Hide/show the back button depending on what the current page is (routeName).
             The back button should essentially be shown on all pages except for the
             home page */
 		Backbone.history.on("all", function(route, router, routeName) {
@@ -51,6 +51,7 @@ var Router = Backbone.Router.extend({
         "teachers/search": 		"viewFilteredTeachers",
         "teachers/all": 		"viewAllTeachers",
         "teachers/:id": 		"viewTeacher",
+        "createTeacher":        "createTeacher",
 
         "filterAdmins": 		"filterAdmins",
         "admins/search": 		"viewFilteredAdmins",
@@ -76,7 +77,7 @@ var Router = Backbone.Router.extend({
     	});
     },
 
-     
+
     loadHome: function() {
       	if ($("#container").html() == "") {
     		this.home();
@@ -262,6 +263,33 @@ var Router = Backbone.Router.extend({
 			});
     	}
     },
+    viewTeacher: function(id) {
+        this.updatePageBreadcrumb("View Teacher (" + id + ")");
+
+        this.loadHome();
+
+        $("#content").html(html["viewTeacher.html"]);
+
+        var parent = $("#teacher-content");
+        new TeacherRecordView({
+            id: id,
+            el: $("#teacher-info"),
+            action: "view",
+            parentContainer: parent
+        });
+    },
+
+    createTeacher: function(id) {
+        this.updatePageBreadcrumb("Create Teacher");
+
+        this.loadHome();
+
+        // temp fix
+        $("#content").html("<div id='child'></div>");
+        new CreateTeacherView({
+            el: $("#child")
+        });
+    },
 
     filterAdmins: function() {
         this.updatePageBreadcrumb("Search Administrators");
@@ -346,7 +374,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Notifications");
 
         this.loadHome();
-        
+
         new NotificationsView({
             el: $("#content")
         });

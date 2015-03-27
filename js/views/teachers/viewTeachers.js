@@ -23,12 +23,12 @@ var SearchTeachersView = Backbone.View.extend({
 	searchTeachers: function(evt) {
 		var view = this;
 		var data = {};
-		
+
 		var firstName = this.$el.find("#first-name").val();
 		if (firstName != "") {
 			data.firstName = firstName;
 		}
-		
+
 		var lastName = this.$el.find("#last-name").val();
 		if (lastName != "") {
 			data.lastName = lastName;
@@ -134,3 +134,7 @@ var TeacherTableRowView = Backbone.View.extend({
 		app.Router.navigate("teachers/" + id, {trigger:true});
 	}
 });
+
+function storeContent() {
+	$("#content").children().detach().appendTo($("#hidden"));
+}

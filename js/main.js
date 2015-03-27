@@ -15,16 +15,16 @@ _.extend(Backbone.Model.prototype, Backbone.Validation.mixin);
 /** Override Backbone's default validation callbacks. Use Bootstrap to highlight invalid fields */
 _.extend(Backbone.Validation.callbacks, {
     valid: function (view, attr, selector) {
-        var $el = view.$('[name=' + attr + ']'), 
+        var $el = view.$('[name=' + attr + ']'),
             $group = $el.closest('.form-group');
-        
+
         $group.removeClass('has-error');
         $group.find('.help-block').html('').addClass('hidden');
     },
     invalid: function (view, attr, error, selector) {
-        var $el = view.$('[name=' + attr + ']'), 
+        var $el = view.$('[name=' + attr + ']'),
             $group = $el.closest('.form-group');
-    
+
         $group.addClass('has-error');
         $group.find('.help-block').html(error).removeClass('hidden');
     }
@@ -39,7 +39,7 @@ $(function() {
 
 	$("body").on("click", function(e) {
 	    if ($(e.target).data('toggle') !== 'popover'
-	        && $(e.target).parents('.popover.in').length === 0) { 
+	        && $(e.target).parents('.popover.in').length === 0) {
 	        $('[data-toggle="popover"]').popover('hide');
 	    }
 	});
@@ -81,6 +81,8 @@ function loadTemplates() {
 		"searchStudents.html",
 		"searchTeachers.html",
 		"viewTeachers.html",
+		"viewTeacher.html",
+		"createTeacher.html",
 		"searchAdmins.html",
 		"viewAdmins.html",
 		"reportCard.html",
