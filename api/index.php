@@ -3,12 +3,10 @@ require 'Slim/Slim.php';
 require_once 'helpers.php';
 require_once 'crossdomain.php';
 
-
 \Slim\Slim::registerAutoloader();
 
-$app = new \Slim\Slim(array(
-    'debug' => true
-));
+$app = new \Slim\Slim();
+
 $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
