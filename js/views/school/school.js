@@ -88,6 +88,11 @@ var SchoolRowView = Backbone.View.extend({
 		+ "<td> <%= model.yearOpened %> </td>"
         + "<td><button class='edit-school btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit School</button> <button class='delete-school btn btn-xs btn-primary center-block' id='<%= model.schoolid %>'>Delete School</button></td>"),
 
+    otherusertemplate: _.template("<td><%= model.location %></td>"
+		+ "<td> <%= model.postalCode %> </td>"
+		+ "<td> <%= model.yearOpened %> </td>"
+        + "<td><button class='edit-school btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit School</button></td>"),
+
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.location %>' name='location'></td>"
 		+ "<td> <input type='text' class='form-control input-sm' value='<%= model.postalCode %>' name='postalCode'> </td>"
 		+ "<td> <input type='text' class='form-control input-sm' value='<%= model.yearOpened %>' name='yearOpened'> </td>"
@@ -102,9 +107,14 @@ var SchoolRowView = Backbone.View.extend({
 
     render: function () {
         var view = this;
+        var usertype = sessionStorage.getItem("gobind-usertype");
         var template;
         if (this.action == "view") {
-            template = this.template;
+            if (usertype == "SU") {
+                template = this.template;
+            }else{
+                template = this.otherusertemplate;
+            }
         }
         else {
             template = this.edittemplate;
