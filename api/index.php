@@ -104,6 +104,7 @@ $app->delete('/documents/:id', 'deleteDocument');
 
 $app->get('/search/users/:usertype', 'findUsers');
 $app->get('/search/sections', 'findSections');
+$app->get('/search/advanced', 'findStudentsWithAdvancedCriteria');
 
 $app->get('/login', 'validateCredentials');
 $app->put('/login/:id', 'updateLogin');
@@ -1086,12 +1087,13 @@ function deleteStudent($id) {
 
 function enrollStudentInSections($id){
     $schoolyearid = $_POST["schoolyearid"];
+    $status = $_POST["status"];
     $sectionids = json_decode($_POST["sectionids"]);
 
     $bindparams = array(
         "userid" => $id,
         "schoolyearid" => $schoolyearid,
-        "status" => "active",
+        "status" => $status,
     );
     $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
@@ -1160,7 +1162,7 @@ function handlePendingStudents(){
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
-function getAvgGrade($id){
+function getAvgGrade($id, $flag=0){
     $totalgrade = 0;
     $sections = getEnrolledSections($id, 1);
     $numsections = count($sections);
@@ -1172,6 +1174,10 @@ function getAvgGrade($id){
         $totalgrade += getStudentSectionGrade((int) $row['sectionid']);
     }
     $grade = ($totalgrade/$numsections)*100;
+
+    if ($flag==1){
+        return $grade;
+    }
     echo json_encode(array("avgGrade"=>$grade."%"));
 }
 
@@ -1574,6 +1580,11 @@ function getUserCount($usertype){
         $bindparams["usertype"] = $usertype;
     }
     echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
+}
+
+function findStudentsWithAdvancedCriteria(){
+
+
 }
 
 #================================================================================================================#
