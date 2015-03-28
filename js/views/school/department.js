@@ -90,11 +90,12 @@ var DepartmentView = Backbone.View.extend({
 
 var DepartmentRowView = Backbone.View.extend({
     template: _.template("<td><%= model.deptName %></td>"
-        + "<td><%= model.status %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Set Inactive</button></td>"),
+        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Delete Department</button></td>"),
+
+    otherusertemplate: _.template("<td><%= model.deptName %></td>"
+        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button></td>"),
 
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.deptName %>' name='deptName'></td>"
-        + "<td><%= model.deptName %></td>"
 		+ "<td> <button class='save-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Save Department</button> <button class='cancel-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Cancel Edit</button></td>"),
 
     initialize: function (options) {
@@ -106,9 +107,14 @@ var DepartmentRowView = Backbone.View.extend({
 
     render: function () {
         var view = this;
+        var usertype = sessionStorage.getItem("gobind-usertype");
         var template;
         if (this.action == "view") {
-            template = this.template;
+            if (usertype == "SU") {
+                template = this.template;
+            }else{
+                template = this.otherusertemplate;
+            }
         }
         else {
             template = this.edittemplate;
