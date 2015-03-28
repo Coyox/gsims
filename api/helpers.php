@@ -43,7 +43,7 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 }
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
-    $emailAdddr = "shanifer@gmail.com";
+    $emailAddr = "shanifer@gmail.com";
     $username = "shanifer";
     $password = "test";
     $firstname = "Shanifer";
