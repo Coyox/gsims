@@ -51,50 +51,38 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
     try {
 
-    $message = array(
-        'subject' => 'Welcome to Gobind Sarvar School',
-        'from_email' => 'info@gobindsarvar.com',
-        'to' => array(array('email' => $emailAddr, 'name' => $firstname.' '.$lastname)),
-        'merge_vars' => array(array(
-            'rcpt' => $emailAddr,
-            'vars' =>
-            array(
-                array(
-                    'name' => 'FIRSTNAME',
-                    'content' => $firstname),
-                array(
-                    'name' => 'USERNAME',
-                    'content' => $username),
-                array(
-                    'name' => 'PASSWORD',
-                    'content' => $password)
-        ))));
-
-    $template_name = 'welcometogs';
-
     $template_content = array(
-        array(
-            'name' => 'header',
-            'content' => '<h2> Welcome *|FIRSTNAME|*! </h2>'),
-        array(
-            'name' => 'main',
-            'content' => 'Thank you for registering with Gobind Sarvar School.<br>
-        Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="https://gobind-sarvar.rhcloud.com">https://gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:<br>Username:*|USERNAME|*<br>
-    Password:*|PASSWORD|*<br>
-    You can log in anytime to view your enrolled course information and results.'),
-        array(
-            'name' => 'footer',
-            'content' => 'This is an auto-generated email. - Gobind Sarvar School')
-
+        array( 'name' => 'USER_NAME', 'content' => $username ),
+        array( 'name' => 'EMAIL', 'content' => $emailAddr ),
+        array( 'name' => 'FIRST_NAME', 'content' => $firstname ),
+        array( 'name' => 'LAST_NAME', 'content' => $lastname ),
+        array( 'name' => 'PASSWORD', 'content' => $password ),
+        array( 'name' => 'LOGIN_URL', 'content' => "https://gobind-sarvar.rhcloud.com" ),
     );
 
-    print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));    print_r($result);
-} catch(Mandrill_Error $e) {
+    $message = array(
+            'subject' => 'Gobind Sarvar: Your username and password',
+            'from_email' => 'info@gobindsarvar.com',
+            'from_name' => 'Gobind Sarvar School',
+            'to' => $mandrill_to,
+
+            // Pass the same parameters for merge vars and template params
+            // to make them available in both variable passing methods
+            'merge_vars' => array(array(
+            'rcpt' => $emailAddr,
+            'vars' => $template_content,
+            )));
+    $template_name = 'welcometogs';
+    print_r($message);
+    echo "*******TEST**********";
+
+    print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));
+    } catch(Mandrill_Error $e) {
     // Mandrill errors are thrown as exceptions
     echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
     // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     throw $e;
-}
+    }
 }
 
 
