@@ -11,6 +11,10 @@ var LoginRouter = Backbone.Router.extend({
 });
 
 var Router = Backbone.Router.extend({
+    buttons: _.template("<div id='button-container' class='hide'>"
+        +       "<button id='back-btn' class='btn btn-primary btn-sm'>Back</button>"
+        +   "</div>"),
+
 	initialize: function(options) {
         var view = this;
 		this.el = $("#container");
@@ -26,7 +30,9 @@ var Router = Backbone.Router.extend({
                     $("#back-container").hide();
                     break;
                 default:
-                    $("#back-container").removeClass("hide").show();
+                    $("#content").prepend(view.buttons());
+                    $("#button-container").removeClass("hide").show();
+                    $(".buttons").children().appendTo($("#button-container"));
                     break;
            }
 		});

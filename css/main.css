@@ -345,8 +345,14 @@ li.paginate_button.active a {
 	color: #9d426b;
 }
 
-#back-container {
-	margin-bottom: 10px;
+#button-container {
+	padding-bottom: 10px;
+	border-bottom: 1px dotted #ddd;
+}
+
+#button-container button {
+	margin-left: 3px;
+	margin-right: 3px;
 }
 
 #department-list {

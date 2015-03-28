@@ -61,20 +61,33 @@ var RegistrationFormView = Backbone.View.extend({
 		var view = this;
 		var studentModel = this.regStudentInfo.model;
 		var sections = this.regSectionsView.sections;
+		var sectionids = [];
+		var schoolid = this.regSectionsView.courseEnrollmentView.schoolid;
+		_.each(sections, function(section, index) {
+			sectionids.push(section.sectionid);
+		}, this);
+		studentModel.set("schoolid", schoolid);
 		studentModel.save().then(function(data) {
-			console.log(data);
-			if (data) {
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
+			if (data.status == "success") {
 				$.ajax({
 					type: "POST",
 					url: studentModel.enrollStudentInSections(studentModel.get("userid")),
 					data: {
-						sectionids: sections
+						sectionids: JSON.stringify(sectionids),
+						status: "pending",
+						schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 					}
 				}).then(function(data) {
-					console.log(data);
-					if (data) {
+					if (typeof data == "string") {
+						data = JSON.parse(data);
+					}
+					if (data.status == "success") {
 						new TransactionResponseView({
-							message: "Thank you for registering. You will receieve an email (" + studentModel.get("emailAddr") + ") when an administrator has approved your request."
+							message: "Thank you for registering. You will receieve an email (" + studentModel.get("emailAddr") + ") when an administrator has approved your request.",
+							redirectUrl: ""
 						});
 					} else {
 						new TransactionResponseView({
