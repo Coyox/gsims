@@ -49,6 +49,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     $firstname = "Shanifer";
     $lastname = "Seit";
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+
     try {
 
     $template_content = array(
@@ -64,7 +65,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
             'subject' => 'Gobind Sarvar: Your username and password',
             'from_email' => 'shaniferseit@hotmail.com', //'info@GobindSarvar.com',
             'from_name' => 'Gobind Sarvar School',
-            'to' => $mandrill_to,
+            'to' => $emailAddr,
 
             // Pass the same parameters for merge vars and template params
             // to make them available in both variable passing methods
@@ -73,8 +74,6 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
             'vars' => $template_content,
             )));
     $template_name = 'welcometogs';
-    print_r($message);
-    echo "*******TEST**********";
 
     print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));
     } catch(Mandrill_Error $e) {
@@ -84,7 +83,6 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     throw $e;
     }
 }
-
 
 /*
 * wrapper to perform sql queries
