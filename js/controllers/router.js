@@ -106,6 +106,12 @@ var Router = Backbone.Router.extend({
         new DashboardView({
             el: $("#content")
         });
+
+        $("#main-content .left").affix({
+            offset: {
+                top: 50
+            }
+        })
     },
 
     email: function() {
@@ -183,7 +189,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("View Student (" + id + ")");
 
     	this.loadHome();
-
+        console.log("in view student");
 		$("#content").html(html["viewStudent.html"]);
 
 		var parent = $("#student-content");
@@ -200,10 +206,11 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
-        // temp fix
-        $("#content").html("<div id='child'></div>");
-        new CreateStudentView({
-            el: $("#child")
+        $("#content").html("<div id='test-reg'></div>");
+        new RegistrationFormView({
+            el: $("#test-reg"),
+            regType: "admin",
+            status: "active"
         });
     },
 
@@ -384,7 +391,9 @@ var Router = Backbone.Router.extend({
 
     registrationForm: function() {
         new RegistrationFormView({
-            el: $("#container")
+            el: $("#container"),
+            regType: "online",
+            status: "pending"
         });
     },
 
