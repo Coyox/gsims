@@ -1473,10 +1473,10 @@ function getUserById($id, $usertype){
     if ($usertype == "T"){
         return getTeacherById($id);
     }
-    else if ($usertypeusertypeusertype == "S"){
+    else if ($usertype == "S"){
         return getStudentById($id);
     }
-    else if ($usertypeusertype == "A"){
+    else if ($usertype == "A"){
         return getAdministratorById($id);
     }
     else if ($usertype == "SU"){
