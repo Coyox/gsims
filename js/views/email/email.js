@@ -2,6 +2,7 @@ var EmailView = Backbone.View.extend({
 	initialize: function(options) {
 		this.emailAddr = options.emailAddr;
 		//this.emails = options.emails; //STUBBED
+		areYouAlive();
 		this.render();
 	},
 
@@ -66,6 +67,46 @@ var EmailView = Backbone.View.extend({
  		});
 	}
 });
+
+function areYouAlive(){
+	console.log("Checking Mandrill status");
+	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+
+	$.ajax({
+		type: 'POST',
+
+  		url: "https://mandrillapp.com/api/1.0/users/ping.json",
+  		data: { 
+  			"key": apiKey
+  		}
+	}).done(function(response) {
+   	if (response != "PONG!"){
+   		// Alert user
+   		alert("Mandrill API is not currently responding:\n" +
+   		 "Your emails may not be sent.\n\n" +
+   			"Please try again later.");
+   	}
+ 	});
+
+}
+
+function checkAcountStatus(){
+	console.log("Checking Mandrill account status");
+	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+
+	$.ajax({
+		type: 'POST',
+
+  		url: "https://mandrillapp.com/api/1.0/users/info.json",
+  		data: { 
+  			"key": apiKey
+  		}
+	}).done(function(response) {
+   	//console.log(response);
+   	console.log(response.username);
+   	
+ 	});
+}
 
 /** Common email function that can be used by any page to send an email (not 
 	just EmailView()). Expects a "params" object as the first parameter that 
