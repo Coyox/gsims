@@ -899,7 +899,7 @@ function updateMarks($id){
         $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and assignmentid=:assignmentid";
         array_push($queries, $sql);
     }
-    echo json_encode(perform_transaction($sql, $bindparams));
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 #================================================================================================================#
 # Students
@@ -1076,7 +1076,7 @@ function createStudent() {
     );
 
     $resp["userid"] = $userid;
-    $resp = $resp + perform_transaction($sql, $bindparams);
+    $resp = $resp + perform_transaction($queries, $bindparams);
     echo json_encode($resp);
 }
 
@@ -1104,13 +1104,12 @@ function enrollStudentInSections($id){
         "schoolyearid" => $schoolyearid,
         "status" => $status,
     );
-    $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
+    $sql = "INSERT INTO enrollment (userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
         $bindparams["sectionid".$i] = $sectionid;
     }
     $sql = rtrim($sql, ",");
-
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
@@ -1141,7 +1140,7 @@ function updateStudentTestScores($id){
         $sql = "UPDATE studentCompetencyTest set mark=:mark".$i." where userid=:userid and courseid=:courseid".$i;
         array_push($queries, $sql);
     }
-    echo json_encode(perform_transaction($sql, $bindparams));
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 function handlePendingStudents(){
@@ -1230,7 +1229,7 @@ function createTeacher() {
     );
 
     $resp["userid"] = $userid;
-    $resp = $resp + perform_transaction($sql, $bindparams);
+    $resp = $resp + perform_transaction($queries, $bindparams);
     echo json_encode($resp);
 }
 
@@ -1311,7 +1310,7 @@ function updateCourseCompetencies($id) {
         $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
         array_push($queries, $sql);
     }
-    echo json_encode(perform_transaction($sql, $bindparams));
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 #================================================================================================================#
@@ -1353,7 +1352,7 @@ function createAdministrator() {
     );
 
     $resp["userid"] = $userid;
-    $resp = $resp + perform_transaction($sql, $bindparams);
+    $resp = $resp + perform_transaction($queries, $bindparams);
     echo json_encode($resp);
 }
 #================================================================================================================#
@@ -1393,7 +1392,7 @@ function createSuperuser() {
     );
 
     $resp["userid"] = $userid;
-    $resp = $resp + perform_transaction($sql, $bindparams);
+    $resp = $resp + perform_transaction($queries, $bindparams);
     echo json_encode($resp);
 }
 
