@@ -140,6 +140,8 @@ var StudentsTableView = Backbone.View.extend({
 
 	events: {
 		"click #refresh": "refreshTable",
+		"click .send-email": "openEmailModal",
+		"change .toggle-checkboxes": "toggleCheckboxes"
 	},
 
 	populateQueryResults: function(data) {
@@ -147,10 +149,18 @@ var StudentsTableView = Backbone.View.extend({
 			var model = new Student(object, {parse:true});
 			new StudentTableRowView({
 				model: model,
-				el: this.addRow(".results")
+				el: this.addRow(".results", model.get("emailAddr"))
 			});
 		}, this);
-		this.$el.find("table").dataTable();
+		this.$el.find("table").dataTable({
+	      	aoColumnDefs: [
+	          	{ bSortable: false, aTargets: [ 4, 5 ] },
+	          	{ sClass: "center", aTargets: [ 4, 5 ] },
+	          	{ sWidth: "2%", aTargets: [ 5 ] }
+	       	]
+		});
+		this.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
+		this.$el.find(".dataTables_filter").append("<button class='btn btn-sm btn-primary dt-btn'>Refresh Table</button>");
 	},
 
 	fetchAllResults: function() {
@@ -160,10 +170,18 @@ var StudentsTableView = Backbone.View.extend({
 				var model = new Student(object, {parse:true});
 				new StudentTableRowView({
 					model: model,
-					el: view.addRow(".results")
+					el: view.addRow(".results", model.get("emailAddr"))
 				});
 			}, view);
-			view.$el.find("table").dataTable();
+			view.$el.find("table").dataTable({
+		      	aoColumnDefs: [
+		          	{ bSortable: false, aTargets: [ 4, 5 ] },
+		          	{ sClass: "center", aTargets: [ 4, 5 ] },
+		          	{ sWidth: "2%", aTargets: [ 5 ] }
+		       	]
+			});
+			view.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
+			view.$el.find(".dataTables_filter").append("<button class='btn btn-sm btn-primary dt-btn'>Refresh</button>");
 		});
 	},
 
@@ -171,11 +189,33 @@ var StudentsTableView = Backbone.View.extend({
 		this.render();
 	},
 
-	addRow: function(selector) {
+	addRow: function(selector, email) {
         var container = $("<tr></tr>");
+        container.data("email", email);
         this.$el.find(selector).first().append(container);
         return container;
-	}
+	},
+
+	openEmailModal: function(evt) {
+		var recipients = [];
+		var rows = this.$el.find("table tbody tr");
+		_.each(rows, function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			if ($(checkbox).is(":checked")) {
+				recipients.push($(checkbox).closest("tr").data("email"));
+			}
+		}, this);	
+		openEmailModal(recipients);
+	},
+
+	toggleCheckboxes: function(evt) {
+		var checked = $(evt.currentTarget).is(":checked");
+		var rows = this.$el.find("table tbody tr");
+		_.each(rows, function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			checkbox.prop("checked", checked);
+		}, this);
+	},
 });
 
 var StudentTableRowView = Backbone.View.extend({
@@ -183,7 +223,8 @@ var StudentTableRowView = Backbone.View.extend({
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><button class='view-student btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Student</button></td>"),
+		+   "<td><a class='view-student primary-link center-block' id='<%= model.userid %>'>[ View Student ]</a></td>"
+		+	"<td><input type='checkbox' class='user-row'></td>"),
 
 	initialize: function(options) {
 		this.render();

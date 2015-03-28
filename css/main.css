@@ -247,8 +247,18 @@ a {
 	z-index: 1000;
 }
 
+.primary-link {
+	cursor: pointer;
+	color: #9d426b;
+	font-weight: bold;
+}
+
 .link:hover {
 	cursor: pointer;
+}
+
+.center {
+	text-align: center;
 }
 
 .red {
@@ -431,6 +441,14 @@ tr.shown td.details-control {
     overflow: auto;
 }
 
+.dt-btn {
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.dataTables_filter label {
+	margin-right: 5px;
+}
 
 
 

@@ -3,7 +3,7 @@ var app = {
 	serverUrl: "https://gobind-sarvar.rhcloud.com/",
 	currentSchoolYear: "2014-2015",
 	selectedSchoolYearId: "100000",
-	selectedSchoolId: "412312"
+	selectedSchoolId: "412312",
 };
 
 /** Object to hold all HTML templates (pre-loaded) */
