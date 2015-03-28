@@ -69,6 +69,8 @@ var Router = Backbone.Router.extend({
         "schoolyears":          "viewSchoolYears",
         "schools":              "schools",
         "departments":          "departments",
+        "courses":              "courses",
+        "sections":             "sections",
 
         "notifications":        "notifications",
 
@@ -371,6 +373,26 @@ var Router = Backbone.Router.extend({
 
     departments: function() {
         this.updatePageBreadcrumb("Departments");
+
+        this.loadHome();
+
+        new DepartmentView({
+            el: $("#content")
+        });
+    },
+
+    courses: function() {
+        this.updatePageBreadcrumb("Courses");
+
+        this.loadHome();
+
+        new DepartmentView({
+            el: $("#content")
+        });
+    },
+
+    sections: function() {
+        this.updatePageBreadcrumb("Sections");
 
         this.loadHome();
 
