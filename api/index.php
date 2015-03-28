@@ -1077,8 +1077,9 @@ function createStudent() {
 
     $resp["userid"] = $userid;
     $resp = $resp + perform_transaction($queries, $bindparams);
-
-    emailLogin($student->emailAddr, $username, $password, $student->firstName, $student->lastName);
+    if ($student->status != "pending"){
+        emailLogin($student->emailAddr, $username, $password, $student->firstName, $student->lastName);
+    }
     echo json_encode($resp);
 }
 
