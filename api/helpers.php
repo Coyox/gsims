@@ -62,7 +62,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
 
     $message = array(
             'subject' => 'Gobind Sarvar: Your username and password',
-            'from_email' => 'info@GobindSarvar.com',
+            'from_email' => 'shaniferseit@hotmail.com', //'info@GobindSarvar.com',
             'from_name' => 'Gobind Sarvar School',
             'to' => $mandrill_to,
 
