@@ -30,7 +30,6 @@ function generateLogin($firstname, $lastname){
      $index = rand(0, $count-1);
      $password .= $chars[$index];
     }
-    //echo json_encode(array("userid"=>$userid, "username"=>$username, "password"=>$password));
     return array($userid, $username, $password);
 }
 

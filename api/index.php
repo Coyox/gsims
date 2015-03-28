@@ -1104,13 +1104,13 @@ function enrollStudentInSections($id){
         "schoolyearid" => $schoolyearid,
         "status" => $status,
     );
-    $sql = "INSERT INTO enrollment(userid, sectionid, schoolyearid, status) values ";
+    $sql = "INSERT INTO enrollment (userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
         $bindparams["sectionid".$i] = $sectionid;
     }
+    echo $sql;
     $sql = rtrim($sql, ",");
-
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
