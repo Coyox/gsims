@@ -20,6 +20,7 @@ var EmailView = Backbone.View.extend({
 	},
 
 	checkAccountStatus: function(evt){
+		var parent = this.$el.find("#stats-panel");
 		console.log("Checking Mandrill account status");
 		var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
 
@@ -31,7 +32,12 @@ var EmailView = Backbone.View.extend({
 	  			"key": apiKey
 	  		}
 		}).done(function(response) {
-	   	console.log(response);
+	   	parent.find(".hourly-quota").text(response.hourly_quota);
+	   	parent.find(".backlog").text(response.backlog);
+	   	parent.find(".sent-today").text(response.stats.today.sent);
+	   	parent.find(".sent-month").text(response.stats.last_30_days.sent);
+	   	parent.find(".bounces-month").text(response.stats.last_30_days.hard_bounces);
+
 	 	});
 	},
 
@@ -100,7 +106,7 @@ function areYouAlive(){
    	if (response != "PONG!"){
    		// Alert user
    		alert("Mandrill API is not currently responding:\n" +
-   		 "Your emails may not be sent.\n\n" +
+   		 "Your emails may not be sent.\nStats may not be fetched.\n\n" +
    			"Please try again later.");
    	}
  	});
