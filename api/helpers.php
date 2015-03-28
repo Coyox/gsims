@@ -63,7 +63,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
 
     $message = array(
             'subject' => 'Gobind Sarvar: Your username and password',
-            'from_email' => 'shaniferseit@hotmail.com', //'info@GobindSarvar.com',
+            'from_email' => 'info@GobindSarvar.com',
             'from_name' => 'Gobind Sarvar School',
             'to' => array( array( 'email' => $emailAddr, 'name' => $firstname.' '.$lastname, 'type' => 'to' ) ),
             // Pass the same parameters for merge vars and template params
@@ -76,9 +76,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
 
     print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));
     } catch(Mandrill_Error $e) {
-    // Mandrill errors are thrown as exceptions
     echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
-    // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     throw $e;
     }
 }

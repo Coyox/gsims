@@ -1077,6 +1077,8 @@ function createStudent() {
 
     $resp["userid"] = $userid;
     $resp = $resp + perform_transaction($queries, $bindparams);
+
+    emailLogin($student->emailAddr, $username, $password, $student->firstName, $student->lastName);
     echo json_encode($resp);
 }
 
@@ -1355,6 +1357,8 @@ function createAdministrator() {
 
     $resp["userid"] = $userid;
     $resp = $resp + perform_transaction($queries, $bindparams);
+
+    emailLogin($teacher->emailAddr, $username, $password, $teacher->firstName, $teacher->lastName);
     echo json_encode($resp);
 }
 #================================================================================================================#
@@ -1395,6 +1399,8 @@ function createSuperuser() {
 
     $resp["userid"] = $userid;
     $resp = $resp + perform_transaction($queries, $bindparams);
+
+    emailLogin($superuser->emailAddr, $username, $password, $superuser->firstName, $superuser->lastName);
     echo json_encode($resp);
 }
 
