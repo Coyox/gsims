@@ -43,11 +43,6 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 }
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
-    $emailAddr = "shanifer@gmail.com";
-    $username = "shanifer";
-    $password = "test";
-    $firstname = "Shanifer";
-    $lastname = "Seit";
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
 
     try {
