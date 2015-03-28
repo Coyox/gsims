@@ -50,7 +50,7 @@ var EmailView = Backbone.View.extend({
 		var body = this.$el.find("#email-message").val();
 		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
 		var from = this.$el.find("#email-from").val();
-		var self = this.$el.find("#self").val();
+		var self = this.$el.find("#self").prop("checked");
 		
 		//Build the JSON request
 		//request.type = 'POST'
@@ -69,7 +69,8 @@ var EmailView = Backbone.View.extend({
 			recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
 		}
 
-		if(self == "on"){
+		if(self){
+			
 			recipients.push(from);
 
 		}
@@ -186,6 +187,7 @@ function openEmailModal(recipients) {
 	console.log("recipients", recipients);
 
 	elem.find(".modal-body").html(html["email.html"]);
+	elem.find("$stats-panel").hide();
 
 	elem.modal({
 		show: true
