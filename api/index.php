@@ -1075,10 +1075,9 @@ function createStudent() {
         "status" => $student->status,
     );
 
-    //$resp["userid"] = $userid;
-    //$resp = $resp + perform_transaction($sql, $bindparams);
-    //echo json_encode($resp);
-    echo perform_transaction($sql, $bindparams);
+    $resp["userid"] = $userid;
+    $resp = $resp + perform_transaction($sql, $bindparams);
+    echo json_encode($resp);
 }
 
 /*
