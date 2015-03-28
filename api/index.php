@@ -1027,9 +1027,15 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $resp = array();
 
-    $resp["userid"] = createNewUser($student->firstName, $student->lastName, $student->emailAddr, 'S');
+    $resp = array();
+    $queries = array();
+    $bindparams = array();
+
+    list($logincreds, $loginsql, $loginbindparam) = createLogin($student->firstName, $student->lastName,'S');
+    list($userid, $username, $password) = $logincreds;
+    array_push($queries, $loginsql);
+    $bindparams[0] = $loginbindparam;
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1039,8 +1045,8 @@ function createStudent() {
     :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
     :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
 
-
-    $bindparams = array(
+    array_push($queries, $sql);
+    $bindparams[1] = array(
         "userid" => $userid,
         "firstName" => $student->firstName,
         "lastName" => $student->lastName,
@@ -1068,7 +1074,9 @@ function createStudent() {
         "paid" => $student->paid,
         "status" => $student->status,
     );
-    $resp = $resp + perform_query($sql,'POST',$bindparams);
+
+    $resp["userid"] = $userid;
+    $resp = $resp + perform_transaction($sql, $bindparams);
     echo json_encode($resp);
 }
 
@@ -1198,12 +1206,20 @@ function createTeacher() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
+
     $resp = array();
-    $resp["userid"] = createNewUser($teacher->firstName, $teacher->lastName, $teacher->emailAddr, 'T');
+    $queries = array();
+    $bindparams = array();
+
+    list($logincreds, $loginsql, $loginbindparam) = createLogin($teacher->firstName, $teacher->lastName,'T');
+    list($userid, $username, $password) = $logincreds;
+    array_push($queries, $loginsql);
+    $bindparams[0] = $loginbindparam;
+
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
-
-    $bindparams = array(
+    array_push($queries, $sql);
+    $bindparams[1] = array(
         "userid" => $userid,
         "schoolid" => $teacher->schoolid,
         "firstName" => $teacher->firstName,
@@ -1212,7 +1228,9 @@ function createTeacher() {
         "status" => $teacher->status,
         "usertype" => 'T'
     );
-    $resp = $resp + perform_query($sql,'POST',$bindparams);
+
+    $resp["userid"] = $userid;
+    $resp = $resp + perform_transaction($sql, $bindparams);
     echo json_encode($resp);
 }
 
@@ -1310,21 +1328,32 @@ function getAdministratorById($id) {
 function createAdministrator() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $admin = json_decode($body);
+    $teacher = json_decode($body);
+
     $resp = array();
-    $resp["userid"] = createNewUser($admin->firstName, $admin->lastName, $admin->emailAddr, 'A');
+    $queries = array();
+    $bindparams = array();
+
+    list($logincreds, $loginsql, $loginbindparam) = createLogin($teacher->firstName, $teacher->lastName,'A');
+    list($userid, $username, $password) = $logincreds;
+    array_push($queries, $loginsql);
+    $bindparams[0] = $loginbindparam;
+
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
-    $bindparams = array(
+    array_push($queries, $sql);
+    $bindparams[1] = array(
         "userid" => $userid,
-        "schoolid" => $admin->schoolid,
-        "firstName" => $admin->firstName,
-        "lastName" => $admin->lastName,
-        "emailAddr" => $admin->emailAddr,
-        "status" => $admin->status,
+        "schoolid" => $teacher->schoolid,
+        "firstName" => $teacher->firstName,
+        "lastName" => $teacher->lastName,
+        "emailAddr" => $teacher->emailAddr,
+        "status" => $teacher->status,
         "usertype" => 'A'
     );
-    $resp = $resp + perform_query($sql,'POST',$bindparams);
+
+    $resp["userid"] = $userid;
+    $resp = $resp + perform_transaction($sql, $bindparams);
     echo json_encode($resp);
 }
 #================================================================================================================#
@@ -1341,19 +1370,30 @@ function getSuperuserById($id) {
 function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $superuser = json_decode($body);
+    $teacher = json_decode($body);
+
     $resp = array();
-    $resp["userid"] = createNewUser($superuser->firstName, $superuser->lastName, $superuser->emailAddr,'SU');
+    $queries = array();
+    $bindparams = array();
+
+    list($logincreds, $loginsql, $loginbindparam) = createLogin($superuser->firstName, $superuser->lastName,'T');
+    list($userid, $username, $password) = $logincreds;
+    array_push($queries, $loginsql);
+    $bindparams[0] = $loginbindparam;
+
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
                          values (:userid, :firstName, :lastName, :emailAddr, :status)";
-    $bindparams = array(
+    array_push($queries, $sql);
+    $bindparams[1] = array(
         "userid" => $userid,
         "firstName" => $superuser->firstName,
         "lastName" => $superuser->lastName,
         "emailAddr" => $superuser->emailAddr,
         "status" => $superuser->status,
     );
-    $resp = $resp + perform_query($sql,'POST',$bindparams);
+
+    $resp["userid"] = $userid;
+    $resp = $resp + perform_transaction($sql, $bindparams);
     echo json_encode($resp);
 }
 
@@ -1436,6 +1476,37 @@ function getUserByEmailAddr($emailAddr){
     }
 }
 
+
+function getUserCount($usertype){
+    $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
+    $status = $_GET['status'];
+    $sql = "SELECT count(*) from ".$table;
+    $bindparams = array();
+    if (isset($status)){
+        $sql.=" where status=:status";
+        $bindparams["status"] = $status;
+    }
+    if ($usertype=="T"|$usertype=="A"){
+        $sql.= (isset($status)? " and ": " where ");
+        $sql.= "usertype=:usertype";
+        $bindparams["usertype"] = $usertype;
+    }
+    echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
+}
+
+function createLogin($firstname, $lastname, $usertype){
+    $sql = "INSERT into login (userid, username, password, usertype)
+            VALUES (:userid, :username, :password, :usertype)";
+
+    list($userid, $username, $password) = generateLogin($firstname, $lastname);
+    $passwordhash = generatePasswordHash($password);
+    $bindparams=array("userid" => $userid,
+                      "username"=> $username,
+                      "password"=> $passwordhash,
+                      "usertype" => $usertype);
+
+    return array(array($userid, $username, $password), $sql, $bindparams);
+}
 #================================================================================================================#
 # Search
 #================================================================================================================#
@@ -1542,48 +1613,6 @@ function findSections(){
         return getSectionsBySchool($schoolyear, $schoolid);
     }
 }
-
-/*
- Create new user in login table with generated login creds
-*/
-
-function createNewUser($firstname, $lastname, $emailAddr, $usertype){
-    $sql = "INSERT into login (userid, username, password, usertype)
-            VALUES (:userid, :username, :password, :usertype)";
-    $userid="";
-    $username="";
-    $password="";
-    list($userid, $username, $password) = generateLogin($firstname, $lastname);
-
-    $passwordhash = generatePasswordHash($password);
-
-    $bindparams=array("userid" => $userid,
-                      "username"=> $username,
-                      "password"=> $passwordhash,
-                      "usertype" => $usertype);
-
-    perform_query($sql,'POST',$bindparams);
-    //emailLogin($emailAddr, $username, $password, $firstname, $lastname);
-    return $userid;
-}
-
-function getUserCount($usertype){
-    $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
-    $status = $_GET['status'];
-    $sql = "SELECT count(*) from ".$table;
-    $bindparams = array();
-    if (isset($status)){
-        $sql.=" where status=:status";
-        $bindparams["status"] = $status;
-    }
-    if ($usertype=="T"|$usertype=="A"){
-        $sql.= (isset($status)? " and ": " where ");
-        $sql.= "usertype=:usertype";
-        $bindparams["usertype"] = $usertype;
-    }
-    echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
-}
-
 
 /*
 // advanced search
