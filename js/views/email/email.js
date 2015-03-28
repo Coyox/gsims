@@ -16,6 +16,23 @@ var EmailView = Backbone.View.extend({
 
 	events: {
 		"click #send" : "sendEmail",
+		"click #fetch": "checkAccountStatus"
+	},
+
+	checkAccountStatus: function(evt){
+		console.log("Checking Mandrill account status");
+		var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+
+		$.ajax({
+			type: 'POST',
+
+	  		url: "https://mandrillapp.com/api/1.0/users/info.json",
+	  		data: { 
+	  			"key": apiKey
+	  		}
+		}).done(function(response) {
+	   	console.log(response);
+	 	});
 	},
 
 	sendEmail: function(evt){
@@ -88,24 +105,6 @@ function areYouAlive(){
    	}
  	});
 
-}
-
-function checkAcountStatus(){
-	console.log("Checking Mandrill account status");
-	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
-
-	$.ajax({
-		type: 'POST',
-
-  		url: "https://mandrillapp.com/api/1.0/users/info.json",
-  		data: { 
-  			"key": apiKey
-  		}
-	}).done(function(response) {
-   	//console.log(response);
-   	console.log(response.username);
-   	
- 	});
 }
 
 /** Common email function that can be used by any page to send an email (not 
