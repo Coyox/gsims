@@ -186,10 +186,12 @@ function openEmailModal(recipients) {
 	console.log("recipients", recipients);
 
 	elem.find(".modal-body").html(html["email.html"]);
+	//elem.find("#stats-panel").hide();
 
 	elem.modal({
 		show: true
 	});
+
 
 	elem.on("hidden.bs.modal", function() {
 		elem.remove();
@@ -200,7 +202,7 @@ function openEmailModal(recipients) {
 		el: elem.find(".modal-body"),
 		emails: recipients
 	});
-
+	elem.find("#stats-panel").hide();
 	var form = elem.find(".form-horizontal");
 	form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
 	form.parent().addClass("o-auto");
