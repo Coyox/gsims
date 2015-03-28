@@ -50,6 +50,7 @@ var EmailView = Backbone.View.extend({
 		var body = this.$el.find("#email-message").val();
 		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
 		var from = this.$el.find("#email-from").val();
+		var self = this.$el.find("#self").val();
 		
 		//Build the JSON request
 		//request.type = 'POST'
@@ -68,7 +69,11 @@ var EmailView = Backbone.View.extend({
 			recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
 		}
 
-		//recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
+		if(self == "on"){
+			recipients.push(from);
+
+		}
+
 		// Push each recipient's data to JSON object
 		recipients.forEach(function(entry){
     		var to = {
@@ -78,6 +83,7 @@ var EmailView = Backbone.View.extend({
     		}
     	request.data.message.to.push(to);
 		})
+
 		// JSONify final request
 		//console.log(JSON.stringify(request.data));
 		// Send using mandrill API and read response
