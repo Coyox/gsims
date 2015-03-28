@@ -13,6 +13,7 @@ $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->get('/students/:id/tests', 'getEnrolledTests');
 $app->get('/students/:id/avgGrade', 'getAvgGrade');
+$app->get('/students/:id', 'getStudentAttendance');
 $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
@@ -26,6 +27,7 @@ $app->get('/teachers', 'getTeachers');
 $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->get('/teachers/:id/competency', 'getCourseCompetencies');
+$app->get('/teachers/:id/attendance', 'getTeacherAttendance');
 $app->put('/teachers/:id/competency', 'updateCourseCompetencies');
 $app->post('/teachers', 'createTeacher');
 $app->post('/teachers/:id', 'addCourseCompetencies');
@@ -85,6 +87,7 @@ $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
+$app->get('/sections/:id/dates', 'getSectionDates');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 $app->post('/sections', 'createSection');
 $app->post('/sections/students/:id/:sid', 'enrollStudent');
@@ -709,8 +712,8 @@ function getAvgAttendance($id){
     $sql = "SELECT classSize from section where sectionid=:id";
     $classSize = (int) perform_query($sql, 'GETCOL', $bindparams);
 
-    $sql = "SELECT count(distinct `date`) from attendance";
-    $numberofdays = (int) perform_query($sql, 'GETCOL');
+    $sql = "SELECT count(distinct `date`) from attendance where sectionid=:id";
+    $numberofdays = (int) perform_query($sql, 'GETCOL', $bindparams);
     if ($numberofdays != 0){
         $sql = "SELECT `date`, count(userid) as present
             from attendance
@@ -730,8 +733,13 @@ function getAvgAttendance($id){
     else {
         echo json_encode(array("avgAttendance"=>"N/A"));
     }
-
 }
+
+function getSectionDates($id){
+    $sql = "SELECT distinct `date` from attendance where sectionid=:id";
+    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+}
+
 function deleteSection($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -1192,6 +1200,10 @@ function getAvgGrade($id, $flag=0){
     echo json_encode(array("avgGrade"=>$grade."%"));
 }
 
+function getStudentAttendance($id){
+    $schoolyearid = $_GET["schoolyearid"];
+    echo json_encode(getAttendance($id, $schoolyearid));
+}
 #================================================================================================================#
 # Teachers
 #================================================================================================================#
@@ -1318,6 +1330,10 @@ function updateCourseCompetencies($id) {
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+function getTeacherAttendance($id){
+    $schoolyearid = $_GET["schoolyearid"];
+    echo json_encode(getAttendance($id, $schoolyearid));
+}
 #================================================================================================================#
 # Administrators
 #================================================================================================================#
@@ -1514,6 +1530,10 @@ function createLogin($firstname, $lastname, $usertype){
                       "usertype" => $usertype);
 
     return array(array($userid, $username, $password), $sql, $bindparams);
+}
+function getAttendance($id, $schoolyearid){
+    $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid";
+    return perform_query($sql, 'GETALL', array("userid"=>$id, "schoolyearid"=>$schoolyearid));
 }
 #================================================================================================================#
 # Search
