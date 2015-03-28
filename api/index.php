@@ -1638,6 +1638,7 @@ function findStudentsWithAdvancedCriteria(){
                     $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
                     if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
                         array_push($qualifiedstudents, $studentid);
+                        break;
                     }
                 }
             }
@@ -1651,6 +1652,8 @@ function findStudentsWithAdvancedCriteria(){
             $sections = getEnrolledSections($studentid, 1);
             $numsections = count($sections);
             if ($numsections == 0){ continue; }
+            foreach ($sections as $section){
+                $sectionid = $section['sectionid'];
                 if (getStudentSectionGrade($sectionid, $userid) < 50) {
                     $failed++;
                 }
@@ -1658,6 +1661,7 @@ function findStudentsWithAdvancedCriteria(){
             if ($failed >= (int) $failcount) {
                 array_push($qualifiedstudents, $studentid);
             }
+        }
     }
 
     $ret = parenthesisList(array_unique($qualifiedstudents));
