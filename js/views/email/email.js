@@ -124,74 +124,35 @@ function sendEmail(params, callback) {
 // The recipients are sent in the "emails" property as an array of strings
 // (ie. an array of emails). To see an example of this, go to the notifications page,
 // and under pending-test students, select a couple students and click on the email button
-function openEmailModal(recipients, numRecipients, userType) {
+function openEmailModal(recipients) {
 	$("#container").append(html["emailModal.html"]);
 
 	// Deferred object to wait for all recipients to be fetched
-	var def = $.Deferred();
 	var elem = $("#email-modal");
 	var backdrop = $(".modal-backdrop");
-	var originalCount = 0;
 
-	if (numRecipients == 0) {
-		if (userType == "S") {
-			var student = new Student();
-			student.fetch().then(function(data) {
-				_.each(data, function(student, index) {
-					recipients.push(student.emailAddr);
-				});
-				def.resolve();
-			});
-		}
-		else if (userType == "T" || userType == "A") { 
-			// teachers and admins
-		} 
-		else if (userType == "SU") {
-			// superusers
-		}
-	} else {
-		originalCount = recipients.length;
-		def.resolve();
-	}
+	console.log("recipients", recipients);
 
-	$.when(def).then(function() {
-		console.log("recipients", recipients);
+	elem.find(".modal-body").html(html["email.html"]);
 
-		elem.find(".modal-body").html(html["email.html"]);
-
-		if (originalCount == 0) {
-			var user;
-			if (userType == "S") {
-				user = "students";
-			} else if (userType == "A") {
-				user = "administrators";
-			} else if (userType == "T") {
-				user == "teachers";
-			} else if (userType == "SU") {
-				user == "superusers"
-			}
-			elem.find(".modal-title").append(" to all " + user);
-		}
-
-		elem.modal({
-			show: true
-		});
-
-		elem.on("hidden.bs.modal", function() {
-			elem.remove();
-			backdrop.remove();
-		});
-
-		var emailView = new EmailView({
-			el: elem.find(".modal-body"),
-			emails: recipients
-		});
-
-		var form = elem.find(".form-horizontal");
-		form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
-		form.parent().addClass("o-auto");
-
-		// Populate the "to" input field (comma separated string)
-		form.find("#email-to").val(recipients.join(", "));
+	elem.modal({
+		show: true
 	});
+
+	elem.on("hidden.bs.modal", function() {
+		elem.remove();
+		backdrop.remove();
+	});
+
+	var emailView = new EmailView({
+		el: elem.find(".modal-body"),
+		emails: recipients
+	});
+
+	var form = elem.find(".form-horizontal");
+	form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
+	form.parent().addClass("o-auto");
+
+	// Populate the "to" input field (comma separated string)
+	form.find("#email-to").val(recipients.join(", "));
 }

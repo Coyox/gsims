@@ -152,11 +152,11 @@ var StudentsTableView = Backbone.View.extend({
 				el: this.addRow(".results", model.get("emailAddr"))
 			});
 		}, this);
-		this.$el.find("table").dataTable({
+		this.table = this.$el.find("table").dataTable({
 	      	aoColumnDefs: [
 	          	{ bSortable: false, aTargets: [ 4, 5 ] },
 	          	{ sClass: "center", aTargets: [ 4, 5 ] },
-	          	{ sWidth: "2%", aTargets: [ 5 ] }
+	          	{ sWidth: "10%", aTargets: [ 5 ] }
 	       	]
 		});
 		this.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
@@ -173,11 +173,11 @@ var StudentsTableView = Backbone.View.extend({
 					el: view.addRow(".results", model.get("emailAddr"))
 				});
 			}, view);
-			view.$el.find("table").dataTable({
+			view.table = view.$el.find("table").dataTable({
 		      	aoColumnDefs: [
 		          	{ bSortable: false, aTargets: [ 4, 5 ] },
 		          	{ sClass: "center", aTargets: [ 4, 5 ] },
-		          	{ sWidth: "2%", aTargets: [ 5 ] }
+		          	{ sWidth: "10%", aTargets: [ 5 ] }
 		       	]
 			});
 			view.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
@@ -198,8 +198,7 @@ var StudentsTableView = Backbone.View.extend({
 
 	openEmailModal: function(evt) {
 		var recipients = [];
-		var rows = this.$el.find("table tbody tr");
-		_.each(rows, function(row, index) {
+		_.each(this.table.fnGetNodes(), function(row, index) {
 			var checkbox = $(row).find("input[type='checkbox']");
 			if ($(checkbox).is(":checked")) {
 				recipients.push($(checkbox).closest("tr").data("email"));
@@ -211,9 +210,9 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	toggleCheckboxes: function(evt) {
+		var nodes = this.table.fnGetNodes();
 		var checked = $(evt.currentTarget).is(":checked");
-		var rows = this.$el.find("table tbody tr");
-		_.each(rows, function(row, index) {
+		_.each(nodes, function(row, index) {
 			var checkbox = $(row).find("input[type='checkbox']");
 			checkbox.prop("checked", checked);
 		}, this);
@@ -226,7 +225,7 @@ var StudentTableRowView = Backbone.View.extend({
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
 		+   "<td><a class='view-student primary-link center-block' id='<%= model.userid %>'>[ View Student ]</a></td>"
-		+	"<td><input type='checkbox' class='user-row'></td>"),
+		+	"<td><input type='checkbox' class='user-row' checked></td>"),
 
 	initialize: function(options) {
 		this.render();
