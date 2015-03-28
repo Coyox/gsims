@@ -44,29 +44,51 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     $emailAdddr = "shanifer@gmail.com";
+    $username = "shanifer";
+    $password = "test";
+    $firstname = "Shanifer";
+    $lastname = "Seit";
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
     try {
-        $message = array(
-        'html' => '<img style="border: 0 !important;-ms-interpolation-mode: bicubic;height: 1px !important;width: 1px !important;margin: 0 !important;padding: 0 !important" src="https://gobind.createsend1.com/t/i-o-ydiuttt-l/o.gif" width="1" height="1" border="0" alt="">
-<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
-Thank you for registering with Gobind Sarvar School.<br>
-Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="http://gobind.createsend1.com/t/i-l-ydiuttt-l-r/">gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Username:'.$username.'<br>
-Password:'.$password.'</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">This is an auto-generated email. &nbsp;Please do not reply.</p>
-',
+
+    $message = array(
         'subject' => 'Welcome to Gobind Sarvar School',
-        'from_email'=>'info@gobindsarvar.com',
-        'from_name' => 'Gobind Sarvar School',
-        'to' => array(
+        'from_email' => 'info@gobindsarvar.com',
+        'to' => array(array('email' => $emailAddr, 'name' => $firstname.' '.$lastname)),
+        'merge_vars' => array(array(
+            'rcpt' => $emailAddr,
+            'vars' =>
             array(
-                'email' => $emailAddr,
-                'name' => $firstname.' '.$lastname,
-                'type' => 'to'
-            )
-        ),
-        );
-    $async = false;
-    $result = $mandrill->messages->send($message, $async);
-    print_r($result);
+                array(
+                    'name' => 'FIRSTNAME',
+                    'content' => $firstname),
+                array(
+                    'name' => 'USERNAME',
+                    'content' => $username),
+                array(
+                    'name' => 'PASSWORD',
+                    'content' => $password)
+        ))));
+
+    $template_name = 'welcometogs';
+
+    $template_content = array(
+        array(
+            'name' => 'header',
+            'content' => '<h2> Welcome *|FIRSTNAME|*! </h2>'),
+        array(
+            'name' => 'main',
+            'content' => 'Thank you for registering with Gobind Sarvar School.<br>
+        Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="https://gobind-sarvar.rhcloud.com">https://gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:<br>Username:*|USERNAME|*<br>
+    Password:*|PASSWORD|*<br>
+    You can log in anytime to view your enrolled course information and results.'),
+        array(
+            'name' => 'footer',
+            'content' => 'This is an auto-generated email. - Gobind Sarvar School')
+
+    );
+
+    print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));    print_r($result);
 } catch(Mandrill_Error $e) {
     // Mandrill errors are thrown as exceptions
     echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
