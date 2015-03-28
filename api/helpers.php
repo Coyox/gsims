@@ -65,8 +65,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
             'subject' => 'Gobind Sarvar: Your username and password',
             'from_email' => 'shaniferseit@hotmail.com', //'info@GobindSarvar.com',
             'from_name' => 'Gobind Sarvar School',
-            'to' => $emailAddr,
-
+            'to' => array( array( 'email' => $emailAddr, 'name' => $firstname+' '+$lastname, 'type' => 'to' ) );
             // Pass the same parameters for merge vars and template params
             // to make them available in both variable passing methods
             'merge_vars' => array(array(
