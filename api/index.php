@@ -1023,14 +1023,10 @@ function updateStudent($id) {
  * Creates a student record
  */
 function createStudent() {
-
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    echo $student->firstName;
-    $userid = createNewUser($student->firstName, $student->$lastName, $student->emailAddr, 'S');
-
-    echo "**********TEST**************";
+    $userid = createNewUser($student->firstName, $student->lastName, $student->emailAddr, 'S');
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1069,8 +1065,9 @@ function createStudent() {
         "paid" => $student->paid,
         "status" => $student->status,
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-    echo json_encode(array("userid"=>$userid));
+    $resp = perform_query($sql,'POST',$bindparams));
+    $resp["userid"]=>$userid;
+    echo json_encode($resp);
 }
 
 /*
@@ -1207,8 +1204,9 @@ function createTeacher() {
         "status" => $teacher->status,
         "usertype" => 'T'
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-    echo json_encode(array("userid"=>$userid));
+    $resp = perform_query($sql,'POST',$bindparams));
+    $resp["userid"]=>$userid;
+    echo json_encode($resp);
 }
 
 /*
@@ -1318,8 +1316,9 @@ function createAdministrator() {
         "status" => $admin->status,
         "usertype" => 'A'
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-    echo json_encode(array("userid"=>$userid));
+    $resp = perform_query($sql,'POST',$bindparams));
+    $resp["userid"]=>$userid;
+    echo json_encode($resp);
 }
 #================================================================================================================#
 # Superusers
@@ -1346,8 +1345,9 @@ function createSuperuser() {
         "emailAddr" => $superuser->emailAddr,
         "status" => $superuser->status,
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-    echo json_encode(array("userid"=>$userid));
+    $resp = perform_query($sql,'POST',$bindparams));
+    $resp["userid"]=>$userid;
+    echo json_encode($resp);
 }
 
 function updateSuperuser($id) {
