@@ -46,15 +46,18 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
     try {
         $message = array(
-        'html' => '<p>Example HTML content</p>',
-        'text' => 'hello',
+        'html' => '<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
+Thank you for registering with Gobind Sarvar School.<br>
+Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="http://gobind.createsend1.com/t/i-l-ydiuttt-l-r/">gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Username:'.$username.'<br>
+Password:'.$password.'</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">This is an auto-generated email. &nbsp;Please do not reply.</p>
+',
         'subject' => 'Welcome to Gobind Sarvar School',
-        'from_email'=>'shaniferseit@hotmail.com',
+        'from_email'=>'info@gobindsarvar.com',
         'from_name' => 'Gobind Sarvar School',
         'to' => array(
             array(
-                'email' => 'shanifer@gmail.com',
-                'name' => 'Shanifer',
+                'email' => $emailAddr,
+                'name' => $firstname.' '.$lastname,
                 'type' => 'to'
             )
         ),
