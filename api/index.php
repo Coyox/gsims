@@ -1109,7 +1109,6 @@ function enrollStudentInSections($id){
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
         $bindparams["sectionid".$i] = $sectionid;
     }
-    echo $sql;
     $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
