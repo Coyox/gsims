@@ -20,7 +20,8 @@ var RegistrationFormView = Backbone.View.extend({
 		}
 
 		this.regStudentInfo = new RegStudentInfo({
-			el: this.$el.find("#info-form")
+			el: this.$el.find("#info-form"),
+			regType: this.regType
 		});
 
 		this.regSectionsView = new RegSectionsView({
@@ -143,7 +144,8 @@ var RegistrationFormView = Backbone.View.extend({
 					if (data.status == "success") {
 						new TransactionResponseView({
 							message: "Thank you for registering. You will receieve an email (" + studentModel.get("emailAddr") + ") when an administrator has approved your request.",
-							redirectUrl: ""
+							redirect: true,
+							url: view.regType == "online" ? "" : "home"
 						});
 					} else {
 						new TransactionResponseView({
@@ -255,13 +257,16 @@ var RegResultsView = Backbone.View.extend({
 
 var RegStudentInfo = Backbone.View.extend({
 	initialize: function(options) {
+		this.regType = options.regType;
 		this.render();
 	},
 
 	render: function() {
 		this.model = new Student();
 
-		this.model.nonEditable.push("paid");
+		if (this.regType == "online") {
+			this.model.nonEditable.push("paid");
+		}
 		this.model.nonEditable.push("status");		
 
 		_.each(this.model.toJSON(), function(value, attr) {
