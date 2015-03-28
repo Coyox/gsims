@@ -1593,16 +1593,16 @@ students who
 - has average between X and Y
 */
 function findStudentsWithAdvancedCriteria(){
-    $lowergrade = $_GET['lowergrade'];
-    $uppergrade = $_GET['uppergrade'];
+    $lowergrade = $_GET['lowerGrade'];
+    $uppergrade = $_GET['upperGrade'];
     $assignmentcount = $_GET['numAssignment'];
     $failcount = $_GET['numFailedSections'];
 
     $qualifiedstudents = array();
 
+    $sql = "SELECT userid from student where status='active'";
+    $students = perform_query($sql, 'GETASSO');
     if (isset($lowergrade) && isset($uppergrade)){
-        $sql = "SELECT userid from student where status='active'";
-        $students = perform_query($sql, 'GETASSO');
         foreach ($students as $row){
             $studenetid = (int) $row['userid'];
             $avgGrade = getAvgGrade($studentid, 1);
@@ -1611,16 +1611,40 @@ function findStudentsWithAdvancedCriteria(){
             }
         }
     }
-
     if (isset($assignmentcount)){
-        //$totalassignmentcount;
-        //$studentassignmentcount;
+        $sql = "SELECT sectionid, count(docid) as numberOfAssignments
+                from document where fullmark is not null group by sectionid";
+        $sectionAsmtCount = perform_query($sql, 'GETASSO');
 
+        $sql = "SELECT m.userid as studentid , sectionid, count(sectionid) as numberOfAssignmentsDone
+             from marks m, document d
+             where m.assignmentid = d.docid group by sectionid";
+        $studentAsmtCount = perform_query($sql, 'GETASSO');
+
+        foreach ($students as $student){
+            $studenetid = (int) $student['userid'];
+            $sections = getEnrolledSections($studentid, 1);
+            $numsections = count($sections);
+            if ($numsections == 0){ continue; }
+            foreach ($sections as $section){
+                $sectionid = $section['sectionid'];
+                if (!array_key_exists($sectionid,$sectionAsmtCount)){
+                    continue;
+                }
+                else {
+                    $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
+                    $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
+                    if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
+                        array_push($qualifiedstudents, $studentid);
+                    }
+                }
+            }
+        }
     }
 
     if (isset($failcount)){}
 
-    $ret = parenthesisList($ids);
+    $ret = parenthesisList(array_unique($qualifiedstudents));
     $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -1629,6 +1653,7 @@ function findStudentsWithAdvancedCriteria(){
     $sql.=$ret[0];
     echo json_encode(perform_query($sql,'GETALL',$ret[1]));
 }
+
 
 #================================================================================================================#
 # Notifications

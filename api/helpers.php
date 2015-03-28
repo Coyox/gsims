@@ -192,3 +192,31 @@ function parenthesisList($ids){
     $sql.= ")";
     return array($sql, $bindparams);
 }
+
+
+// for walking fetchAll(PDO::FETCH_ASSOC) array
+// e.g. a row in the array
+// "userid" => 1234, "marks" => "90"
+// extract_value
+// gets the marks of userid 1234
+
+// $colarray in form of:
+// array(
+//     array("id"=>$id, "$id_colname"=>$id_colname)
+// );
+function extract_value($array, $colarray, $val_colname) {
+    foreach($array as $row) {
+        $match = 1;
+        foreach($colarray as $col){
+            if ($row[$col["id_colname"]] != $col["id"]){
+                $match = 0;
+                break;
+            }
+        }
+        if ($match == 1) {
+            return $row[$val_colname];
+        }
+        else { continue; }
+    }
+    return 0;
+}
