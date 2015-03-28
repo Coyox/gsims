@@ -59,6 +59,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
         array( 'name' => 'LAST_NAME', 'content' => $lastname ),
         array( 'name' => 'PASSWORD', 'content' => $password ),
         array( 'name' => 'LOGIN_URL', 'content' => "https://gobind-sarvar.rhcloud.com" ),
+        array( 'name' => 'IMG_SRC', 'content' => "https://gobind-sarvar.rhcloud.com/img/logo.png"),
     );
 
     $message = array(
@@ -74,7 +75,7 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
             )));
     $template_name = 'welcometogs';
 
-    print_r($mandrill->messages->sendTemplate($template_name, $template_content, $message));
+    $mandrill->messages->sendTemplate($template_name, $template_content, $message);
     } catch(Mandrill_Error $e) {
     echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
     throw $e;
