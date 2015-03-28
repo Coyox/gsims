@@ -1230,6 +1230,8 @@ function createTeacher() {
 
     $resp["userid"] = $userid;
     $resp = $resp + perform_transaction($queries, $bindparams);
+
+    emailLogin($teacher->emailAddr, $username, $password, $teacher->firstName, $teacher->lastName);
     echo json_encode($resp);
 }
 

@@ -1,5 +1,5 @@
 <?php
-//require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
+require_once '../vendor/mandrill/mandrill/src/Mandrill.php'; //Not required with Composer
 define("IDdigits", 6);
 define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
 define("less","<=");
@@ -42,33 +42,38 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
     return $id;
 }
 
-// function emailLogin($emailAdd, $username, $password, $firstname, $lastname){
-//     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
-//     try {
-//         $message = array(
-//         'html' => '<p>Example HTML content</p>',
-//         'text' => 'hello',
-//         'subject' => 'Welcome to Gobind Sarvar School',
-//         'from_email'=>'shaniferseit@hotmail.com',
-//         'from_name' => 'Gobind Sarvar School',
-//         'to' => array(
-//             array(
-//                 'email' => 'shanifer@gmail.com',
-//                 'name' => 'Shanifer',
-//                 'type' => 'to'
-//             )
-//         ),
-//         );
-//     $async = false;
-//     $result = $mandrill->messages->send($message, $async);
-//     print_r($result);
-// } catch(Mandrill_Error $e) {
-//     // Mandrill errors are thrown as exceptions
-//     echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
-//     // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-//     throw $e;
-// }
-// }
+function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
+    $emailAdddr = "shanifer@gmail.com";
+    $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+    try {
+        $message = array(
+        'html' => '<img style="border: 0 !important;-ms-interpolation-mode: bicubic;height: 1px !important;width: 1px !important;margin: 0 !important;padding: 0 !important" src="https://gobind.createsend1.com/t/i-o-ydiuttt-l/o.gif" width="1" height="1" border="0" alt="">
+<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
+Thank you for registering with Gobind Sarvar School.<br>
+Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="http://gobind.createsend1.com/t/i-l-ydiuttt-l-r/">gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Username:'.$username.'<br>
+Password:'.$password.'</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">This is an auto-generated email. &nbsp;Please do not reply.</p>
+',
+        'subject' => 'Welcome to Gobind Sarvar School',
+        'from_email'=>'info@gobindsarvar.com',
+        'from_name' => 'Gobind Sarvar School',
+        'to' => array(
+            array(
+                'email' => $emailAddr,
+                'name' => $firstname.' '.$lastname,
+                'type' => 'to'
+            )
+        ),
+        );
+    $async = false;
+    $result = $mandrill->messages->send($message, $async);
+    print_r($result);
+} catch(Mandrill_Error $e) {
+    // Mandrill errors are thrown as exceptions
+    echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
+    // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+    throw $e;
+}
+}
 
 
 /*

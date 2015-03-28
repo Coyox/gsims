@@ -3,10 +3,14 @@ var TransactionResponseView = Backbone.View.extend({
 		this.message = options.message;
 		this.title = options.title;
 		this.status = options.status;
+		this.redirect = options.redirect;
+		this.url = options.url;
 		this.render();
 	},
 
 	render: function() {
+		var view = this;
+
 		$("#container").append(html["transactionResponse.html"]);
 
 		$("#transaction-modal .modal-body").html(this.message);
@@ -26,6 +30,9 @@ var TransactionResponseView = Backbone.View.extend({
 		$("#transaction-modal").on("hidden.bs.modal", function() {
 			$("#transaction-modal").remove();
 			$(".modal-backdrop").remove();
+			if (view.redirect) {
+				app.Router.navigate(view.url, {trigger:true});
+			}
 		});
 	}
 });
@@ -116,13 +123,11 @@ function populateStatusMenu(elem, statuses, selected) {
 }
 
 function setDateOfBirth(model) {
-	console.log(model.get("dateOfBirth"));
 	if (model.get("dateOfBirth") == "") {
 		var month = model.get("month");
 		var day = model.get("day");
 		var year = model.get("year");
 		var dob;
-		console.log(month,day,year);
 		if (month !== undefined && day !== undefined && year != undefined) {
 			dob = year + "-" + month + "-" + day;
 		} else {
