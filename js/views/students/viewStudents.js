@@ -204,8 +204,10 @@ var StudentsTableView = Backbone.View.extend({
 			if ($(checkbox).is(":checked")) {
 				recipients.push($(checkbox).closest("tr").data("email"));
 			}
-		}, this);	
-		openEmailModal(recipients);
+		}, this);
+
+		var numRecipients = recipients.length;
+		openEmailModal(recipients, numRecipients, "S");
 	},
 
 	toggleCheckboxes: function(evt) {

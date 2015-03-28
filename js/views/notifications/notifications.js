@@ -239,7 +239,7 @@ var PendingTestView = Backbone.View.extend({
 				recipients.push($(checkbox).closest("tr").data("email"));
 			}
 		}, this);	
-		openEmailModal(recipients);
+		openEmailModal(recipients, recipients.length, "S");
 	}
 });
 
