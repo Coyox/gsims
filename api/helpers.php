@@ -18,7 +18,7 @@ function generateLogin($firstname, $lastname){
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
     $lastname = strtolower($lastname);
-    $username=$username=$firstname[0].$lastname.substr($userid, -5);
+    $username=$firstname[0].$lastname.substr($userid, -5);
 
     // password to be hashed
     $password='';
