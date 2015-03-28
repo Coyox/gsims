@@ -1027,7 +1027,9 @@ function createStudent() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
-    $userid = createNewUser($student->firstName, $student->lastName, $student->emailAddr, 'S');
+    $resp = array();
+
+    $resp["userid"] = createNewUser($student->firstName, $student->lastName, $student->emailAddr, 'S');
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1066,8 +1068,7 @@ function createStudent() {
         "paid" => $student->paid,
         "status" => $student->status,
     );
-    $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=$userid;
+    $resp = $resp + perform_query($sql,'POST',$bindparams);
     echo json_encode($resp);
 }
 
@@ -1197,7 +1198,8 @@ function createTeacher() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
-    $userid = createNewUser($teacher->firstName, $teacher->lastName, $teacher->emailAddr, 'T');
+    $resp = array();
+    $resp["userid"] = createNewUser($teacher->firstName, $teacher->lastName, $teacher->emailAddr, 'T');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
 
@@ -1210,8 +1212,7 @@ function createTeacher() {
         "status" => $teacher->status,
         "usertype" => 'T'
     );
-    $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=$userid;
+    $resp = $resp + perform_query($sql,'POST',$bindparams);
     echo json_encode($resp);
 }
 
@@ -1310,7 +1311,8 @@ function createAdministrator() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $admin = json_decode($body);
-    $userid = createNewUser($admin->firstName, $admin->lastName, $admin->emailAddr, 'A');
+    $resp = array();
+    $resp["userid"] = createNewUser($admin->firstName, $admin->lastName, $admin->emailAddr, 'A');
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
                          values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
     $bindparams = array(
@@ -1322,8 +1324,7 @@ function createAdministrator() {
         "status" => $admin->status,
         "usertype" => 'A'
     );
-    $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=$userid;
+    $resp = $resp + perform_query($sql,'POST',$bindparams);
     echo json_encode($resp);
 }
 #================================================================================================================#
@@ -1341,7 +1342,8 @@ function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $superuser = json_decode($body);
-    $userid = createNewUser($superuser->firstName, $superuser->lastName, $superuser->emailAddr,'SU');
+    $resp = array();
+    $resp["userid"] = createNewUser($superuser->firstName, $superuser->lastName, $superuser->emailAddr,'SU');
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
                          values (:userid, :firstName, :lastName, :emailAddr, :status)";
     $bindparams = array(
@@ -1351,8 +1353,7 @@ function createSuperuser() {
         "emailAddr" => $superuser->emailAddr,
         "status" => $superuser->status,
     );
-    $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=$userid;
+    $resp = $resp + perform_query($sql,'POST',$bindparams);
     echo json_encode($resp);
 }
 
@@ -1560,7 +1561,8 @@ function createNewUser($firstname, $lastname, $emailAddr, $usertype){
                       "username"=> $username,
                       "password"=> $passwordhash,
                       "usertype" => $usertype);
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+
+    perform_query($sql,'POST',$bindparams);
     //emailLogin($emailAddr, $username, $password, $firstname, $lastname);
     return $userid;
 }
@@ -1582,9 +1584,50 @@ function getUserCount($usertype){
     echo json_encode(perform_query($sql, 'GETCOL', $bindparams));
 }
 
+
+/*
+// advanced search
+students who
+- are missing an X number of assignments,
+- are failing X number of classes,
+- has average between X and Y
+*/
 function findStudentsWithAdvancedCriteria(){
+    $lowergrade = $_GET['lowergrade'];
+    $uppergrade = $_GET['uppergrade'];
+    $assignmentcount = $_GET['numAssignment'];
+    $failcount = $_GET['numFailedSections'];
 
+    $qualifiedstudents = array();
 
+    if (isset($lowergrade) && isset($uppergrade)){
+        $sql = "SELECT userid from student where status='active'";
+        $students = perform_query($sql, 'GETASSO');
+        foreach ($students as $row){
+            $studenetid = (int) $row['userid'];
+            $avgGrade = getAvgGrade($studentid, 1);
+            if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
+                array_push($qualifiedstudents, $studentid);
+            }
+        }
+    }
+
+    if (isset($assignmentcount)){
+        //$totalassignmentcount;
+        //$studentassignmentcount;
+
+    }
+
+    if (isset($failcount)){}
+
+    $ret = parenthesisList($ids);
+    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status
+    from student where userid in ";
+    $sql.=$ret[0];
+    echo json_encode(perform_query($sql,'GETALL',$ret[1]));
 }
 
 #================================================================================================================#
