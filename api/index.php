@@ -1066,7 +1066,7 @@ function createStudent() {
         "status" => $student->status,
     );
     $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=>$userid;
+    $resp["userid"]=$userid;
     echo json_encode($resp);
 }
 
@@ -1205,7 +1205,7 @@ function createTeacher() {
         "usertype" => 'T'
     );
     $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=>$userid;
+    $resp["userid"]=$userid;
     echo json_encode($resp);
 }
 
@@ -1317,7 +1317,7 @@ function createAdministrator() {
         "usertype" => 'A'
     );
     $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=>$userid;
+    $resp["userid"]=$userid;
     echo json_encode($resp);
 }
 #================================================================================================================#
@@ -1346,7 +1346,7 @@ function createSuperuser() {
         "status" => $superuser->status,
     );
     $resp = perform_query($sql,'POST',$bindparams);
-    $resp["userid"]=>$userid;
+    $resp["userid"]=$userid;
     echo json_encode($resp);
 }
 
