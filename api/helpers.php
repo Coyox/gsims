@@ -43,10 +43,12 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 }
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
+    $emailAdddr = "shanifer@gmail.com";
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
     try {
         $message = array(
-        'html' => '<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
+        'html' => '<img style="border: 0 !important;-ms-interpolation-mode: bicubic;height: 1px !important;width: 1px !important;margin: 0 !important;padding: 0 !important" src="https://gobind.createsend1.com/t/i-o-ydiuttt-l/o.gif" width="1" height="1" border="0" alt="">
+<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
 Thank you for registering with Gobind Sarvar School.<br>
 Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="http://gobind.createsend1.com/t/i-l-ydiuttt-l-r/">gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Username:'.$username.'<br>
 Password:'.$password.'</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">This is an auto-generated email. &nbsp;Please do not reply.</p>
