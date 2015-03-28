@@ -1,7 +1,6 @@
 var EmailView = Backbone.View.extend({
 	initialize: function(options) {
 		this.emailAddr = options.emailAddr;
-		//this.emails = options.emails; //STUBBED
 		areYouAlive();
 		this.render();
 	},
@@ -9,14 +8,28 @@ var EmailView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["email.html"]);
 		//this.$el.find("#email-to").val(this.emailAddr);
+		//this.$el.find("#dialog").dialog({ modal: true, autoOpen: false });
+		this.$el.find("#pre").hide();
+
 
 		var userEmail = sessionStorage.getItem('gobind-email') ; // TODO: Get the email of the logged in user
 		this.$el.find("#email-from").val(userEmail);
 	},
 
 	events: {
-		"click #send" : "sendEmail",
-		"click #fetch": "checkAccountStatus"
+		"click #send" :   "sendEmail",
+		"click #fetch":   "checkAccountStatus",
+		"click #preview": "previewHTML"
+	},
+
+	previewHTML: function(evt){
+
+		var body = this.$el.find("#email-message").val();
+		this.$el.find("#pre").show();
+		this.$el.find('#dialog').html(body);
+		
+
+	 	
 	},
 
 	checkAccountStatus: function(evt){
@@ -43,7 +56,6 @@ var EmailView = Backbone.View.extend({
 
 	sendEmail: function(evt){
 		var recipientInput = this.$el.find("#email-to").val(); // Input from the "to" form
-		//TODO: Recipients pulls the array as a parameter from calling page.
 		var recipients = []; // array where each index contains an email 
 		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
@@ -59,6 +71,7 @@ var EmailView = Backbone.View.extend({
 		request.data.key = apiKey;
 		request.data.message = {};
 		request.data.message.from_email = from;
+		request.data.message.from_name = "Gobind Sarvar School";
 		request.data.message.to = [];
 		request.data.message.autotext = 'true'
 		request.data.message.subject = subject;
@@ -68,11 +81,8 @@ var EmailView = Backbone.View.extend({
 		if (recipients.length == 0){
 			recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
 		}
-
-		if(self){
-			
+		if(self == true){
 			recipients.push(from);
-
 		}
 
 		// Push each recipient's data to JSON object
@@ -94,6 +104,9 @@ var EmailView = Backbone.View.extend({
   			data: JSON.stringify(request.data),
 		}).done(function(response) {
    		console.log(response);
+   		alert("Message sent successfully!");
+ 		}).fail(function(xhr, textStatus, errorThrown){
+ 			alert("Error sending email:\n\n" + xhr.responseText);
  		});
 	}
 });
