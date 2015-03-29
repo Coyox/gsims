@@ -246,7 +246,7 @@ function createSchoolYear(){
         $idsql = "SELECT courseid from course where courseid=:courseid";
 
         $sql = "INSERT into course (courseid, courseName, description, deptid, schoolyearid, status)
-                SELECT :courseid, courseName, description, deptid, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+                SELECT :courseid, courseName, description, deptid, :schoolyearid, :status FROM course where schoolyearid=:activeschoolyear
                 AND (courseName not in (SELECT courseName from course where schoolyearid=:schoolyearid)) LIMIT 1";
 
         for ($i=0 ; $i<$rowcount; $i++){
