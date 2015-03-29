@@ -119,13 +119,17 @@ var CourseRowView = Backbone.View.extend({
     template: _.template("<td><%= model.courseName %></td>"
         + "<td><%= deptName %></td>"
         + "<td><%= model.description %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Course</button></td>"),
+        + "<td><button class='edit-course btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Course</button><button class='delete-course btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Delete Course</button></td>"),
 
     otherusertemplate: _.template("<td><%= model.courseName %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>View Course</button></td>"),
+        + "<td><%= deptName %></td>"
+        + "<td><%= model.description %></td>"
+        + "<td><button class='edit-course btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Course</button></td>"),
 
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.courseName %>' name='courseName'></td>"
-		+ "<td> <button class='save-dept btn btn-xs btn-primary center-block' id='<%= model.courseid %>'>Save Department</button> <button class='cancel-dept btn btn-xs btn-primary center-block' id='<%= model.courseid %>'>Cancel Edit</button></td>"),
+        + "<td><input type='text' class='form-control input-sm' value='<%= deptName %>' name='deptName'></td>"
+        + "<td><input type='text' class='form-control input-sm' value='<%= model.description %>' name='description'></td>"
+		+ "<td> <button class='save-course btn btn-xs btn-primary center-block' id='<%= model.courseid %>'>Save Course</button> <button class='cancel-course btn btn-xs btn-primary center-block' id='<%= model.courseid %>'>Cancel Edit</button></td>"),
 
     initialize: function (options) {
         this.action = "view";
@@ -155,14 +159,14 @@ var CourseRowView = Backbone.View.extend({
     },
 
     events: {
-        "click .edit-dept": "editDept",
-        "click .delete-dept": "deleteDept",
-        "click .save-dept": "saveDept",
-        "click .cancel-dept": "cancelDept",
+        "click .edit-course": "editCourse",
+        "click .delete-course": "deleteCourse",
+        "click .save-course": "saveCourse",
+        "click .cancel-course": "cancelCourse",
         "keyup input": "updateModel"
     },
     
-    cancelDept: function(evt) {
+    cancelCourse: function(evt) {
         console.log("cancelled dept change");
         this.model.attributes = JSON.parse(this.untouchedModel);
         this.action = "view";
@@ -175,12 +179,12 @@ var CourseRowView = Backbone.View.extend({
         this.model.set(name, value);
     },
 
-    editDept: function (evt) {
+    editCourse: function (evt) {
         this.action = "edit";
         this.render();
     },
 
-    deleteDept: function(evt) {
+    deleteCourse: function(evt) {
         var usertype = sessionStorage.getItem("gobind-usertype");
         var view = this;
         var id = $(evt.currentTarget).attr("id");
@@ -200,7 +204,7 @@ var CourseRowView = Backbone.View.extend({
 
     },
 
-    saveDept: function (evt) {
+    saveCourse: function (evt) {
         var view = this;
         var id = $(evt.currentTarget).attr("id");
         this.model.set("id", id);
