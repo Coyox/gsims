@@ -1,12 +1,34 @@
-<div class="o-auto">
-	<div class="col-sm-3">
-		<h4>Select a Department</h4>
-		<hr>
-		<ul id="department-list" class="list-group"></ul>
+<div id="course-selection" class="o-auto">
+	<div class="col-sm-12" class="course-selection-component o-auto">
+		<div>
+			<h4>1. Select a Department</h4>
+			<div id="department-list"></div>
+		</div>
 	</div>
-	<div class="col-sm-9">
-		<h4>Enrolled Sections</h4>
-		<hr>
+	<div class="divider"></div>
+
+
+	<div class="col-sm-12 course-selection-component o-auto">
+		<h4>2. Showing courses for: <strong class="department-name">[ none selected ]</strong>
+			<br>
+		</h4>
+		<table id="course-list" class="table table-striped table-bordered">
+			<thead>
+				<th>Sections</th>
+				<th>Course Name</th>
+				<th>Description</th>
+				<th>Pre Reqs</th>
+			</thead>
+			<tbody class="results"></tbody>
+		</table>
+	</div>
+	<div class="divider"></div>
+
+	<div class="col-sm-12 course-selection-component o-auto">
+		<h4>3. Enrolled Sections 
+			<br>
+			<small>You will be enrolled in each of the following sections</small>
+		</h4>
 		<table id="enrolled-list" class="table table-striped table-bordered">
 			<thead>
 				<tr>
@@ -20,18 +42,9 @@
 			</thead>
 			<tbody class="results"></tbody>
 		</table>
+	</div>
 
-		<br><br>
-
-		<h4>Showing courses for: <strong class="department-name"></strong></h4>
-		<hr>
-		<table id="course-list" class="table table-striped table-bordered">
-			<thead>
-				<th>View Sections</th>
-				<th>Course Name</th>
-				<th>Description</th>
-			</thead>
-			<tbody class="results"></tbody>
-		</table>
+	<div class="col-sm-12">
+		<button id="save-sections" class="btn btn-sm btn-primary pull-right">Save Courses</button>
 	</div>
 </div> 

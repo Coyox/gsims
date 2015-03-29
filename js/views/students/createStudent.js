@@ -5,92 +5,145 @@ var CreateStudentView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["createStudent.html"]);
+
+		populateMonthMenu(this.$el.find("#month-menu"));
+		populateDayMenu(this.$el.find("#day-menu"));
+		populateYearMenu(this.$el.find("#year-menu"));
 	},	
 
 	events: {
 		"click #search": "searchExistingStudent",
 		"click #clear": "clearForm",
-		"click .view-student": "viewStudent",
-		"click #save-student": "saveStudent",
 		"click #skip": "skipSearchCheck",
-		"click #to-enrollment": "loadCourseEnrollment"
 	},
 
 	searchExistingStudent: function(evt) {
 		var view = this;
+		var params = {};
 		var parent = this.$el.find("#quick-search");
+
 		var firstName = parent.find("#first-name").val();
+		if (firstName != "") {
+			params.firstName = firstName;
+		}
+
 		var lastName = parent.find("#last-name").val();
-		var bday = parent.find("#birthday").val();
+		if (lastName != "") {
+			params.lastName = lastName;
+		}
+
+		var month = this.$el.find("#month-menu option:selected");
+		var day = this.$el.find("#day-menu option:selected");
+		var year = this.$el.find("#year-menu option:selected");
+
+		if (!month.is(":disabled") && !day.is(":disabled") && !year.is(":disabled")) {
+			params.dateOfBirth = year.val() + "-" + month.val() + "-" + day.val();
+		}
 
 		var student = new Student();
 		student.fetch({
 			url: student.getSearchStudentsUrl(),
-			data: {
-				firstName: firstName,
-				lastName: lastName,
-				//dateOfBirth: bday
-			}
+			data: params
 		}).then(function(data) {
-			var elem = view.$el.find("#create-message");
-			var message = capitalize(firstName) + " " + capitalize(lastName);
-			if (data.length > 0) {
-				var id = data[0].userid;
-				message += " has already registered for the school.";
-				message += " Click <a class='view-student' id='" + id + "'><strong>here</strong></a> to modify their information";
-			} else {
-				message += " has not registered for the school yet.";
-				message += " Fill out the following form to register them into the school.";
-				
-				view.createFormTemplate(elem.parent());
-				view.populateForm(elem.parent(), {
-					firstName: firstName, 
-					lastName: lastName,
-					dateOfBirth: bday
+			// STUDENT MAY EXIST
+			if (data.length) {
+				app.Router.navigate("students/search");
+				new StudentsTableView({
+					el: $("#content"),
+					results: data,
+					template: "createStudentSearch.html"
 				});
 			}
-			elem.html(message);
-			elem.parent().removeClass("hide").show();
-			parent.hide();
+			// STUDENT DOESNT EXIST
+			else {
+				view.enrollmentForm({
+					firstName: firstName,
+					lastName: lastName,
+					month: month.val(),
+					day: day.val(),
+					year: year.val()
+				});
+			}
 		});
 	},
 
 	skipSearchCheck: function() {
-		this.$el.find("#quick-search").hide();
-		
-		var parent = this.$el.find("#create-form");
-		parent.find("#create-message").hide();
-		parent.removeClass("hide");
-
-		this.createFormTemplate(parent);
-		this.populateForm(parent);
+		this.enrollmentForm();
 	},
 
-	createFormTemplate: function(elem) {
+	enrollmentForm: function(params) {
+		app.Router.navigate("enrollmentForm", {trigger:true});
+
+		var el = app.enrollmentFormView.el;
+		_.each(params, function(value, name) {
+			if (name == "firstName" || name == "lastName") {
+				$(el).find("[name='" + name + "']").val(value);
+			} else {
+				console.log("#" + name + "-menu option[value='" + value + "']");
+				$(el).find("#" + name + "-menu option[value='" + value + "']").prop("selected", true);
+			}
+		}, this);
+		//app.enrollmentFormView.populateForm(params);
+	},
+
+	// saveStudent: function(evt) {
+	// 	Backbone.Validation.bind(this);	
+
+	// 	if (this.model.isValid(true)) {
+	// 		this.model.save().then(function(data) {
+	// 			console.log(data);
+	// 		}).fail(function(data) {
+	// 			new TransactionResponseView({
+	// 				title: "ERROR",
+	// 				status: "error",
+	// 				message: "TODO"
+	// 			});
+	// 		});
+	// 	}
+	// },
+
+	clearForm: function(evt) {
+		this.$el.find("input").val("");
+	}
+});
+
+var EnrollmentFormView = Backbone.View.extend({
+	initialize: function(options) {
+		this.onlineReg = options.onlineReg;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(html["enrollmentForm.html"]);
+
 		var formTemplate = html["viewStudent.html"]();
 		formTemplate = $(formTemplate).find("#student-info").html();
-		elem.append(formTemplate);
-		elem.find(".form-buttons").remove();
-		elem.find(".delete").remove();
+
+		this.$el.find("#form").html(formTemplate);
+		this.$el.find(".form-buttons").remove();
+		this.$el.find(".delete").remove();
+		this.populateForm();
 	},
 
-	viewStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		app.Router.navigate("students/" + id, {trigger:true});
+	events: {
+		"click #to-enrollment": "validateModel"
 	},
 
-	populateForm: function(elem, prefilled) {
+	populateForm: function(prefilled) {
 		this.model = new Student();
+
+		if (this.onlineReg == true) {
+			this.model.nonEditable.push("paid");
+			this.model.nonEditable.push("status");
+		}
+
 		_.each(this.model.toJSON(), function(value, attr) {
 			if (this.model.nonEditable.indexOf(attr) == -1) {
 				var filled = prefilled ? prefilled[attr] : undefined;
-				var value;
 				if (filled) {
 					value = filled;
 					this.model.set(attr, value);
-				} else {
-					value = "";
-				}
+				} 
 				new StudentRecordRowView({
 					el: this.addRow(this.model, attr),
 					action: "edit",
@@ -100,39 +153,6 @@ var CreateStudentView = Backbone.View.extend({
 				});
 			}
 		}, this);
-	},
-
-	saveStudent: function(evt) {
-		Backbone.Validation.bind(this);	
-
-		if (this.model.isValid(true)) {
-			this.model.save().then(function(data) {
-				console.log(data);
-			}).fail(function(data) {
-				new TransactionResponseView({
-					title: "ERROR",
-					status: "error",
-					message: "TODO"
-				})
-			});
-		}
-
-		// this.model.set({
-		// 	id: Math.floor(Math.random()*10000)
-		// });
-
-		// this.model.save(null, {
-		// 	type: "POST",
-		// 	url: "http://gobind-sarvar.rhcloud.com/api/students" // TODO: dont hardcode url
-		// }).then(function() {
-		// 	new TransactionResponseView({
-		// 		message: "Record successfully created. Click the refresh button on the table to see your changes (or just refresh the page)."
-		// 	});		
-		// });
-	},
-
-	clearForm: function(evt) {
-		this.$el.find("input").val("");
 	},
 
 	addRow: function(model, attr) {
@@ -151,20 +171,25 @@ var CreateStudentView = Backbone.View.extend({
         return container;	
 	},
 
-	loadCourseEnrollment: function() {
+	validateModel: function() {
 		Backbone.Validation.bind(this);	
 
+		setDateOfBirth(this.model);
 		if (this.model.isValid(true)) {
-			app.Router.navigate("courseEnrollment", {trigger:true});
-			// this.model.save().then(function(data) {
-			// 	console.log(data);
-			// }).fail(function(data) {
-			// 	new TransactionResponseView({
-			// 		title: "ERROR",
-			// 		status: "error",
-			// 		message: "TODO"
-			// 	})
-			// });
+			console.log("VALID");
+			// app.Router.navigate("registrationEnrollment", {trigger:true});			
+			// app.regEnrollmentView.studentModel = this.model;
+
+			// if (this.onlineReg) {
+			// 	app.regEnrollmentView.el = $("#container");
+			// 	app.regEnrollmentView.render();
+			// 	app.regEnrollmentView.studentModel.set("status", "pending");
+			// 	app.regEnrollmentView.onlineReg = true;
+			// }
+
+			// app.regEnrollmentView.displayForm();
+		} else {
+			console.log("INVALID");
 		}
 	}
 });

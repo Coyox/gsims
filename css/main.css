@@ -47,20 +47,41 @@ a {
 }
 
 #login-panel {
+	background-color: #f2f2f2;
 	overflow: auto;
 	margin-top: 20px;
+}
+
+.login-text, .heading-text {
+	font-size: 24px;
+	color: #666;
+	margin-bottom: 20px;
+	font-weight: normal;
+}
+
+.register-text {
+	font-size: 20px;
+	color: #666;
+	margin-bottom: 20px;
+	font-weight: normal;
+}
+
+#register {
+	color: #9d426b;
 }
 
 .login-left {
 	float: left;
 	width: 50%;
 	padding-right: 20px;
-	border-right: 1px dotted #ccc;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 5px;
 }
 
 .login-right {
 	float: right;
-	width: 47%;
+	width: 49%;
 }
 
 .login-right .login-background {
@@ -71,10 +92,6 @@ a {
 
 #forgot-password {
 	margin-top: 3px;
-}
-
-#register, #register-icon {
-	color: #9d426b;
 }
 
 #sidebar {
@@ -230,8 +247,18 @@ a {
 	z-index: 1000;
 }
 
+.primary-link {
+	cursor: pointer;
+	color: #9d426b;
+	font-weight: bold;
+}
+
 .link:hover {
 	cursor: pointer;
+}
+
+.center {
+	text-align: center;
 }
 
 .red {
@@ -318,17 +345,36 @@ li.paginate_button.active a {
 	color: #9d426b;
 }
 
-#back-container {
-	margin-bottom: 10px;
+#button-container {
+	padding-bottom: 10px;
+	border-bottom: 1px dotted #ddd;
+}
+
+#button-container button {
+	margin-left: 3px;
+	margin-right: 3px;
 }
 
 #department-list {
-
+	overflow: auto;
+	margin-bottom: 20px;
 }
 
-#department-list .list-group-item:hover {
-	background-color: #f2f2f2;
+#department-list span {
+	background: #fff;
+	border: 2px solid #ddd;
+	color: #666;
+    margin: 5px;
+}
+
+#department-list span:hover {
+	background-color: #9d426b;
+	color: #fff;
 	cursor: pointer;
+}
+
+.dept-item {
+	list-style: none;
 }
 
 #course-list {
@@ -352,11 +398,78 @@ tr.shown td.details-control {
     background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
 }
 
+.font-14 {
+	font-size: 14px;
+}
+
 .font-16 {
 	font-size: 16px;
 }
 
-.enroll-link {
+.enroll-link, .remove-section {
 	color: #9d426b;
 	font-weight: bold;
 }
+
+#registration-page, #enrollment-page {
+	padding: 20px;
+}
+
+.form-horizontal .form-group {
+	margin-bottom: 10px;
+}
+
+.placeholder-error::-webkit-input-placeholder {
+    color: #CB0000;
+}
+.placeholder-error:-moz-placeholder {
+    /* FF 4-18 */
+    color: #CB0000;
+}
+.placeholder-error::-moz-placeholder {
+    /* FF 19+ */
+    color: #CB0000;
+}
+.placeholder-error:-ms-input-placeholder {
+    /* IE 10+ */
+    color: #CB0000;
+}
+
+.course-selection-component {
+    margin-bottom: 30px;
+}
+
+.divider {
+    border: 1px dashed #ddd;
+    height: 1px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: auto;
+}
+
+.dt-btn {
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.dataTables_filter label {
+	margin-right: 5px;
+}
+
+.asterisk {
+	font-size: 14px;
+	color: #CB0000;
+	padding-left: 5px;
+}
+
+
+
+.easyWizardSteps {list-style:none;width:100%;overflow:hidden;margin:0;padding:0;border-bottom:1px solid #ccc;margin-bottom:20px}
+.easyWizardSteps li {font-size:18px;display:inline-block;padding:10px;color:#B0B1B3;margin-right:20px;}
+.easyWizardSteps li span {font-size:24px}
+.easyWizardSteps li.current {color:#9d426b}
+
+.easyWizardButtons {overflow:hidden;padding:10px;}
+.easyWizardButtons button, .easyWizardButtons .submit {cursor:pointer}
+.easyWizardButtons .prev {float:left}
+.easyWizardButtons .next, .easyWizardButtons .submit {float:right}

@@ -6,13 +6,26 @@ var LoginView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["login.html"]);  
+		var view = this;
+		var schoolyear = new SchoolYear();
+		schoolyear.fetch({
+			url: schoolyear.getActiveSchoolYearUrl()
+		}).then(function(data) {
+			view.$el.html(html["login.html"]);  
+			if (data.openForReg == 1) {
+				view.$el.find("#reg-open").removeClass("hide").show();
+			} else {
+				view.$el.find("#reg-closed").removeClass("hide").show();
+			}
+			app.openForReg = data.openForReg;
+		});
 	},
 
 	events: {
 		"click #login": "validateCredentials",
 		"keyup #password, #username": "loginOnEnter",
-		"click #forgot-password": "forgotPassword"
+		"click #forgot-password": "forgotPassword",
+		"click #register": "registerPage"
 	},
 
 	validateCredentials: function(evt) {
@@ -34,11 +47,12 @@ var LoginView = Backbone.View.extend({
 					app.usertype = data.usertype;
 					sessionStorage.setItem("gobind-username", app.username);
 					sessionStorage.setItem("gobind-usertype", app.usertype);
-
+					sessionStorage.setItem("gobind-login", JSON.stringify(data));
 					view.model.fetch({
 						url: view.model.getUsers(data.userid, data.usertype)
 					}).then(function (data) {
 						sessionStorage.setItem("gobind-email", data.emailAddr);
+						sessionStorage.setItem("gobind-user", JSON.stringify(data));
 						app.Router.navigate("home", {trigger:true});
 					});
 				} else {
@@ -58,6 +72,10 @@ var LoginView = Backbone.View.extend({
 		if (evt.keyCode == 13) {
 			this.validateCredentials();
 		}
+	},
+
+	registerPage: function(evt) {
+		app.Router.navigate("registrationForm", {trigger:true});
 	}
 });
 
@@ -79,33 +97,24 @@ var ForgotPasswordView = Backbone.View.extend({
 
 		var user = new User();
 		user.fetch({
-			url: user.getUsers("341231", "SU")
+			url: user.getUserByEmail(email)
 		}).then(function(data) {
-			if (typeof data !== undefined) {
-				if (data.emailAddr == email) {
-					var link = "https://gobind-sarvar.rhcloud.com/#reset" + data.userid + "/username1";
-					sendEmail({
-						from: "info@gobindsarvar.com",
-						to: [{
-							email: email,
-							name: "Gobind Sarvar",
-							type: "to"
-						}],
-						subject: "Gobind Sarvar - Reset Account Password",
-						body: link
-					}, function() {
-						new TransactionResponseView({
-							message: "An email has been sent to: " + email + ". Please follow the link to reset your password."
-						});
-					});
-				} else {
-					// No user exists with the specified email
+			if (data) {
+				var link = "https://gobind-sarvar.rhcloud.com/#reset/" + data.userid + "/" + data.username;
+				sendEmail({
+					from: "info@gobindsarvar.com",
+					to: [{
+						email: email,
+						name: "Gobind Sarvar",
+						type: "to"
+					}],
+					subject: "Gobind Sarvar - Reset Account Password",
+					body: link
+				}, function() {
 					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "No user exists with the email address: " + email + ". Please provide a valid email address."
+						message: "An email has been sent to: " + email + ". Please follow the link to reset your password."
 					});
-				}
+				});
 			} else {
 				// No user exists with the specified email
 				new TransactionResponseView({
@@ -143,9 +152,16 @@ var ResetPasswordView = Backbone.View.extend({
 			user.set("id", this.id);
 			user.set("userid", this.id);
 			user.save().then(function(data) {
-				console.log(data);
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Password succsesfully reset. Please try logging in again."
+					});
+				} else {
+					new TransactionResponseView({
+						message: "Password could not be reset. Please refresh the page and try again."
+					});
+				}
 			});
-		
 		}
 	}
 });

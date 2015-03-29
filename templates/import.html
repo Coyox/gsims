@@ -1,0 +1,22 @@
+<div>
+	<div id="container">
+		<input type="file" id="csv-file" class="btn btn-primary">
+		<br>
+		<button id="import" class="btn btn-primary">Import Template</button>
+        <div id="not-found" class="hide">
+			<div class="alert alert-danger">
+				Please select a file to import.
+			</div>
+		</div>
+		<br><br>
+		<button id="downloadAttendance" class="btn btn-primary" type="submit">Download Attendance Template</button>
+		<br><br>
+		<form method="get" action="data_templates/import_students.csv">
+		<button id="downloadStudents" class="btn btn-primary" type="submit">Download Create-Students Template</button>
+		</form>
+		<br><br>
+		<form method="get" action="data_templates/import_teachers_administrators.csv">
+		<button id="downloadTeachers" class="btn btn-primary" type="submit">Download Create-Teachers/Administrators Template</button>
+		</form>
+	</div>
+</div>

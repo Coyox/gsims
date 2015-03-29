@@ -1,8 +1,25 @@
+var LoginRouter = Backbone.Router.extend({
+    routes: {
+        "": "login"
+    },
+
+    login: function() {
+        new LoginView({
+            el: $("#container")
+        });
+    },
+});
+
 var Router = Backbone.Router.extend({
+    buttons: _.template("<div id='button-container' class='hide'>"
+        +       "<button id='back-btn' class='btn btn-primary btn-sm'>Back</button>"
+        +   "</div>"),
+
 	initialize: function(options) {
+        var view = this;
 		this.el = $("#container");
 
-        /** Hide/show the back button depending on what the current page is (routeName). 
+        /** Hide/show the back button depending on what the current page is (routeName).
             The back button should essentially be shown on all pages except for the
             home page */
 		Backbone.history.on("all", function(route, router, routeName) {
@@ -13,7 +30,9 @@ var Router = Backbone.Router.extend({
                     $("#back-container").hide();
                     break;
                 default:
-                    $("#back-container").removeClass("hide").show();
+                    $("#content").prepend(view.buttons());
+                    $("#button-container").removeClass("hide").show();
+                    $(".buttons").children().appendTo($("#button-container"));
                     break;
            }
 		});
@@ -30,12 +49,15 @@ var Router = Backbone.Router.extend({
         "students/all": 		"viewAllStudents",
         "students/:id": 		"viewStudent",
         "createStudent":        "createStudent",
+        "enrollmentForm":       "studentEnrollmentForm",
         "courseEnrollment":     "courseEnrollment",
+        "registrationForm":     "registrationForm",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
         "teachers/all": 		"viewAllTeachers",
         "teachers/:id": 		"viewTeacher",
+        "createTeacher":        "createTeacher",
 
         "filterAdmins": 		"filterAdmins",
         "admins/search": 		"viewFilteredAdmins",
@@ -43,10 +65,22 @@ var Router = Backbone.Router.extend({
         "admins/:id": 			"viewAdmin",
 
         "email" :               "email",
+
+        "schoolyears":          "viewSchoolYears",
+        "schools":              "schools",
+        "departments":          "departments",
+        "courses":              "courses",
+        "sections":             "sections",
+
+        "notifications":        "notifications",
+
+        "settings":             "settings",
+
+        "import":               "importData"
     },
 
-    updatePageBreadcrumb: function(text) {
-        $("#breadcrumb-text").html(text);
+    updatePageBreadcrumb: function(text, icon) {
+        $("#breadcrumb-text").html("<span class='glyphicon glyphicon-" + icon + "'></span>" + text);
     },
 
     login: function() {
@@ -62,20 +96,33 @@ var Router = Backbone.Router.extend({
     	}
     },
 
-    home: function() {
-        this.updatePageBreadcrumb("Home");
+    createChild: function() {
+        $("#content").html("<div id='child'></div>");
+    },
+
+    home: function(isHome) {
+        this.updatePageBreadcrumb("Home", "home");
 
     	new HomePageView({
     		el: this.el
     	});
+
+        if (Backbone.history.fragment == "home") {
+            new DashboardView({
+                el: $("#content")
+            });
+        }
+
+        $("#main-content .left").affix({
+            offset: {
+                top: 50
+            }
+        })
     },
 
     email: function() {
-        this.updatePageBreadcrumb("Send Email");
-
         this.loadHome();
-
-        //$("#content").html(html["email.html"]);
+        this.updatePageBreadcrumb("Send Email", "envelope");
 
         new EmailView({
             el: $("#content"),
@@ -97,9 +144,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterStudents: function() {
-        this.updatePageBreadcrumb("Search Students");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Search Students", "user");
 
     	var filterStudents = $("#hidden").find("#filter-students-container");
     	if (filterStudents.length) {
@@ -112,9 +158,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredStudents: function() {
-        this.updatePageBreadcrumb("Students");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Students", "user");
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -127,9 +172,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllStudents: function() {
-        this.updatePageBreadcrumb("Students");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Students", "user");
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -142,9 +186,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewStudent: function(id) {
-        this.updatePageBreadcrumb("View Student (" + id + ")");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("View Student", "user");
 
 		$("#content").html(html["viewStudent.html"]);
 
@@ -158,31 +201,41 @@ var Router = Backbone.Router.extend({
     },
 
     createStudent: function(id) {
-        this.updatePageBreadcrumb("Create Student");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Create Student", "user");
 
-        $("#content").html("<div id='create-student-container'></div>");
-
-        new CreateStudentView({
-            el: $("#create-student-container")
+        $("#content").html("<div id='test-reg'></div>");
+        new RegistrationFormView({
+            el: $("#test-reg"),
+            regType: "admin",
+            status: "active"
         });
     },
 
-    courseEnrollment: function() {
-        this.updatePageBreadcrumb("Course Enrollment");
-
+    studentEnrollmentForm: function() {
         this.loadHome();
+        this.updatePageBreadcrumb("Create Student", "user");
 
-        new CourseEnrollmentView({
+        app.enrollmentFormView = new EnrollmentFormView({
             el: $("#content")
         });
     },
 
-    filterTeachers: function() {
-        this.updatePageBreadcrumb("Search Teachers");
+    courseEnrollment: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Course Enrollment", "th-list");
 
-    	this.loadHome();
+        var user = JSON.parse(sessionStorage.getItem("gobind-user"));
+
+        app.courseEnrollmentView = new CourseEnrollmentView({
+            el: $("#content"),
+            userid: user ? user.userid : false
+        });
+    },
+
+    filterTeachers: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Search Teachers", "user");
 
     	var filterTeachers = $("#hidden").find("#filter-teachers-container");
     	if (filterTeachers.length) {
@@ -195,9 +248,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredTeachers: function() {
-        this.updatePageBreadcrumb("Teachers");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Teachers", "user");
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -210,9 +262,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllTeachers: function() {
-        this.updatePageBreadcrumb("Teachers");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Teachers", "user");
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -223,11 +274,29 @@ var Router = Backbone.Router.extend({
 			});
     	}
     },
+    viewTeacher: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("View Teacher", "user");
+
+        new TeacherRecordView({
+            id: id,
+            el: $("#content"),
+            action: "view",
+        });
+    },
+
+    createTeacher: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Create Teacher", "user");
+
+        new CreateTeacherView({
+            el: $("#content").html("")
+        });
+    },
 
     filterAdmins: function() {
-        this.updatePageBreadcrumb("Search Administrators");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Search Administrators", "user");
 
     	var filterAdmins = $("#hidden").find("#filter-admins-container");
     	if (filterAdmins.length) {
@@ -240,9 +309,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredAdmins: function() {
-        this.updatePageBreadcrumb("Administrators");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Administrators", "user");
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -255,9 +323,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllAdmins: function() {
-        this.updatePageBreadcrumb("Administrators");
-
-    	this.loadHome();
+        this.loadHome();
+        this.updatePageBreadcrumb("Administrators", "user");
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -269,7 +336,83 @@ var Router = Backbone.Router.extend({
     	}
     },
 
-    courses: function() {
+    viewSchoolYears: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("School Years", "calendar");
 
+        new SchoolYearView({
+            el: $("#content")
+        });
+    },
+
+    schools: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Schools", "education");
+
+        new SchoolView({
+            el: $("#content")
+        });
+    },
+
+    departments: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Departments", "th-list");
+
+        new DepartmentView({
+            el: $("#content")
+        });
+    },
+
+    courses: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Courses", "th-list");
+
+        new CourseView({
+            el: $("#content")
+        });
+    },
+
+    sections: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Sections", "th-list");
+
+        new DepartmentView({
+            el: $("#content")
+        });
+    },
+
+    notifications: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Notifications", "bell");
+
+        new NotificationsView({
+            el: $("#content")
+        });
+    },
+
+    registrationForm: function() {
+        new RegistrationFormView({
+            el: $("#container"),
+            regType: "online",
+            status: "pending"
+        });
+    },
+
+    settings: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Settings", "wrench");
+
+        new UserSettingsView({
+            el: $("#content")
+        });
+    },
+
+    importData: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Import Data", "import");
+
+        new ImportView({
+            el: $("#content")
+        });
     }
 });

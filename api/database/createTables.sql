@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS `department` (
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`),
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 
@@ -44,12 +44,13 @@ CREATE TABLE IF NOT EXISTS `course` (
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`deptid`) REFERENCES `department` (`deptid`) ON DELETE CASCADE,
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `prereqs` (
-  `courseid` int(11) PRIMARY KEY NOT NULL,
-  `prereq` char(5) NOT NULL,
+  `courseid` int(11) NOT NULL,
+  `prereq` char(50) NOT NULL,
+  PRIMARY KEY (`courseid`, `prereq`),
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
 );
 
@@ -133,53 +134,53 @@ CREATE TABLE IF NOT EXISTS `section` (
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `document` (
   `docid` int(11) PRIMARY KEY NOT NULL,
   `docName` varchar(50)  NOT NULL,
   `description` varchar(50) NOT NULL,
-  `link` varchar(255) NOT NULL,
+  `link` varchar(255),
   `sectionid` int(11) NOT NULL,
-  `userid` int(11) NOT NULL,
+  `userid` int(11),
   `fullmark` smallint(5),
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`),
+  FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE SET NULL,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE,
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 
  CREATE TABLE IF NOT EXISTS `attendance` (
   `date` date NOT NULL,
-  `userid` int(11) NOT NULL,
-  `sectionid` int(11) NOT NULL,
+  `userid` int(11),
+  `sectionid` int(11),
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `date`),
-  FOREIGN KEY (`userid`) REFERENCES `login` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`),
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`userid`) REFERENCES `login` (`userid`) ON DELETE SET NULL,
+  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE SET NULL,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 
  CREATE TABLE IF NOT EXISTS `enrollment` (
-  `userid` int(11) NOT NULL,
+  `userid` int(11),
   `sectionid` int(11) NOT NULL,
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `schoolyearid`),
-  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`),
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE SET NULL,
+  FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
- CREATE TABLE IF NOT EXISTS `waitlisted` (
+CREATE TABLE IF NOT EXISTS `waitlisted` (
   `userid` int(11) NOT NULL,
   `waitlistid` int(11) NOT NULL,
   PRIMARY KEY (`userid`, `waitlistid`),
@@ -195,9 +196,9 @@ CREATE TABLE IF NOT EXISTS `marks` (
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`assignmentid`,`userid`, `schoolyearid`),
-  FOREIGN KEY (`assignmentid`) REFERENCES `document` (`docid`),
+  FOREIGN KEY (`assignmentid`) REFERENCES `document` (`docid`) ON DELETE CASCADE,
   FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`)
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );
 
 
@@ -220,4 +221,20 @@ CREATE TABLE IF NOT EXISTS `teaching` (
   FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE CASCADE,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS `studentCompetencyTest` (
+  `userid` int(11) NOT NULL,
+  `courseid` int(11) NOT NULL,
+  `mark` float,
+  PRIMARY KEY (`userid`,`courseid`),
+  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
+  FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS `apikeys` (
+  `keyid` varchar(255) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`keyid`, `name`)
 );

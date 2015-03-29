@@ -3,7 +3,7 @@ var app = {
 	serverUrl: "https://gobind-sarvar.rhcloud.com/",
 	currentSchoolYear: "2014-2015",
 	selectedSchoolYearId: "100000",
-	selectedSchoolId: "412312"
+	selectedSchoolId: "412312",
 };
 
 /** Object to hold all HTML templates (pre-loaded) */
@@ -15,16 +15,16 @@ _.extend(Backbone.Model.prototype, Backbone.Validation.mixin);
 /** Override Backbone's default validation callbacks. Use Bootstrap to highlight invalid fields */
 _.extend(Backbone.Validation.callbacks, {
     valid: function (view, attr, selector) {
-        var $el = view.$('[name=' + attr + ']'), 
+        var $el = view.$('[name=' + attr + ']'),
             $group = $el.closest('.form-group');
-        
+
         $group.removeClass('has-error');
         $group.find('.help-block').html('').addClass('hidden');
     },
     invalid: function (view, attr, error, selector) {
-        var $el = view.$('[name=' + attr + ']'), 
+        var $el = view.$('[name=' + attr + ']'),
             $group = $el.closest('.form-group');
-        
+
         $group.addClass('has-error');
         $group.find('.help-block').html(error).removeClass('hidden');
     }
@@ -35,9 +35,11 @@ $(function() {
 	loadLoginTemplate();
 	loadTemplates();
 
+	setActiveSchoolYear();
+
 	$("body").on("click", function(e) {
 	    if ($(e.target).data('toggle') !== 'popover'
-	        && $(e.target).parents('.popover.in').length === 0) { 
+	        && $(e.target).parents('.popover.in').length === 0) {
 	        $('[data-toggle="popover"]').popover('hide');
 	    }
 	});
@@ -52,7 +54,7 @@ function loadLoginTemplate() {
 	var xhr = $.ajax("templates/" + name);
 	$.when(xhr).then(function(data) {
 		html[name] = data;
-		init();
+		app.LoginRouter = new LoginRouter();
 	});
 }
 
@@ -75,15 +77,37 @@ function loadTemplates() {
 		"footer.html",
 		"email.html",
 		"enrolledSections.html",
-		"tempContent.html",
 		"searchStudents.html",
 		"searchTeachers.html",
 		"viewTeachers.html",
+		"viewTeacher.html",
+		"createTeacher.html",
 		"searchAdmins.html",
 		"viewAdmins.html",
 		"reportCard.html",
 		"courseEnrollment.html",
-		"viewSections.html",
+		"viewSchoolYear.html",
+		"createSchoolYear.html",
+        "createDepartment.html",
+        "createSection.html",
+        "createCourse.html",
+        "viewDepartments.html",
+        "viewCourses.html",
+        "viewSections.html",
+        "viewSchools.html",
+        "createSchool.html",
+		"createStudentSearch.html",
+		"enrollmentForm.html",
+		"dashboard.html",
+		"notifications.html",
+		"pendingRegistration.html",
+		"pendingTest.html",
+		"emailModal.html",
+		"registrationPage.html",
+		"termsAndConditions.html",
+		"settings.html",
+		"import.html",
+		"subSection.html"
 	];
 
 	$.each(templates, function(i, name) {
@@ -94,9 +118,9 @@ function loadTemplates() {
 		});
 	});
 
-	// $.when.apply($, promises).then(function() {
-	// 	init();
-	// });
+	$.when.apply($, promises).then(function() {
+		init();
+	});
 }
 
 /** Initialization function */
@@ -105,8 +129,14 @@ function init() {
 	Backbone.history.start();
 }
 
-
-
-
-
-
+/** Set the current school year (for all requests) */
+function setActiveSchoolYear() {
+	var schoolyear = new SchoolYear();
+	schoolyear.fetch({
+		url: schoolyear.getActiveSchoolYearUrl()
+	}).then(function(data) {
+		app.currentSchoolYear = data.schoolyear;
+		app.currentSchoolYearId = data.schoolyearid;
+		sessionStorage.setItem("gobind-activeSchoolYear", app.currentSchoolYearId);
+	});
+}

@@ -1,18 +1,16 @@
 <div id="login-container" class="center-block">
 	<img src="img/logo.png" class="logo center-block">
 	<div id="login-panel" class="panel panel-default">
-		<div class="panel-heading gradient">
- 			<span>Gobind Sarvar School - Login</span>
- 		</div>
 		<div class="panel-body">
 			<div class="login-left">
+				<label class="login-text">Log In</label>
 				<div class="alert alert-danger hide">Invalid Username/Password</div>
 				<div class="form-horizontal">
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div class="input-group">
 								<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-								<input type="text" id="username" class="form-control input-sm" name="username" placeholder="Username" autofocus>
+								<input type="text" id="username" class="form-control" name="username" placeholder="Username" autofocus>
 							</div>
 							<span class="help-block hidden"></span>
 						</div>
@@ -21,7 +19,7 @@
 						<div class="col-sm-12">
 							<div class="input-group">
 								<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-								<input type="password" id="password" class="form-control input-sm" name="password" placeholder="Password">
+								<input type="password" id="password" class="form-control" name="password" placeholder="Password">
 							</div>
 							<small id="forgot-password" class="pull-right cursor">forgot password</small>
 							<span class="help-block hidden"></span>
@@ -29,20 +27,31 @@
 					</div>
 					<div class="form-group">
 						<div class="col-sm-12">
-							<button id="login" class="btn btn-primary btn-block">Login</button>
+							<button id="login" class="btn btn-primary btn-block">
+								<span id="register-icon" class="glyphicon glyphicon-hand-right"></span> Login
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="login-right">
 				<div class="login-background">
-					<strong>Don't have an account?</strong>
-					<br>
-					<span>Gobind Sarvar is currently accepting new students. </span>
-					<h4>
-						<span id="register-icon" class="glyphicon glyphicon-hand-right"></span> 
-						<a id="register">Register today!</a>
-					</h4>
+					<div id="reg-open" class="hide">
+						<strong class="register-text">Don't have a <br> Gobind Sarvar Account?</strong>
+						<br>
+						<br>
+						<span class="font-14">We are currently accepting new students!</span>
+						<br>
+						<br>
+						<h4>
+							<a id="register">
+								<span id="register-icon" class="glyphicon glyphicon-hand-right"></span> Register Today!
+							</a>
+						</h4>
+					</div>
+					<div id="reg-closed" class="hide">
+						<strong>Gobind Sarvar is currently not accepting any new students. Please visit try again at a later date, or contact the office at info@gobindsarvar.com.</strong>
+					</div>
 				</div>
 			</div>
 		</div>

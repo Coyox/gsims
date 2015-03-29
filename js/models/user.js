@@ -15,8 +15,8 @@ var Student = Backbone.Model.extend({
 		phoneNumber: "",
 		emailAddr: "",
 		gender: "",
-		allergies: false,
-		prevAttendedGS: false,
+		allergies: "",
+		prevAttendedGS: "",
 		parentFirstName: "",
 		parentLastName: "",
 		parentPhoneNumber: "",
@@ -25,9 +25,9 @@ var Student = Backbone.Model.extend({
 		emergencyContactLastName: "",
 		emergencyContactRelation: "",
 		emergencyContactPhoneNumber: "",
-		paid: false,
+		paid: 0,
 		schoolid: "",
-		status: "",
+		status: "active",
 		lastAccessed: ""
 	},
 
@@ -91,17 +91,18 @@ var Student = Backbone.Model.extend({
 		},
 		emergencyContactRelation: {
 			required: true
+		},
+		paid: {
+			required: true
+		},
+		status: {
+			required: true
 		}
 	},
 
     /** We will assume that a field is required unless otherwise stated below */
-    required: [
-    	"allergies", "prevAttendedGS", "streetAddr2"
-    ],
-
-    /** We will assume that a field is required unless otherwise stated below */
    	nonEditable: [
-   		"paid", "schoolid", "status", "lastAccessed", "userid"
+   		"schoolid", "lastAccessed", "userid"
    	],
 
    	/** Student info properties */
@@ -131,24 +132,89 @@ var Student = Backbone.Model.extend({
 
    	getSearchStudentsUrl: function() {
    		return app.serverUrl + "api/search/users/S";
-   	}
+   	},
+
+   	getPendingTestsUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/tests";
+   	},
+
+   	updatePendingUrl: function() {
+   		return this.urlRoot + "/pending";
+   	},
+
+   	enrollStudentInSections: function(id) {
+   		return this.urlRoot + "/" + id + "/sections";
+   	},
+
+   	getPrevEnrolledSections: function(id) {
+   		return this.urlRoot + "/" + id + "/prevSections";
+   	},
+
+   	studentStatuses: [
+   		"active",
+   		"inactive",
+   		"pending",
+   		"pending-test"
+   	]
 });
 
 var Teacher = Backbone.Model.extend({
 	defaults: {
+		userid: "",
+		firstName: "",
+		lastName: "",
 		emailAddr: "",
 		schoolid: "",
-		paid: "",
 		status: "",
-		usertype: ""
+		usertype: "",
+		lastAccessed: ""
 	},
+
+	validation: {
+		firstName: {
+			required: true
+		},
+		lastName: {
+			required: true
+		},
+		emailAddr: [{
+			required: true
+		}, {
+			pattern: "email",
+			msg: "Please provide a valid email address."
+		}],
+		status: {
+			required: true
+		}
+	},
+
+	nonEditable: [
+   		"schoolid", "lastAccessed", "userid", "usertype"
+   	],
 
     urlRoot: app.serverUrl + "api/teachers",
 
    	getSearchTeachersUrl: function(usertype) {
    		usertype = usertype || "T";
    		return app.serverUrl + "api/search/users/" + usertype;
-   	}
+   	},
+
+   	getTeachingSectionsUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/sections";
+   	},
+
+   	getCourseCompetencyUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/competency";
+   	},
+
+   	addCourseCompetencyUrl: function(id) {
+   		return this.urlRoot + "/" + id;
+   	},
+
+   	teacherStatuses:[
+   		"active",
+   		"inactive"
+   	]
 });
 
 var Superuser = Backbone.Model.extend({
@@ -177,11 +243,15 @@ var User = Backbone.Model.extend({
 	},
 
     urlRoot: app.serverUrl + "api/login",
-   	
+
    	getUsers: function(id, usertype) {
    		if (typeof id == undefined || typeof usertype == undefined) {
    			return undefined;
    		}
    		return app.serverUrl + "api/users/" + id + "/" + usertype;
+   	},
+
+   	getUserByEmail: function(email) {
+   		return app.serverUrl + "api/users/" + email;
    	}
 });

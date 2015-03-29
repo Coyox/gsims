@@ -62,7 +62,6 @@ var StudentRecordView = Backbone.View.extend({
 		$(evt.currentTarget).parent().find(".save-btn, .cancel-btn").removeClass("hide").show();
 
 		var props = this.getPropertiesByType(table);
-
 		_.each(this.model.toJSON(), function(value, attr) {
 			if (props.indexOf(attr) > -1 && this.model.nonEditable.indexOf(attr) == -1) {
 				new StudentRecordRowView({
@@ -84,6 +83,7 @@ var StudentRecordView = Backbone.View.extend({
 			this.model.attributes = JSON.parse(this.model.untouched);
 			def.resolve();
 		} else {
+			setDateOfBirth(this.model);
 			if (this.model.isValid(true)) {
 				if ($(evt.currentTarget).hasClass("save-btn")) {
 					this.model.save().then(function(data) {
@@ -189,9 +189,38 @@ var StudentRecordRowView = Backbone.View.extend({
 		+	"<div class='col-sm-8'>"
 		+		"<span><%= value %></span>"
 		+	"</div>"),
+
 	editTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
 		+		"<input type='text' class='form-control input-sm' value='<%= value %>' name='<%= name %>'>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	dobTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8 form-inline'>"
+		+		"<select id='month-menu' class='form-control input-sm' name='month'></select>"
+		+		"<select id='day-menu' class='form-control input-sm' name='day'></select>"
+		+		"<select id='year-menu' class='form-control input-sm' name='year'></select>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	genderTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8 form-inline'>"
+		+   	"<label class='radio-inline'><input type='radio' name='<%= name %>' value='M'> Male</label>"
+		+		"<label class='radio-inline'><input type='radio' name='<%= name %>' value='F'> Female</label>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	statusTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<select id='status-menu' class='form-control input-sm' name='status'></select>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+	paidTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8 form-inline'>"
+		+   	"<label class='radio-inline'><input type='radio' name='<%= name %>' value='1'> Paid</label>"
+		+		"<label class='radio-inline'><input type='radio' name='<%= name %>' value='0'> Unpaid</label>"
 		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 
@@ -208,29 +237,87 @@ var StudentRecordRowView = Backbone.View.extend({
 		this.label = splitChars(this.label);
 		this.label = this.simplifyName(this.label);
 
+		var params = {
+			name: this.name,
+			label: this.label,
+			value: this.value			
+		};
+
 		if (this.action == "view") {
-			this.$el.html(this.viewTemplate({
-				name: this.name,
-				label: this.label,
-				value: this.value
-			}));
+			if (this.name == "prevAttendedGS") {
+				params.value = "n/a";
+			} 
+			else if (this.name == "paid") {
+				params.value = this.value == 1 ? "Paid" : "Unpaid";
+			}
+			else if (this.name == "status") {
+				params.value = capitalize(this.value);
+			}
+			this.$el.html(this.viewTemplate(params));
 		} else {
-			this.$el.html(this.editTemplate({
-				name: this.name,
-				label: this.label,
-				value: this.value
-			}));
+			var validationProperty = this.model.validation[this.name];
+			var isRequired = validationProperty ? validationProperty.required : false;
+			if (isRequired) {
+				params.label = this.label + "<span class='asterisk'>*</span>";
+			}
+			// DOB month/day/year dropdown menu
+			if (this.name == "dateOfBirth") {
+				var month = "", day = "", year = "";
+				if (this.value) {
+					dob = this.value.split("-");
+					month = dob[1];
+					day = dob[2];
+					year = dob[0];
+				} 
+				this.$el.html(this.dobTemplate(params));
+				populateMonthMenu(this.$el.find("#month-menu"), month);
+				populateDayMenu(this.$el.find("#day-menu"), day);
+				populateYearMenu(this.$el.find("#year-menu"), year);
+			} 
+			// Gender radio boxes
+			else if (this.name == "gender") {
+				this.$el.html(this.genderTemplate(params));
+				this.$el.find("[value='" + this.value + "']").prop("checked", true);
+			} 
+			// Status dropdown menu
+			else if (this.name == "status") {
+				this.$el.html(this.statusTemplate(params));
+				populateStatusMenu(this.$el.find("#status-menu"), this.model.studentStatuses, this.value);
+			}
+			// Paid radio boxes
+			else if (this.name == "paid") {
+				this.$el.html(this.paidTemplate(params));
+				this.$el.find("[value='" + this.value + "']").prop("checked", true);
+			} 
+			// Plain text field
+			else {
+				this.$el.html(this.editTemplate(params));
+			}
 		}
 	},
 
 	events: {
-		"keyup input": "updateModel"
+		"change input": "updateInput",
+		"change select": "updateSelect",
+		"change input[type='radio']": "updateRadio"
 	},
 
-	updateModel: function(evt) {
+	updateInput: function(evt) {
 		var val = $(evt.currentTarget).val();
 		this.model.set(this.name, val);
 	},
+
+	updateSelect: function(evt) {
+		var name = $(evt.currentTarget).attr("name");
+		var val = $(evt.currentTarget).find("option:selected").val();
+		this.model.set(name, val);
+	},
+
+	updateRadio: function(evt) {
+		var name = $(evt.currentTarget).attr("name");
+		var val = $(evt.currentTarget).attr("value");
+		this.model.set(name, val);
+	}, 
 
 	simplifyName: function(str) {
 		if (str.toLowerCase().indexOf("parent") > -1) {
@@ -342,7 +429,6 @@ var ReportCardView = Backbone.View.extend({
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
-		// +	"<td><%= model.sectionid %></td>"
 		+	"<td><%= this.teacherNames() %></td>"
 		// +	"<td>[teacher name]</td>" // TODO: get these fields
 		+	"<td>[student's grade]</td>"),

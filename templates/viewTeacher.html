@@ -1,0 +1,54 @@
+<div id="teacher-content">
+	<br>
+	<ul id="teacher-tabs" class="nav nav-tabs nav-justified">
+		<li class="active">
+			<a data-toggle="tab" data-target="#teacher-info">
+				<span class="glyphicon glyphicon-user"></span> Teacher Information
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#course-info">
+				<span class="glyphicon glyphicon-th-list"></span> Teaching Courses
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#email">
+				<span class="glyphicon glyphicon-envelope"></span> Email Teacher
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<br>
+		<div id="teacher-info" class="tab-pane active o-auto">
+			<div class="col-sm-12">				
+				<button id="edit-teacher" class="btn btn-primary btn-sm hide">Edit Teacher</button>
+				<button id="save-teacher" class="btn btn-primary btn-sm hide">Save Teacher</button>
+				<!-- <button id="delete-teacher" class="btn btn-primary btn-sm">Delete Teacher</button> -->
+				<button id="set-admin" class="btn btn-primary btn-sm">Set As Administrator</button>
+			</div>
+			<div class="col-sm-6">
+				<br>
+				<h4>Teacher Information</h4>
+				<div id="teacher-info-table" class="form-horizontal well property-table"></div>
+			</div>
+			<div class="col-sm-12">
+				<br>
+				<h4>Course Competency
+					<br>
+					<small>A value of '0' indicates that a teacher cannot teach a course in this department, or that they have not specified their competency level. A value of '1' indicates that they can teach a beginners course, '2' an intermediate course, and '3' an advanced course.</small>
+				</h4>
+				<hr>
+				<div class="well o-auto">
+					<div class="col-sm-6">
+						<div id="comp-info" class="form-horizontal"></div>
+					</div>
+					<div class="col-sm-6">
+						<div id="comp2-info" class="form-horizontal"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="course-info" class="tab-pane"></div>
+		<div id="email" class="tab-pane"></div>
+	</div>
+</div>

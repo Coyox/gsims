@@ -6,7 +6,7 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-2 control-label">To</label>
+		<label class="col-sm-2 control-label" title="Separate emails with a comma">To</label>
 		<div class="col-sm-10">
 			<input type="text" id="email-to" class="form-control input-sm">
 		</div>
@@ -18,15 +18,63 @@
 		</div>
 	</div>	
 	<div class="form-group">
-		<label class="col-sm-2 control-label">Message</label>
+		<label class="col-sm-2 control-label" title="HTML is supported">Message</label>
 		<div class="col-sm-10">
 			<textarea id="email-message" class="form-control"></textarea>
+		</div>
+	</div>
+		<div class="form-group">
+		<label class="col-sm-2 control-label"></label>
+		<div class="col-sm-10">
+			<button class="btn btn-primary btn-sm" id="preview" rows="15">Preview HTML</button>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-2 control-label"></label>
 		<div class="col-sm-10">
 			<button class="btn btn-primary btn-sm" id="send" rows="15">Send</button>
+			<input type='checkbox' class='toggle-checkboxes right' id="self" checked>Send a copy to myself</input>
 		</div>
 	</div>
+</div>
+
+		
+<div id="stats-panel" class="col-sm-4 main-content.right">
+	<div class="panel panel-default">
+		<div class="panel-heading">Email Usage</div>
+		<div class="panel-body">
+			<div class="form-horizontal">
+				<div class="form-group" title="The number of emails allowed to be sent per hour">
+					<label class="col-sm-6">Hourly Quota</label>
+					<span class='hourly-quota'></span>
+				</div>
+				<div class="form-group" title="The number of emails queued to be sent past the hourly limit">
+					<label class="col-sm-6">Queued</label>
+					<span class='backlog'></span>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-6">Sent Today</label>
+					<span class='sent-today'></span>
+				</div>
+				<div class="form-group" title="Granted 12000 free sent emails per month">
+					<label class="col-sm-6">Sent Last 30 Days</label>
+					<span class='sent-month'></span>
+				</div>
+				<div class="form-group" title="Emails that could not be delivered">
+					<label class="col-sm-6">Bounces Last 30 Days</label>
+					<span class='bounces-month'></span>
+				</div>
+			</div>
+		</div>
+	</div>
+		<div class="form-group">
+			<label class="col-sm-0 control-label"></label>
+			<div class="col-sm-10">
+				<button class="btn btn-primary btn-sm" id="fetch" rows="15">Fetch</button>
+			</div>
+		</div>			
+</div>
+
+<div id="pre" class="form-horizontal col-sm-8 well">
+	<div id="dialog" class="form-group"></div>
 </div>
