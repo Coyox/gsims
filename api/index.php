@@ -213,72 +213,75 @@ function createSchoolYear(){
     array_push($combinedbindparams, $bindparams);
 
     if ($schoolyear->data->duplicate == 1){
-        $current_schoolyear = $schoolyear->data->currentSchoolYear;
+        echo json_encode(array("status"=>"dup"));
 
-        // create a row for each department
-        $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
-        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
-        $idsql = "SELECT deptid from dept where deptid=:deptid";
+        // $current_schoolyear = $schoolyear->data->currentSchoolYear;
 
-        $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
-                SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
-                AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
-        $bindparams = array(
-            "schoolyearid" => $schoolyearid,
-            "activeschoolyear" => $current_schoolyear,
-            "status" => $schoolyear->status
-        );
-        for ($i=0 ; $i<$rowcount; $i++){
-            $id = generateUniqueID($idsql, "deptid");
-            $bindparams["deptid"] = $id;
-            array_push($queries, $sql);
-            array_push($combinedbindparams, $bindparams);
-        }
+        // // create a row for each department
+        // $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
+        // $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        // $idsql = "SELECT deptid from dept where deptid=:deptid";
 
-        //create row for each course
-        $bindparams = array(
-            "schoolyearid" => $schoolyearid,
-            "activeschoolyear" => $current_schoolyear,
-            "status" => $schoolyear->status
-        );
-        $sql = "SELECT count(*) from course where schoolyearid=:activeschoolyear";
-        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
-        $idsql = "SELECT courseid from course where courseid=:courseid";
+        // $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
+        //         SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+        //         AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
+        // $bindparams = array(
+        //     "schoolyearid" => $schoolyearid,
+        //     "activeschoolyear" => $current_schoolyear,
+        //     "status" => $schoolyear->status
+        // );
+        // for ($i=0 ; $i<$rowcount; $i++){
+        //     $id = generateUniqueID($idsql, "deptid");
+        //     $bindparams["deptid"] = $id;
+        //     array_push($queries, $sql);
+        //     array_push($combinedbindparams, $bindparams);
+        // }
 
-        $sql = "INSERT into course (courseid, courseName, description, deptid, schoolyearid, status)
-                SELECT :courseid, courseName, description, deptid, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
-                AND (courseName not in (SELECT courseName from course where schoolyearid=:schoolyearid)) LIMIT 1";
+        // //create row for each course
+        // $bindparams = array(
+        //     "schoolyearid" => $schoolyearid,
+        //     "activeschoolyear" => $current_schoolyear,
+        //     "status" => $schoolyear->status
+        // );
+        // $sql = "SELECT count(*) from course where schoolyearid=:activeschoolyear";
+        // $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        // $idsql = "SELECT courseid from course where courseid=:courseid";
 
-        for ($i=0 ; $i<$rowcount; $i++){
-            $id = generateUniqueID($idsql, "courseid");
-            $bindparams["courseid"] = $id;
-            array_push($queries, $sql);
-            array_push($combinedbindparams, $bindparams);
-        }
+        // $sql = "INSERT into course (courseid, courseName, description, deptid, schoolyearid, status)
+        //         SELECT :courseid, courseName, description, deptid, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+        //         AND (courseName not in (SELECT courseName from course where schoolyearid=:schoolyearid)) LIMIT 1";
+
+        // for ($i=0 ; $i<$rowcount; $i++){
+        //     $id = generateUniqueID($idsql, "courseid");
+        //     $bindparams["courseid"] = $id;
+        //     array_push($queries, $sql);
+        //     array_push($combinedbindparams, $bindparams);
+        // }
 
 
-        //create row for each section
-        $bindparams = array(
-            "schoolyearid" => $schoolyearid,
-            "activeschoolyear" => $current_schoolyear,
-            "status" => $schoolyear->status
-        );
-        $sql = "SELECT count(*) from section where schoolyearid=:activeschoolyear";
-        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
-        $idsql = "SELECT sectionid from section where sectionid=:sectionid";
+        // //create row for each section
+        // $bindparams = array(
+        //     "schoolyearid" => $schoolyearid,
+        //     "activeschoolyear" => $current_schoolyear,
+        //     "status" => $schoolyear->status
+        // );
+        // $sql = "SELECT count(*) from section where schoolyearid=:activeschoolyear";
+        // $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        // $idsql = "SELECT sectionid from section where sectionid=:sectionid";
 
-        $sql = "INSERT into section (sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, schoolyearid, status)
-                SELECT :sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, :schoolyearid, :status FROM section where schoolyearid=:activeschoolyear
-                AND (sectionCode not in (SELECT sectionCode from section where schoolyearid=:schoolyearid)) LIMIT 1";
+        // $sql = "INSERT into section (sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, schoolyearid, status)
+        //         SELECT :sectionid, courseid, sectionCode, day, startTime, endTime, roomCapacity, roomLocation, classSize, :schoolyearid, :status FROM section where schoolyearid=:activeschoolyear
+        //         AND (sectionCode not in (SELECT sectionCode from section where schoolyearid=:schoolyearid)) LIMIT 1";
 
-        for ($i=0 ; $i<$rowcount; $i++){
-            $id = generateUniqueID($idsql, "sectionid");
-            $bindparams["sectionid"] = $id;
-            array_push($queries, $sql);
-            array_push($combinedbindparams, $bindparams);
-        }
+        // for ($i=0 ; $i<$rowcount; $i++){
+        //     $id = generateUniqueID($idsql, "sectionid");
+        //     $bindparams["sectionid"] = $id;
+        //     array_push($queries, $sql);
+        //     array_push($combinedbindparams, $bindparams);
+        // }
     }
-    echo json_encode(perform_transaction($queries, $combinedbindparams));
+    //echo json_encode(perform_transaction($queries, $combinedbindparams));
+    echo json_encode(array("status"=>"nodup"));
 }
 
 
