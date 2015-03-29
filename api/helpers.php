@@ -43,7 +43,7 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
 }
 
 function getKey($name){
-    $sql = "SELECT key from key where name=:name";
+    $sql = "SELECT `key` from key where name=:name";
     return perform_query($sql, 'GETCOL', array("name"=>$name));
 }
 
