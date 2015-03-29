@@ -84,7 +84,7 @@ var DashboardView = Backbone.View.extend({
 			parent.find(".superusers").text(data);
 		});
 		count.fetch({
-			url: count.getSectionCountURL()
+			url: count.getSectionCountURL(),
 			data: {
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
 				schoolid: 412312//TODO
