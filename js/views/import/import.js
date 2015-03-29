@@ -40,42 +40,42 @@ var ImportView = Backbone.View.extend({
 	},
 	parseData: function() {
 		try{
+			var view = this;
 			var results = Papa.parse($("#csv-file")[0].files[0], {
+				header: true,
 				complete: function(results) {
 					$("#not-found").hide();
 					console.log(results);
-					if (results.data[1][2] == "First Name"){ //import teachers template
-
-					}
-					else if (results.data[1][2] == "Paid") { //import students template
-						for (i=1; i < results.data.length; i++){
-							console.log(results.data)
-							var studentModel = new Student();
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-							// studentModel.set("schoolid", schoolid);
-
-
+					
+					// STUDENT
+					if (results.data[0].city) {
+						var studentList = [];
+						var valid = true;
+						$.each(results.data, function(i, row) {
+							var student = new Student(row, {parse:true});
+							var isValid = student.isValid(true);
+							var validate = student.validate();
+							if (!student.isValid()) {
+								valid = false;
+								console.log("invalid", validate);
+							}
+							studentList.push(student.toJSON());
+						});
+						if (valid) {
+							// insert
+						} else {
+							// display a message
 						}
-
+						console.log("list of students", studentList);
+					} 
+					// TEACHER
+					else if (results.data[0].schoolid) {
+						$.each(results.data, function(i, row) {
+							var teacher = new Teacher(row, {parse:true});
+							console.log(teacher.toJSON());
+						});
 					}
+					// ATTENDANCE
 					else {
 
 						var attendancedate = results.data[1][0];
