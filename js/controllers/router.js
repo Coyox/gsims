@@ -74,7 +74,9 @@ var Router = Backbone.Router.extend({
 
         "notifications":        "notifications",
 
-        "settings":             "settings"
+        "settings":             "settings",
+
+        "import":               "importData"
     },
 
     updatePageBreadcrumb: function(text) {
@@ -425,6 +427,16 @@ var Router = Backbone.Router.extend({
         this.loadHome();
 
         new UserSettingsView({
+            el: $("#content")
+        });
+    },
+
+    importData: function() {
+        this.updatePageBreadcrumb("Import Data");
+
+        this.loadHome();
+
+        new ImportView({
             el: $("#content")
         });
     }
