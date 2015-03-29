@@ -25,6 +25,8 @@ var TeacherRecordView = Backbone.View.extend({
 		this.model.fetch().then(function(data) {
 			var teacher = new Teacher(data, {parse:true});
 			view.model = teacher;
+			console.log(data);
+			view.emailTab(data);
 
 			view.teacherInformationTab(teacher);
 		});
@@ -145,7 +147,14 @@ var TeacherRecordView = Backbone.View.extend({
 				}
 			});
 		});
-	}
+	},
+
+		emailTab: function(data) {
+		new EmailView({
+			el: $("#email"),
+			emailAddr: data.emailAddr
+		});
+	},
 });
 
 // var TeacherRecordView = Backbone.View.extend({

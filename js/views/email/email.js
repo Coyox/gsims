@@ -7,8 +7,9 @@ var EmailView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["email.html"]);
-		//this.$el.find("#email-to").val(this.emailAddr);
-		//this.$el.find("#dialog").dialog({ modal: true, autoOpen: false });
+		if(this.emailAddr){
+			this.$el.find("#email-to").val(this.emailAddr);
+		}
 		this.$el.find("#pre").hide();
 
 
@@ -27,8 +28,6 @@ var EmailView = Backbone.View.extend({
 		var body = this.$el.find("#email-message").val();
 		this.$el.find("#pre").show();
 		this.$el.find('#dialog').html(body);
-		
-
 	 	
 	},
 
