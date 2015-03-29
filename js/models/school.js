@@ -67,7 +67,11 @@ var Section = Backbone.Model.extend({
 
     getSearchSectionsUrl: function() {
     	return app.serverUrl + "api/search/sections";
-    }
+    },
+	
+	getSectionTeachersUrl: function(id) {
+		return this.urlRoot + "/" + id + "/teachers";
+	},
 });
 
 var Prereq = Backbone.Model.extend({
