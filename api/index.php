@@ -216,10 +216,9 @@ function createSchoolYear(){
         $current_schoolyear = $schoolyear->data->currentSchoolYear;
 
         // // create a row for each department
-        $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
+/*        $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
         $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
         $idsql = "SELECT deptid from dept where deptid=:deptid";
-        echo json_encode(array("rowcount"=>$rowcount));
         $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
                 SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
                 AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
@@ -232,7 +231,7 @@ function createSchoolYear(){
             $id = generateUniqueID($idsql, "deptid");
             $bindparams["deptid"] = $id;
             array_push($queries, $sql);
-            array_push($combinedbindparams, $bindparams);
+            array_push($combinedbindparams, $bindparams);*/
         // }
 
         // //create row for each course
@@ -277,7 +276,6 @@ function createSchoolYear(){
         //     array_push($queries, $sql);
         //     array_push($combinedbindparams, $bindparams);
         // }
-            echo json_encode(array("status"=>"test"));
     }
     $resp = perform_transaction($queries, $combinedbindparams);
     echo json_encode($resp);
@@ -1502,7 +1500,9 @@ function deleteTeacher($id) {
 * Get the sections the teacher teaches
 */
 function getTeachingSections($id){
-    $sql = "SELECT courseid, sectionid from teaching where userid=:id";
+    $sql = "SELECT t.courseid, c.courseName, c.description, t.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
+    from teaching t, course c, section s
+    where t.userid=:id and t.sectionid=s.sectionid and t.courseid=c.courseid";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
