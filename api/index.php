@@ -228,12 +228,12 @@ function createSchoolYear(){
             "activeschoolyear" => $current_schoolyear,
             "status" => $schoolyear->status
         );
-        for ($i=0 ; $i<$rowcount; $i++){
+        // for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "deptid");
             $bindparams["deptid"] = $id;
             array_push($queries, $sql);
             array_push($combinedbindparams, $bindparams);
-        }
+        // }
 
         // //create row for each course
         // $bindparams = array(
