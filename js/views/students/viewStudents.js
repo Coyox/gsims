@@ -224,7 +224,7 @@ var StudentTableRowView = Backbone.View.extend({
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><a class='view-student primary-link center-block' id='<%= model.userid %>'>[ View Student ]</a></td>"
+		+   "<td><span class='view-student primary-link center-block' id='<%= model.userid %>'>[ View Student ]</span></td>"
 		+	"<td><input type='checkbox' class='user-row' checked></td>"),
 
 	initialize: function(options) {
