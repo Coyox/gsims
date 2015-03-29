@@ -73,7 +73,7 @@ var SchoolYearView = Backbone.View.extend({
 				backdrop.remove();
 				view.model.save({
 					data: {duplicate:1,
-						   currentSchoolYear:sessionStorage.getItem("activeSchoolYear")}
+						   currentSchoolYear:sessionStorage.getItem("gobind-activeSchoolYear")}
 				}).then(function(data) {
 					if (data.status=="success") {
 						new TransactionResponseView({
