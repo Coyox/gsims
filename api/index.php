@@ -217,10 +217,9 @@ function createSchoolYear(){
 
         // // create a row for each department
         $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
-        echo json_encode(perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear)));
-        //$rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
 
-/*        $idsql = "SELECT deptid from dept where deptid=:deptid";
+        $idsql = "SELECT deptid from dept where deptid=:deptid";
         $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
                 SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
                 AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
@@ -232,8 +231,9 @@ function createSchoolYear(){
         // for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "deptid");
             $bindparams["deptid"] = $id;
-            array_push($queries, $sql);
-            array_push($combinedbindparams, $bindparams);*/
+            echo json_encode(perform_query($sql, '', $bindparams));
+            //array_push($queries, $sql);
+            //array_push($combinedbindparams, $bindparams);
         // }
 
         // //create row for each course
