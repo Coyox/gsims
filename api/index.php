@@ -219,7 +219,7 @@ function createSchoolYear(){
         $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
         $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
         $idsql = "SELECT deptid from dept where deptid=:deptid";
-
+        echo json_encode("rowcount"=>$rowcount);
         $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
                 SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
                 AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
@@ -277,8 +277,10 @@ function createSchoolYear(){
         //     array_push($queries, $sql);
         //     array_push($combinedbindparams, $bindparams);
         // }
+            echo json_encode("status"=>"test");
     }
-    echo json_encode(perform_transaction($queries, $combinedbindparams));
+    $resp = perform_transaction($queries, $combinedbindparams);
+    echo json_encode($resp);
     //echo json_encode(array("status"=>"nodup"));
 }
 
