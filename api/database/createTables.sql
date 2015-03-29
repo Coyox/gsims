@@ -231,3 +231,9 @@ CREATE TABLE IF NOT EXISTS `studentCompetencyTest` (
   FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS `key` (
+  `keyid` int(11) PRIMARY KEY NOT NULL auto_increment,
+  `key` varchar(255) NOT NULL,
+  `name` varchar(50) NOT NULL
+);

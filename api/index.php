@@ -131,6 +131,8 @@ $app->post('/purge/section', 'purgeSections');
 $app->post('/purge/document', 'purgeDocuments');
 $app->delete('/purge/inactive', 'purgeInactive');
 
+$app->get('/keys/:name', 'getKeyByName');
+
 $app->run();
 
 
@@ -2050,4 +2052,10 @@ function purgeInactive(){
         array_push($queries, $sql);
     }
     echo json_encode(perform_transaction($queries));
+}
+#================================================================================================================#
+# Key
+#================================================================================================================#
+function getKeyByName($name){
+    echo json_encode(getKey($name));
 }

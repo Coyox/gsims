@@ -42,9 +42,14 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
     return $id;
 }
 
+function getKey($name){
+    $sql = "SELECT key from key where name=:name";
+    return perform_query($sql, 'GETCOL', array("name"=>$name));
+}
+
 // array of array(emailAddr, username, password, firstname, lastname)?
 function massEmailLogin($userInfoList){
-    $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+    $mandrill = new Mandrill(get_mandrillkey('mandrill'));
     foreach ($userInfoList as $user){
         try {
 
@@ -81,7 +86,7 @@ function massEmailLogin($userInfoList){
 
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
-    $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+    $mandrill = new Mandrill(get_mandrillkey());
 
     try {
 
