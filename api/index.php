@@ -28,9 +28,8 @@ $app->get('/teachers/:id', 'getTeacherById');
 $app->get('/teachers/:id/sections', 'getTeachingSections');
 $app->get('/teachers/:id/competency', 'getCourseCompetencies');
 $app->get('/teachers/:id/attendance', 'getTeacherAttendance');
-$app->put('/teachers/:id/competency', 'updateCourseCompetencies');
+$app->post('/teachers/:id/competency', 'updateCourseCompetencies');
 $app->post('/teachers', 'createTeacher');
-$app->post('/teachers/:id', 'addRemoveCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
 
@@ -1415,11 +1414,12 @@ function getCourseCompetencies($id) {
 }
 
 
-function addRemoveCourseCompetencies($id){
+function updateCourseCompetencies($id){
     $queries = array();
     $combinedbindparams = array();
-    if (isset($_POST["competencies"])){
-        $list = json_decode($_POST["competencies"]);
+
+    if (isset($_POST["insertComp"])){
+        $list = json_decode($_POST["insertComps"]);
         $bindparams = array("userid" => $id);
         $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
         foreach (array_values($list) as $i => $result) {
@@ -1431,8 +1431,8 @@ function addRemoveCourseCompetencies($id){
         array_push($queries, $sql);
         $combinedbindparams[0] = $bindparams;
     }
-   if (isset($_POST["deptids"])){
-        $list = json_decode($_POST["deptids"]);
+   if (isset($_POST["deleteComp"])){
+        $list = json_decode($_POST["deleteComps"]);
         $sql = "DELETE from teacherCourseCompetency where userid=:userid and deptid in  ";
         list($sqlparens, $bindparams) = parenthesisList($list);
         $bindparams["userid"]= $id;
@@ -1440,19 +1440,14 @@ function addRemoveCourseCompetencies($id){
         array_push($queries, $sql);
         $combinedbindparams[1] = $bindparams;
     }
-    echo json_encode(perform_transaction($queries, $bindparams));
-}
 
-function updateCourseCompetencies($id) {
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $results = json_decode($body);
-    $queries = array();
-    $bindparams = array();
-    foreach (array_values($results) as $i => $result){
-        $bindparams[$i] = array("userid" => $id, "deptid".$i=>$result->deptid, "level".$i=>$result->level);
-        $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
-        array_push($queries, $sql);
+    if (isset($_POST["updateComps"])){
+        $list = json_decode($_POST["updateComps"]);
+        foreach (array_values($results) as $i => $result){
+            $bindparams[$i+2] = array("userid" => $id, "deptid".$i=>$result->deptid, "level".$i=>$result->level);
+            $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
+            array_push($queries, $sql);
+        }
     }
     echo json_encode(perform_transaction($queries, $bindparams));
 }
