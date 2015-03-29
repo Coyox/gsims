@@ -49,7 +49,7 @@ function getKey($name){
 
 // array of array(emailAddr, username, password, firstname, lastname)?
 function massEmailLogin($userInfoList){
-    $mandrill = new Mandrill(get_mandrillkey('mandrill'));
+    $mandrill = new Mandrill((string)getKey('mandrill'));
     foreach ($userInfoList as $user){
         try {
 
@@ -86,7 +86,7 @@ function massEmailLogin($userInfoList){
 
 
 function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
-    $mandrill = new Mandrill(get_mandrillkey());
+    $mandrill = new Mandrill((string)getKey('mandrill'));
 
     try {
 
