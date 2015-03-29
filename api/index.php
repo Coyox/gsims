@@ -213,29 +213,27 @@ function createSchoolYear(){
     array_push($combinedbindparams, $bindparams);
 
     if ($schoolyear->data->duplicate == 1){
-        echo json_encode(array("status"=>"dup"));
-
-        // $current_schoolyear = $schoolyear->data->currentSchoolYear;
+        $current_schoolyear = $schoolyear->data->currentSchoolYear;
 
         // // create a row for each department
-        // $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
-        // $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
-        // $idsql = "SELECT deptid from dept where deptid=:deptid";
+        $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
+        $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
+        $idsql = "SELECT deptid from dept where deptid=:deptid";
 
-        // $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
-        //         SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
-        //         AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
-        // $bindparams = array(
-        //     "schoolyearid" => $schoolyearid,
-        //     "activeschoolyear" => $current_schoolyear,
-        //     "status" => $schoolyear->status
-        // );
-        // for ($i=0 ; $i<$rowcount; $i++){
-        //     $id = generateUniqueID($idsql, "deptid");
-        //     $bindparams["deptid"] = $id;
-        //     array_push($queries, $sql);
-        //     array_push($combinedbindparams, $bindparams);
-        // }
+        $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
+                SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
+                AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
+        $bindparams = array(
+            "schoolyearid" => $schoolyearid,
+            "activeschoolyear" => $current_schoolyear,
+            "status" => $schoolyear->status
+        );
+        for ($i=0 ; $i<$rowcount; $i++){
+            $id = generateUniqueID($idsql, "deptid");
+            $bindparams["deptid"] = $id;
+            array_push($queries, $sql);
+            array_push($combinedbindparams, $bindparams);
+        }
 
         // //create row for each course
         // $bindparams = array(
