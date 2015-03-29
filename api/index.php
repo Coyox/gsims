@@ -278,8 +278,8 @@ function createSchoolYear(){
         //     array_push($combinedbindparams, $bindparams);
         // }
     }
-    //echo json_encode(perform_transaction($queries, $combinedbindparams));
-    echo json_encode(array("status"=>"nodup"));
+    echo json_encode(perform_transaction($queries, $combinedbindparams));
+    //echo json_encode(array("status"=>"nodup"));
 }
 
 
