@@ -57,7 +57,7 @@ var DashboardView = Backbone.View.extend({
 		var parent = this.$el.find("#user-panel");
 		var object = JSON.parse(sessionStorage.getItem("gobind-login"));
 		parent.find(".username").text(sessionStorage.getItem("gobind-username"));
-		parent.find(".last-logged-in").text(object.lastLogin);	
+		parent.find(".last-logged-in").text(object.lastLogin);
 	},
 
 	populateStats: function() {
@@ -82,6 +82,15 @@ var DashboardView = Backbone.View.extend({
 			url: count.getCountUrl("SU")
 		}).then(function(data) {
 			parent.find(".superusers").text(data);
+		});
+		count.fetch({
+			url: count.getSectionCountURL(),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+				schoolid: 412312//TODO
+			}
+		}).then(function(data) {
+			parent.find(".sections").text(data);
 		});
 	},
 

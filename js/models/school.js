@@ -132,5 +132,8 @@ var Prereqs = Backbone.Collection.extend({
 var Count = Backbone.Model.extend({
 	getCountUrl: function(usertype) {
 		return app.serverUrl + "api/count/" + usertype;
+	},
+	getSectionCountURL: function(){
+		return app.serverUrl + "api/sections/count";
 	}
 });
