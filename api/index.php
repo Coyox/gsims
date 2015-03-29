@@ -1429,7 +1429,7 @@ function updateCourseCompetencies($id){
         }
         $sql = rtrim($sql, ",");
         array_push($queries, $sql);
-        $combinedbindparams[0] = $bindparams;
+        array_push($combinedbindparams, $bindparams);
     }
    if (isset($_POST["deleteComps"])){
         $list = json_decode($_POST["deleteComps"]);
@@ -1438,15 +1438,15 @@ function updateCourseCompetencies($id){
         $bindparams["userid"]= $id;
         $sql.= $sqlparens;
         array_push($queries, $sql);
-        $combinedbindparams[1] = $bindparams;
+        array_push($combinedbindparams, $bindparams);
     }
 
     if (isset($_POST["updateComps"])){
         $list = json_decode($_POST["updateComps"]);
         foreach (array_values($results) as $i => $result){
-            $bindparams[$i+2] = array("userid" => $id, "deptid".$i=>$result->deptid, "level".$i=>$result->level);
             $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
             array_push($queries, $sql);
+            array_push($combinedparams, array("userid" =>$id, "deptid".$i=>$result->deptid, "level".$i=>$result->level));
         }
     }
     echo json_encode(perform_transaction($queries, $bindparams));
