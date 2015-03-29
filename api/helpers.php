@@ -42,39 +42,78 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
     return $id;
 }
 
-function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
-    $emailAdddr = "shanifer@gmail.com";
+// array of array(emailAddr, username, password, firstname, lastname)?
+function massEmailLogin($userInfoList){
     $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
-    try {
-        $message = array(
-        'html' => '<img style="border: 0 !important;-ms-interpolation-mode: bicubic;height: 1px !important;width: 1px !important;margin: 0 !important;padding: 0 !important" src="https://gobind.createsend1.com/t/i-o-ydiuttt-l/o.gif" width="1" height="1" border="0" alt="">
-<p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Welcome!<br>
-Thank you for registering with Gobind Sarvar School.<br>
-Your login information for the student dashboard on&nbsp;<a style="text-decoration: underline;transition: all .2s;color: #41637e" data-emb-href-display="gobind-sarvar.rhcloud.com" href="http://gobind.createsend1.com/t/i-l-ydiuttt-l-r/">gobind-sarvar.rhcloud.com</a>&nbsp;has been generated:</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">Username:'.$username.'<br>
-Password:'.$password.'</p><p style="Margin-top: 0;color: #565656;font-family: Georgia,serif;font-size: 16px;line-height: 25px;Margin-bottom: 25px">This is an auto-generated email. &nbsp;Please do not reply.</p>
-',
-        'subject' => 'Welcome to Gobind Sarvar School',
-        'from_email'=>'info@gobindsarvar.com',
-        'from_name' => 'Gobind Sarvar School',
-        'to' => array(
-            array(
-                'email' => $emailAddr,
-                'name' => $firstname.' '.$lastname,
-                'type' => 'to'
-            )
-        ),
-        );
-    $async = false;
-    $result = $mandrill->messages->send($message, $async);
-    print_r($result);
-} catch(Mandrill_Error $e) {
-    // Mandrill errors are thrown as exceptions
-    echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
-    // A mandrill error occurred: Mandrill_Unknown_Subaccount - No subaccount exists with the id 'customer-123'
-    throw $e;
-}
+    foreach ($userInfoList as $user){
+        try {
+
+            $template_content = array(
+                array( 'name' => 'USER_NAME', 'content' => $user["username"] ),
+                array( 'name' => 'EMAIL', 'content' => $user["emailAddr"] ),
+                array( 'name' => 'FIRST_NAME', 'content' => $user["firstName"] ),
+                array( 'name' => 'LAST_NAME', 'content' => $user["lastName"] ),
+                array( 'name' => 'PASSWORD', 'content' => $user["password"] ),
+                array( 'name' => 'LOGIN_URL', 'content' => "https://gobind-sarvar.rhcloud.com" ),
+                array( 'name' => 'IMG_SRC', 'content' => "https://gobind-sarvar.rhcloud.com/img/logo.png"),
+                );
+
+            $message = array(
+                'subject' => 'Gobind Sarvar: Your username and password',
+                'from_email' => 'info@GobindSarvar.com',
+                'from_name' => 'Gobind Sarvar School',
+                'to' => array( array( 'email' => $user["emailAddr"], 'name' => $user["firstName"].' '.$user["lastName"], 'type' => 'to' ) ),
+            // Pass the same parameters for merge vars and template params
+            // to make them available in both variable passing methods
+                'merge_vars' => array(array(
+                    'rcpt' => $user["emailAddr"],
+                    'vars' => $template_content,
+                    )));
+            $template_name = 'welcometogs';
+
+            $mandrill->messages->sendTemplate($template_name, $template_content, $message);
+        } catch(Mandrill_Error $e) {
+            echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
+            throw $e;
+        }
+    }
 }
 
+
+function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
+    $mandrill = new Mandrill('C_s6D7OmZEgKBIspAvuBcw');
+
+    try {
+
+        $template_content = array(
+            array( 'name' => 'USER_NAME', 'content' => $username ),
+            array( 'name' => 'EMAIL', 'content' => $emailAddr ),
+            array( 'name' => 'FIRST_NAME', 'content' => $firstname ),
+            array( 'name' => 'LAST_NAME', 'content' => $lastname ),
+            array( 'name' => 'PASSWORD', 'content' => $password ),
+            array( 'name' => 'LOGIN_URL', 'content' => "https://gobind-sarvar.rhcloud.com" ),
+            array( 'name' => 'IMG_SRC', 'content' => "https://gobind-sarvar.rhcloud.com/img/logo.png"),
+            );
+
+        $message = array(
+            'subject' => 'Gobind Sarvar: Your username and password',
+            'from_email' => 'info@GobindSarvar.com',
+            'from_name' => 'Gobind Sarvar School',
+            'to' => array( array( 'email' => $emailAddr, 'name' => $firstname.' '.$lastname, 'type' => 'to' ) ),
+            // Pass the same parameters for merge vars and template params
+            // to make them available in both variable passing methods
+            'merge_vars' => array(array(
+                'rcpt' => $emailAddr,
+                'vars' => $template_content,
+                )));
+        $template_name = 'welcometogs';
+
+        $mandrill->messages->sendTemplate($template_name, $template_content, $message);
+    } catch(Mandrill_Error $e) {
+        echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
+        throw $e;
+    }
+}
 
 /*
 * wrapper to perform sql queries

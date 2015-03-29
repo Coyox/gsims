@@ -1,5 +1,63 @@
 <form id="registration-page" class="center-block o-auto">
-	<section id="info-form" class="step" data-step-title="Registration Form">
+
+	<section id="search-form" class="dude" data-step-title="Search">
+		<div id="create-student-container">
+			<div class="well">Provide the student's first name, last name, and birthday to check if the student is already registered. Click the 'Next' button to skip this step.</div>
+			<div id="quick-search" class="o-auto">
+				<div class="form-horizontal col-sm-6">
+					<div class="form-group">
+						<label class="control-label col-sm-3">First Name</label>
+						<div class="col-sm-9">
+							<input type="text" id="first-name" class="form-control input-sm">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3">Last Name</label>
+						<div class="col-sm-9">
+							<input type="text" id="last-name" class="form-control input-sm">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3">Birthday</label>
+						<div class="col-sm-9 form-inline">
+							<select id="month-menu" class="form-control input-sm"></select>
+							<select id="day-menu" class="form-control input-sm"></select>
+							<select id="year-menu" class="form-control input-sm"></select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="results-form" class="dude o-auto" data-step-title="Results">
+		<div id="found" class="hide">
+			<div class="alert alert-danger">
+				Some students were found that matched the provided first name, last name and/or birthday. If the student has already registered, you may modify their information by selecting a student below. Otherwise, click on the 'Next' button to proceed to the enrollment form.
+			</div>
+			<div id="students-table-container">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Email Address</th>
+							<th>View</th>
+						</tr>
+					</thead>
+					<tbody class="results"></tbody>
+				</table>
+			</div>
+		</div>
+		<div id="not-found" class="hide">
+			<div class="alert alert-success">
+				No students were found that matched the provided first name, last name and/or birthday. Click on the 'Next' button to proceed to the registration form.
+			</div>
+		</div>
+	</section>
+
+	<section id="info-form" class="dude" data-step-title="Registration Form">
 		<div class="col-sm-12">
 			<div class="student-component col-sm-6">
 				<h4>Student Information </h4>
@@ -22,7 +80,7 @@
 		</div>
 	</section>
 
-	<section id="sections-form" class="step o-auto" data-step-title="Course Selection">
+	<section id="sections-form" class="dude o-auto" data-step-title="Course Selection">
 		<div id="course-selection" class="o-auto">
 			<div class="course-selection-component o-auto">
 				<div class="col-sm-3">
@@ -78,7 +136,7 @@
 		</div> 
 	</section>
 
-	<section id="terms-form" class="step" data-step-title="Terms and Conditions">
+	<section id="terms-form" class="dude" data-step-title="Terms and Conditions">
 		<div id="terms-and-conditions" class="col-sm-12">
 			<span class="login-text">Terms and Conditions</span>
 			<br>
@@ -117,7 +175,7 @@
 		</div>
 	</section>
 
-	<section id="finish-form" class="step" data-step-title="Finish">
+	<section id="finish-form" class="dude" data-step-title="Finish">
 		<div class="alert alert-success">Please verify that the following information is correct. If there are any errors, use the "Previous" button to make any changes.</div>
 		<div id="final-student-model">
 			<div class="col-sm-12">
