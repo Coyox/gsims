@@ -36,73 +36,111 @@ var ImportView = Backbone.View.extend({
 			link.setAttribute("href", encodedUri);
 			link.setAttribute("download", "import_attendance.csv");
 			link.click();
-	});
+		});
 	},
 	parseData: function() {
 		try{
 			var results = Papa.parse($("#csv-file")[0].files[0], {
 				complete: function(results) {
+					$("#not-found").hide();
 					console.log(results);
-					var attendancedate = results.data[1][0];
-					var teacherid = results.data[1][1];
-					var sectionid = results.data[1][2];
-					var studentids = [];
+					if (results.data[1][2] == "First Name"){ //import teachers template
 
-					for (i = 3; i < results.data.length; i++) {
-						if (results.data[i][3] && results.data[i][3].indexOf("P") > -1){
-							studentids.push(results.data[i][0]);
-						}
 					}
-					if (studentids.length > 0){
-						var section = new Section();
-						$.ajax({
-							type: "POST",
-							url: section.inputAttendance(sectionid),
-							data: {
-								date: attendancedate,
-								schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-								userids: JSON.stringify(studentids)
-							}
-						}).then(function(data) {
-							try {
-								if (typeof data == "string") {
-									data = JSON.parse(data);
-								}
+					else if (results.data[1][2] == "Paid") { //import students template
+						for (i=1; i < results.data.length; i++){
+							console.log(results.data)
+							var studentModel = new Student();
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
+							// studentModel.set("schoolid", schoolid);
 
-								if (data.status == "success"){
-									new TransactionResponseView({
-										title: "SUCCESS",
-										message: "Template CSV successfully imported!",
-									});
+
+						}
+
+					}
+					else {
+
+						var attendancedate = results.data[1][0];
+						var teacherid = results.data[1][1];
+						var sectionid = results.data[1][2];
+						var studentids = [];
+
+						for (i = 3; i < results.data.length; i++) {
+							if (results.data[i][3] && results.data[i][3].indexOf("P") > -1){
+								studentids.push(results.data[i][0]);
+							}
+						}
+						if (studentids.length > 0){
+							var section = new Section();
+							$.ajax({
+								type: "POST",
+								url: section.inputAttendance(sectionid),
+								data: {
+									date: attendancedate,
+									schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+									userids: JSON.stringify(studentids)
 								}
-								else {
+							}).then(function(data) {
+								try {
+									if (typeof data == "string") {
+										data = JSON.parse(data);
+									}
+
+									if (data.status == "success"){
+										new TransactionResponseView({
+											title: "SUCCESS",
+											message: "Template CSV successfully imported!",
+										});
+									}
+									else {
+										new TransactionResponseView({
+											title: "ERROR",
+											status: "Error",
+											message: "Sorry, we could not import your CSV. Please make sure the CSV matches the template's format."
+										});
+									}
+								}
+								catch(err){
 									new TransactionResponseView({
 										title: "ERROR",
 										status: "Error",
-										message: "Sorry, we could not import your CSV. Please make sure the CSV matches the template's format."
+										message: "Sorry, we could not import your CSV. Please make sure you are not importing more than once for the same file."
 									});
 								}
-							}
-							catch(err){
+							}).fail(function(jqxhr){
 								new TransactionResponseView({
 									title: "ERROR",
 									status: "Error",
-									message: "Sorry, we could not import your CSV. Please make sure you are not importing more than once for the same file."
+									message: "Sorry, we could not import your CSV. Please make sure that the CSV matches the template's format"
 								});
-							}
-						}).fail(function(jqxhr){
-							new TransactionResponseView({
-								title: "ERROR",
-								status: "Error",
-								message: "Sorry, we could not import your CSV. Please make sure that the CSV matches the template's format"
 							});
-						});
+						}
+
+
 					}
 				}
 			});
 } catch(err){
-		this.$el.find("#not-found").removeClass("hide").show();
-	}
+	this.$el.find("#not-found").removeClass("hide").show();
+}
 },
 });
 
