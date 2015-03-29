@@ -5,7 +5,7 @@ var School = Backbone.Model.extend({
 		yearOpened: "",
 		status: "inactive"
 	},
-     
+
     	validation: {
 		location: {
 			required: true,
@@ -17,7 +17,7 @@ var School = Backbone.Model.extend({
 			required: true,
 		}
 	},
-     
+
     urlRoot: app.serverUrl + "api/schools",
 
     getDepartmentsUrl: function(id) {
@@ -60,7 +60,7 @@ var Dept = Backbone.Model.extend({
 		schoolyearid: "",
 		status: "inactive"
 	},
-    
+
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
@@ -76,7 +76,7 @@ var Course = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    
+
     urlRoot: app.serverUrl + "api/courses",
 });
 
@@ -93,7 +93,7 @@ var Section = Backbone.Model.extend({
 		schoolyearid:"",
 		status: ""
 	},
-    
+
     urlRoot: app.serverUrl + "api/sections",
 
     getDropStudentUrl: function(sectionid, studentid) {
@@ -103,10 +103,13 @@ var Section = Backbone.Model.extend({
     getSearchSectionsUrl: function() {
     	return app.serverUrl + "api/search/sections";
     },
-
    	unassignTeacherUrl: function(sectionid, teacherid) {
    		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid;
    	},
+    inputAttendance: function(sectionid){
+    	return this.urlRoot + "/" + sectionid + "/attendance";
+    }
+
 });
 
 var Prereq = Backbone.Model.extend({
