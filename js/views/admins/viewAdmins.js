@@ -88,7 +88,7 @@ var AdminsTableView = Backbone.View.extend({
 			var model = new Teacher(object, {parse:true});
 			new AdminTableRowView({
 				model: model,
-				el: this.addRow(".results")
+				el: this.addRow(".results", model.get("emailAddr"))
 			});
 		}, this);
 		view.table = this.$el.find("table").dataTable({
@@ -99,7 +99,7 @@ var AdminsTableView = Backbone.View.extend({
 	       	]
 		});
 		this.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
-		this.$el.find(".dataTables_filter").append("<button class='btn btn-sm btn-primary dt-btn'>Refresh Table</button>");
+		this.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh Table</button>");
 	},
 
 	fetchAllResults: function() {
@@ -123,7 +123,7 @@ var AdminsTableView = Backbone.View.extend({
 		       	]
 			});
 			view.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
-			view.$el.find(".dataTables_filter").append("<button class='btn btn-sm btn-primary dt-btn'>Refresh</button>");
+			view.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh</button>");
 		});
 	},
 
@@ -154,6 +154,12 @@ var AdminsTableView = Backbone.View.extend({
 			var checkbox = $(row).find("input[type='checkbox']");
 			checkbox.prop("checked", checked);
 		}, this);
+	},
+
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
 	},
 });
 
