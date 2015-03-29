@@ -92,7 +92,7 @@ var Router = Backbone.Router.extend({
 
     loadHome: function() {
       	if ($("#container").html() == "") {
-    		this.home();
+    		this.home(true);
     	}
     },
 
@@ -100,16 +100,18 @@ var Router = Backbone.Router.extend({
         $("#content").html("<div id='child'></div>");
     },
 
-    home: function() {
+    home: function(isHome) {
         this.updatePageBreadcrumb("Home");
 
     	new HomePageView({
     		el: this.el
     	});
 
-        new DashboardView({
-            el: $("#content")
-        });
+        if (isHome) {
+            new DashboardView({
+                el: $("#content")
+            });
+        }
 
         $("#main-content .left").affix({
             offset: {
@@ -119,11 +121,8 @@ var Router = Backbone.Router.extend({
     },
 
     email: function() {
-        this.updatePageBreadcrumb("Send Email");
-
         this.loadHome();
-
-        //$("#content").html(html["email.html"]);
+        this.updatePageBreadcrumb("Send Email");
 
         new EmailView({
             el: $("#content"),
@@ -145,9 +144,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterStudents: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Search Students");
-
-    	this.loadHome();
 
     	var filterStudents = $("#hidden").find("#filter-students-container");
     	if (filterStudents.length) {
@@ -160,9 +158,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredStudents: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Students");
-
-    	this.loadHome();
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -175,9 +172,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllStudents: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Students");
-
-    	this.loadHome();
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -190,10 +186,9 @@ var Router = Backbone.Router.extend({
     },
 
     viewStudent: function(id) {
+        this.loadHome();
         this.updatePageBreadcrumb("View Student (" + id + ")");
 
-    	this.loadHome();
-        console.log("in view student");
 		$("#content").html(html["viewStudent.html"]);
 
 		var parent = $("#student-content");
@@ -206,9 +201,8 @@ var Router = Backbone.Router.extend({
     },
 
     createStudent: function(id) {
-        this.updatePageBreadcrumb("Create Student");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Create Student");
 
         $("#content").html("<div id='test-reg'></div>");
         new RegistrationFormView({
@@ -219,9 +213,8 @@ var Router = Backbone.Router.extend({
     },
 
     studentEnrollmentForm: function() {
-        this.updatePageBreadcrumb("Create Student");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Create Student");
 
         app.enrollmentFormView = new EnrollmentFormView({
             el: $("#content")
@@ -229,9 +222,8 @@ var Router = Backbone.Router.extend({
     },
 
     courseEnrollment: function() {
-        this.updatePageBreadcrumb("Course Enrollment");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Course Enrollment");
 
         var user = JSON.parse(sessionStorage.getItem("gobind-user"));
 
@@ -242,9 +234,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterTeachers: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Search Teachers");
-
-    	this.loadHome();
 
     	var filterTeachers = $("#hidden").find("#filter-teachers-container");
     	if (filterTeachers.length) {
@@ -257,9 +248,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredTeachers: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Teachers");
-
-    	this.loadHome();
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -272,9 +262,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllTeachers: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Teachers");
-
-    	this.loadHome();
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -286,9 +275,8 @@ var Router = Backbone.Router.extend({
     	}
     },
     viewTeacher: function(id) {
-        this.updatePageBreadcrumb("View Teacher (" + id + ")");
-
         this.loadHome();
+        this.updatePageBreadcrumb("View Teacher (" + id + ")");
 
         new TeacherRecordView({
             id: id,
@@ -298,9 +286,8 @@ var Router = Backbone.Router.extend({
     },
 
     createTeacher: function() {
-        this.updatePageBreadcrumb("Create Teacher");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Create Teacher");
 
         new CreateTeacherView({
             el: $("#content").html("")
@@ -308,9 +295,8 @@ var Router = Backbone.Router.extend({
     },
 
     filterAdmins: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Search Administrators");
-
-    	this.loadHome();
 
     	var filterAdmins = $("#hidden").find("#filter-admins-container");
     	if (filterAdmins.length) {
@@ -323,9 +309,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewFilteredAdmins: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Administrators");
-
-    	this.loadHome();
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -338,9 +323,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewAllAdmins: function() {
+        this.loadHome();
         this.updatePageBreadcrumb("Administrators");
-
-    	this.loadHome();
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -353,9 +337,8 @@ var Router = Backbone.Router.extend({
     },
 
     viewSchoolYears: function() {
-        this.updatePageBreadcrumb("School Years");
-
         this.loadHome();
+        this.updatePageBreadcrumb("School Years");
 
         new SchoolYearView({
             el: $("#content")
@@ -363,9 +346,8 @@ var Router = Backbone.Router.extend({
     },
 
     schools: function() {
-        this.updatePageBreadcrumb("Schools");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Schools");
 
         new SchoolView({
             el: $("#content")
@@ -373,9 +355,8 @@ var Router = Backbone.Router.extend({
     },
 
     departments: function() {
-        this.updatePageBreadcrumb("Departments");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Departments");
 
         new DepartmentView({
             el: $("#content")
@@ -383,9 +364,8 @@ var Router = Backbone.Router.extend({
     },
 
     courses: function() {
-        this.updatePageBreadcrumb("Courses");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Courses");
 
         new CourseView({
             el: $("#content")
@@ -393,9 +373,8 @@ var Router = Backbone.Router.extend({
     },
 
     sections: function() {
-        this.updatePageBreadcrumb("Sections");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Sections");
 
         new DepartmentView({
             el: $("#content")
@@ -403,9 +382,8 @@ var Router = Backbone.Router.extend({
     },
 
     notifications: function() {
-        this.updatePageBreadcrumb("Notifications");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Notifications");
 
         new NotificationsView({
             el: $("#content")
@@ -421,9 +399,8 @@ var Router = Backbone.Router.extend({
     },
 
     settings: function() {
-        this.updatePageBreadcrumb("Settings");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Settings");
 
         new UserSettingsView({
             el: $("#content")
@@ -431,9 +408,8 @@ var Router = Backbone.Router.extend({
     },
 
     importData: function() {
-        this.updatePageBreadcrumb("Import Data");
-
         this.loadHome();
+        this.updatePageBreadcrumb("Import Data");
 
         new ImportView({
             el: $("#content")
