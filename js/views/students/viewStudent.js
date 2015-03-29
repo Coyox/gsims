@@ -255,6 +255,11 @@ var StudentRecordRowView = Backbone.View.extend({
 			}
 			this.$el.html(this.viewTemplate(params));
 		} else {
+			var validationProperty = this.model.validation[this.name];
+			var isRequired = validationProperty ? validationProperty.required : false;
+			if (isRequired) {
+				params.label = this.label + "<span class='asterisk'>*</span>";
+			}
 			// DOB month/day/year dropdown menu
 			if (this.name == "dateOfBirth") {
 				var month = "", day = "", year = "";
