@@ -30,7 +30,7 @@ $app->get('/teachers/:id/competency', 'getCourseCompetencies');
 $app->get('/teachers/:id/attendance', 'getTeacherAttendance');
 $app->put('/teachers/:id/competency', 'updateCourseCompetencies');
 $app->post('/teachers', 'createTeacher');
-$app->post('/teachers/:id', 'addCourseCompetencies');
+$app->post('/teachers/:id', 'addRemoveCourseCompetencies');
 $app->put('/teachers/:id', 'updateTeacher');
 $app->delete('/teachers/:id', 'deleteTeacher');
 
@@ -1415,21 +1415,32 @@ function getCourseCompetencies($id) {
 }
 
 
-function addCourseCompetencies($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    //$results = json_decode($body);
-    $list = json_decode($_POST["competencies"]);
-    echo $list;
-    $bindparams = array("userid" => $id);
-    $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
-    foreach (array_values($list) as $i => $result) {
-        $sql.= "(:userid, :deptid".$i.", :level".$i.", 'active'),";
-        $bindparams["deptid".$i] = $result->deptid;
-        $bindparams["level".$i] = $result->level;
+function addRemoveCourseCompetencies($id){
+    $queries = array();
+    $combinedbindparams = array();
+    if (isset($_POST["competencies"])){
+        $list = json_decode($_POST["competencies"]);
+        $bindparams = array("userid" => $id);
+        $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
+        foreach (array_values($list) as $i => $result) {
+            $sql.= "(:userid, :deptid".$i.", :level".$i.", 'active'),";
+            $bindparams["deptid".$i] = $result->deptid;
+            $bindparams["level".$i] = $result->level;
+        }
+        $sql = rtrim($sql, ",");
+        array_push($queries, $sql);
+        $combinedbindparams[0] = $bindparams;
     }
-    $sql = rtrim($sql, ",");
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+   if (isset($_POST["deptids"])){
+        $list = json_decode($_POST["deptids"]);
+        $sql = "DELETE from teacherCourseCompetency where userid=:userid and deptid in  ";
+        list($sqlparens, $bindparams) = parenthesisList($list);
+        $bindparams["userid"]= $id;
+        $sql.= $sqlparens;
+        array_push($queries, $sql);
+        $combinedbindparams[1] = $bindparams;
+    }
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 function updateCourseCompetencies($id) {
