@@ -718,7 +718,7 @@ function inputAttendance($id){
         "status" => 'active'
     );
 
-    $sql = "INSERT INTO attendance(`date`, `userid`, `sectionid`, `schoolyearid`, `status`) values ";
+    $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `status`) values ";
     foreach (array_values($userids) as $i => $userid) {
         $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :status),";
         $bindparams["userid".$i] = $userid;
@@ -982,9 +982,7 @@ function getAllEnrolledTests(){
     WHERE t.userid = s.userid and c.courseid = t.courseid and c.deptid = d.deptid and s.status='pending-test'";
     echo json_encode(perform_query($sql, 'GETALL'));
 }
-/*
- * provide schoolyear string instead of schoolyearid
- */
+
 function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status

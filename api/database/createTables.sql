@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 
 CREATE TABLE IF NOT EXISTS `prereqs` (
   `courseid` int(11) NOT NULL,
-  `prereq` char(5) NOT NULL,
+  `prereq` char(50) NOT NULL,
   PRIMARY KEY (`courseid`, `prereq`),
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
 );
