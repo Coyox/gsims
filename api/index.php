@@ -219,7 +219,7 @@ function createSchoolYear(){
         $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
         $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
         $idsql = "SELECT deptid from dept where deptid=:deptid";
-        echo json_encode("rowcount"=>$rowcount);
+        echo json_encode(array("rowcount"=>$rowcount));
         $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
                 SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
                 AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
