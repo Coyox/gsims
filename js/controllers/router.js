@@ -79,8 +79,8 @@ var Router = Backbone.Router.extend({
         "import":               "importData"
     },
 
-    updatePageBreadcrumb: function(text) {
-        $("#breadcrumb-text").html(text);
+    updatePageBreadcrumb: function(text, icon) {
+        $("#breadcrumb-text").html("<span class='glyphicon glyphicon-" + icon + "'></span>" + text);
     },
 
     login: function() {
@@ -101,7 +101,7 @@ var Router = Backbone.Router.extend({
     },
 
     home: function(isHome) {
-        this.updatePageBreadcrumb("Home");
+        this.updatePageBreadcrumb("Home", "home");
 
     	new HomePageView({
     		el: this.el
@@ -122,7 +122,7 @@ var Router = Backbone.Router.extend({
 
     email: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Send Email");
+        this.updatePageBreadcrumb("Send Email", "envelope");
 
         new EmailView({
             el: $("#content"),
@@ -145,7 +145,7 @@ var Router = Backbone.Router.extend({
 
     filterStudents: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Search Students");
+        this.updatePageBreadcrumb("Search Students", "user");
 
     	var filterStudents = $("#hidden").find("#filter-students-container");
     	if (filterStudents.length) {
@@ -159,7 +159,7 @@ var Router = Backbone.Router.extend({
 
     viewFilteredStudents: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Students");
+        this.updatePageBreadcrumb("Students", "user");
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -173,7 +173,7 @@ var Router = Backbone.Router.extend({
 
     viewAllStudents: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Students");
+        this.updatePageBreadcrumb("Students", "user");
 
     	var studentResults = $("#hidden").find("#students-table-container");
     	if (studentResults.length) {
@@ -187,7 +187,7 @@ var Router = Backbone.Router.extend({
 
     viewStudent: function(id) {
         this.loadHome();
-        this.updatePageBreadcrumb("View Student (" + id + ")");
+        this.updatePageBreadcrumb("View Student", "user");
 
 		$("#content").html(html["viewStudent.html"]);
 
@@ -202,7 +202,7 @@ var Router = Backbone.Router.extend({
 
     createStudent: function(id) {
         this.loadHome();
-        this.updatePageBreadcrumb("Create Student");
+        this.updatePageBreadcrumb("Create Student", "user");
 
         $("#content").html("<div id='test-reg'></div>");
         new RegistrationFormView({
@@ -214,7 +214,7 @@ var Router = Backbone.Router.extend({
 
     studentEnrollmentForm: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Create Student");
+        this.updatePageBreadcrumb("Create Student", "user");
 
         app.enrollmentFormView = new EnrollmentFormView({
             el: $("#content")
@@ -223,7 +223,7 @@ var Router = Backbone.Router.extend({
 
     courseEnrollment: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Course Enrollment");
+        this.updatePageBreadcrumb("Course Enrollment", "th-list");
 
         var user = JSON.parse(sessionStorage.getItem("gobind-user"));
 
@@ -235,7 +235,7 @@ var Router = Backbone.Router.extend({
 
     filterTeachers: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Search Teachers");
+        this.updatePageBreadcrumb("Search Teachers", "user");
 
     	var filterTeachers = $("#hidden").find("#filter-teachers-container");
     	if (filterTeachers.length) {
@@ -249,7 +249,7 @@ var Router = Backbone.Router.extend({
 
     viewFilteredTeachers: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Teachers");
+        this.updatePageBreadcrumb("Teachers", "user");
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -263,7 +263,7 @@ var Router = Backbone.Router.extend({
 
     viewAllTeachers: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Teachers");
+        this.updatePageBreadcrumb("Teachers", "user");
 
     	var teacherResults = $("#hidden").find("#teachers-table-container");
     	if (teacherResults.length) {
@@ -276,7 +276,7 @@ var Router = Backbone.Router.extend({
     },
     viewTeacher: function(id) {
         this.loadHome();
-        this.updatePageBreadcrumb("View Teacher (" + id + ")");
+        this.updatePageBreadcrumb("View Teacher", "user");
 
         new TeacherRecordView({
             id: id,
@@ -287,7 +287,7 @@ var Router = Backbone.Router.extend({
 
     createTeacher: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Create Teacher");
+        this.updatePageBreadcrumb("Create Teacher", "user");
 
         new CreateTeacherView({
             el: $("#content").html("")
@@ -296,7 +296,7 @@ var Router = Backbone.Router.extend({
 
     filterAdmins: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Search Administrators");
+        this.updatePageBreadcrumb("Search Administrators", "user");
 
     	var filterAdmins = $("#hidden").find("#filter-admins-container");
     	if (filterAdmins.length) {
@@ -310,7 +310,7 @@ var Router = Backbone.Router.extend({
 
     viewFilteredAdmins: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Administrators");
+        this.updatePageBreadcrumb("Administrators", "user");
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -324,7 +324,7 @@ var Router = Backbone.Router.extend({
 
     viewAllAdmins: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Administrators");
+        this.updatePageBreadcrumb("Administrators", "user");
 
     	var adminResults = $("#hidden").find("#admins-table-container");
     	if (adminResults.length) {
@@ -338,7 +338,7 @@ var Router = Backbone.Router.extend({
 
     viewSchoolYears: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("School Years");
+        this.updatePageBreadcrumb("School Years", "calendar");
 
         new SchoolYearView({
             el: $("#content")
@@ -347,7 +347,7 @@ var Router = Backbone.Router.extend({
 
     schools: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Schools");
+        this.updatePageBreadcrumb("Schools", "education");
 
         new SchoolView({
             el: $("#content")
@@ -356,7 +356,7 @@ var Router = Backbone.Router.extend({
 
     departments: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Departments");
+        this.updatePageBreadcrumb("Departments", "th-list");
 
         new DepartmentView({
             el: $("#content")
@@ -365,7 +365,7 @@ var Router = Backbone.Router.extend({
 
     courses: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Courses");
+        this.updatePageBreadcrumb("Courses", "th-list");
 
         new CourseView({
             el: $("#content")
@@ -374,7 +374,7 @@ var Router = Backbone.Router.extend({
 
     sections: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Sections");
+        this.updatePageBreadcrumb("Sections", "th-list");
 
         new DepartmentView({
             el: $("#content")
@@ -383,7 +383,7 @@ var Router = Backbone.Router.extend({
 
     notifications: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Notifications");
+        this.updatePageBreadcrumb("Notifications", "bell");
 
         new NotificationsView({
             el: $("#content")
@@ -400,7 +400,7 @@ var Router = Backbone.Router.extend({
 
     settings: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Settings");
+        this.updatePageBreadcrumb("Settings", "wrench");
 
         new UserSettingsView({
             el: $("#content")
@@ -409,7 +409,7 @@ var Router = Backbone.Router.extend({
 
     importData: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Import Data");
+        this.updatePageBreadcrumb("Import Data", "import");
 
         new ImportView({
             el: $("#content")
