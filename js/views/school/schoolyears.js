@@ -72,15 +72,21 @@ var SchoolYearView = Backbone.View.extend({
 				elem.remove();
 				backdrop.remove();
 				view.model.save({
-					dataType: "text",
 					data: {duplicate:1,
 						   currentSchoolYear:sessionStorage.getItem("activeSchoolYear")}
 				}).then(function(data) {
-					if (data) {
+					if (data.status=="success") {
 						new TransactionResponseView({
 							message: "New school year successfully created."
 						});
 						view.render();
+					}
+					else {
+						new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Could not create a new school year."
+					});
 					}
 				}).fail(function(data) {
 					new TransactionResponseView({
