@@ -1671,18 +1671,23 @@ function getUserByEmailAddr($emailAddr){
     }
 }
 
-
 function getUserCount($usertype){
     $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
     $status = $_GET['status'];
+    $schoolid = $_GET['schoolid'];
     $sql = "SELECT count(*) from ".$table;
     $bindparams = array();
     if (isset($status)){
         $sql.=" where status=:status";
         $bindparams["status"] = $status;
     }
-    if ($usertype=="T"|$usertype=="A"){
+    if (isset($schoolid) && $usertype!="SU"){
         $sql.= (isset($status)? " and ": " where ");
+        $sql.= "schoolid=:schoolid";
+        $bindparams["schoolid"] = $schoolid;
+    }
+    if ($usertype=="T"|$usertype=="A"){
+        $sql.= (isset($status)||isset($schoolid)? " and ": " where ");
         $sql.= "usertype=:usertype";
         $bindparams["usertype"] = $usertype;
     }
