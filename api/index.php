@@ -1417,7 +1417,7 @@ function addCourseCompetencies($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     //$results = json_decode($body);
-    $list = json_decode($_POST['competencies']);
+    $list = json_decode($_POST["competencies"]);
     echo $list;
     $bindparams = array("userid" => $id);
     $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
