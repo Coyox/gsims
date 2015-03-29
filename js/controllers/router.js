@@ -92,7 +92,7 @@ var Router = Backbone.Router.extend({
 
     loadHome: function() {
       	if ($("#container").html() == "") {
-    		this.home(true);
+    		this.home();
     	}
     },
 
@@ -107,7 +107,7 @@ var Router = Backbone.Router.extend({
     		el: this.el
     	});
 
-        if (isHome) {
+        if (Backbone.history.fragment == "home") {
             new DashboardView({
                 el: $("#content")
             });
