@@ -103,17 +103,19 @@ var Section = Backbone.Model.extend({
     getDropStudentUrl: function(sectionid, studentid) {
    		return this.urlRoot + "/students/" + sectionid + "/" + studentid;
     },
-
     getSearchSectionsUrl: function() {
     	return app.serverUrl + "api/search/sections";
     },
    	unassignTeacherUrl: function(sectionid, teacherid) {
    		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid;
    	},
-
     inputAttendance: function(sectionid){
     	return this.urlRoot + "/" + sectionid + "/attendance";
+    },
+    getStudentsEnrolled: function(sectionid){
+    	return this.urlRoot + "/" + sectionid + "/students";
     }
+
 });
 
 var Prereq = Backbone.Model.extend({
