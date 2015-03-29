@@ -106,7 +106,8 @@ function loadTemplates() {
 		"registrationPage.html",
 		"termsAndConditions.html",
 		"settings.html",
-		"import.html"
+		"import.html",
+		"subSection.html"
 	];
 
 	$.each(templates, function(i, name) {

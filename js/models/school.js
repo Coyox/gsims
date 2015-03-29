@@ -78,6 +78,10 @@ var Course = Backbone.Model.extend({
 	},
     
     urlRoot: app.serverUrl + "api/courses",
+
+    getCoursePrereqs: function(id) {
+    	return this.urlRoot + "/" + id + "/prereqs";
+    }
 });
 
 var Section = Backbone.Model.extend({
@@ -107,6 +111,7 @@ var Section = Backbone.Model.extend({
    	unassignTeacherUrl: function(sectionid, teacherid) {
    		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid;
    	},
+
 });
 
 var Prereq = Backbone.Model.extend({

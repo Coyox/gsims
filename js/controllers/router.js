@@ -233,8 +233,11 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
+        var user = JSON.parse(sessionStorage.getItem("gobind-user"));
+
         app.courseEnrollmentView = new CourseEnrollmentView({
-            el: $("#content")
+            el: $("#content"),
+            userid: user ? user.userid : false
         });
     },
 
@@ -291,7 +294,6 @@ var Router = Backbone.Router.extend({
             id: id,
             el: $("#content"),
             action: "view",
-            parentContainer: parent
         });
     },
 

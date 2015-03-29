@@ -146,6 +146,10 @@ var Student = Backbone.Model.extend({
    		return this.urlRoot + "/" + id + "/sections";
    	},
 
+   	getPrevEnrolledSections: function(id) {
+   		return this.urlRoot + "/" + id + "/prevSections";
+   	},
+
    	studentStatuses: [
    		"active",
    		"inactive",

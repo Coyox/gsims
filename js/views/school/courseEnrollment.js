@@ -2,6 +2,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 	initialize: function(options) {
 		var view = this;
 		this.results = options.results;
+		this.userid = options.userid;
 		this.render();
 	},
 
@@ -29,31 +30,46 @@ var CourseEnrollmentView = Backbone.View.extend({
 			this.populateDepartments();
 		}
 
+		if (this.userid) {
+			var student = new Student();
+			student.fetch({
+				url: student.getPrevEnrolledSections(this.userid),
+				data: {
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+				}
+			}).then(function(data) {
+				console.log(data);
+			});
+		}
+
 		this.courseTable = this.$el.find("#course-list").DataTable({
 			dom: "t",
 			bAutoWidth: false,
 			aoColumns: [
-				{ sWidth: "20%" },
+				{ sWidth: "10%" },
 				{ sWidth: "40%" },
-				{ sWidth: "40%" }
-			]
+				{ sWidth: "20%" },
+				{ sWidth: "30%" }
+			],
+			bSort: false
 		});
 
 		this.enrolledTable = this.$el.find("#enrolled-list").DataTable({
-			dom: "t"
+			dom: "t",
+			bSort: false
 		});
 	},
 
 	events: {
 		"click #save-sections": "saveEnrolledSections",
-		"change #school-menu": "populateDepartments"
+		"change #school-menu": "populateDepartments",
+		"click #save-sections": "saveEnrolledSections"
 	},
 
 	populateDepartments: function(evt) {
 		var view = this;
 		var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
 			$("#school-options").find("option:selected").attr("id");
-			console.log(schoolid);
 
 		// temp fix
 		if (!schoolid) {
@@ -96,7 +112,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 				valid = false;
 			} else {
 				valid = true;
-				sections.push($(row).data("section"));
+				sections.push($(row).data("section").sectionid);
 			}
 		}, this);
 		
@@ -106,10 +122,34 @@ var CourseEnrollmentView = Backbone.View.extend({
 				message: "Please select at least one section before proceeding."
 			});
 		} else {
-			new TransactionResponseView({
-				title: "Course Selection",
-				message: "todo.."
-			});	
+			var view = this;
+			var student = new Student();
+			$.ajax({
+				type: "POST",
+				url: student.enrollStudentInSections("416716"),
+				data: {
+					sectionids: JSON.stringify(sections),
+					status: "pending",
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+				}
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
+						redirect: true,
+						url: view.regType == "online" ? "" : "home"
+					});
+				} else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Sorry, we could not process your request. Please try again."
+					});
+				}
+			});
 		}
 	}
 });
@@ -153,10 +193,15 @@ var DepartmentListItem = Backbone.View.extend({
 
 			_.each(data, function(object, index) {
 				var course = new Course(object, {parse:true});
-				new CourseTableRowView({
-					el: view.addCourseRow(),
-					model: course,
-					parentView: view.parentView
+				course.fetch({
+					url: course.getCoursePrereqs(course.get("courseid"))
+				}).then(function(data) {
+					new CourseTableRowView({
+						el: view.addCourseRow(),
+						model: course,
+						parentView: view.parentView,
+						prereqs: data
+					});
 				});
 			});
 		});
@@ -172,16 +217,28 @@ var DepartmentListItem = Backbone.View.extend({
 var CourseTableRowView = Backbone.View.extend({
 	template: _.template("<td class='details-control' data-name='<%= model.courseName %>'></td>"
 		+ 	"<td><%= model.courseName %></td>"
-		+	"<td><%= model.description %></td>"),
+		+	"<td><%= model.description %></td>"
+		+	"<td><%= prereqs %></td>"),
 
 	initialize: function(options) {
 		this.parentView = options.parentView;
+		this.prereqs = options.prereqs;
 		this.render();
 	},
 
 	render: function() {
+		var prereqs;
+		if (this.prereqs && this.prereqs.length) {
+			prereqs = $.map(this.prereqs, function(object) {
+				return object.prereq;
+			}).join(",");
+		} else {
+			prereqs = "None";
+		}
+
 		this.$el.html(this.template({
-			model: this.model.toJSON()
+			model: this.model.toJSON(),
+			prereqs: prereqs
 		}));
 	},
 
@@ -198,10 +255,6 @@ var CourseTableRowView = Backbone.View.extend({
 		if (tr.hasClass("shown")) {
 			tr.next("tr").remove();
 			tr.removeClass("shown");
-
-			// fix this
-	    	var height = $("#course-selection").height() + 60;
-	    	$('.wizard .content').css("height", height);
 		} else {
 			var courseName = $(evt.currentTarget).data("name");
 			var section = new Section();
@@ -215,23 +268,23 @@ var CourseTableRowView = Backbone.View.extend({
 			}).then(function(data) {
 				tr.addClass("shown");
 
-				// new SectionTableView({
-				// 	el: view.createSubTable(tr),
-				// 	data: data,
-				// 	parentView: view.parentView
-				// });
+				new SectionSubView({
+					el: view.createSubTable(tr),
+					data: data,
+					parentView: view.parentView
+				});
 			});			
 		}
 	},
 
 	createSubTable: function(parent) {
-		var row = $("<tr><td colspan='3'></td></tr>");
+		var row = $("<tr><td colspan='4'></td></tr>");
 		parent.after(row);
 		return row;
 	}
 });
 
-var SectionTableView = Backbone.View.extend({
+var SectionSubView = Backbone.View.extend({
 	initialize: function(options) {
 		this.data = options.data;
 		this.parentView = options.parentView;
@@ -239,7 +292,7 @@ var SectionTableView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.find("td").html(html["viewSections.html"]);
+		this.$el.find("td").html(html["subSection.html"]);
 
 		if (this.data.length == 0) {
 			this.$el.find("td").html("<div class='alert alert-danger'>There are currently no sections available.</div>");
