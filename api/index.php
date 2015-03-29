@@ -1418,7 +1418,7 @@ function updateCourseCompetencies($id){
     $queries = array();
     $combinedbindparams = array();
 
-    if (isset($_POST["insertComp"])){
+    if (isset($_POST["insertComps"])){
         $list = json_decode($_POST["insertComps"]);
         $bindparams = array("userid" => $id);
         $sql = "INSERT INTO teacherCourseCompetency(userid, deptid, level, status) values ";
@@ -1431,7 +1431,7 @@ function updateCourseCompetencies($id){
         array_push($queries, $sql);
         $combinedbindparams[0] = $bindparams;
     }
-   if (isset($_POST["deleteComp"])){
+   if (isset($_POST["deleteComps"])){
         $list = json_decode($_POST["deleteComps"]);
         $sql = "DELETE from teacherCourseCompetency where userid=:userid and deptid in  ";
         list($sqlparens, $bindparams) = parenthesisList($list);
