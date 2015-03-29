@@ -1446,7 +1446,7 @@ function updateCourseCompetencies($id){
         foreach (array_values($list) as $i => $result){
             $sql = "UPDATE teacherCourseCompetency set level=:level".$i." where userid=:userid and deptid=:deptid".$i;
             array_push($queries, $sql);
-            array_push($combinedparams, array("userid" =>$id, "deptid".$i=>$result->deptid, "level".$i=>$result->level));
+            array_push($combinedbindparams, array("userid" =>$id, "deptid".$i=>$result->deptid, "level".$i=>$result->level));
         }
     }
     echo json_encode(perform_transaction($queries, $combinedbindparams));
