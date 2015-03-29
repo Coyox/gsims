@@ -39,32 +39,51 @@ var CreateTeacherView = Backbone.View.extend({
 
 	saveTeacher: function() {
 		Backbone.Validation.bind(this);
-
+		var view = this;
 		this.model.set("usertype", "T");
 		this.model.set("schoolid", "412312");
 		this.model.set("status",  "active");
 		console.log(this.model);
 
 		if (this.model.isValid(true)) {
-			new TransactionResponseView({
-				message: "todo..."
+			this.model.save({
+				dataType: "json"
+			}).then(function(data) {
+				console.log(data);
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status == "success") {
+					new TransactionResponseView({
+						message: "Teacher successfully created."
+					});
+					var insertComp = [];
+					_.each(view.model.competency, function(dept, index) {
+						if (dept.level != 0) {
+							insertComp.push({
+								deptid: dept.deptid,
+								level: dept.level
+							});
+						}
+					});
+					$.ajax({
+						type: "POST",
+						url: view.model.addCourseCompetencyUrl(data.userid),
+						data: {
+							competencies: JSON.stringify(insertComp)
+						}
+					});
+					view.render();
+				} else {
+					new TransactionResponseView({
+						message: "Sorry, the teacher could not be created. Please try again."
+					});
+				}
+			}).fail(function(jqXHR) {
+				new TransactionResponseView({
+					message: "Sorry, the teacher could not be created. Please try again."
+				});
 			});
-			// this.model.save({
-			// 	dataType: "json"
-			// }).then(function(data) {
-			// 	console.log(data);
-			// 	if (typeof data == "string") {
-			// 		data = JSON.parse(data);
-			// 	}
-			// 	if (data.status == "success") {
-			// 		new TransactionResponseView({
-			// 			message: "Teacher successfully created."
-			// 		});
-			// 		console.log(data);
-			// 	}
-			// }).fail(function(jqXHR) {
-			// 	console.log(jqXHR.responseJSON);
-			// });
 		} else {
 
 		}
@@ -177,7 +196,8 @@ var TeacherCompetencyView = Backbone.View.extend({
 				});
 				view.model.competency.push({
 					deptName: dept.deptName,
-					level: level
+					level: level,
+					deptid: dept.deptid
 				});
 				new TeacherCompetencyRowView({
 					el: view.addRow(index),
