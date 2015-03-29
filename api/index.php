@@ -13,7 +13,7 @@ $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
 $app->get('/students/:id/tests', 'getEnrolledTests');
 $app->get('/students/:id/avgGrade', 'getAvgGrade');
-$app->get('/students/:id', 'getStudentAttendance');
+$app->get('/students/:id/attendance', 'getStudentAttendance');
 $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
