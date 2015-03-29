@@ -19,6 +19,7 @@ $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
+$app->put('/students/:id/sections', 'approveDenyEnrollment');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
@@ -1214,6 +1215,29 @@ function enrollStudentInSections($id){
     $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
+
+function approveDenyEnrollment($id){
+    $queries = array();
+    $bindparams = array();
+    if (isset($_POST['approvedList'])){
+        $students = json_decode($_POST['approvedList']);
+        foreach($students as $student){
+            $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid=:sectionid";
+            array_push($bindparams, array("userid"=>$student->userid, "sectionid"=>$student->sectionid));
+            array_push($queries, $sql);
+        }
+    }
+    if (isset($_POST['deniedList'])){
+        $students = json_decode($_POST['deniedList']);
+        foreach($students as $student){
+            $sql = "DELETE from enrollment where userid=:userid and sectionid=:sectionid";
+            array_push($bindparams, array("userid"=>$student->userid, "sectionid"=>$student->sectionid));
+            array_push($queries, $sql);
+        }
+    }
+    echo json_encode(perform_transaction($queries, $bindparams));
+}
+
 
 function enrollStudentInTests($id){
     $request = \Slim\Slim::getInstance()->request();
