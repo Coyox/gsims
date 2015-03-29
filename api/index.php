@@ -1713,7 +1713,7 @@ function getAttendance($id, $schoolyearid){
 }
 
 function getAttendanceByMonth($id, $schoolyearid, $month){
-    $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid and month(`date`)=:$month";
+    $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid and month(`date`)=:month";
     return perform_query($sql, 'GETALL', array("userid"=>$id, "month"=>$month, "schoolyearid"=>$schoolyearid));
 }
 
