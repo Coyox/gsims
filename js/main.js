@@ -105,7 +105,8 @@ function loadTemplates() {
 		"emailModal.html",
 		"registrationPage.html",
 		"termsAndConditions.html",
-		"settings.html"
+		"settings.html",
+		"import.html"
 	];
 
 	$.each(templates, function(i, name) {
