@@ -277,7 +277,7 @@ function createSchoolYear(){
         //     array_push($queries, $sql);
         //     array_push($combinedbindparams, $bindparams);
         // }
-            echo json_encode("status"=>"test");
+            echo json_encode(array("status"=>"test"));
     }
     $resp = perform_transaction($queries, $combinedbindparams);
     echo json_encode($resp);
