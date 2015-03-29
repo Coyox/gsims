@@ -151,12 +151,14 @@
 		</li>
 	</ul>
 
+	<% if (usertype == "S") { %>
 	<li>
 		<a href="#courseEnrollment" class="sidebar-link" data-link="courses">
 			<span class="glyphicon glyphicon-th-list"></span>
 			<span class="text"> Course Enrollment</span>
 		</a>
 	</li>
+	<% } %>
 
 	<!-- ADMIN TOOLS -->
 	<% if (usertype == "A" || usertype == "SU") { %>

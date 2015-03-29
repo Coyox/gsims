@@ -126,7 +126,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 			var student = new Student();
 			$.ajax({
 				type: "POST",
-				url: student.enrollStudentInSections("416716"),
+				url: student.enrollStudentInSections(this.userid),
 				data: {
 					sectionids: JSON.stringify(sections),
 					status: "pending",
