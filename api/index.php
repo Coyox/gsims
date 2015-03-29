@@ -207,7 +207,7 @@ function createSchoolYear(){
     $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>$schoolyear->status, "openForReg"=>$schoolyear->openForReg);
     echo json_encode(perform_query($sql,'POST', $bindparam));
 
-    if ($schoolyear->duplicate == 1){
+    if ($schoolyear->data->duplicate == 1){
         $current_schoolyear = $schoolyear->currentSchoolYear;
 
         // create a row for each department
