@@ -1,5 +1,8 @@
 USE gobind;
 
+INSERT into apikeys(`keyid`, `name`) values ('C_s6D7OmZEgKBIspAvuBcw', 'mandrill');
+
+
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
 VALUES(341231, 412312, "Harry", "Potter", "test@gmail.com", "active", "T"),
 (341232, 412312, "Shanifer, Seit", "test1@gmail.com", "active", "T"),
