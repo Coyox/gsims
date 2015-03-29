@@ -50,8 +50,8 @@ var SchoolYearView = Backbone.View.extend({
 
 	createSchoolYear: function(evt) {
 		var view = this;
-		Backbone.Validation.bind(this);	
-		
+		Backbone.Validation.bind(this);
+
 		this.$el.append(html["createSchoolYear.html"]);
 
 		var elem = $("#create-year-modal");
@@ -60,19 +60,21 @@ var SchoolYearView = Backbone.View.extend({
 		elem.modal({
 			show: true
 		});
-		
+
 		elem.on("hidden.bs.modal", function() {
 			elem.remove();
 			backdrop.remove();
 		});
-		
+
 		elem.on("click", "#save", function() {
 			view.model.set("schoolyear", $("#school-year").val());
 			if (view.model.isValid(true)) {
 				elem.remove();
 				backdrop.remove();
 				view.model.save({
-					dataType: "text"
+					dataType: "text",
+					data: {duplicate:1,
+						   currentSchoolYear:sessionStorage.getItem("activeSchoolYear")}
 				}).then(function(data) {
 					if (data) {
 						new TransactionResponseView({
@@ -110,9 +112,9 @@ var SchoolYearView = Backbone.View.extend({
 				var promise = model.save(null, {
 					url: this.model.updateRegistrationUrl(id)
 				});
-				promises.push(promise);	
+				promises.push(promise);
 			}
-		}, this);	
+		}, this);
 
 		// Wait for both queries to return
 		$.when.apply($, promises).then(function() {
@@ -136,7 +138,7 @@ var SchoolYearView = Backbone.View.extend({
 });
 
 var SchoolYearRowView = Backbone.View.extend({
-	viewTemplate: _.template("<td><%= model.schoolyear %></td>" 
+	viewTemplate: _.template("<td><%= model.schoolyear %></td>"
 		+	"<td><%= status %></td>"
 		+	"<td><%= openForReg %></td>"),
 
@@ -150,7 +152,7 @@ var SchoolYearRowView = Backbone.View.extend({
 	},
 
 	render: function() {
-		var view = this; 
+		var view = this;
 
 		if (this.action == "view") {
 			this.$el.html(this.viewTemplate({
@@ -162,7 +164,7 @@ var SchoolYearRowView = Backbone.View.extend({
 			this.$el.html(this.editTemplate({
 				model: this.model.toJSON()
 			}));
-		
+
 			// active school year switch
 			this.$el.find("[name='active-switch']").bootstrapSwitch({
 				size: "mini",

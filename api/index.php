@@ -198,6 +198,7 @@ function createSchoolYear(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $schoolyear = json_decode($body);
+    $rsep = array();
 
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
     $schoolyearid = generateUniqueID($sql, "schoolyearid");
@@ -205,10 +206,10 @@ function createSchoolYear(){
     $sql = "INSERT into schoolyear (schoolyearid, schoolyear, status, openForReg)
             values (:schoolyearid, :schoolyear, :status, :openForReg)";
     $bindparam = array("schoolyearid"=>$schoolyearid, "schoolyear"=>$schoolyear->schoolyear, "status"=>$schoolyear->status, "openForReg"=>$schoolyear->openForReg);
-    echo json_encode(perform_query($sql,'POST', $bindparam));
+    $resp = perform_query($sql,'POST', $bindparam);
 
     if ($schoolyear->data->duplicate == 1){
-        $current_schoolyear = $schoolyear->currentSchoolYear;
+        $current_schoolyear = $schoolyear->data->currentSchoolYear;
 
         // create a row for each department
         $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
@@ -227,7 +228,7 @@ function createSchoolYear(){
         for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "deptid");
             $bindparams["deptid"] = $id;
-            echo json_encode(perform_query($sql,'POST',$bindparams));
+            $resp = $resp + perform_query($sql,'POST',$bindparams);
         }
 
         //create row for each course
@@ -242,7 +243,7 @@ function createSchoolYear(){
         for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "courseid");
             $bindparams["courseid"] = $id;
-            echo json_encode(perform_query($sql,'POST',$bindparams));
+            $resp = $resp + perform_query($sql,'POST',$bindparams);
         }
 
         //create row for each section
@@ -257,8 +258,9 @@ function createSchoolYear(){
         for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "sectionid");
             $bindparams["sectionid"] = $id;
-            echo json_encode(perform_query($sql,'POST',$bindparams));
+            $resp = $resp + perform_query($sql,'POST',$bindparams);
         }
+        echo json_encode($resp);
     }
 }
 
