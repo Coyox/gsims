@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS `studentCompetencyTest` (
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS `keys` (
+CREATE TABLE IF NOT EXISTS `apikeys` (
   `keyid` varchar(255) NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`keyid`, `name`)
