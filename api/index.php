@@ -1315,7 +1315,13 @@ function getAvgGrade($id, $flag=0){
 
 function getStudentAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
-    echo json_encode(getAttendance($id, $schoolyearid));
+    $month = $_GET["month"];
+    if (isset($month)){
+        echo json_encode(getAttendanceByMonth($id, $schoolyearid, $month));
+    }
+    else {
+        echo json_encode(getAttendance($id, $schoolyearid));
+    }
 }
 #================================================================================================================#
 # Teachers
@@ -1496,7 +1502,13 @@ function updateCourseCompetencies($id){
 
 function getTeacherAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
-    echo json_encode(getAttendance($id, $schoolyearid));
+    $month = $_GET["month"];
+    if (isset($month)){
+        echo json_encode(getAttendanceByMonth($id, $schoolyearid, $month));
+    }
+    else {
+        echo json_encode(getAttendance($id, $schoolyearid));
+    }
 }
 #================================================================================================================#
 # Administrators
@@ -1698,6 +1710,11 @@ function getUserCount($usertype){
 function getAttendance($id, $schoolyearid){
     $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid";
     return perform_query($sql, 'GETALL', array("userid"=>$id, "schoolyearid"=>$schoolyearid));
+}
+
+function getAttendanceByMonth($id, $schoolyearid, $month){
+    $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid and month(`date`)=:month";
+    return perform_query($sql, 'GETALL', array("userid"=>$id, "month"=>$month, "schoolyearid"=>$schoolyearid));
 }
 
 function createLogin($firstname, $lastname, $usertype){
