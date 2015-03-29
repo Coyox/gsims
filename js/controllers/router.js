@@ -287,12 +287,9 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
-        $("#content").html(html["viewTeacher.html"]);
-
-        var parent = $("#teacher-content");
         new TeacherRecordView({
             id: id,
-            el: $("#teacher-info"),
+            el: $("#content"),
             action: "view",
             parentContainer: parent
         });

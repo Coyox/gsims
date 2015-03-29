@@ -215,11 +215,11 @@ var CourseTableRowView = Backbone.View.extend({
 			}).then(function(data) {
 				tr.addClass("shown");
 
-				new SectionTableView({
-					el: view.createSubTable(tr),
-					data: data,
-					parentView: view.parentView
-				});
+				// new SectionTableView({
+				// 	el: view.createSubTable(tr),
+				// 	data: data,
+				// 	parentView: view.parentView
+				// });
 			});			
 		}
 	},

@@ -54,9 +54,6 @@ var CreateTeacherView = Backbone.View.extend({
 					data = JSON.parse(data);
 				}
 				if (data.status == "success") {
-					new TransactionResponseView({
-						message: "Teacher successfully created."
-					});
 					var insertComp = [];
 					_.each(view.model.competency, function(dept, index) {
 						if (dept.level != 0) {
@@ -66,13 +63,34 @@ var CreateTeacherView = Backbone.View.extend({
 							});
 						}
 					});
-					$.ajax({
-						type: "POST",
-						url: view.model.addCourseCompetencyUrl(data.userid),
-						data: {
-							competencies: JSON.stringify(insertComp)
-						}
-					});
+					if (insertComp.length) {
+						$.ajax({
+							type: "POST",
+							url: view.model.addCourseCompetencyUrl(data.userid),
+							data: {
+								competencies: JSON.stringify(insertComp)
+							}
+						}).then(function(data) {
+							if (typeof data == "string") {
+								data = JSON.parse(data);
+							}
+							if (data.status == "success") {
+								new TransactionResponseView({
+									message: "Teacher successfully created. " + insertComp.length + " competency levels updated."
+								});								
+							} else {
+								new TransactionResponseView({
+									title: "ERROR",
+									status: "error",
+									message: "Teacher successfully created, but the competency levels could not be updated."
+								});								
+							}
+						})
+					} else {
+						new TransactionResponseView({
+							message: "Teacher successfully created."
+						});
+					}
 					view.render();
 				} else {
 					new TransactionResponseView({
