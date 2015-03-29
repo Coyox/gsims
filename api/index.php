@@ -198,7 +198,7 @@ function createSchoolYear(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $schoolyear = json_decode($body);
-    $rsep = array();
+    $resp = array();
 
     $sql = "SELECT schoolyearid from schoolyear where schoolyearid=:schoolyearid";
     $schoolyearid = generateUniqueID($sql, "schoolyearid");
