@@ -386,7 +386,7 @@ var Router = Backbone.Router.extend({
 
         this.loadHome();
 
-        new DepartmentView({
+        new CourseView({
             el: $("#content")
         });
     },

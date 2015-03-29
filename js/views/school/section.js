@@ -3,7 +3,7 @@ var DepartmentView = Backbone.View.extend({
         this.model = new Dept();
         this.render();
     },
-     
+
     render: function () {
         this.$el.html(html["viewDepartments.html"]);
         var view = this;
@@ -27,7 +27,7 @@ var DepartmentView = Backbone.View.extend({
             });
         });
     },
-
+     
     events: {
         "click #create-dept": "createDept",
     },
