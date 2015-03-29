@@ -1449,7 +1449,7 @@ function updateCourseCompetencies($id){
             array_push($combinedparams, array("userid" =>$id, "deptid".$i=>$result->deptid, "level".$i=>$result->level));
         }
     }
-    echo json_encode(perform_transaction($queries, $bindparams));
+    echo json_encode(perform_transaction($queries, $combinedbindparams));
 }
 
 function getTeacherAttendance($id){
