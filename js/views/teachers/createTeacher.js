@@ -196,10 +196,11 @@ var TeacherCompetencyView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
-		var schoolid = $("#school-options option:selected").attr("id");
 		var school = new School();
+		var schoolid = this.model.get("schoolid");
+		console.log(this.model.get("schoolid"));
 		school.fetch({
-			url: school.getDepartmentsUrl(this.model.get("schoolid")),
+			url: school.getDepartmentsUrl(schoolid),// (this.model.get("schoolid")),
 			data: {
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
