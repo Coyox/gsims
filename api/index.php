@@ -712,7 +712,7 @@ function updateSection($id) {
         "roomCapacity" => $course->roomCapacity,
         "roomLocation" => $course->roomLocation,
         "classSize" => $course->classSize,
-        "schoolyearid" => $coursecourse->schoolyearid,
+        "schoolyearid" => $course->schoolyearid,
         "status" => $course->status
     );
     echo json_encode(perform_query($sql,'',$bindparams));
