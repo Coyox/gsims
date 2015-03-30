@@ -4,6 +4,9 @@ var CourseView = Backbone.View.extend({
         this.render();
     },
      
+    events: {
+        "click #purge-courses": "purgeCourses"
+    },
      render: function () {
         this.$el.html(html["viewCourses.html"]);
         var view = this;
@@ -64,6 +67,45 @@ var CourseView = Backbone.View.extend({
         this.$el.find(".results").append(container);
         return container;
     },
+
+        purgeCourses: function(){
+        var course = new Course();
+		course.fetch().then(function(data) {
+            var ids = [];
+			_.each(data, function(object, index) {
+                 ids.push(object.courseid);
+            });
+            var purge = new Purge();
+            $.ajax({
+                type: "POST",
+                url: purge.purgeCourses(),
+                data: {
+                  deptids: JSON.stringify(ids)
+                }
+            }).then(function(data) {
+           // if (typeof data == "string") {
+           //     data = JSON.parse(data);
+           // }
+                if (data.status == "success") {
+                  new TransactionResponseView({
+                      message: "The selected records have successfully been purged."
+                  });
+             } else {
+                  new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+                    });               
+                }
+            }).fail(function(data) {
+                new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+             }); 
+         });
+     });
+     },
 
     createDept: function (evt) {
         console.log("in create dept");

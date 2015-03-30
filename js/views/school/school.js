@@ -26,6 +26,7 @@ var SchoolView = Backbone.View.extend({
 
     events: {
         "click #create-school": "createSchool",
+        "click #purge-school": "purgeSchool"
     },
 
     addRow: function () {
@@ -33,6 +34,45 @@ var SchoolView = Backbone.View.extend({
         this.$el.find(".results").append(container);
         return container;
     },
+
+     purgeSchool: function(){
+        var school = new School();
+		school.fetch().then(function(data) {
+            var ids = [];
+			_.each(data, function(object, index) {
+                 ids.push(object.schoolid);
+            });
+            var purge = new Purge();
+            $.ajax({
+                type: "POST",
+                url: purge.purgeSchools(),
+                data: {
+                  schoolids: JSON.stringify(ids)
+                }
+            }).then(function(data) {
+           // if (typeof data == "string") {
+           //     data = JSON.parse(data);
+           // }
+                if (data.status == "success") {
+                  new TransactionResponseView({
+                      message: "The selected records have successfully been purged."
+                  });
+             } else {
+                  new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+                    });               
+                }
+            }).fail(function(data) {
+                new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+             }); 
+         });
+     });
+     },
 
     createSchool: function (evt) {
         var view = this;

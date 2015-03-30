@@ -113,7 +113,7 @@ $app->get('/search/sections', 'findSections');
 $app->get('/search/advanced', 'findStudentsWithAdvancedCriteria');
 
 $app->get('/login', 'validateCredentials');
-$app->put('/login/:id', 'updateLogin');
+$app->post('/login/:id', 'updateLogin');
 $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
@@ -145,12 +145,18 @@ $app->run();
 function validateCredentials() {
     $password = $_GET['password'];
     if (isset($password)){
-        $sql = "SELECT password from login where username=:username LIMIT 1";
+        $sql = "SELECT usertype, password from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
         $user = perform_query($sql, 'GET', $bindparam);
         if ($user->password === crypt($password, $user->password)) {
             $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
-            echo json_encode(perform_query($sql, '', $bindparam));
+            $resp = perform_query($sql, '', $bindparam);
+            if ($resp["status"]=="success"){
+                echo json_encode($user);
+            }
+            else {
+                echo $resp;
+            }
         }
         else {
             echo json_encode(array("status"=>"failure"));
@@ -889,13 +895,13 @@ function createDocument(){
     $docid = generateUniqueID($sql, "docid");
 
     $sql = "INSERT into document (docid, docName, description, link, sectionid, userid, fullmark, schoolyearid, status)
-            values (:docid, :docName, :description, :link, :sectionid, :userid, fullmark, :schoolyearid, :status)";
+            values (:docid, :docName, :description, :link, :sectionid, :userid, :fullmark, :schoolyearid, :status)";
 
     $bindparams = array(
         "docid" => $docid,
         "docName" => $doc->docName,
         "description" => $doc->description,
-        "link" => $docdoc->link,
+        "link" => $doc->link,
         "sectionid" => $doc->sectionid,
         "userid" => $doc->userid,
         "fullmark" => $doc->fullmark,
