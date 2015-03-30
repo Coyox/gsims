@@ -85,17 +85,13 @@ var SearchStudentsView = Backbone.View.extend({
 		var view = this;
 		var data = {};
 
-		var firstName = this.$el.find("#lower-grade").val();
-		if (firstName != "") {
+		var lowerGrade = this.$el.find("#lower-grade").val();
+		if (lowerGrade != "") {
 			var upperGrade = this.$el.find("#upper-grade").val();
 			if (upperGrade != "") {
 				data.upperGrade = upperGrade;
 				data.lowerGrade = lowerGrade;
 			}
-		}
-		var upperGrade = this.$el.find("#upper-grade").val();
-		if (upperGrade != "") {
-			data.upperGrade = upperGrade;
 		}
 		var numAssignment = this.$el.find("#num-assignment").val();
 		if (numAssignment != "") {

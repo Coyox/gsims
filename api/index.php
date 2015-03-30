@@ -1324,8 +1324,13 @@ function getAvgGrade($id, $flag=0){
     $sections = getEnrolledSections($id, 1);
     $numsections = count($sections);
     if ($numsections == 0){
-        echo json_encode(array("avgGrade"=>"N/A"));
-        return;
+        if ($flag==1){
+            return -1;
+        }
+        else {
+            echo json_encode(array("avgGrade"=>"N/A"));
+            return;
+        }
     }
     foreach ($sections as $row){
         $totalgrade += getStudentSectionGrade($row['sectionid'], $id);
@@ -1913,6 +1918,7 @@ function findStudentsWithAdvancedCriteria(){
         foreach ($students as $row){
             $studentid = $row['userid'];
             $avgGrade = getAvgGrade($studentid, 1);
+            if ($avgGrade == -1){ continue; }
             if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
                 array_push($qualifiedstudents, $studentid);
             }
@@ -1931,7 +1937,7 @@ function findStudentsWithAdvancedCriteria(){
         $studentAsmtCount = perform_query($sql, 'GETASSO');
 
         foreach ($students as $student){
-            $studenetid = $student['userid'];
+            $studentid = $student['userid'];
             $sections = getEnrolledSections($studentid, 1);
             $numsections = count($sections);
             if ($numsections == 0){ continue; }
@@ -1953,7 +1959,7 @@ function findStudentsWithAdvancedCriteria(){
     if (isset($failcount)){
         foreach ($students as $student){
             $failed = 0;
-            $studenetid = $student['userid'];
+            $studentid = $student['userid'];
             $sections = getEnrolledSections($studentid, 1);
             $numsections = count($sections);
             if ($numsections == 0){ continue; }
