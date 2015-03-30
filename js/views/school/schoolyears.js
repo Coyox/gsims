@@ -39,8 +39,48 @@ var SchoolYearView = Backbone.View.extend({
 	events: {
 		"click #create-year": "createSchoolYear",
 		"click #edit-year": "editSchoolYear",
-		"click #save-year": "saveSchoolYear"
+		"click #save-year": "saveSchoolYear",
+        "click #purge-year": "purgeSchoolYear"
 	},
+
+    purgeSchoolYear: function(){
+        var schoolyear = new SchoolYear();
+		schoolyear.fetch().then(function(data) {
+            var ids = [];
+			_.each(data, function(object, index) {
+                 ids.push(object.schoolyearid);
+            });
+            var purge = new Purge();
+            $.ajax({
+                type: "POST",
+                url: purge.purgeSchoolYears(),
+                data: {
+                  schoolyearids: JSON.stringify(ids)
+                }
+            }).then(function(data) {
+           // if (typeof data == "string") {
+           //     data = JSON.parse(data);
+           // }
+                if (data.status == "success") {
+                  new TransactionResponseView({
+                      message: "The selected records have successfully been purged."
+                  });
+             } else {
+                  new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+                    });               
+                }
+            }).fail(function(data) {
+                new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+             }); 
+         });
+     });
+     },
 
 	addRow: function() {
 		var container = $("<tr></tr>");

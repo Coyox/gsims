@@ -30,6 +30,7 @@ var DepartmentView = Backbone.View.extend({
 
     events: {
         "click #create-dept": "createDept",
+        "click #purge-dept": "purgeDept"
     },
 
     addRow: function () {
@@ -38,6 +39,44 @@ var DepartmentView = Backbone.View.extend({
         return container;
     },
 
+    purgeDept: function(){
+        var dept = new Dept();
+		dept.fetch().then(function(data) {
+            var ids = [];
+			_.each(data, function(object, index) {
+                 ids.push(object.deptid);
+            });
+            var purge = new Purge();
+            $.ajax({
+                type: "POST",
+                url: purge.purgeDepartmentss(),
+                data: {
+                  deptids: JSON.stringify(ids)
+                }
+            }).then(function(data) {
+           // if (typeof data == "string") {
+           //     data = JSON.parse(data);
+           // }
+                if (data.status == "success") {
+                  new TransactionResponseView({
+                      message: "The selected records have successfully been purged."
+                  });
+             } else {
+                  new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+                    });               
+                }
+            }).fail(function(data) {
+                new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+             }); 
+         });
+     });
+     },
     createDept: function (evt) {
         console.log("in create dept");
         var view = this;

@@ -6,6 +6,7 @@ var CourseManagement = Backbone.View.extend({
 		this.render();
 	},
 
+    
 	render: function() {
 		var view = this;
 
@@ -65,8 +66,49 @@ var CourseManagement = Backbone.View.extend({
 		"change #school-menu": "populateDepartments",
 		"click #save-sections": "saveEnrolledSections",
 
-		"click #add-course": "addCourseToDept"
+		"click #add-course": "addCourseToDept",
+        "click #purge-courses": "purgeCourses"
+        
 	},
+
+     purgeCourses: function(){
+        var course = new Course();
+		course.fetch().then(function(data) {
+            var ids = [];
+			_.each(data, function(object, index) {
+                 ids.push(object.courseid);
+            });
+            var purge = new Purge();
+            $.ajax({
+                type: "POST",
+                url: purge.purgeCourses(),
+                data: {
+                  deptids: JSON.stringify(ids)
+                }
+            }).then(function(data) {
+           // if (typeof data == "string") {
+           //     data = JSON.parse(data);
+           // }
+                if (data.status == "success") {
+                  new TransactionResponseView({
+                      message: "The selected records have successfully been purged."
+                  });
+             } else {
+                  new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+                    });               
+                }
+            }).fail(function(data) {
+                new TransactionResponseView({
+                    title: "ERROR",
+                    status: "error",
+                    message: "The selected could not be purged. Please try again."
+             }); 
+         });
+     });
+     },
 
 	populateDepartments: function(evt) {
 		var view = this;
