@@ -107,6 +107,7 @@ function loadTemplates() {
 		"termsAndConditions.html",
 		"settings.html",
 		"import.html",
+		"export.html",
 		"subSection.html",
 		"attendance.html"
 	];

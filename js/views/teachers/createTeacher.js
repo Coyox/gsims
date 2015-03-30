@@ -77,13 +77,13 @@ var CreateTeacherView = Backbone.View.extend({
 							if (data.status == "success") {
 								new TransactionResponseView({
 									message: "Teacher successfully created. " + insertComp.length + " competency levels updated."
-								});								
+								});
 							} else {
 								new TransactionResponseView({
 									title: "ERROR",
 									status: "error",
 									message: "Teacher successfully created, but the competency levels could not be updated."
-								});								
+								});
 							}
 						})
 					} else {
@@ -198,35 +198,7 @@ var TeacherCompetencyView = Backbone.View.extend({
 		var view = this;
 		var schoolid = $("#school-options option:selected").attr("id");
 		var school = new School();
-		school.fetch({
-			url: school.getDepartmentsUrl("412312"),
-			//url: school.getDepartmentsUrl(schoolid),
-			data: {
-				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-			}
-		}).then(function(data) {
-			_.each(data, function(dept, index) {
-				var level = 0;
-				_.each(view.existingLevels, function(existing, index) {
-					if (existing.deptid == dept.deptid) {
-						level = existing.level;
-					}
-				});
-				view.model.competency.push({
-					deptName: dept.deptName,
-					level: level,
-					deptid: dept.deptid
-				});
-				new TeacherCompetencyRowView({
-					el: view.addRow(index),
-					model: view.model,
-					index: index,
-					deptModel: dept,
-					action: view.action,
-					level: level
-				});
-			});
-		});
+
 	},
 
 	addRow: function(index) {
@@ -268,8 +240,8 @@ var TeacherCompetencyRowView = Backbone.View.extend({
 			this.$el.html(this.viewTemplate({
 				label: this.deptModel.deptName,
 				level: level
-			}));			
-		} else {	
+			}));
+		} else {
 			this.$el.html(this.editTemplate({
 				label: this.deptModel.deptName,
 				index: this.index
