@@ -296,19 +296,24 @@ var DepartmentSelectionView = Backbone.View.extend({
 			var table = $("#course-list");
 			table.find(".results").empty();
 
-			_.each(data, function(object, index) {
-				var course = new Course(object, {parse:true});
-				course.fetch({
-					url: course.getCoursePrereqs(course.get("courseid"))
-				}).then(function(data) {
-					new CourseTableRowView({
-						el: view.addCourseRow(),
-						model: course,
-						parentView: view.parentView,
-						prereqs: data
+			if (data.length == 0) {
+				table.hide();
+				table.after("<br><div class='alert alert-danger'>No courses were found for this department.</div>");
+			} else {
+				_.each(data, function(object, index) {
+					var course = new Course(object, {parse:true});
+					course.fetch({
+						url: course.getCoursePrereqs(course.get("courseid"))
+					}).then(function(data) {
+						new CourseTableRowView({
+							el: view.addCourseRow(),
+							model: course,
+							parentView: view.parentView,
+							prereqs: data
+						});
 					});
 				});
-			});
+			}
 		});
 	},
 
@@ -581,6 +586,11 @@ var ViewCourse = Backbone.View.extend({
 					courseName: course.get("courseName")
 				}
 			}).then(function(data) {
+				if (data.length == 0) {
+					var table = view.$el.find("#sections-table");
+					table.hide();
+					table.after("<div class='alert alert-danger'>No sections were found for this course.</div>");
+				}
 				_.each(data, function(sec, index) {
 					var section = new Section(sec, {parse:true});
 					new CourseSectionView({
@@ -758,7 +768,6 @@ var SectionView = Backbone.View.extend({
 		var view = this;
 		this.model = new Section({id: this.id});
 		this.model.fetch().then(function(data) {
-			console.log(data);
 			_.each(data, function(value, attr) {
 				new ViewSectionRow({
 					el: view.addRow(),
@@ -771,7 +780,7 @@ var SectionView = Backbone.View.extend({
 			view.teachersForm(view.id);
 			view.enrolledStudentsTab(view.id);
 			view.attendanceTab(view.id);
-			view.documentTab(view.id);
+			view.assignmentTab(view.id);
 		});
 	},
 
@@ -816,7 +825,8 @@ var SectionView = Backbone.View.extend({
 		});
 	},
 
-	documentTab: function(id) {
+	assignmentTab: function(id) {
+		console.log("tab");
 		new DocumentsView({
 			el: $("#documents"),
 			sectionid: id
@@ -1069,15 +1079,21 @@ var TeacherSectionView = Backbone.View.extend({
 		section.fetch({
 			url: section.getSectionTeachersUrl(this.sectionid)
 		}).then(function(data) {
-			_.each(data, function(teach, index) {
-				var model = new Teacher(teach, {parse:true});
-				new TeacherSectionRowView({
-					el: view.addRow(),
-					model: model,
-					sectionid: view.sectionid,
-					parent: view
+			if (data.length == 0) {
+				var table = view.$el.find("table");
+				table.hide();
+				table.after("<div class='alert alert-danger'>There are currently no teachers teaching this section.</div>");
+			} else {
+				_.each(data, function(teach, index) {
+					var model = new Teacher(teach, {parse:true});
+					new TeacherSectionRowView({
+						el: view.addRow(),
+						model: model,
+						sectionid: view.sectionid,
+						parent: view
+					});
 				});
-			});
+			}		
 			// view.table = view.$el.find("table").dataTable({
 			// 	dom: "t"
 			// });
@@ -1153,18 +1169,24 @@ var StudentsEnrolledView = Backbone.View.extend({
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
-			_.each(data, function(student, index) {
-				var model = new Student(student, {parse:true});
-				new StudentsEnrolledRowView({
-					el: view.addRow(),
-					model: model,
-					userid: model.get("userid"),
-					sectionid: view.sectionid
+			if (data.length == 0) {
+				var table = view.$el.find("table");
+				table.hide();
+				table.after("<div class='alert alert-danger'>There are currently no registered in this section.</div>");
+			} else {			
+				_.each(data, function(student, index) {
+					var model = new Student(student, {parse:true});
+					new StudentsEnrolledRowView({
+						el: view.addRow(),
+						model: model,
+						userid: model.get("userid"),
+						sectionid: view.sectionid
+					});
 				});
-			});
-			// view.table = view.$el.find("table").dataTable({
-			// 	dom: "t"
-			// });
+				// view.table = view.$el.find("table").dataTable({
+				// 	dom: "t"
+				// });
+			}
 		});	
 	},
 
@@ -1252,26 +1274,32 @@ var AttendanceView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.find("table tbody").empty();
-		$("#date").datepicker({
-			dateFormat: "yy-mm-dd"
-		});
+		// $("#date").datepicker({
+		// 	dateFormat: "yy-mm-dd"
+		// });
 
 		var view = this;
 		var section = new Section();
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
-			_.each(data, function(student, index) {
-				var model = new Student(student, {parse:true});
-				new AttendanceRowView({
-					el: view.addRow(model.get("userid")),
-					model: model,
-					userid: model.get("userid")
+			if (data.length == 0) {
+				var table = view.$el.find("table");
+				table.hide();
+				table.after("<div class='alert alert-danger'>There are currently no registered in this section.</div>");
+			} else {
+				_.each(data, function(student, index) {
+					var model = new Student(student, {parse:true});
+					new AttendanceRowView({
+						el: view.addRow(model.get("userid")),
+						model: model,
+						userid: model.get("userid")
+					});
 				});
-			});
-			//view.table = view.$el.find("table").dataTable({
-			// 	dom: "t"
-			// });
+				//view.table = view.$el.find("table").dataTable({
+				// 	dom: "t"
+				// });
+			}
 		});	
 	},
 
@@ -1383,16 +1411,22 @@ var DocumentsView = Backbone.View.extend({
 				sectionid: this.sectionid
 			}
 		}).then(function(data) {
-			_.each(data, function(doc, index) {
-				var d1 = new Document(doc, {parse:true});
-				new DocumentRowView({
-					el: view.addRow(),
-					model: d1,
+			if (data.length == 0) {
+				var table = view.$el.find("table");
+				table.hide();
+				table.after("<br><br><div class='alert alert-danger'>There are currently no documents/assignments/quizzes for this section.</div>");
+			} else {
+				_.each(data, function(doc, index) {
+					var d1 = new Document(doc, {parse:true});
+					new DocumentRowView({
+						el: view.addRow(),
+						model: d1,
+					});
 				});
-			});
-			// view.table = view.$el.find("table").dataTable({
-			// 	dom: "t"
-			// });
+				// view.table = view.$el.find("table").dataTable({
+				// 	dom: "t"
+				// });
+			}
 		});	
 	},
 
