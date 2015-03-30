@@ -15,7 +15,8 @@ var ImportView = Backbone.View.extend({
 	constructCSV: function(){
 		var teacherid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid;
 		var sectionid = 777778; // TODO
-		var dataRows = [["Enter Date Below(YYYY-MM-DD)", "Teacher ID", "Section ID"], ["", teacherid, sectionid], ["Student ID", "First Name", "Last Name", "Present as P"]];
+
+		var dataRows = [["date", "teacherid", "sectionid","studentid","firstName","lastName","present"]];
 		var csvContent = "data:text/csv;charset=utf-8,";
 		var section = new Section();
 		section.fetch({
@@ -23,7 +24,11 @@ var ImportView = Backbone.View.extend({
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Student(object, {parse:true});
-				var student = [model.get("userid"), model.get("firstName"), model.get("lastName")];
+				if (index == 0){
+					dataRows.push(["", teacherid, sectionid, model.get("userid"), model.get("firstName"), model.get("lastName")]);
+					return true;
+				}
+				var student = ["","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
 				dataRows.push(student);
 			});
 			dataRows.forEach(function(lineArray, index){
@@ -81,6 +86,8 @@ var ImportView = Backbone.View.extend({
 									if (data.status=="success") {
 										new TransactionResponseView({
 											message: "All students have been created and imported successfully. Students imported with an active status will receive an email with their login informations shortly"
+													+ "<br><br> List of added students <br> " + data.userids
+
 										});
 									}
 									else {
@@ -183,6 +190,7 @@ var ImportView = Backbone.View.extend({
 												if (data.status=="success") {
 													new TransactionResponseView({
 														message: "All teachers and administrators have been created and imported successfully. Teachers imported with an active status will receive an email with their login informations shortly"
+																  + "<br><br> List of added userids: <br> " + data.userids
 													});
 												}
 												else {
@@ -289,7 +297,7 @@ var ImportView = Backbone.View.extend({
 									if (data.status == "success"){
 										new TransactionResponseView({
 											title: "SUCCESS",
-											message: "Template CSV successfully imported!",
+											message: "Template CSV successfully imported! Attendance for the following users have been inputted:<br><br>" + data.userids
 										});
 									}
 									else {
