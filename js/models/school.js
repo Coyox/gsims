@@ -181,3 +181,24 @@ var Count = Backbone.Model.extend({
 		return app.serverUrl + "api/sections/count";
 	}
 });
+
+var Purge = Backbone.Model.extend({
+	urlRoot: app.serverUrl + "api/purge",
+
+	purgeInactive: function() {
+		return this.urlRoot + "/inactive";
+	}
+
+	// THESE ARE THE ROUTES
+	// $app->post('/purge/attendance', 'purgeAttendance');
+	// $app->post('/purge/waitlist', 'purgeWaitlist');
+	// $app->post('/purge/user', 'purgeUsers');
+	// $app->post('/purge/schoolyear', 'purgeSchoolYears');
+	// $app->post('/purge/school', 'purgeSchools');
+	// $app->post('/purge/department', 'purgeDepartments');
+	// $app->post('/purge/course', 'purgeCourses');
+	// $app->post('/purge/section', 'purgeSections');
+	// $app->post('/purge/document', 'purgeDocuments');
+	// $app->delete('/purge/inactive', 'purgeInactive');
+
+});

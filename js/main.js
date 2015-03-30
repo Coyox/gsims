@@ -108,12 +108,14 @@ function loadTemplates() {
 		"settings.html",
 		"import.html",
 		"export.html",
+        "viewPurge.html",
 		"subSection.html",
 		"attendance.html",
 		"manageCourses.html",
 		"viewCourse.html",
 		"viewSection.html",
-		"addStudentToSection.html"
+		"addStudentToSection.html",
+		"viewPurge.html"
 	];
 
 	$.each(templates, function(i, name) {

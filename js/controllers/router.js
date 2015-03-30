@@ -79,6 +79,7 @@ var Router = Backbone.Router.extend({
 
         "import":               "importData",
         "export":               "exportData",
+        "purge":                "purgeData",
 
         "viewCourse/:id":       "viewCourse",
 
@@ -431,10 +432,18 @@ var Router = Backbone.Router.extend({
         });
     },
 
+    purgeData: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Purge Data", "trash");
+
+        new PurgeView({
+            el: $("#content")
+        });
+    },
+
     manageCourses: function() {
         this.loadHome();
         this.updatePageBreadcrumb("Manage Courses", "wrench");
-
         new CourseManagement({
             el: $("#content")
         })

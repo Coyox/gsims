@@ -28,14 +28,16 @@ var ExportView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var model = new Section(object, {parse:true});
 				var section = [model.get("sectionid"), model.get("courseid"), model.get("courseName"), model.get("sectionCode"), model.get("day"), model.get("startTime"), model.get("endTime"), model.get("roomCapacity"), model.get("roomLocation"), model.get("classSize"), model.get("status")];
-				//var section = $.map(object, function(element) { return element; });
 				dataRows.push(section);
 			});
 			dataRows.forEach(function(lineArray, index){
-				console.log(lineArray);
-				dataString = lineArray.join(", ");
-				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
-			});
+				var temp = lineArray[4];
+   				lineArray[4] = "TEMP"; // course days
+   				temp = temp.replace(/,/g , " ");
+   				lineArray = lineArray.join(",");
+   				lineArray = lineArray.replace("TEMP", temp);
+   				csvContent += index < dataRows.length ? lineArray+ "\n" : lineArray;
+   			});
 			var encodedUri = encodeURI(csvContent);
 			var link = document.createElement("a");
 			link.setAttribute("href", encodedUri);
@@ -97,9 +99,9 @@ var ExportView = Backbone.View.extend({
 	exportStudents: function(){
 		var schoolid = 412312; // TODO choose schoolid
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
-    "province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
-    "parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",
-    "emergencyContactPhoneNumber", "schoolid", "paid", "status"]];
+		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
+		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",
+		"emergencyContactPhoneNumber", "schoolid", "paid", "status"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
 		var school = new School();
@@ -107,12 +109,8 @@ var ExportView = Backbone.View.extend({
 			url: school.getStudentsUrl(schoolid),
 		}).then(function(data) {
 			_.each(data, function(object, index) {
-				// var model = new Student(object, {parse:true});
-				// console.log(model);
 				var student = $.map(object, function(element) { return element; });
-				// console.log(student);
 				dataRows.push(student);
-				//var student = ["","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
 			});
 			dataRows.forEach(function(lineArray, index){
 				console.log(lineArray);
