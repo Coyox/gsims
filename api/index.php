@@ -148,8 +148,6 @@ function validateCredentials() {
         $sql = "SELECT password from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
         $user = perform_query($sql, 'GET', $bindparam);
-        echo json_encode(json_encode(array("hash"=>crypt($password, $user->password))));
-        return;
         if ($user->password === crypt($password, $user->password)) {
             $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
             echo json_encode(perform_query($sql, '', $bindparam));
