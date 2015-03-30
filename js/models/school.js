@@ -106,6 +106,11 @@ var Section = Backbone.Model.extend({
     getSearchSectionsUrl: function() {
     	return app.serverUrl + "api/search/sections";
     },
+	
+	getSectionTeachersUrl: function(id) {
+		return this.urlRoot + "/" + id + "/teachers";
+	},
+
    	unassignTeacherUrl: function(sectionid, teacherid) {
    		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid;
    	},

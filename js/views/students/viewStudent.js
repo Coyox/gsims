@@ -326,7 +326,7 @@ var StudentRecordRowView = Backbone.View.extend({
 			return str.slice(18);
 		}
 		return str;
-	}
+	},
 });
 
 var EnrolledSectionsView = Backbone.View.extend({
@@ -429,7 +429,8 @@ var ReportCardView = Backbone.View.extend({
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
-		+	"<td>[teacher name]</td>" // TODO: get these fields
+		+	"<td><%= this.teacherNames() %></td>"
+		// +	"<td>[teacher name]</td>" // TODO: get these fields
 		+	"<td>[student's grade]</td>"),
 
 	initialize: function(options) {
@@ -441,32 +442,68 @@ var ReportCardRowView = Backbone.View.extend({
 			model: this.model.toJSON()
 		}));
 	},
-
-	events: {
-		"click .view-student": "viewStudent",
-		"click .edit-student": "editStudent",
-		"click .delete-student": "deleteStudent"
+	
+	teacherNames: function() {
+		// TODO: stub
+		var id = this.model.get("sectionid");
+		var output = "test";
+		this.model.fetch({url:this.model.getSectionTeachersUrl(id)}).then(function(data) {
+			console.log(data);
+			// output = data.lastName + ", " + data.firstName;
+			_.each(data, function(object, index) {
+				var teacher = new Teacher(object, {parse:true});
+				console.log(teacher);
+				output += teacher.lastName + ", " + teacher.firstName + "; ";
+			});
+		});
+		// output
+		return output;
 	},
-
-	viewStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		app.Router.navigate("students/" + id, {trigger:true});
-	},
-
-	editStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new StudentRecordView({
-			id: id,
-			el: $("#update-container"),
-			action: "edit"
-		});		
-	},
-
-	deleteStudent: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-		new DeleteRecordView({
-			id: id,
-			el: $("#delete-container")
-		});		
-	}
 });
+
+// var ReportCardTeacherView = Backbone.View.extend({
+	// template: _.template("<td><%= model.courseName %></td>"
+		// +	"<td><%= model.sectionCode %></td>"
+		// +	"<td><%= model.sectionCode %></td>"
+		// +	"<td>[teacher name]</td>" // TODO: get these fields
+		// +	"<td>[student's grade]</td>"),
+
+	// initialize: function(options) {
+		// this.render();
+	// },
+
+	// render: function() {
+		// this.$el.html(this.template({
+			// model: this.model.toJSON()
+		// }));
+	// },
+// });
+
+function dlReportCardPDF() {
+	// TODO: stub
+	window.alert("Download Report Card as PDF - clicked"); // for testing only
+}
+
+function dlReportCardCSV() {
+	// TODO: stub
+	// window.alert("Download Report Card as CSV - clicked"); // for testing only
+	
+	var output = "";
+	var i;
+	var j;
+	for (i = 0; i < document.getElementById("report-card-table").rows.length; i++) {
+		for (j = 0; j < document.getElementById("report-card-table").rows[i].cells.length; j++) {
+			output += getCellContent('report-card-table', i, j) + ",";
+			// output += document.getElementById("report-card-table").rows[i].cells[j].innerHTML + ",";
+		}
+		output += "\n";
+	}
+	
+	window.alert("output: " + output); // for testing only
+}
+
+// Helper function
+// remember to pass id string with single-quotes (ie. 'report-card-table')
+function getCellContent(id, row, cell) {
+    return document.getElementById(id).rows[row].cells[cell].innerHTML;
+}
