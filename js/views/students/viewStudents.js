@@ -13,6 +13,7 @@ var SearchStudentsView = Backbone.View.extend({
 	events: {
 		"click #search-students": "searchStudents",
 		"click #search-all-students": "searchAllStudents",
+		"click #advanced-search-students": "advancedSearchStudents",
 		"click #clear-fields": "clearFields",
 		"change #year-operator": "changeOperator"
 	},
@@ -80,7 +81,7 @@ var SearchStudentsView = Backbone.View.extend({
 		});
 	},
 
-	advancedSearch: function(evt) {
+	advancedSearchStudents: function(evt) {
 		var view = this;
 		var data = {};
 
@@ -105,14 +106,9 @@ var SearchStudentsView = Backbone.View.extend({
 			data.numFailedSections = numFailedSections;
 		}
 
-		var status = this.$el.find("#status-options option:selected");
-		if (!status.is(":disabled")) {
-			data.status = status.val();
-		}
-
 		var model = new Student();
 		model.fetch({
-			url: model.getSearchStudentsUrl(),
+			url: model.getAdvancedSearchUrl(),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);

@@ -1969,14 +1969,19 @@ function findStudentsWithAdvancedCriteria(){
         }
     }
 
-    $ret = parenthesisList(array_unique($qualifiedstudents));
-    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
-    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
-    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status
-    from student where userid in ";
-    $sql.=$ret[0];
-    echo json_encode(perform_query($sql,'GETALL',$ret[1]));
+    list($sqlparens, $bindparams) = parenthesisList(array_unique($qualifiedstudents));
+    if ($sqlparens = "()"){
+        echo json_encode(array());
+    }
+    else {
+        $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+        province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+        parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+        emergencyContactPhoneNumber, schoolid, paid, status
+        from student where userid in ";
+        $sql.= $sqlparens;
+        echo json_encode(perform_query($sql,'GETALL',$bindparams));
+    }
 }
 
 
