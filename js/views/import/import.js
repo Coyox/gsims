@@ -1,5 +1,6 @@
 var ImportView = Backbone.View.extend({
 	initialize: function(options) {
+		this.loadOptions();
 		this.render();
 
 	},
@@ -12,8 +13,21 @@ var ImportView = Backbone.View.extend({
 		"click #import": "parseData",
 		"click #downloadAttendance": "constructCSV"
 	},
+
+	loadOptions: function(){
+		//var view = this;
+		//var x = document.getElementById("section");
+		var x = this.$el.find("#section");
+		var option = document.createElement("option");
+		option.text = "Test thing";
+		x.add(option);
+
+	},
+
 	constructCSV: function(){
 		var teacherid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid;
+		var section = this.$el.find("#section").val();
+		console.log(section);
 		var sectionid = 777778; // TODO
 
 		var dataRows = [["date", "teacherid", "sectionid","studentid","firstName","lastName","present"]];
@@ -335,5 +349,10 @@ var ImportView = Backbone.View.extend({
 			this.$el.find("#not-found").removeClass("hide").show();
 		}
 	},
+
+
+
 });
+
+
 
