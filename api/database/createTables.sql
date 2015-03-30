@@ -189,14 +189,14 @@ CREATE TABLE IF NOT EXISTS `waitlisted` (
 );
 
 CREATE TABLE IF NOT EXISTS `marks` (
-  `assignmentid` int(11) NOT NULL,
+  `docid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `mark` float  NOT NULL,
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`assignmentid`,`userid`, `schoolyearid`),
-  FOREIGN KEY (`assignmentid`) REFERENCES `document` (`docid`) ON DELETE CASCADE,
+  PRIMARY KEY (`docid`,`userid`, `schoolyearid`),
+  FOREIGN KEY (`docid`) REFERENCES `document` (`docid`) ON DELETE CASCADE,
   FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );

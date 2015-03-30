@@ -789,7 +789,7 @@ function getStudentSectionGrade($sectionid, $userid){
         return -1;
     }
     $sql = "SELECT coalesce(sum(mark),0) from marks
-            where assignmentid in
+            where docid in
                 (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
             and userid=:userid";
     $bindparams["userid"]=$userid;
@@ -903,14 +903,14 @@ function inputMarks($id){
     $schoolyearid = $_POST["schoolyearid"];
 
     $bindparams = array(
-        "assignmentid" => $id,
+        "docid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => 'active'
     );
 
-    $sql = "INSERT INTO marks(assignmentid, userid, mark, schoolyearid, status) values ";
+    $sql = "INSERT INTO marks(docid, userid, mark, schoolyearid, status) values ";
      foreach (array_values($students) as $i => $student) {
-        $sql.= "(:assignmentid, :userid".$i.", :mark".$i.", :schoolyearid, :status),";
+        $sql.= "(:docid, :userid".$i.", :mark".$i.", :schoolyearid, :status),";
         $bindparams["userid".$i] = $student->userid;
         $bindparams["mark".$i] = $student->mark;
     }
@@ -925,8 +925,8 @@ function updateMarks($id){
     $queries = array();
     $bindparams = array();
     foreach (array_values($results) as $i => $result){
-        $bindparams[$i] = array("assignmentid" => $id, "userid".$i=>$result->userid, "mark".$i=>$result->mark);
-        $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and assignmentid=:assignmentid";
+        $bindparams[$i] = array("docid" => $id, "userid".$i=>$result->userid, "mark".$i=>$result->mark);
+        $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and docid=:docid";
         array_push($queries, $sql);
     }
     echo json_encode(perform_transaction($queries, $bindparams));
@@ -1904,7 +1904,7 @@ function findStudentsWithAdvancedCriteria(){
 
         $sql = "SELECT m.userid as studentid , sectionid, count(sectionid) as numberOfAssignmentsDone
              from marks m, document d
-             where m.assignmentid = d.docid group by sectionid";
+             where m.docid = d.docid group by sectionid";
         $studentAsmtCount = perform_query($sql, 'GETASSO');
 
         foreach ($students as $student){
