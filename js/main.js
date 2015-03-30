@@ -107,7 +107,8 @@ function loadTemplates() {
 		"termsAndConditions.html",
 		"settings.html",
 		"import.html",
-		"subSection.html"
+		"subSection.html",
+		"attendance.html"
 	];
 
 	$.each(templates, function(i, name) {

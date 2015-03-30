@@ -19,6 +19,7 @@ var StudentRecordView = Backbone.View.extend({
 			view.studentInformationTab(data, model);
 			view.emailTab(data);
 			view.coursesTab(data, model);
+			view.attendanceTab(data, model);
 			view.reportCardTab(data, model);
 		});
 	},
@@ -178,9 +179,11 @@ var StudentRecordView = Backbone.View.extend({
 		});
 	},
 
-	/** TODO: Attendance tab */
-	attendanceTab: function(data) {
-
+	attendanceTab: function(data, model) {
+		new StudentAttendanceView({
+			el: $("#attendance"),
+			model: model
+		})
 	}
 });
 
@@ -395,22 +398,182 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 	}
 });
 
+var StudentAttendanceView = Backbone.View.extend({
+	initialize: function(options) {
+		this.currentMonth = new Date().getMonth();
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(html["attendance.html"]);
+
+		var currMonth = this.indexToMonth(this.currentMonth);
+		var nextMonth = this.indexToMonth(parseInt(this.currentMonth) + 1);
+		var prevMonth = this.indexToMonth(parseInt(this.currentMonth) - 1);
+		this.$el.find("#current-month").text(currMonth.toUpperCase());
+		this.$el.find("#next-month").text(nextMonth + " >").attr("name", this.currentMonth + 1);
+		this.$el.find("#prev-month").text("< " + prevMonth).attr("name", this.currentMonth - 1);
+
+		var view = this;
+		var student = new Student({id:this.model.get("userid")});
+		student.fetch({
+			url: student.getAttendanceUrl(this.model.get("userid")),
+			data: {
+				month: parseInt(this.currentMonth) + 1,
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
+		}).then(function(att) {
+			var student = new Student();
+			student.fetch({
+				url: student.getEnrolledSectionsUrl(view.model.get("userid"))
+			}).then(function(data) {
+				_.each(data, function(section, index) {
+					var model = new Section(section, {parse:true});
+					new StudentAttendanceRowView({
+						el: view.addRow(),
+						model: model,
+						courseName: model.get("courseName"),
+						attendance: att,
+						sectionid: model.get("sectionid")
+					});
+				});
+			});
+		});
+	},
+
+	events: {
+		"click #next-month": "nextMonth",
+		"click #prev-month": "prevMonth",
+	},
+
+	addRow: function() {
+		var container = $("<tr></tr>");
+		this.$el.find(".table").append(container);
+		return container;
+	},
+
+	indexToMonth: function(index) {
+		index = index.toString();
+		switch (index) {
+			case "0":
+				return "January";
+			case "1":
+				return "February";
+			case "2":
+				return "March";
+			case "3":
+				return "April";
+			case "4":
+				return "May";
+			case "5":
+				return "June";
+			case "6":
+				return "July";
+			case "7":
+				return "August";
+			case "8":
+				return "September";
+			case "9":
+				return "October";
+			case "10":
+				return "November";
+			case "11":
+				return "December";
+			default:
+				return ""
+		}
+	},
+
+	nextMonth: function(evt) {
+		this.currentMonth = $(evt.currentTarget).attr("name");
+		this.render();
+	},
+
+	prevMonth: function(evt) {
+		this.currentMonth = $(evt.currentTarget).attr("name");
+		this.render();
+	}
+});
+
+var StudentAttendanceRowView = Backbone.View.extend({
+	template: _.template("<td><%= section %></td>"
+		+	"<td name='01'></td>"
+		+	"<td name='02'></td>"
+		+	"<td name='03'></td>"
+		+	"<td name='04'></td>"
+		+	"<td name='05'></td>"
+		+	"<td name='06'></td>"
+		+	"<td name='07'></td>"
+		+	"<td name='08'></td>"
+		+	"<td name='09'></td>"
+		+	"<td name='10'></td>"
+		+	"<td name='11'></td>"
+		+	"<td name='12'></td>"
+		+	"<td name='13'></td>"
+		+	"<td name='14'></td>"
+		+	"<td name='15'></td>"
+		+	"<td name='16'></td>"
+		+	"<td name='17'></td>"
+		+	"<td name='18'></td>"
+		+	"<td name='19'></td>"
+		+	"<td name='20'></td>"
+		+	"<td name='21'></td>"
+		+	"<td name='22'></td>"
+		+	"<td name='23'></td>"
+		+	"<td name='24'></td>"
+		+	"<td name='25'></td>"
+		+	"<td name='26'></td>"
+		+	"<td name='27'></td>"
+		+	"<td name='28'></td>"
+		+	"<td name='29'></td>"
+		+	"<td name='30'></td>"
+		+	"<td name='31'></td>"),
+
+	initialize: function(options) {
+		this.index = options.index;
+		this.userid = options.userid;
+		this.month = options.month;
+		this.attendance = options.attendance;
+		this.courseName = options.courseName;
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+		this.$el.html(this.template({
+			section: this.courseName
+		}));
+
+		_.each(this.attendance, function(att, index) {
+			if (att.sectionid == this.sectionid) {
+				var parsedDay = att.date.split("-")[2];
+				var cell = this.$el.find("td[name='" + parsedDay + "']");
+				cell.text("P");
+				cell.addClass("bg-success");
+			}
+		}, this);
+	}
+});
+
+
+
 var ReportCardView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
 	},
 
 	render: function() {
-		console.log("render");
+		//console.log("render");
 		this.$el.html(html["reportCard.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
 		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
-			console.log(data);
+			//console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				console.log(section);
+				//console.log(section);
 				new ReportCardRowView({
 					el: view.addRow(),
 					model: section
