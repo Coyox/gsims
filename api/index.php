@@ -341,11 +341,11 @@ function getStudentsBySchool($id){
     echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
 }
 function getTeachersBySchool($id){
-    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' and schoolid=:schoolid" ;
+    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status, usertype from teacher where usertype='T' and schoolid=:schoolid" ;
     echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
 }
 function getAdministratorsBySchool($id){
-    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and schoolid=:schoolid" ;
+    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status, usertype from teacher where usertype='A' and schoolid=:schoolid" ;
     echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
 }
 function createSchool(){
