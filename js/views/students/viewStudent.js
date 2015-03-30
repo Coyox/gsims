@@ -592,7 +592,7 @@ var ReportCardView = Backbone.View.extend({
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
-		+	"<td><%= this.teacherNames() %></td>"
+		+	"<td><%= teacher %></td>"
 		+	"<td>[student's grade]</td>"),
 
 	initialize: function(options) {
@@ -600,26 +600,27 @@ var ReportCardRowView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
+		var view = this;
+		this.model.set("id", this.model.get("sectionid"));
+		this.model.fetch({
+			url: this.model.getSectionTeachersUrl(this.model.get("sectionid"))
+		}).then(function(data) {
+			// Get teacher names
+			var names = "";
+			_.each(data, function(teacher, index) {
+				var fullName = teacher.firstName + " " + teacher.lastName;
+				names += fullName + ","
+			});
+			names = names.slice(0,-1);
+		
+			// Populate table cells
+			view.$el.html(view.template({
+				model: view.model.toJSON(),
+				teacher: names
+			}));
+		});
 	},
 	
-	teacherNames: function() {
-		var id = this.model.get("sectionid");
-		var teacher;
-		var output;
-		//var output = "BUTTS";
-		this.model.fetch({url:this.model.getSectionTeachersUrl(id)}).then(function(data) {
-			teacher = data[0];
-			output = "Butt Stallion";
-			if(teacher){
-			output = teacher.lastName + ", " + teacher.firstName;
-			} 
-			console.log("Teacher name: " + output)
-		});
-		return output;
-	},
 });
 
 // var ReportCardTeacherView = Backbone.View.extend({
