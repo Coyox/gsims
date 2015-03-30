@@ -147,13 +147,14 @@ function validateCredentials() {
     if (isset($password)){
         $sql = "SELECT password from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
-        $dbpass = (string) perform_query($sql, 'GETCOL', $bindparam);
-        if ($dbpass === crypt($password, $dbpass)) {
+        $user = perform_query($sql, 'GET', $bindparam);
+        $hash = crypt($password, $user->password);
+        if ($user->password === $hash) {
             $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
             echo json_encode(perform_query($sql, '', $bindparam));
         }
         else {
-            echo json_encode(array("status"=>"failure"));
+            echo json_encode(array("hash"=>$hash, "status"=>"failure"));
         }
     }
     else {
