@@ -573,10 +573,11 @@ var ReportCardView = Backbone.View.extend({
 			//console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				//console.log(section);
+				//console.log(id);
 				new ReportCardRowView({
 					el: view.addRow(),
-					model: section
+					model: section,
+					id: id
 				});
 			});
 		});
@@ -593,7 +594,7 @@ var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
 		+	"<td><%= teacher %></td>"
-		+	"<td>[student's grade]</td>"),
+		+	"<td><%= grade %></td>"),
 
 	initialize: function(options) {
 		this.render();
@@ -601,6 +602,7 @@ var ReportCardRowView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
+		var id = this.id;
 		this.model.set("id", this.model.get("sectionid"));
 		this.model.fetch({
 			url: this.model.getSectionTeachersUrl(this.model.get("sectionid"))
@@ -616,9 +618,17 @@ var ReportCardRowView = Backbone.View.extend({
 			// Populate table cells
 			view.$el.html(view.template({
 				model: view.model.toJSON(),
-				teacher: names
+				teacher: names,
+				grade: "0"
 			}));
 		});
+		// Get grades	
+		this.model.fetch({
+			url: this.model.getStudentGradeForSection(this.model.get("sectionid"), id)
+		}).then(function(data) {
+			console.log("fetched...");
+		});
+
 	},
 	
 });
