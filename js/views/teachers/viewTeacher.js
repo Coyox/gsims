@@ -25,7 +25,7 @@ var TeacherRecordView = Backbone.View.extend({
 			}
 
 			view.model = new Teacher(data, {parse:true});
-			view.model.set("id", view.id);
+			view.model.set("userid", view.id);
 			view.emailTab(data);
 			view.teacherInformationTab(view.model);
 			view.teacherSectionsTab(view.model);
@@ -41,6 +41,7 @@ var TeacherRecordView = Backbone.View.extend({
 	teacherInformationTab: function() {
 		_.each(this.model.toJSON(), function(value, name) {
 			if (this.model.nonEditable.indexOf(name) == -1) {
+				console.log(name);
 				new CreateTeacherRowView({
 					el: this.addRow(),
 					model: this.model,
@@ -73,7 +74,7 @@ var TeacherRecordView = Backbone.View.extend({
 		var container = $("<div class='form-group'></div>");
 		this.$el.find("#teacher-info-table").append(container);
 		return container;
-	},	
+	},
 
 	editTeacher: function(evt) {
 		this.action = "edit";
@@ -112,7 +113,7 @@ var TeacherRecordView = Backbone.View.extend({
 						deptid: comp.deptid,
 						level: comp.level
 					});
-				}	
+				}
 			}
 		});
 
@@ -138,20 +139,20 @@ var TeacherRecordView = Backbone.View.extend({
 				if (data.status == "success") {
 					new TransactionResponseView({
 						message: "Teacher successfully saved."
-					});		
+					});
 					$.ajax({
 						type: "POST",
 						url: view.model.getCourseCompetencyUrl(view.model.get("userid")),
 						data: params
 					});
 					view.action = "view";
-					view.render();			
+					view.render();
 				} else {
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
 						message: "Sorry, there was a problem saving this teacher. Please try again."
-					});		
+					});
 				}
 			});
 		}
@@ -168,12 +169,12 @@ var TeacherRecordView = Backbone.View.extend({
 		$("#confirmation-modal").modal({
 			show: true
 		});
-		
+
 		$("#confirmation-modal").on("hidden.bs.modal", function() {
 			$("#confirmation-modal").remove();
 			$(".modal-backdrop").remove();
 		});
-		
+
 		$("#confirmation-modal").on("click", "#confirm-yes", function() {
 			$("#confirmation-modal").remove();
 			$(".modal-backdrop").remove();
@@ -187,13 +188,13 @@ var TeacherRecordView = Backbone.View.extend({
 				if (data.status == "success") {
 					new TransactionResponseView({
 						message: "This teacher is now an administrator."
-					});					
+					});
 				} else {
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
 						message: "Sorry, there was a problem setting this teacher as an administrator. Please try again."
-					});		
+					});
 				}
 			});
 		});
