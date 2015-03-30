@@ -415,6 +415,7 @@ var Router = Backbone.Router.extend({
         new ImportView({
             el: $("#content")
         });
+    },
 
     exportData: function() {
         this.loadHome();
