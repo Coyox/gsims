@@ -9,10 +9,13 @@ var AdminRecordView = Backbone.View.extend({
 		var view = this;
 		console.log(this.id);
 		var teacher = new Teacher({id:this.id});
-		teacher.fetch().then(function(data) {
+		teacher.fetch( {
+			url: teacher.admin_urlRoot + "/" + this.id
+		}
+		).then(function(data) {
 			console.log(data);
 
-	        view.$el.html(html["viewAdmin.html"]);
+			view.$el.html(html["viewAdmin.html"]);
 			view.$el.find("#admin-info-table").empty();
 			view.$el.find("#comp-info, #comp2-info").empty();
 
@@ -201,9 +204,9 @@ var TeachingSectionsView = Backbone.View.extend({
 	},
 
 	addRow: function() {
-        var container = $("<tr></tr>");
-        this.$el.find("#enrolled-sections-table .results").first().append(container);
-        return container;
+		var container = $("<tr></tr>");
+		this.$el.find("#enrolled-sections-table .results").first().append(container);
+		return container;
 	}
 });
 
