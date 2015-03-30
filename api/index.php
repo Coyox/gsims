@@ -145,15 +145,16 @@ $app->run();
 function validateCredentials() {
     $password = $_GET['password'];
     if (isset($password)){
-        $sql = "SELECT * from login where username=:username LIMIT 1";
+        $sql = "SELECT password from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
         $user = perform_query($sql, 'GET', $bindparam);
-        if ( hash_equals($user->password, crypt($password, $user->password)) ) {
+        $hash = crypt($password, $user->password);
+        if ($user->password === $hash) {
             $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
             echo json_encode(perform_query($sql, '', $bindparam));
         }
         else {
-            echo json_encode(array("status"=>"failure"));
+            echo json_encode(array("hash"=>$hash, "status"=>"failure"));
         }
     }
     else {
@@ -1999,9 +2000,9 @@ function getTeachersWithMissingInputAttendance(){
 # Purge
 #================================================================================================================#
 function purge($ids, $sql){
-    $ret = parenthesisList($ids);
-    $sql.=$ret[0];
-    echo json_encode(perform_query($sql,'',$ret[1]));
+    list($sqlparens, $bindparams) = parenthesisList($list);
+    $sql.= $sqlparens;
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 function purgeAttendance(){
     if (isset($_POST['schoolyearids'])||isset($POST_['userids'])) {
