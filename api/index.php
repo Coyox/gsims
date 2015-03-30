@@ -1911,7 +1911,7 @@ function findStudentsWithAdvancedCriteria(){
     // has average between X and Y
     if (isset($lowergrade) && isset($uppergrade)){
         foreach ($students as $row){
-            $studenetid = $row['userid'];
+            $studentid = $row['userid'];
             $avgGrade = getAvgGrade($studentid, 1);
             if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
                 array_push($qualifiedstudents, $studentid);
@@ -1925,7 +1925,7 @@ function findStudentsWithAdvancedCriteria(){
                 from document where fullmark is not null group by sectionid";
         $sectionAsmtCount = perform_query($sql, 'GETASSO');
 
-        $sql = "SELECT m.userid as studentid , sectionid, count(sectionid) as numberOfAssignmentsDone
+        $sql = "SELECT m.userid as studentid, sectionid, count(sectionid) as numberOfAssignmentsDone
              from marks m, document d
              where m.docid = d.docid group by sectionid";
         $studentAsmtCount = perform_query($sql, 'GETASSO');
