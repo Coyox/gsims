@@ -674,7 +674,7 @@ function dlReportCardCSV() {
 		}
 		output += "\n";
 	}
-	console.log(output);
+	//console.log(output);
 	var encodedUri = encodeURI(output);
 	var link = document.createElement("a");
 	link.setAttribute("href", "data:text/csv;charset=utf-8," + encodedUri);
