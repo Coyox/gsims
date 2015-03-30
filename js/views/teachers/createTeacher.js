@@ -198,7 +198,34 @@ var TeacherCompetencyView = Backbone.View.extend({
 		var view = this;
 		var schoolid = $("#school-options option:selected").attr("id");
 		var school = new School();
-
+		school.fetch({
+			url: school.getDepartmentsUrl(this.model.get("schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
+		}).then(function(data) {
+			_.each(data, function(dept, index) {
+				var level = 0;
+				_.each(view.existingLevels, function(existing, index) {
+					if (existing.deptid == dept.deptid) {
+						level = existing.level;
+					}
+				});
+				view.model.competency.push({
+					deptName: dept.deptName,
+					level: level,
+					deptid: dept.deptid
+				});
+				new TeacherCompetencyRowView({
+					el: view.addRow(index),
+					model: view.model,
+					index: index,
+					deptModel: dept,
+					action: view.action,
+					level: level
+				});
+			});
+		});
 	},
 
 	addRow: function(index) {

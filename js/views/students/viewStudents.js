@@ -73,14 +73,14 @@ var SearchStudentsView = Backbone.View.extend({
 
 		var model = new Student();
 		model.fetch({
-			url: model.getAdvancedSearchUrl(),
+			url: model.getSearchStudentsUrl(),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
 		});
 	},
 
-	searchStudents: function(evt) {
+	advancedSearch: function(evt) {
 		var view = this;
 		var data = {};
 

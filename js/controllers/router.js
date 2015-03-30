@@ -395,8 +395,9 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("Create Superuser", "user");
 
-        new CreateSuperuserView({
-            el: $("#content").html("")
+        new CreateTeacherView({
+            el: $("#content").html(""),
+            usertype: "SU"
         });
     },
     viewSchoolYears: function() {

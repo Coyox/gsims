@@ -168,14 +168,14 @@ var AdminRecordView = Backbone.View.extend({
 	},
 
 	adminSectionsTab: function(model) {
-		new TeachingSectionsView({
+		new AdminTeachingSectionsView({
 			el: this.$el.find("#course-info"),
 			model: model
 		});
 	}
 });
 
-var TeachingSectionsView = Backbone.View.extend({
+var AdminTeachingSectionsView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
 	},
@@ -191,7 +191,7 @@ var TeachingSectionsView = Backbone.View.extend({
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				new TeachingSectionsRowView({
+				new AdminTeachingSectionsRowView({
 					el: view.addRow(),
 					model: section,
 					teacherid: id
@@ -210,7 +210,7 @@ var TeachingSectionsView = Backbone.View.extend({
 	}
 });
 
-var TeachingSectionsRowView = Backbone.View.extend({
+var AdminTeachingSectionsRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
 		+	"<td><%= model.day %></td>"

@@ -21,7 +21,7 @@ var CreateSuperuserView = Backbone.View.extend({
 			}
 		}, this);
 
-		this.competencyView = new SuperuserCompetencyView({
+		this.competencyView = new AdminCompetencyView({
 			el: this.$el,
 			model: this.model
 		});

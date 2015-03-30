@@ -41,7 +41,6 @@ var TeacherRecordView = Backbone.View.extend({
 	teacherInformationTab: function() {
 		_.each(this.model.toJSON(), function(value, name) {
 			if (this.model.nonEditable.indexOf(name) == -1) {
-				console.log(name);
 				new CreateTeacherRowView({
 					el: this.addRow(),
 					model: this.model,
@@ -222,6 +221,8 @@ var TeachingSectionsView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["enrolledSections.html"]);
+
+		$("#add-course").hide();
 
 		var view = this;
 		var id = this.model.get("userid");

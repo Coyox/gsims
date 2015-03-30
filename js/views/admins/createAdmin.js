@@ -21,7 +21,7 @@ var CreateAdminView = Backbone.View.extend({
 			}
 		}, this);
 
-		this.competencyView = new TeacherCompetencyView({
+		this.competencyView = new AdminCompetencyView({
 			el: this.$el,
 			model: this.model
 		});
@@ -186,7 +186,7 @@ var CreateAdminRowView = Backbone.View.extend({
 	}
 });
 
-var TeacherCompetencyView = Backbone.View.extend({
+var AdminCompetencyView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model.competency = [];
 		this.action = options.action;
@@ -209,7 +209,7 @@ var TeacherCompetencyView = Backbone.View.extend({
 	}
 });
 
-var TeacherCompetencyRowView = Backbone.View.extend({
+var AdminCompetencyRowView = Backbone.View.extend({
 
 	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
