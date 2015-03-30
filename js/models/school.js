@@ -131,7 +131,11 @@ var Section = Backbone.Model.extend({
     },
     getStudentAttendance: function(id) {
     	return this.urlRoot + "/" + id + "/attendance";
-    }
+    },
+	
+	getStudentGradeForSection: function(sectionid, studentid) {
+		return this.urlRoot + "/" + sectionid + "/students/" + studentid;
+	}
 });
 
 var Prereq = Backbone.Model.extend({
