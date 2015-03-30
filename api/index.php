@@ -54,6 +54,7 @@ $app->delete('/schoolyears/:id', 'deleteSchoolYear');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
+$app->get('/schools/:id/students', 'getStudentsBySchool');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
@@ -329,7 +330,14 @@ function getDepartmentCount($id){
     $sql = "SELECT count(*) from department where schoolid=:schoolid and schoolyearid=:schoolyear";
     echo json_encode(perform_query($sql,'GETCOL', array("schoolid"=>$id,"schoolyear"=>$schoolyear)));
 }
-
+function getStudentsBySchool($id){
+    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+    emergencyContactPhoneNumber, schoolid, paid, status
+    from student where schoolid=:schoolid";
+    echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
+}
 function createSchool(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -945,7 +953,6 @@ function getStudents() {
     from student";
     echo json_encode(perform_query($sql, 'GETALL'));
 }
-
 /*
  * Returns a single student record
  */
