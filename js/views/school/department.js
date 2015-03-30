@@ -5,9 +5,11 @@ var DepartmentView = Backbone.View.extend({
     },
      
     render: function () {
-
+        var usertype = sessionStorage.getItem("gobind-usertype");
         this.$el.html(html["viewDepartments.html"]);
-
+        if(usertype == "SU"){
+            $("#purge-dept").removeClass("hide");
+        }
         var view = this;
 
         var department = new Dept();
