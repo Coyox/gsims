@@ -8,7 +8,11 @@ var CourseView = Backbone.View.extend({
         "click #purge-courses": "purgeCourses"
     },
      render: function () {
-        this.$el.html(html["viewCourses.html"]);
+        var template = html["viewCourses.html"];
+		template = template({
+			usertype: sessionStorage.getItem("gobind-usertype")
+		});
+		this.$el.html(template);
         var view = this;
         var department = new Dept();
         var course = new Course();

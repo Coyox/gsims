@@ -5,7 +5,8 @@ var SchoolView = Backbone.View.extend({
     },
      
     render: function () {
-        this.$el.html(html["viewSchools.html"]);
+        
+		this.$el.html(html["viewSchools.html"]);
 
         var view = this;
         var school = new School();
@@ -35,7 +36,7 @@ var SchoolView = Backbone.View.extend({
         return container;
     },
 
-     purgeSchool: function(){
+    purgeSchool: function(){
         var school = new School();
 		school.fetch().then(function(data) {
             var ids = [];
