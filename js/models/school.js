@@ -187,7 +187,39 @@ var Purge = Backbone.Model.extend({
 
 	purgeInactive: function() {
 		return this.urlRoot + "/inactive";
-	}
+	},
+
+    purgeWaitlist: function() {
+        return this.urlRoot + "/waitlist";
+    },
+
+    purgeUsers: function() {
+        return this.urlRoot + "/user";
+    },
+
+    purgeSchoolYears: function() {
+        return this.urlRoot + "/schoolyear";
+    },
+
+    purgeSchools: function() {
+        return this.urlRoot + "/school";
+    },
+
+    purgeDepartments: function() {
+        return this.urlRoot + "/department";
+    },
+
+    purgeCourses: function() {
+        return this.urlRoot + "/course";
+    },
+
+    purgeSections: function() {
+        return this.urlRoot + "/section";
+    },
+
+    purgeDocuments: function() {
+        return this.urlRoot + "/document";
+    }
 
 	// THESE ARE THE ROUTES
 	// $app->post('/purge/attendance', 'purgeAttendance');
