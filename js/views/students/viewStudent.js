@@ -573,10 +573,11 @@ var ReportCardView = Backbone.View.extend({
 			//console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				//console.log(section);
+				//console.log(id);
 				new ReportCardRowView({
 					el: view.addRow(),
-					model: section
+					model: section,
+					id: id
 				});
 			});
 		});
@@ -592,36 +593,44 @@ var ReportCardView = Backbone.View.extend({
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
-		+	"<td><%= this.teacherNames() %></td>"
-		// +	"<td>[teacher name]</td>" // TODO: get these fields
-		+	"<td>[student's grade]</td>"),
+		+	"<td><%= teacher %></td>"
+		+	"<td><%= grade %></td>"),
 
 	initialize: function(options) {
 		this.render();
 	},
 
 	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
+		var view = this;
+		var id = this.id;
+		this.model.set("id", this.model.get("sectionid"));
+		this.model.fetch({
+			url: this.model.getSectionTeachersUrl(this.model.get("sectionid"))
+		}).then(function(data) {
+			// Get teacher names
+			var names = "";
+			_.each(data, function(teacher, index) {
+				var fullName = teacher.firstName + " " + teacher.lastName;
+				names += fullName + ","
+			});
+			names = names.slice(0,-1);
+		
+			// Populate table cells
+			view.$el.html(view.template({
+				model: view.model.toJSON(),
+				teacher: names,
+				grade: "0"
+			}));
+		});
+		// Get grades	
+		this.model.fetch({
+			url: this.model.getStudentGradeForSection(this.model.get("sectionid"), id)
+		}).then(function(data) {
+			console.log("fetched...");
+		});
+
 	},
 	
-	teacherNames: function() {
-		// TODO: stub
-		var id = this.model.get("sectionid");
-		var output = "test";
-		this.model.fetch({url:this.model.getSectionTeachersUrl(id)}).then(function(data) {
-			console.log(data);
-			// output = data.lastName + ", " + data.firstName;
-			_.each(data, function(object, index) {
-				var teacher = new Teacher(object, {parse:true});
-				console.log(teacher);
-				output += teacher.lastName + ", " + teacher.firstName + "; ";
-			});
-		});
-		// output
-		return output;
-	},
 });
 
 // var ReportCardTeacherView = Backbone.View.extend({

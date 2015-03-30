@@ -807,8 +807,8 @@ function getStudentSectionGrade($sectionid, $userid){
         return -1;
     }
     $sql = "SELECT coalesce(sum(mark),0) from marks
-            where docid in
-                (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
+            where assignmentid in
+                (SELECT assignmentid from document where sectionid=:sectionid and fullmark is not null)
             and userid=:userid";
     $bindparams["userid"]=$userid;
     $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
