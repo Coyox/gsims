@@ -145,7 +145,7 @@ $app->run();
 function validateCredentials() {
     $password = $_GET['password'];
     if (isset($password)){
-        $sql = "SELECT * from login where username=:username LIMIT 1";
+        $sql = "SELECT usertype, password from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
         $user = perform_query($sql, 'GET', $bindparam);
         if ($user->password === crypt($password, $user->password)) {
@@ -161,22 +161,6 @@ function validateCredentials() {
         else {
             echo json_encode(array("status"=>"failure"));
         }
-
-
-
-        $sql = "SELECT * from login where username=:username LIMIT 1";
-        $bindparam = array("username"=> $_GET['username']);
-        $user = perform_query($sql, 'GET', $bindparam);
-        // if ( hash_equals($user->password, crypt($password, $user->password)) ) {
-        //     echo json_encode($user);
-        // }
-        $sql = "UPDATE login set lastLogin=CURRENT_TIMESTAMP where username=:username";
-        perform_query($sql, '', $bindparam);
-        echo json_encode($user);
-
-
-
-
     }
     else {
         $sql = "SELECT userid, username, usertype, lastLogin from login order by userid asc";
