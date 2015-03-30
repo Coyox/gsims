@@ -84,6 +84,7 @@ function loadTemplates() {
 		"createTeacher.html",
 		"searchAdmins.html",
 		"viewAdmins.html",
+		"viewSuperusers.html",
 		"reportCard.html",
 		"courseEnrollment.html",
 		"viewSchoolYear.html",
