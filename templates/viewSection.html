@@ -1,0 +1,79 @@
+<div id="section">
+	<br>
+	<ul id="section-tabs" class="nav nav-tabs nav-justified">
+		<li class="active">
+			<a data-toggle="tab" data-target="#section-info">
+				<span class="glyphicon glyphicon-user"></span> Section Information
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#student-enrolled">
+				<span class="glyphicon glyphicon-th-list"></span> Students
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#attendance">
+				<span class="glyphicon glyphicon-stats"></span> Attendance
+			</a>
+		</li>
+		<li>
+			<a data-toggle="tab" data-target="#documents">
+				<span class="glyphicon glyphicon-file"></span> Documents
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content">
+		<br>
+		<div id="section-info" class="tab-pane active">
+			<button id="edit-section" class="btn btn-sm btn-primary">Edit Section</button>
+			<button id="save-section" class="btn btn-sm btn-primary hide">Save Section</button>
+			<button id="delete-section" class="btn btn-sm btn-primary">Delete Section</button>
+			<br><br>
+			<div id="section-form">
+				<div class="form-horizontal col-sm-6 well"></div>
+			</div>
+		</div>
+		<div id="student-enrolled" class="tab-pane">
+			<button id="add-student" class="btn btn-sm btn-primary">Add Student</button>
+			<br><br>
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Email Address</th>
+						<th>Grade</th>
+						<th>Drop</th>
+					</tr>
+				</thead>
+				<tbody class="results"></tbody>
+			</table>
+		</div>
+		<div id="attendance" class="tab-pane">
+			<div class="col-sm-12">
+				<label class="col-sm-1">Date</label>
+				<div class="col-sm-5">
+					<input type="text" id="date" class="form-control input-sm" placeholder="YYYY-MM-DD">
+				</div>
+				<div class="col-sm-1">
+					<button id="update-attendance" class="btn btn-primary btn-sm">Update Attendance</button>
+				</div>
+			</div>
+			<br><br><br>
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Present</th>
+					</tr>
+				</thead>
+				<tbody class="results"></tbody>
+			</table>
+		</div>
+		<div id="documents" class="tab-pane"></div>
+	</div>
+</div>

@@ -107,6 +107,30 @@ var Section = Backbone.Model.extend({
 		status: ""
 	},
 
+    validation: {
+		day: {
+			required: true,
+		},
+		startTime: {
+			required: true,
+		},
+		endTime: {
+			required: true,
+		},
+		roomCapacity: {
+			required: true,
+		},
+		roomLocation: {
+			required: true,
+		},
+		classSize: {
+			required: true,
+		},
+		status: {
+			required: true,
+		},
+	},
+
     urlRoot: app.serverUrl + "api/sections",
 
     getDropStudentUrl: function(sectionid, studentid) {
@@ -132,6 +156,10 @@ var Section = Backbone.Model.extend({
     getStudentAttendance: function(id) {
     	return this.urlRoot + "/" + id + "/attendance";
     },
+
+    getStudentGradeForSection: function(sectionid, studentid) {
+		return this.urlRoot + "/" + sectionid + "/students/" + studentid;    	
+    }
 });
 
 var Prereq = Backbone.Model.extend({

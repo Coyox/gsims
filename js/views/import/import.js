@@ -290,6 +290,7 @@ var ImportView = Backbone.View.extend({
 								}
 							}).then(function(data) {
 								try {
+									console.log(typeof data);
 									if (typeof data == "string") {
 										data = JSON.parse(data);
 									}

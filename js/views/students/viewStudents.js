@@ -1,5 +1,7 @@
 var SearchStudentsView = Backbone.View.extend({
 	initialize: function(options) {
+		this.redirect = options.redirect;
+		this.sectionid = options.sectionid;
 		this.render();
 	},
 
@@ -79,11 +81,19 @@ var SearchStudentsView = Backbone.View.extend({
 	},
 
 	changeRoute: function(data) {
-		app.Router.navigate("students/search");
-		var view = new StudentsTableView({
-			el: $("#content"),
-			results: data
-		});
+		if (this.redirect == false) {
+			var view = new AddTableView({
+				el: this.$el,
+				results: data,
+				sectionid: this.sectionid
+			});
+		} else {
+			app.Router.navigate("students/search");
+			var view = new StudentsTableView({
+				el: $("#content"),
+				results: data
+			});
+		}
 	},
 
 	populateYearMenu: function() {
@@ -112,6 +122,95 @@ var SearchStudentsView = Backbone.View.extend({
 		} else {
 			elem.hide();
 		}
+	}
+});
+
+var AddTableView = Backbone.View.extend({
+	initialize: function(options) {
+		this.template = options.template;
+		this.results = options.results;
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(html["viewStudents.html"]);
+		this.populateQueryResults(this.results);
+	},
+
+	populateQueryResults: function(data) {
+		_.each(data, function(object, index) {
+			var model = new Student(object, {parse:true});
+			new AddTableRowView({
+				model: model,
+				el: this.addRow(".results", model.get("emailAddr")),
+				sectionid: this.sectionid
+			});
+		}, this);
+		this.table = this.$el.find("table").dataTable({
+	      	aoColumnDefs: [
+	          	{ bSortable: false, aTargets: [ 4, 5 ] },
+	          	{ sClass: "center", aTargets: [ 4, 5 ] },
+	          	{ sWidth: "10%", aTargets: [ 5 ] }
+	       	]
+		});
+	},
+
+	addRow: function(selector, email) {
+        var container = $("<tr></tr>");
+        container.data("email", email);
+        this.$el.find(selector).first().append(container);
+        return container;
+	},
+});
+
+var AddTableRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.userid %></td>"
+		+	"<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= model.emailAddr %></td>"
+		+   "<td><span class='add-student primary-link center-block' id='<%= model.userid %>'>[ Add Student ]</span></td>"
+		+	"<td></td>"),
+
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	events: {
+		"click .add-student": "addStudent"
+	},
+
+	addStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		var student = new Student({id: id});
+		$.ajax({
+			type: "POST",
+			url: student.enrollStudentInSections(id),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+				status: "active",
+				sectionids: JSON.stringify([this.sectionid]),
+				userid: id
+			}
+		}).then(function(data) {
+			console.log(data);
+			new TransactionResponseView({
+				message: "This student has been added to this section."
+			});
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "This student could not be added to this section. Please try again."
+			});
+		})
 	}
 });
 

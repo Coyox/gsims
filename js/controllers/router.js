@@ -52,6 +52,7 @@ var Router = Backbone.Router.extend({
         "enrollmentForm":       "studentEnrollmentForm",
         "courseEnrollment":     "courseEnrollment",
         "registrationForm":     "registrationForm",
+        "manageCourses":        "manageCourses",
 
         "filterTeachers": 		"filterTeachers",
         "teachers/search": 		"viewFilteredTeachers",
@@ -78,6 +79,10 @@ var Router = Backbone.Router.extend({
 
         "import":               "importData",
         "export":               "exportData"
+
+        "viewCourse/:id":       "viewCourse",
+
+        "viewSection/:id":      "viewSection"
     },
 
     updatePageBreadcrumb: function(text, icon) {
@@ -423,6 +428,35 @@ var Router = Backbone.Router.extend({
 
         new ExportView({
             el: $("#content")
+        });
+    },
+
+    manageCourses: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Manage Courses", "wrench");
+
+        new CourseManagement({
+            el: $("#content")
+        })
+    },
+
+    viewCourse: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("View Course", "th-list");
+
+        new ViewCourse({
+            el: $("#content"),
+            id: id
+        });
+    },
+
+    viewSection: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("View Section", "th-list");
+
+        new SectionView({
+            el: $("#content"),
+            id: id
         });
     }
 });

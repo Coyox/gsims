@@ -109,7 +109,11 @@ function loadTemplates() {
 		"import.html",
 		"export.html",
 		"subSection.html",
-		"attendance.html"
+		"attendance.html",
+		"manageCourses.html",
+		"viewCourse.html",
+		"viewSection.html",
+		"addStudentToSection.html"
 	];
 
 	$.each(templates, function(i, name) {
