@@ -145,7 +145,7 @@ $app->run();
 function validateCredentials() {
     $password = $_GET['password'];
     if (isset($password)){
-        $sql = "SELECT usertype, password from login where username=:username LIMIT 1";
+        $sql = "SELECT * from login where username=:username LIMIT 1";
         $bindparam = array("username"=> $_GET['username']);
         $user = perform_query($sql, 'GET', $bindparam);
         if ($user->password === crypt($password, $user->password)) {
