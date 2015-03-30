@@ -15,11 +15,19 @@ var ImportView = Backbone.View.extend({
 	},
 
 	loadOptions: function(){
-		//var view = this;
+		var tid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid
 		var x = document.getElementById("section");
 		var option = document.createElement("option");
-		//option.text = "Test thing";
-		//x.add(option);
+		var teacher = new Teacher();
+		teacher.fetch({
+			url: teacher.getTeachingSectionsUrl(id),
+		}).then(function(data){
+			console.log(data);
+			_.each(data, function(object,index){
+				option.text = object.sectionid;
+				x.add(option);
+			});
+		});
 
 	},
 
@@ -27,7 +35,8 @@ var ImportView = Backbone.View.extend({
 		var teacherid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid;
 		var section = this.$el.find("#section").val();
 		console.log(section);
-		var sectionid = 777778; // TODO
+		//var sectionid = 777778; // TODO
+		var sectionid = section;
 
 		var dataRows = [["date", "teacherid", "sectionid","studentid","firstName","lastName","present"]];
 		var csvContent = "data:text/csv;charset=utf-8,";
