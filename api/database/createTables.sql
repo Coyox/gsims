@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `prereqs` (
 CREATE TABLE IF NOT EXISTS `login` (
   `userid` int(11) PRIMARY KEY NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(50)  NOT NULL,
+  `password` varchar(255)  NOT NULL,
   `usertype` char(2) NOT NULL,
   `lastLogin` timestamp
 );
