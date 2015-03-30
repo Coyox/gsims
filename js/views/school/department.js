@@ -5,8 +5,11 @@ var DepartmentView = Backbone.View.extend({
     },
      
     render: function () {
+
         this.$el.html(html["viewDepartments.html"]);
+
         var view = this;
+
         var department = new Dept();
         var school = new School();
         school.fetch({
