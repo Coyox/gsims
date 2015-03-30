@@ -1,12 +1,12 @@
 var ImportView = Backbone.View.extend({
 	initialize: function(options) {
-		this.loadOptions();
 		this.render();
 
 	},
 
 	render: function() {
 		this.$el.html(html["import.html"]);
+		this.loadOptions();
 	},
 
 	events: {
@@ -16,11 +16,10 @@ var ImportView = Backbone.View.extend({
 
 	loadOptions: function(){
 		//var view = this;
-		//var x = document.getElementById("section");
-		var x = this.$el.find("#section");
+		var x = document.getElementById("section");
 		var option = document.createElement("option");
-		option.text = "Test thing";
-		x.add(option);
+		//option.text = "Test thing";
+		//x.add(option);
 
 	},
 
