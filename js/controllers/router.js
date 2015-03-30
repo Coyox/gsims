@@ -124,11 +124,11 @@ var Router = Backbone.Router.extend({
             });
         }
 
-        $("#main-content .left").affix({
-            offset: {
-                top: 50
-            }
-        })
+        // $("#main-content .left").affix({
+        //     offset: {
+        //         top: 50
+        //     }
+        // })
     },
 
     email: function() {

@@ -284,6 +284,8 @@ var DepartmentSelectionView = Backbone.View.extend({
 
 		$(".department-name").text(name);
 
+		$("#course-container").removeClass("hide");
+
 		var dept = new Dept();
 		dept.fetch({
 			url: dept.getCoursesUrl(id),
@@ -550,6 +552,7 @@ var ViewCourse = Backbone.View.extend({
 	initialize: function(options) {
 		this.id = options.id;
 		this.action = "view";
+		this.model = new Section();
 		this.render();
 	},
 
@@ -558,8 +561,9 @@ var ViewCourse = Backbone.View.extend({
 
 		var view = this;
 		var course = new Course({id:this.id});
+		$("#course-selection").data("courseid", this.id);
+		var courseid = this.id;
 		course.fetch().then(function(data) {
-			console.log(data);
 			_.each(data, function(value, attr) {
 				new ViewCourseRow({
 					el: view.addRow(),
@@ -577,7 +581,6 @@ var ViewCourse = Backbone.View.extend({
 					courseName: course.get("courseName")
 				}
 			}).then(function(data) {
-				console.log(data);
 				_.each(data, function(sec, index) {
 					var section = new Section(sec, {parse:true});
 					new CourseSectionView({
@@ -607,11 +610,11 @@ var ViewCourse = Backbone.View.extend({
 	},
 
 	addSectionToCourse: function(evt) {
-		var courseid = $(evt.currentTarget).data("courseid");
+		var courseid = Backbone.history.fragment.split("/")[1];
 
 		var view = this;
 
-		$("#container").append(html["createSection.html"]);
+		this.$el.append(html["createSection.html"]);
 
 		var elem = $("#create-section-modal");
 		var backdrop = $(".modal-backdrop");
@@ -625,15 +628,22 @@ var ViewCourse = Backbone.View.extend({
 			backdrop.remove();
 		});
 
-		this.model = new Section();
 		Backbone.Validation.bind(this);
 
 		elem.on("click", "#save", function() {
-			view.model.set("deptid", deptid);
-			view.model.set("courseName", view.$el.find("#courseName").val());
-			view.model.set("description", view.$el.find("#description").val());
+			var days = [];
+			_.each($(".day"), function(day, index) {
+				if ($(day).is(":checked")) {
+					days.push($(day).data("day").toUpperCase());
+				}
+			});
+			days = days.join(",");
+			view.model.set("day", days);
+			view.model.set("courseid", courseid);
 			view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
 			view.model.set("status", "active");
+
+			console.log(view.model);
 			if (view.model.isValid(true)) {
 				elem.remove();
 				backdrop.remove();
@@ -661,6 +671,12 @@ var ViewCourse = Backbone.View.extend({
 			}
 		});
 	},
+
+	updateSection: function(evt) {
+		var val = $(evt.currentTarget).val();
+		var name = $(evt.currentTarget).attr("name");
+		this.model.set(name, val);
+	}
 });
 
 
@@ -752,8 +768,10 @@ var SectionView = Backbone.View.extend({
 					model: view.model
 				});
 			});
+			view.teachersForm(view.id);
 			view.enrolledStudentsTab(view.id);
 			view.attendanceTab(view.id);
+			view.documentTab(view.id);
 		});
 	},
 
@@ -761,7 +779,8 @@ var SectionView = Backbone.View.extend({
 		"click #edit-section": "editSection",
 		"click #save-section": "saveSection",
 		"click #add-student": "addStudent",
-		"click #delete-section": "deleteSection"
+		"click #delete-section": "deleteSection",
+		"click #add-teacher": "addTeacherToSection"
 	},
 
 	addRow: function() {
@@ -783,9 +802,23 @@ var SectionView = Backbone.View.extend({
 		});
 	},
 
+	teachersForm: function(id) {
+		new TeacherSectionView({
+			el: $("#section-teachers-form"),
+			sectionid: id
+		});
+	},
+
 	attendanceTab: function(id) {
 		new AttendanceView({
 			el: $("#attendance"),
+			sectionid: id
+		});
+	},
+
+	documentTab: function(id) {
+		new DocumentsView({
+			el: $("#documents"),
 			sectionid: id
 		});
 	},
@@ -914,6 +947,64 @@ var SectionView = Backbone.View.extend({
 		});	
 	},
 
+	addTeacherToSection: function() {
+		$("#container").append(html["addTeacherToSection.html"]);
+
+		var elem = $("#add-teacher-modal");
+		var backdrop = $(".modal-backdrop");
+
+		new SearchTeachersView({
+			el: $(".modal-body"),
+			redirect: false,
+			sectionid: this.id
+		});
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+
+		this.model = new Section();
+		Backbone.Validation.bind(this);
+
+		elem.on("click", "#save", function() {
+			// view.model.set("deptid", deptid);
+			// view.model.set("courseName", view.$el.find("#courseName").val());
+			// view.model.set("description", view.$el.find("#description").val());
+			// view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
+			// view.model.set("status", "active");
+			// if (view.model.isValid(true)) {
+			// 	elem.remove();
+			// 	backdrop.remove();
+			// 	view.model.save().then(function(data) {
+			// 		if (data.status=="success") {
+			// 			new TransactionResponseView({
+			// 				message: "New course successfully created."
+			// 			});
+			// 			view.render();
+			// 		}
+			// 		else {
+			// 			new TransactionResponseView({
+			// 				title: "ERROR",
+			// 				status: "error",
+			// 				message: "Could not create a new course."
+			// 			});
+			// 		}
+			// 	}).fail(function(data) {
+			// 		new TransactionResponseView({
+			// 			title: "ERROR",
+			// 			status: "error",
+			// 			message: "Could not create a new course."
+			// 		});
+			// 	});
+			// }
+		});	
+	}
+
 
 });
 
@@ -966,6 +1057,90 @@ var ViewSectionRow = Backbone.View.extend({
 	}
 });
 
+var TeacherSectionView = Backbone.View.extend({
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+		var section = new Section({id: this.sectionid});
+		section.fetch({
+			url: section.getSectionTeachersUrl(this.sectionid)
+		}).then(function(data) {
+			_.each(data, function(teach, index) {
+				var model = new Teacher(teach, {parse:true});
+				new TeacherSectionRowView({
+					el: view.addRow(),
+					model: model,
+					sectionid: view.sectionid,
+					parent: view
+				});
+			});
+			// view.table = view.$el.find("table").dataTable({
+			// 	dom: "t"
+			// });
+		});
+
+	},
+
+	addRow: function(evt) {
+		var container = $("<tr></tr>");
+		this.$el.find("table tbody").append(container);
+		return container;
+	}
+});
+
+var TeacherSectionRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+   "<td><span class='unassign-teacher primary-link center-block' id='<%= model.userid %>'>[ Unassign ]</span></td>"),
+
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.parent = options.parent;
+		this.render();
+	},
+
+	events: {
+		"click .unassign-teacher": "unassignTeacher"
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	unassignTeacher: function(evt) {
+		var view = this;
+		var id = $(evt.currentTarget).attr("id");
+		var section = new Section();
+		$.ajax({
+			type: "DELETE",
+			url: section.unassignTeacherUrl(this.sectionid, id),
+		}).then(function(data) {
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
+			if (data.status=="success") {
+				new TransactionResponseView({
+					message: "Teacher was successfully unassigned."
+				});
+				view.parent.render();
+			}
+			else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Cound not unassign teacher. Please try again."
+				});
+			}
+		});
+	}
+});
+
 var StudentsEnrolledView = Backbone.View.extend({
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
@@ -978,15 +1153,18 @@ var StudentsEnrolledView = Backbone.View.extend({
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
-			console.log(data);
 			_.each(data, function(student, index) {
 				var model = new Student(student, {parse:true});
 				new StudentsEnrolledRowView({
 					el: view.addRow(),
 					model: model,
-					userid: model.get("userid")
+					userid: model.get("userid"),
+					sectionid: view.sectionid
 				});
 			});
+			// view.table = view.$el.find("table").dataTable({
+			// 	dom: "t"
+			// });
 		});	
 	},
 
@@ -1002,15 +1180,21 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
-		+	"<td>grade</td>"
-		+   "<td><span class='view-student primary-link center-block' id='<%= model.userid %>'>[ Drop Student ]</span></td>"),
+		+	"<td><%= grade %></td>"
+		+   "<td><span class='drop-student primary-link center-block' id='<%= model.userid %>'>[ Drop Student ]</span></td>"),
 
 	initialize: function(options) {
 		this.userid = options.userid;
+		this.sectionid = options.sectionid;
 		this.render();
 	},
 
+	events: {
+		"click .drop-student": "dropStudent"
+	},
+
 	render: function() {
+		this.$el.find("tbody").empty();
 		var view = this;
 		var sectionid = this.model.get("sectionid");
 		var userid = this.userid;
@@ -1018,12 +1202,40 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 		section.fetch({
 			url: section.getStudentGradeForSection(sectionid, userid)
 		}).then(function(data) {
-			console.log(data);
+			view.$el.html(view.template({
+				model: view.model.toJSON(),
+				grade: data.studentGrade || ""
+			}));
 		});
+	},
 
-		view.$el.html(view.template({
-			model: view.model.toJSON()
-		}));
+	dropStudent: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		var view = this;
+		var sec = new Section({id: id});
+		sec.destroy({
+			url: sec.getDropStudentUrl(this.sectionid, id)
+		}).then(function(data) {
+			if (data.status=="success") {
+				new TransactionResponseView({
+					message: "Student has been successfully dropped."
+				});
+				view.render();
+			}
+			else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Student could not be dropped. Please try again."
+				});
+			}		
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "Student could not be dropped. Please try again."
+			});
+		});
 	}
 });
 
@@ -1039,12 +1251,16 @@ var AttendanceView = Backbone.View.extend({
 	},
 
 	render: function() {
+		this.$el.find("table tbody").empty();
+		$("#date").datepicker({
+			dateFormat: "yy-mm-dd"
+		});
+
 		var view = this;
 		var section = new Section();
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
-			console.log(data);
 			_.each(data, function(student, index) {
 				var model = new Student(student, {parse:true});
 				new AttendanceRowView({
@@ -1053,7 +1269,15 @@ var AttendanceView = Backbone.View.extend({
 					userid: model.get("userid")
 				});
 			});
+			//view.table = view.$el.find("table").dataTable({
+			// 	dom: "t"
+			// });
 		});	
+	},
+
+	events: {
+		"change .toggle-checkboxes": "toggleCheckboxes",
+		"click #update-attendance": "updateAttendance"
 	},
 
 	addRow: function(id) {
@@ -1064,22 +1288,59 @@ var AttendanceView = Backbone.View.extend({
 	},
 
 	updateAttendance: function() {
+		var view = this;
 		var rows = this.$el.find("table tbody tr");
 		var attended = [];
 		_.each(rows, function(row, index) {
 			if ($(row).find("input[type='checkbox']").is(":checked")) {
-				attended.push($(row).data("id"));
+				attended.push($(row).attr("id"));
 			}
 		}, this);
 
+		var section = new Section();
 		$.ajax({
 			type: "POST",
 			url: section.inputAttendance(this.sectionid),
 			data: {
-
+				date: this.$el.find("#date").val(),
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+				userids: JSON.stringify(attended)
 			}
+		}).then(function(data) {
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
+			if (data.status=="success") {
+				new TransactionResponseView({
+					message: "Attendance successfully inputted."
+				});
+				view.table.fnDestroy();
+				view.render();
+			}
+			else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Could not input attendance. Please try again."
+				});
+			}
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "Could not input attendance. Please try again."
+			});
 		});
-	}
+	},
+
+	toggleCheckboxes: function(evt) {
+		var nodes = this.table.fnGetNodes();
+		var checked = $(evt.currentTarget).is(":checked");
+		_.each(nodes, function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			checkbox.prop("checked", checked);
+		}, this);
+	},
 });
 
 var AttendanceRowView = Backbone.View.extend({
@@ -1105,8 +1366,174 @@ var AttendanceRowView = Backbone.View.extend({
 });
 
 
+var DocumentsView = Backbone.View.extend({
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.render();
+	},
 
+	render: function() {
+		this.$el.find("table tbody").empty();
 
+		var view = this;
+		var doc = new Document();
+		this.model = doc;
+		doc.fetch({
+			data: {
+				sectionid: this.sectionid
+			}
+		}).then(function(data) {
+			_.each(data, function(doc, index) {
+				var d1 = new Document(doc, {parse:true});
+				new DocumentRowView({
+					el: view.addRow(),
+					model: d1,
+				});
+			});
+			// view.table = view.$el.find("table").dataTable({
+			// 	dom: "t"
+			// });
+		});	
+	},
+
+	events: {
+		"change .toggle-checkboxes": "toggleCheckboxes",
+		"click #update-attendance": "updateAttendance",
+		"click #add-document": "createDocument",
+		"change input": "updateModel"
+	},
+
+	addRow: function(id) {
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		this.$el.find("table tbody").append(container);
+		return container;
+	},
+
+	createDocument: function() {
+		this.$el.append(html["createDocument.html"]);
+		var view = this;
+		var elem = $("#create-doc-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+
+		Backbone.Validation.bind(this);
+
+		elem.on("click", "#save", function() {
+			view.model.set("sectionid", view.sectionid);
+			view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
+			view.model.set("userid", JSON.parse(sessionStorage.getItem("gobind-user")).userid);
+			view.model.set("status", "active");
+			console.log(view.model.toJSON());
+			if (view.model.isValid(true)) {
+				elem.remove();
+				backdrop.remove();
+				view.model.save().then(function(data) {
+					if (data.status=="success") {
+						new TransactionResponseView({
+							message: "New document successfully created."
+						});
+						view.table.fnDestroy();
+						view.render();
+					}
+					else {
+						new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "Could not create a new document."
+						});
+					}
+				}).fail(function(data) {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Could not create a new document."
+					});
+				});
+			}
+		});	
+	},
+
+	updateModel: function(evt) {
+		var val = $(evt.currentTarget).val();
+		var name = $(evt.currentTarget).attr("name");
+		this.model.set(name, val);
+		console.log(this.model.toJSON());
+	}
+});
+
+var DocumentRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.docName %></td>"
+		+	"<td><%= model.description %></td>"
+		+	"<td><%= model.link %></td>"
+		+	"<td><%= model.fullmark %></td>"
+		+	"<td><%= model.status %></td>"
+		// +	"<td><span id='<%= model.docid %>' class='edit-doc primary-link'>[ Edit ]</span></td>"
+		+	"<td><span id='<%= model.docid %>' class='delete-doc primary-link'>[ Delete ]</span></td>"),
+
+	initialize: function(options) {
+		this.userid = options.userid;
+		this.render();
+	},
+
+	events: {
+		//"click .edit-doc": "editDocument",
+		"click .delete-doc": "deleteDocument"
+	},
+
+	render: function() {
+		var view = this;
+		var sectionid = this.model.get("sectionid");
+		var userid = this.userid;
+
+		view.$el.html(view.template({
+			model: view.model.toJSON()
+		}));
+	},
+
+	editDocument: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+
+	},
+
+	deleteDocument: function(evt) {
+		var view = this;
+		var id = $(evt.currentTarget).attr("id");
+		$.ajax({
+			type: "DELETE",
+			url: this.model.urlRoot + "/" + id,
+		}).then(function(data) {
+			if (data.status=="success") {
+				new TransactionResponseView({
+					message: "Document successfully deleted."
+				});
+				view.table.fnDestroy();
+				view.render();
+			}
+			else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Could not delete the document."
+				});
+			}			
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "Could not delete the document."
+			});
+		});
+	}
+});
 
 
 
