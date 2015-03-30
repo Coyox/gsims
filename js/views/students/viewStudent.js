@@ -602,10 +602,12 @@ var ReportCardRowView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
-		var id = this.id;
-		this.model.set("id", this.model.get("sectionid"));
+		var sid = this.id;
+		var secid = this.model.get("sectionid");	
+		//this.model.set("id", secid);
+		//Get teacher names
 		this.model.fetch({
-			url: this.model.getSectionTeachersUrl(this.model.get("sectionid"))
+			url: this.model.getSectionTeachersUrl(secid)
 		}).then(function(data) {
 			// Get teacher names
 			var names = "";
@@ -614,20 +616,38 @@ var ReportCardRowView = Backbone.View.extend({
 				names += fullName + ","
 			});
 			names = names.slice(0,-1);
-		
-			// Populate table cells
-			view.$el.html(view.template({
+			// Get grades
+			view.model.fetch({
+				url: view.model.getStudentGradeForSection(secid, sid)
+			}).then(function(data){
+				var grade = data.studentGrade;
+				view.$el.html(view.template({
 				model: view.model.toJSON(),
 				teacher: names,
-				grade: "0"
-			}));
+				grade: grade
+			}))});
+			
+			
+			// Populate table cells
+//			view.$el.html(view.template({
+//				model: view.model.toJSON(),
+//				teacher: names,
+//				//grade: "0"
+			//}));
 		});
-		// Get grades	
-		this.model.fetch({
-			url: this.model.getStudentGradeForSection(this.model.get("sectionid"), id)
+
+		// Get grades
+/*		this.model.fetch({
+			url: this.model.getStudentGradeForSection(secid, sid)
 		}).then(function(data) {
-			console.log("fetched...");
-		});
+			console.log(data);
+			var grade = data.studentGrade;
+
+			view.$el.html(view.template({
+				model: view.model.toJSON(),
+				grade: grade
+			}));
+		});*/
 
 	},
 	
