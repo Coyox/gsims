@@ -593,7 +593,6 @@ var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
 		+	"<td><%= this.teacherNames() %></td>"
-		// +	"<td>[teacher name]</td>" // TODO: get these fields
 		+	"<td>[student's grade]</td>"),
 
 	initialize: function(options) {
@@ -607,19 +606,18 @@ var ReportCardRowView = Backbone.View.extend({
 	},
 	
 	teacherNames: function() {
-		// TODO: stub
 		var id = this.model.get("sectionid");
-		var output = "test";
+		var teacher;
+		var output;
+		//var output = "BUTTS";
 		this.model.fetch({url:this.model.getSectionTeachersUrl(id)}).then(function(data) {
-			console.log(data);
-			// output = data.lastName + ", " + data.firstName;
-			_.each(data, function(object, index) {
-				var teacher = new Teacher(object, {parse:true});
-				console.log(teacher);
-				output += teacher.lastName + ", " + teacher.firstName + "; ";
-			});
+			teacher = data[0];
+			output = "Butt Stallion";
+			if(teacher){
+			output = teacher.lastName + ", " + teacher.firstName;
+			} 
+			console.log("Teacher name: " + output)
 		});
-		// output
 		return output;
 	},
 });
