@@ -65,6 +65,8 @@ var Router = Backbone.Router.extend({
         "admins/all": 			"viewAllAdmins",
         "admins/:id": 			"viewAdmin",
 
+        "superusers/all":       "viewAllSuperusers",
+
         "email" :               "email",
 
         "schoolyears":          "viewSchoolYears",
@@ -343,6 +345,19 @@ var Router = Backbone.Router.extend({
     	}
     },
 
+    viewAllSuperusers: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Superusers", "user");
+
+        var superuserResults = $("#hidden").find("#superusers-table-container");
+        if (superuserResults.length) {
+            superuserResults.detach().appendTo($("#content").empty());
+        } else {
+            new SuperusersTableView({
+                el: $("#content")
+            });
+        }
+    },
     viewSchoolYears: function() {
         this.loadHome();
         this.updatePageBreadcrumb("School Years", "calendar");
