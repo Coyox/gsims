@@ -108,6 +108,7 @@ function loadTemplates() {
 		"settings.html",
 		"import.html",
 		"export.html",
+        "viewpurge.html",
 		"subSection.html",
 		"attendance.html",
 		"manageCourses.html",
