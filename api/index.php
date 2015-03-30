@@ -113,7 +113,7 @@ $app->get('/search/sections', 'findSections');
 $app->get('/search/advanced', 'findStudentsWithAdvancedCriteria');
 
 $app->get('/login', 'validateCredentials');
-$app->put('/login/:id', 'updateLogin');
+$app->post('/login/:id', 'updateLogin');
 $app->get('/login/:id', 'getLoginById');
 
 $app->get('/users/:id/:usertype', 'getUserById');
