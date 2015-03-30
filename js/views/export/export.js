@@ -5,6 +5,7 @@ var ExportView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["export.html"]);
+		this.loadOptions();
 	},
 
 	events: {
@@ -13,8 +14,24 @@ var ExportView = Backbone.View.extend({
 		"click #exportAdmins": "exportAdmins",
 		"click #exportSections": "exportSections",
 	},
+
+	loadOptions: function(){
+		var x = document.getElementById("schoolid");
+		var school = new School();
+		school.fetch({
+			url: school.getSchoolsUrl(),
+		}).then(function(data){
+			console.log(data);
+			_.each(data, function(object,index){
+				var option = document.createElement("option");
+				option.text = object.schoolid;
+				x.add(option);
+			});
+		});
+	},
+
 	exportSections: function(){
-		var schoolid = 412312; // TODO choose schoolid
+		var schoolid = this.$el.find("#schoolid").val();
 		var dataRows = [["sectionid", "courseid", "courseName", "sectionCode", "day", "startTime", "endTime", "roomCapacity", "roomLocation", "classSize", "status"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -46,7 +63,7 @@ var ExportView = Backbone.View.extend({
 		});
 	},
 	exportAdmins: function(){
-		var schoolid = 412312; // TODO choose schoolid
+		var schoolid = this.$el.find("#schoolid").val();
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -71,7 +88,7 @@ var ExportView = Backbone.View.extend({
 		});
 	},
 	exportTeachers: function(){
-		var schoolid = 412312; // TODO choose schoolid
+		var schoolid = this.$el.find("#schoolid").val();
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -97,7 +114,7 @@ var ExportView = Backbone.View.extend({
 	},
 
 	exportStudents: function(){
-		var schoolid = 412312; // TODO choose schoolid
+		var schoolid = this.$el.find("#schoolid").val();
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
 		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
 		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",

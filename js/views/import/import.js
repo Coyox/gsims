@@ -17,18 +17,16 @@ var ImportView = Backbone.View.extend({
 	loadOptions: function(){
 		var tid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid
 		var x = document.getElementById("section");
-		var option = document.createElement("option");
 		var teacher = new Teacher();
 		teacher.fetch({
-			url: teacher.getTeachingSectionsUrl(id),
+			url: teacher.getTeachingSectionsUrl(tid),
 		}).then(function(data){
-			console.log(data);
 			_.each(data, function(object,index){
+				var option = document.createElement("option");
 				option.text = object.sectionid;
 				x.add(option);
 			});
 		});
-
 	},
 
 	constructCSV: function(){

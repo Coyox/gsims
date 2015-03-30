@@ -20,6 +20,10 @@ var School = Backbone.Model.extend({
 
     urlRoot: app.serverUrl + "api/schools",
 
+    getSchoolsUrl: function(){
+    	return this.urlRoot;
+    },
+
     getDepartmentsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/departments";
     },
