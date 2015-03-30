@@ -434,7 +434,7 @@ var Router = Backbone.Router.extend({
 
     purgeData: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Purge Data", "purge");
+        this.updatePageBreadcrumb("Purge Data", "trash");
 
         new PurgeView({
             el: $("#content")

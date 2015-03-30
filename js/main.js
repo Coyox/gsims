@@ -114,7 +114,8 @@ function loadTemplates() {
 		"manageCourses.html",
 		"viewCourse.html",
 		"viewSection.html",
-		"addStudentToSection.html"
+		"addStudentToSection.html",
+		"viewPurge.html"
 	];
 
 	$.each(templates, function(i, name) {
