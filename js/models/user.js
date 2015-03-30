@@ -197,6 +197,7 @@ var Teacher = Backbone.Model.extend({
    	],
 
     urlRoot: app.serverUrl + "api/teachers",
+    admin_urlRoot: app.serverUrl + "api/administrators",
 
    	getSearchTeachersUrl: function(usertype) {
    		usertype = usertype || "T";
@@ -214,7 +215,6 @@ var Teacher = Backbone.Model.extend({
    	addCourseCompetencyUrl: function(id) {
    		return this.urlRoot + "/" + id;
    	},
-
    	teacherStatuses:[
    		"active",
    		"inactive"
