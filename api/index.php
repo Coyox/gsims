@@ -609,11 +609,15 @@ function getSectionById($id){
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
 /* Get number of students enrolled for a section */
-function getStudentCount($id){
-    $sql = "SELECT *
-            FROM (SELECT count(userid) from enrollment group by sectionid) s
+function getStudentCount($id, $flag=0){
+    $sql = "SELECT studentCount
+            FROM (SELECT sectionid, count(userid) as studentCount from enrollment group by sectionid) s
             where s.sectionid = :id";
-    echo json_encode(perform_query($sql, 'GET', array("id"=>$id)));
+    $count = perform_query($sql, 'GETCOL', array("id"=>$id));
+    if ($flag == 1) {
+        return $count;
+    }
+    echo json_encode($count);
 }
 function getStudentsEnrolled($id){
     $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
@@ -729,8 +733,7 @@ function inputAttendance($id){
 
 function getAvgAttendance($id){
     $bindparams = array("id"=>$id);
-    $sql = "SELECT classSize from section where sectionid=:id";
-    $classSize = (int) perform_query($sql, 'GETCOL', $bindparams);
+    $classSize = (int) getStudentCount($id, 1);
 
     $sql = "SELECT count(distinct `date`) from attendance where sectionid=:id";
     $numberofdays = (int) perform_query($sql, 'GETCOL', $bindparams);
@@ -746,7 +749,6 @@ function getAvgAttendance($id){
         foreach ($results as $row){
             $totalpresent += (int) $row['present'];
         }
-
         $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
         echo json_encode(array("avgAttendance"=>$avgAttendance."%"));
     }
