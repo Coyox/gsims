@@ -1274,9 +1274,9 @@ var AttendanceView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.find("table tbody").empty();
-		// $("#date").datepicker({
-		// 	dateFormat: "yy-mm-dd"
-		// });
+		$("#date").datepicker({
+			dateFormat: "yy-mm-dd"
+		});
 
 		var view = this;
 		var section = new Section();
