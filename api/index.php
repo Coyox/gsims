@@ -2055,7 +2055,7 @@ function purgeSchoolYears($ids=array()){
 }
 function purgeDepartments($ids=array()){
     if (!array_filter($ids)){
-        $ids = json_decode($_POST['docids']);
+        $ids = json_decode($_POST['deptids']);
     }
     $sql = "DELETE from department where deptid in ";
     return purge($ids, $sql);

@@ -31,13 +31,13 @@ var ExportView = Backbone.View.extend({
 				dataRows.push(section);
 			});
 			dataRows.forEach(function(lineArray, index){
-   				var temp = lineArray[4];
-   				lineArray[4] = "TEMP";
-   				temp = temp.replace(/,/g , "-");
+				var temp = lineArray[4];
+   				lineArray[4] = "TEMP"; // course days
+   				temp = temp.replace(/,/g , " ");
    				lineArray = lineArray.join(",");
    				lineArray = lineArray.replace("TEMP", temp);
-				csvContent += index < dataRows.length ? lineArray+ "\n" : lineArray;
-			});
+   				csvContent += index < dataRows.length ? lineArray+ "\n" : lineArray;
+   			});
 			var encodedUri = encodeURI(csvContent);
 			var link = document.createElement("a");
 			link.setAttribute("href", encodedUri);
@@ -99,9 +99,9 @@ var ExportView = Backbone.View.extend({
 	exportStudents: function(){
 		var schoolid = 412312; // TODO choose schoolid
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
-    "province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
-    "parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",
-    "emergencyContactPhoneNumber", "schoolid", "paid", "status"]];
+		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
+		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",
+		"emergencyContactPhoneNumber", "schoolid", "paid", "status"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
 		var school = new School();
@@ -109,12 +109,8 @@ var ExportView = Backbone.View.extend({
 			url: school.getStudentsUrl(schoolid),
 		}).then(function(data) {
 			_.each(data, function(object, index) {
-				// var model = new Student(object, {parse:true});
-				// console.log(model);
 				var student = $.map(object, function(element) { return element; });
-				// console.log(student);
 				dataRows.push(student);
-				//var student = ["","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
 			});
 			dataRows.forEach(function(lineArray, index){
 				console.log(lineArray);
