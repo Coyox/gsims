@@ -1171,7 +1171,7 @@ function massCreateStudents($students) {
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
-        $resp["userid"] = $userids;
+        $resp["userids"] = json_encode($userids);
         $transaction_result = $resp + $transaction_result;
         foreach ($emailparams as $student) {
             if ($student->status != "pending"){
@@ -1403,7 +1403,7 @@ function massCreateTeachers($teachers, $usertype) {
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
-        $resp["userid"] = $userids;
+        $resp["userids"] = json_encode($userids);
         $transaction_result = $resp + $transaction_result;
         massEmailLogin($emailparams);
     }
