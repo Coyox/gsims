@@ -150,6 +150,10 @@ var Student = Backbone.Model.extend({
    		return this.urlRoot + "/" + id + "/prevSections";
    	},
 
+   	getAttendanceUrl: function(id) {
+   		return this.urlRoot + "/" + id + "/attendance";
+   	},
+
    	studentStatuses: [
    		"active",
    		"inactive",
