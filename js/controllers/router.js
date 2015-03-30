@@ -421,7 +421,7 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("Export Data", "export");
 
-        new ImportView({
+        new ExportView({
             el: $("#content")
         });
     }

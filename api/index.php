@@ -55,6 +55,8 @@ $app->delete('/schoolyears/:id', 'deleteSchoolYear');
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
 $app->get('/schools/:id/students', 'getStudentsBySchool');
+$app->get('/schools/:id/teachers', 'getTeachersBySchool');
+$app->get('/schools/:id/administrators', 'getAdministratorsBySchool');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
@@ -336,6 +338,14 @@ function getStudentsBySchool($id){
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
     emergencyContactPhoneNumber, schoolid, paid, status
     from student where schoolid=:schoolid";
+    echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
+}
+function getTeachersBySchool($id){
+    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' and schoolid=:schoolid" ;
+    echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
+}
+function getAdministratorsBySchool($id){
+    $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and schoolid=:schoolid" ;
     echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
 }
 function createSchool(){

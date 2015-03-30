@@ -25,7 +25,13 @@ var School = Backbone.Model.extend({
     },
     getStudentsUrl: function(id){
     	return this.urlRoot + "/" + id + "/students"
-    }
+    },
+    getTeachersUrl: function(id){
+    	return this.urlRoot + "/" + id + "/teachers"
+    },
+    getAdminsUrl: function(id){
+    	return this.urlRoot + "/" + id + "/administrators"
+    },
 });
 
 var SchoolYear = Backbone.Model.extend({
