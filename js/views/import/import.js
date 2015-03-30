@@ -237,71 +237,94 @@ var ImportView = Backbone.View.extend({
 
 
 					}
-					// ATTENDANCE // check if students are enrolled,
+					// ATTENDANCE
 					else {
 
-						var attendancedate = results.data[1][0];
-						var teacherid = results.data[1][1];
-						var sectionid = results.data[1][2];
 						var studentids = [];
 
-						for (i = 3; i < results.data.length; i++) {
-							if (results.data[i][3] && results.data[i][3].indexOf("P") > -1){
-								studentids.push(results.data[i][0]);
-							}
-						}
-						//TODO validation
+							var attendancedate = results.data[0].date;
+							var teacherid =  results.data[0].teacherid;
+							var sectionid =  results.data[0].sectionid;
 
+						$.each(results.data, function(i, row) {
+							if (i==0 || i==1) {	return true; }
+							if (row.studentid && row.present == "P"){
+								studentids.push(row.studentid);
+								console.log(row.studentid);
+							}
+						});
 						var section = new Section();
+						console.log(sectionid);
+						console.log(section.getStudentsEnrolled(sectionid));
 						$.ajax({
-							type: "POST",
-							url: section.inputAttendance(sectionid),
-							data: {
-								date: attendancedate,
-								schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-								userids: JSON.stringify(studentids)
-							}
+							type: "GET",
+							url: section.getStudentsEnrolled(sectionid)
 						}).then(function(data) {
-							try {
-								if (typeof data == "string") {
-									data = JSON.parse(data);
+							var ids = [];
+							_.each(data, function(row, index) {
+								ids.push(row.userid);
+							});
+							_.each(studentids, function(student, index){
+								//if inputted student id is not enrolled in the section
+								if (ids.indexOf(student) == -1) {
+									studentids.splice(index, 1);
 								}
+							});
 
-								if (data.status == "success"){
-									new TransactionResponseView({
-										title: "SUCCESS",
-										message: "Template CSV successfully imported!",
-									});
+							studentids.push(teacherid);
+							$.ajax({
+								type: "POST",
+								url: section.inputAttendance(sectionid),
+								data: {
+									date: attendancedate,
+									schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+									userids: JSON.stringify(studentids)
 								}
-								else {
+							}).then(function(data) {
+								try {
+									if (typeof data == "string") {
+										data = JSON.parse(data);
+									}
+
+									if (data.status == "success"){
+										new TransactionResponseView({
+											title: "SUCCESS",
+											message: "Template CSV successfully imported!",
+										});
+									}
+									else {
+										new TransactionResponseView({
+											title: "ERROR",
+											status: "Error",
+											message: "Sorry, we could not import your CSV. Please make sure the CSV matches the template's format."
+										});
+									}
+								}
+								catch(err){
+									console.log(err);
 									new TransactionResponseView({
 										title: "ERROR",
 										status: "Error",
-										message: "Sorry, we could not import your CSV. Please make sure the CSV matches the template's format."
+										message: "Sorry, we could not import your CSV. Please make sure you are not importing more than once for the same file."
 									});
 								}
-							}
-							catch(err){
-								console.log(err);
+							}).fail(function(jqxhr){
 								new TransactionResponseView({
 									title: "ERROR",
 									status: "Error",
-									message: "Sorry, we could not import your CSV. Please make sure you are not importing more than once for the same file."
+									message: "Sorry, we could not import your CSV. Please make sure that the CSV matches the template's format"
 								});
-							}
-						}).fail(function(jqxhr){
-							new TransactionResponseView({
-								title: "ERROR",
-								status: "Error",
-								message: "Sorry, we could not import your CSV. Please make sure that the CSV matches the template's format"
 							});
+
 						});
+
 					}
 				}
 			});
-} catch(err){
-	this.$el.find("#not-found").removeClass("hide").show();
-}
-},
+		}
+		catch(err){
+			this.$el.find("#not-found").removeClass("hide").show();
+		}
+	},
 });
 
