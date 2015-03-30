@@ -1,5 +1,7 @@
 var SearchTeachersView = Backbone.View.extend({
 	initialize: function(options) {
+		this.redirect = options.redirect;
+		this.sectionid = options.sectionid;
 		this.render();
 	},
 
@@ -44,11 +46,19 @@ var SearchTeachersView = Backbone.View.extend({
 	},
 
 	changeRoute: function(data) {
-		app.Router.navigate("teachers/search");
-		var view = new TeachersTableView({
-			el: $("#content"),
-			results: data
-		});
+		if (this.redirect == false) {
+			var view = new AddTeacherTableView({
+				el: this.$el,
+				results: data,
+				sectionid: this.sectionid
+			});
+		} else {
+			app.Router.navigate("teachers/search");
+			var view = new TeachersTableView({
+				el: $("#content"),
+				results: data
+			});
+		}
 	},
 
 	clearFields: function() {
@@ -56,6 +66,90 @@ var SearchTeachersView = Backbone.View.extend({
 		parent.find("input[type='text']").val("");
 	}
 });
+
+var AddTeacherTableView = Backbone.View.extend({
+	initialize: function(options) {
+		this.template = options.template;
+		this.results = options.results;
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(html["viewTeachers.html"]);
+		this.populateQueryResults(this.results);
+	},
+
+	populateQueryResults: function(data) {
+		_.each(data, function(object, index) {
+			var model = new Teacher(object, {parse:true});
+			new AddTeacherTableRowView({
+				model: model,
+				el: this.addRow(".results", model.get("emailAddr")),
+				sectionid: this.sectionid
+			});
+		}, this);
+		this.table = this.$el.find("table").dataTable({
+	      	aoColumnDefs: [
+	          	{ bSortable: false, aTargets: [ 4, 5 ] },
+	          	{ sClass: "center", aTargets: [ 4, 5 ] },
+	          	{ sWidth: "10%", aTargets: [ 5 ] }
+	       	]
+		});
+	},
+
+	addRow: function(selector, email) {
+        var container = $("<tr></tr>");
+        container.data("email", email);
+        this.$el.find(selector).first().append(container);
+        return container;
+	},
+});
+
+var AddTeacherTableRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.userid %></td>"
+		+	"<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= model.emailAddr %></td>"
+		+   "<td><span class='add-teacher primary-link center-block' id='<%= model.userid %>'>[ Add Teacher ]</span></td>"
+		+	"<td></td>"),
+
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	events: {
+		"click .add-teacher": "addTeacher"
+	},
+
+	addTeacher: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		var section = new Section();
+		$.ajax({
+			type: "POST",
+			url: section.assignSectionTeacher(this.sectionid, id)
+		}).then(function(data) {
+			console.log(data);
+			new TransactionResponseView({
+				message: "This teacher has been added to this section."
+			});
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "This teacher could not be added to this section. Please try again."
+			});
+		})
+	}
+});
+
 
 var TeachersTableView = Backbone.View.extend({
 	initialize: function(options) {

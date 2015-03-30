@@ -163,6 +163,10 @@ var Section = Backbone.Model.extend({
 	
 	getStudentGradeForSection: function(sectionid, studentid) {
 		return this.urlRoot + "/" + sectionid + "/students/" + studentid;
+	},
+
+	assignSectionTeacher: function(sectionid, teacherid) {
+		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid
 	}
 });
 
@@ -236,5 +240,34 @@ var Purge = Backbone.Model.extend({
 	// $app->post('/purge/section', 'purgeSections');
 	// $app->post('/purge/document', 'purgeDocuments');
 	// $app->delete('/purge/inactive', 'purgeInactive');
+
+});
+
+var Document = Backbone.Model.extend({
+	defaults: {
+		docid: "",
+		docName: "",
+		description: "",
+		link: "",
+		sectionid: "",
+		userid: "",
+		fullmark: "",
+		schoolyearid: "",
+		status: ""
+	},
+
+    validation: {
+		docName: {
+			required: true,
+		},
+		description: {
+			required: true,
+		},
+		link: {
+			required: true,
+		}
+	},	
+
+	urlRoot: app.serverUrl + "api/documents"
 
 });

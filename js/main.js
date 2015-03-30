@@ -120,7 +120,9 @@ function loadTemplates() {
 		"viewCourse.html",
 		"viewSection.html",
 		"addStudentToSection.html",
-		"viewPurge.html"
+		"viewPurge.html",
+		"createDocument.html",
+		"addTeacherToSection.html"
 	];
 
 	$.each(templates, function(i, name) {

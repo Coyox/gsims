@@ -133,6 +133,9 @@ var Student = Backbone.Model.extend({
    	getSearchStudentsUrl: function() {
    		return app.serverUrl + "api/search/users/S";
    	},
+   	getAdvancedSearchUrl: function() {
+   		return app.serverUrl + "api/search/advanced";
+   	},
 
    	getPendingTestsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/tests";

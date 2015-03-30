@@ -1,13 +1,16 @@
 var SchoolView = Backbone.View.extend({
     initialize: function (options) {
+
         this.model = new School();
         this.render();
     },
      
     render: function () {
-        
+        var usertype = sessionStorage.getItem("gobind-usertype");
 		this.$el.html(html["viewSchools.html"]);
-
+        if(usertype == "SU"){
+            $("#purge-schools").removeClass("hide");
+        }
         var view = this;
         var school = new School();
         school.fetch().then(function (data) {

@@ -27,12 +27,12 @@ var SearchStudentsView = Backbone.View.extend({
 	searchStudents: function(evt) {
 		var view = this;
 		var data = {};
-		
+
 		var firstName = this.$el.find("#first-name").val();
 		if (firstName != "") {
 			data.firstName = firstName;
 		}
-		
+
 		var lastName = this.$el.find("#last-name").val();
 		if (lastName != "") {
 			data.lastName = lastName;
@@ -60,7 +60,7 @@ var SearchStudentsView = Backbone.View.extend({
 
 			if (value == "between") {
 				data.lowerYear = this.$el.find(".lower").val();
-				data.upperYear = this.$el.find(".upper").val(); 
+				data.upperYear = this.$el.find(".upper").val();
 			} else {
 				data.year = this.$el.find("#year-option option:selected").val();
 			}
@@ -69,6 +69,45 @@ var SearchStudentsView = Backbone.View.extend({
 		var city = this.$el.find("#city").val();
 		if (city != "") {
 			data.city = city;
+		}
+
+		var model = new Student();
+		model.fetch({
+			url: model.getAdvancedSearchUrl(),
+			data: data
+		}).then(function(data) {
+			view.changeRoute(data);
+		});
+	},
+
+	searchStudents: function(evt) {
+		var view = this;
+		var data = {};
+
+		var firstName = this.$el.find("#lower-grade").val();
+		if (firstName != "") {
+			var upperGrade = this.$el.find("#upper-grade").val();
+			if (upperGrade != "") {
+				data.upperGrade = upperGrade;
+				data.lowerGrade = lowerGrade;
+			}
+		}
+		var upperGrade = this.$el.find("#upper-grade").val();
+		if (upperGrade != "") {
+			data.upperGrade = upperGrade;
+		}
+		var numAssignment = this.$el.find("#num-assignment").val();
+		if (numAssignment != "") {
+			data.numAssignment = numAssignment;
+		}
+		var numFailedSections = this.$el.find("#num-failed-sections").val();
+		if (numFailedSections != "") {
+			data.numFailedSections = numFailedSections;
+		}
+
+		var status = this.$el.find("#status-options option:selected");
+		if (!status.is(":disabled")) {
+			data.status = status.val();
 		}
 
 		var model = new Student();
@@ -226,7 +265,7 @@ var StudentsTableView = Backbone.View.extend({
 
 		if (this.template) {
 			this.$el.html(html[this.template]);
-		} else { 
+		} else {
 			this.$el.html(html["viewStudents.html"]);
 		}
 
@@ -286,7 +325,7 @@ var StudentsTableView = Backbone.View.extend({
 
 	refreshTable: function(evt) {
 		evt.stopImmediatePropagation();
-	
+
 		this.table.fnDestroy();
 		this.render();
 	},

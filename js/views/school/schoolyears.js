@@ -7,8 +7,11 @@ var SchoolYearView = Backbone.View.extend({
 
 	render: function() {
 		this.list = [];
+        var usertype = sessionStorage.getItem("gobind-usertype");
 		this.$el.html(html["viewSchoolYear.html"]);
-
+        if(usertype == "SU"){
+            $("#purge-year").removeClass("hide");
+        }
 		if (this.action == "view") {
 			this.$el.find("#edit-year").removeClass("hide").show();
 		} else {
