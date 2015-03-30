@@ -870,7 +870,7 @@ function createDocument(){
     $sql = "SELECT docid from document where docid=:docid";
     $docid = generateUniqueID($sql, "docid");
 
-    $sql = "INSERT into section (docid, docName, description, link, sectionid, userid, fullmark, schoolyearid, status)
+    $sql = "INSERT into document (docid, docName, description, link, sectionid, userid, fullmark, schoolyearid, status)
             values (:docid, :docName, :description, :link, :sectionid, :userid, fullmark, :schoolyearid, :status)";
 
     $bindparams = array(
