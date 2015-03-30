@@ -634,34 +634,38 @@ var ReportCardRowView = Backbone.View.extend({
 	
 });
 
-// var ReportCardTeacherView = Backbone.View.extend({
-	// template: _.template("<td><%= model.courseName %></td>"
-		// +	"<td><%= model.sectionCode %></td>"
-		// +	"<td><%= model.sectionCode %></td>"
-		// +	"<td>[teacher name]</td>" // TODO: get these fields
-		// +	"<td>[student's grade]</td>"),
-
-	// initialize: function(options) {
-		// this.render();
-	// },
-
-	// render: function() {
-		// this.$el.html(this.template({
-			// model: this.model.toJSON()
-		// }));
-	// },
-// });
-
 function dlReportCardPDF() {
-	// TODO: stub
-	window.alert("Download Report Card as PDF - clicked"); // for testing only
+
+	var output = "";
+	var i;
+	var j;
+	for (i = 0; i < document.getElementById("report-card-table").rows.length; i++) {
+		for (j = 0; j < document.getElementById("report-card-table").rows[i].cells.length; j++) {
+			output += getCellContent('report-card-table', i, j) + ",";
+			// output += document.getElementById("report-card-table").rows[i].cells[j].innerHTML + ",";
+		}
+		output += "\n";
+	}
+		//var table = this.$el.find("#report-card-table");
+		//console.log(table);
+
+        var doc = new jsPDF();
+        doc.setFontSize(22)
+        doc.text(35, 25, "Gobind Sarvar Report Card");
+		doc.setFontSize(14)
+		doc.fromHTML(
+			document.getElementById("report-card-table"),
+				5.5,
+				5.5,
+				{
+					'width': 500,
+					'elementHandlers' : "specialElementHandlers"
+		});
+
+        doc.save("Reportcard.pdf");
 }
 
 function dlReportCardCSV() {
-	// TODO: stub
-	// window.alert("Download Report Card as CSV - clicked"); // for testing only
-	var dataRows = [["courseName", "sectionCode", "teacherName", "grade"]];
-
 	var csvContent = "data:text/csv;charset=utf-8,";
 	
 	var output = "";
