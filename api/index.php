@@ -1171,7 +1171,7 @@ function massCreateStudents($students) {
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
-        $resp["userid"] = $userid;
+        $resp["userid"] = $userids;
         $transaction_result = $resp + $transaction_result;
         foreach ($emailparams as $student) {
             if ($student->status != "pending"){
@@ -1403,7 +1403,7 @@ function massCreateTeachers($teachers, $usertype) {
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
-        $resp["userid"] = $userid;
+        $resp["userid"] = $userids;
         $transaction_result = $resp + $transaction_result;
         massEmailLogin($emailparams);
     }
@@ -1742,7 +1742,7 @@ function massCreateLogins($users, $usertype){
     $sql = "INSERT into login (userid, username, password, usertype) values ";
 
     foreach (array_values($users) as $i => $user) {
-        list($userid, $username, $password) = generateLogin($user->firstname, $user->lastname);
+        list($userid, $username, $password) = generateLogin($user->firstName, $user->lastName);
         $passwordhash = generatePasswordHash($password);
 
         $sql.= "(:userid".$i.", :username".$i.", :password".$i.", :usertype".$i."),";
@@ -1752,6 +1752,7 @@ function massCreateLogins($users, $usertype){
         $loginbindparams["usertype".$i] = $usertype;
         $userids[$i] = $userid;
         $emailparams[$i] = array("emailAddr"=>$user->emailAddr, "username"=>$username, "password"=>$password, "firstName"=>$user->firstName, "lastName"=>$user->lastName);
+        array_push($userids, $userid);
     }
     $sql = rtrim($sql, ",");
     return array($userids, $emailparams, $sql, $loginbindparams);
