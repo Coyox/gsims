@@ -28,13 +28,15 @@ var ExportView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var model = new Section(object, {parse:true});
 				var section = [model.get("sectionid"), model.get("courseid"), model.get("courseName"), model.get("sectionCode"), model.get("day"), model.get("startTime"), model.get("endTime"), model.get("roomCapacity"), model.get("roomLocation"), model.get("classSize"), model.get("status")];
-				//var section = $.map(object, function(element) { return element; });
 				dataRows.push(section);
 			});
 			dataRows.forEach(function(lineArray, index){
-				console.log(lineArray);
-				dataString = lineArray.join(", ");
-				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
+   				var temp = lineArray[4];
+   				lineArray[4] = "TEMP";
+   				temp = temp.replace(/,/g , "-");
+   				lineArray = lineArray.join(",");
+   				lineArray = lineArray.replace("TEMP", temp);
+				csvContent += index < dataRows.length ? lineArray+ "\n" : lineArray;
 			});
 			var encodedUri = encodeURI(csvContent);
 			var link = document.createElement("a");
