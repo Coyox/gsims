@@ -78,7 +78,7 @@ var Router = Backbone.Router.extend({
         "settings":             "settings",
 
         "import":               "importData",
-        "export":               "exportData"
+        "export":               "exportData",
 
         "viewCourse/:id":       "viewCourse",
 

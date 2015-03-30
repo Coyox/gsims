@@ -1034,12 +1034,9 @@ var AttendanceView = Backbone.View.extend({
 			type: "POST",
 			url: section.inputAttendance(this.sectionid),
 			data: {
-				
-			}
-		})
 
-    inputAttendance: function(sectionid){
-    	return this.urlRoot + "/" + sectionid + "/attendance";
+			}
+		});
 	}
 });
 
