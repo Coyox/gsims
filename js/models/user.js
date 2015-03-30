@@ -16,7 +16,7 @@ var Student = Backbone.Model.extend({
 		emailAddr: "",
 		gender: "",
 		allergies: "",
-		prevAttendedGS: "",
+		prevSchools: "",
 		parentFirstName: "",
 		parentLastName: "",
 		parentPhoneNumber: "",
