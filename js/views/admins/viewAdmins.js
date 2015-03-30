@@ -26,12 +26,12 @@ var SearchAdminsView = Backbone.View.extend({
 	searchAdmins: function(evt) {
 		var view = this;
 		var data = {};
-		
+
 		var firstName = this.$el.find("#first-name").val();
 		if (firstName != "") {
 			data.firstName = firstName;
 		}
-		
+
 		var lastName = this.$el.find("#last-name").val();
 		if (lastName != "") {
 			data.lastName = lastName;

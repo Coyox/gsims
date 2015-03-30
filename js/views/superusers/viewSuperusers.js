@@ -124,7 +124,7 @@ var SuperuserTableRowView = Backbone.View.extend({
 		"click .view-superuser": "viewSuperuser",
 	},
 
-	viewAdmin: function(evt) {
+	viewSuperuser: function(evt) {
 		storeContent();
 
 		var id = $(evt.currentTarget).attr("id");

@@ -64,9 +64,11 @@ var Router = Backbone.Router.extend({
         "admins/search": 		"viewFilteredAdmins",
         "admins/all": 			"viewAllAdmins",
         "admins/:id": 			"viewAdmin",
+        "createAdmin":          "createAdmin",
 
         "superusers/all":       "viewAllSuperusers",
-
+        "superusers/:id":       "viewSuperuser",
+        "createSuperuser":      "createSuperuser",
         "email" :               "email",
 
         "schoolyears":          "viewSchoolYears",
@@ -345,6 +347,26 @@ var Router = Backbone.Router.extend({
     	}
     },
 
+    viewAdmin: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("View Admin", "user");
+
+        new AdminRecordView({
+            id: id,
+            el: $("#content"),
+            action: "view",
+        });
+    },
+
+    createAdmin: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Create Admin", "user");
+
+        new CreateAdminView({
+            el: $("#content").html("")
+        });
+    },
+
     viewAllSuperusers: function() {
         this.loadHome();
         this.updatePageBreadcrumb("Superusers", "user");
@@ -357,6 +379,25 @@ var Router = Backbone.Router.extend({
                 el: $("#content")
             });
         }
+    },
+    viewSuperuser: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("View Superuser", "user");
+
+        new SuperuserRecordView({
+            id: id,
+            el: $("#content"),
+            action: "view",
+        });
+    },
+
+    createSuperuser: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Create Superuser", "user");
+
+        new CreateSuperuserView({
+            el: $("#content").html("")
+        });
     },
     viewSchoolYears: function() {
         this.loadHome();
