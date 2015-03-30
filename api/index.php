@@ -895,7 +895,7 @@ function createDocument(){
         "docid" => $docid,
         "docName" => $doc->docName,
         "description" => $doc->description,
-        "link" => $docdoc->link,
+        "link" => $doc->link,
         "sectionid" => $doc->sectionid,
         "userid" => $doc->userid,
         "fullmark" => $doc->fullmark,
