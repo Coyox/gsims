@@ -799,7 +799,7 @@ function getStudentGradeForSection($id, $userid){
 }
 /*wrapper for getStudentGradeForSection*/
 function getStudentSectionGrade($sectionid, $userid){
-    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectiond and fullmark is not null";
+    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectionid and fullmark is not null";
     $bindparams = array("sectionid"=>$sectionid);
     $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
 
