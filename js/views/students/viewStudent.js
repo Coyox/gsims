@@ -600,11 +600,14 @@ var ReportCardRowView = Backbone.View.extend({
 		this.render();
 	},
 
+	//events: {
+	//	"click #dl-report-card-csv": "dlReport",
+	//},
+
 	render: function() {
 		var view = this;
 		var sid = this.id;
 		var secid = this.model.get("sectionid");	
-		//this.model.set("id", secid);
 		//Get teacher names
 		this.model.fetch({
 			url: this.model.getSectionTeachersUrl(secid)
@@ -626,29 +629,7 @@ var ReportCardRowView = Backbone.View.extend({
 				teacher: names,
 				grade: grade
 			}))});
-			
-			
-			// Populate table cells
-//			view.$el.html(view.template({
-//				model: view.model.toJSON(),
-//				teacher: names,
-//				//grade: "0"
-			//}));
 		});
-
-		// Get grades
-/*		this.model.fetch({
-			url: this.model.getStudentGradeForSection(secid, sid)
-		}).then(function(data) {
-			console.log(data);
-			var grade = data.studentGrade;
-
-			view.$el.html(view.template({
-				model: view.model.toJSON(),
-				grade: grade
-			}));
-		});*/
-
 	},
 	
 });
@@ -679,6 +660,9 @@ function dlReportCardPDF() {
 function dlReportCardCSV() {
 	// TODO: stub
 	// window.alert("Download Report Card as CSV - clicked"); // for testing only
+	var dataRows = [["courseName", "sectionCode", "teacherName", "grade"]];
+
+	var csvContent = "data:text/csv;charset=utf-8,";
 	
 	var output = "";
 	var i;
@@ -690,8 +674,13 @@ function dlReportCardCSV() {
 		}
 		output += "\n";
 	}
-	
-	window.alert("output: " + output); // for testing only
+	console.log(output);
+	var encodedUri = encodeURI(output);
+	var link = document.createElement("a");
+	link.setAttribute("href", "data:text/csv;charset=utf-8," + encodedUri);
+	link.setAttribute("download", "Reportcard.csv");
+	link.click();
+
 }
 
 // Helper function
