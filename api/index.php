@@ -1333,7 +1333,13 @@ function getAvgGrade($id, $flag=0){
         }
     }
     foreach ($sections as $row){
-        $totalgrade += getStudentSectionGrade($row['sectionid'], $id);
+        $sectiongrade = getStudentSectionGrade($row['sectionid'], $id);
+        if ($sectiongrade == -1){
+            $numsections -= 1;
+        }
+        else {
+            $totalgrade += $sectiongrade;
+        }
     }
     $grade = ($totalgrade/$numsections)*100;
 
@@ -1931,6 +1937,7 @@ function findStudentsWithAdvancedCriteria(){
         $sql = "SELECT sectionid, count(docid) as numberOfAssignments
                 from document where fullmark is not null group by sectionid";
         $sectionAsmtCount = perform_query($sql, 'GETASSO');
+        print_r($sectionAsmtCount);
 
         $sql = "SELECT m.userid as studentid, sectionid, count(sectionid) as numberOfAssignmentsDone
              from marks m, document d
@@ -1943,7 +1950,10 @@ function findStudentsWithAdvancedCriteria(){
             if ($numsections == 0){ continue; }
             foreach ($sections as $section){
                 $sectionid = $section['sectionid'];
-                if (!array_key_exists($sectionid,$sectionAsmtCount)){ continue; }
+                if (!array_key_exists($sectionid,$sectionAsmtCount)){
+                    echo json_encode(array("sectionid"=>$sectionid));
+                    continue;
+                }
                 else {
                     $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
                     $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
@@ -1979,7 +1989,7 @@ function findStudentsWithAdvancedCriteria(){
     $qualifiedstudents = array_values(array_unique($qualifiedstudents));
     list($sqlparens, $bindparams) = parenthesisList($qualifiedstudents);
     if ($sqlparens = "()"){
-        echo json_encode(array());
+        echo json_encode($bindparams);
     }
     else {
         $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
