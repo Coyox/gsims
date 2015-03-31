@@ -1917,12 +1917,12 @@ function findStudentsWithAdvancedCriteria(){
     if (isset($lowergrade) && isset($uppergrade)){
         foreach ($students as $row){
             $studentid = $row['userid'];
-            echo json_encode(array("userid"=>$studentid));
             $avgGrade = getAvgGrade($studentid, 1);
             if ($avgGrade == -1){ continue; }
             if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
                 array_push($qualifiedstudents, $studentid);
             }
+            echo json_encode(array("userid"=>$studentid, "averageGrade"=>$avgGrade, "upperGrade"=>$uppergrade, "lowerGrade"=>$lowergrade));
         }
     }
 
@@ -1936,7 +1936,6 @@ function findStudentsWithAdvancedCriteria(){
              from marks m, document d
              where m.docid = d.docid group by sectionid";
         $studentAsmtCount = perform_query($sql, 'GETASSO');
-
         foreach ($students as $student){
             $studentid = $student['userid'];
             $sections = getEnrolledSections($studentid, 1);
@@ -1951,6 +1950,7 @@ function findStudentsWithAdvancedCriteria(){
                     if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
                         array_push($qualifiedstudents, $studentid);
                     }
+                    echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid, "numAssignmentsDone"=>$numAssignmentsDone, "numAssignments"=>$numAssignments));
                 }
             }
         }
@@ -1965,8 +1965,10 @@ function findStudentsWithAdvancedCriteria(){
             if ($numsections == 0){ continue; }
             foreach ($sections as $section){
                 $sectionid = $section['sectionid'];
+                echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid));
                 if (getStudentSectionGrade($sectionid, $userid) < 50) {
                     $failed++;
+                    echo json_encode(array("failedCourse"=>"yes","studentid"=>$studentid, "sectionid"=>$sectionid));
                 }
             }
             if ($failed >= (int) $failcount) {
