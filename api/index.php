@@ -1341,7 +1341,7 @@ function getAvgGrade($id, $flag=0){
             $totalgrade += $sectiongrade;
         }
     }
-    $grade = $totalgrade/$numsections;
+    $grade = ($totalgrade/$numsections);
 
     if ($flag==1){
         return $grade;
@@ -1954,7 +1954,7 @@ function findStudentsWithAdvancedCriteria(){
                     if ($sec['sectionid'] == $sectionid){
                         echo json_encode(array("sectionid"=>$sectionid));
                         $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
-                         $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
+                        $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
                         if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
                             array_push($qualifiedstudents, $studentid);
                         }
@@ -1967,8 +1967,8 @@ function findStudentsWithAdvancedCriteria(){
                 // }
                 // else {
 
-                    echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid, "numAssignmentsDone"=>$numAssignmentsDone, "numAssignments"=>$numAssignments));
-                }
+                echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid, "numAssignmentsDone"=>$numAssignmentsDone, "numAssignments"=>$numAssignments));
+
             }
         }
     }
