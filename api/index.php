@@ -1917,6 +1917,7 @@ function findStudentsWithAdvancedCriteria(){
     if (isset($lowergrade) && isset($uppergrade)){
         foreach ($students as $row){
             $studentid = $row['userid'];
+            echo json_encode(array("userid"=>$studentid));
             $avgGrade = getAvgGrade($studentid, 1);
             if ($avgGrade == -1){ continue; }
             if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
@@ -1949,7 +1950,6 @@ function findStudentsWithAdvancedCriteria(){
                     $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
                     if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
                         array_push($qualifiedstudents, $studentid);
-                        break;
                     }
                 }
             }
@@ -1974,8 +1974,8 @@ function findStudentsWithAdvancedCriteria(){
             }
         }
     }
-
-    list($sqlparens, $bindparams) = parenthesisList(array_unique($qualifiedstudents));
+    $qualifiedstudents = array_values(array_unique($qualifiedstudents));
+    list($sqlparens, $bindparams) = parenthesisList($qualifiedstudents);
     if ($sqlparens = "()"){
         echo json_encode(array());
     }
