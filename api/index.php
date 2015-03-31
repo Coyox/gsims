@@ -1341,7 +1341,7 @@ function getAvgGrade($id, $flag=0){
             $totalgrade += $sectiongrade;
         }
     }
-    $grade = ($totalgrade/$numsections)*100;
+    $grade = $totalgrade/$numsections;
 
     if ($flag==1){
         return $grade;
@@ -1928,7 +1928,6 @@ function findStudentsWithAdvancedCriteria(){
             if ((int)$lowergrade <= $avgGrade && $avgGrade <= (int)$uppergrade){
                 array_push($qualifiedstudents, $studentid);
             }
-            echo json_encode(array("userid"=>$studentid, "averageGrade"=>$avgGrade, "upperGrade"=>$uppergrade, "lowerGrade"=>$lowergrade));
         }
     }
 
@@ -1950,16 +1949,24 @@ function findStudentsWithAdvancedCriteria(){
             if ($numsections == 0){ continue; }
             foreach ($sections as $section){
                 $sectionid = $section['sectionid'];
-                if (!array_key_exists($sectionid,$sectionAsmtCount)){
-                    echo json_encode(array("sectionid"=>$sectionid));
-                    continue;
-                }
-                else {
-                    $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
-                    $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
-                    if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
-                        array_push($qualifiedstudents, $studentid);
+
+                foreach ($sectionAsmtCount as $sec){
+                    if ($sec['sectionid'] == $sectionid){
+                        echo json_encode(array("sectionid"=>$sectionid));
+                        $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
+                         $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
+                        if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
+                            array_push($qualifiedstudents, $studentid);
+                        }
                     }
+                }
+
+                // if (!array_key_exists($sectionid,$sectionAsmtCount)){
+                //     echo json_encode(array("sectionid"=>$sectionid));
+                //     continue;
+                // }
+                // else {
+
                     echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid, "numAssignmentsDone"=>$numAssignmentsDone, "numAssignments"=>$numAssignments));
                 }
             }
