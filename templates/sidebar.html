@@ -157,7 +157,6 @@
 	<% } %>
 
 	<!-- ADMIN TOOLS -->
-	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#admin-tools" class="collapsed">
 		<a class="sidebar-link" data-link="admin-tools">
 			<span class="glyphicon glyphicon-wrench"></span>
@@ -166,6 +165,7 @@
 		</a>
 	</li>
 	<ul class="sub-menu collapse" id="admin-tools">
+	<% if (usertype == "A" || usertype == "SU") { %>
 		<li>
 			<span class="glyphicon glyphicon-calendar"></span>
 			<a href="#schoolyears">Manage School Years</a>
@@ -174,20 +174,21 @@
 			<span class="glyphicon glyphicon-education"></span>
 			<a href="#schools">Manage Schools</a>
 		</li>
-		<li>
-			<span class="glyphicon glyphicon-export"></span>
-			<a href="#export">Export Data</a>
-		</li>
-		<li>
-			<span class="glyphicon glyphicon-import"></span>
-			<a href="#import">Import Data</a>
-		</li>
         <li>
 			<span class="glyphicon glyphicon-fire"></span>
 			<a href="#purge">Purge Data</a>
 		</li>
+		<li>
+			<span class="glyphicon glyphicon-export"></span>
+			<a href="#export">Export Data</a>
+		</li>
+		<% } %>
+		<li>
+			<span class="glyphicon glyphicon-import"></span>
+			<a href="#import">Import Data</a>
+		</li>
 	</ul>
-	<% } %>
+	
 
 	<!-- EMAIL -->
 	<li>
