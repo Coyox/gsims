@@ -1984,7 +1984,7 @@ function findStudentsWithAdvancedCriteria(){
     }
     $qualifiedstudents = array_values(array_unique($qualifiedstudents));
     list($sqlparens, $bindparams) = parenthesisList($qualifiedstudents);
-    if ($sqlparens = "()"){
+    if ($sqlparens == "()"){
         echo json_encode($bindparams);
     }
     else {
