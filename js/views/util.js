@@ -122,6 +122,21 @@ function populateStatusMenu(elem, statuses, selected) {
 	});
 }
 
+function populateSchoolMenu(elem, schools, selected) {
+	//elem.append("<option selected disabled> School </option>");
+	$.each(schools, function(i, val) {
+		var option = $("<option></option>");
+		option.attr("value", val.schoolid);
+		option.prop("selected", val == selected);
+		option.text(capitalize(val.location));
+		elem.append(option);
+	});
+}
+
+function getSelectedSchool() {
+	return $("#school-menu").find("option:selected").attr("value");
+}
+
 function setDateOfBirth(model) {
 	if (model.get("dateOfBirth") == "") {
 		var month = model.get("month");

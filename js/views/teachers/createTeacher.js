@@ -1,11 +1,29 @@
 var CreateTeacherView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model = new Teacher();
+		this.usertype = options.usertype || "T";
+		if (this.usertype == "A") { 
+			console.log("setting as a");
+			this.model.set("usertype", "A");
+		} else {
+			this.model.set("usertype", "T");
+		}
 		this.render();
 	},
 
 	render: function() {
+		this.$el.html();
 		this.$el.html(html["createTeacher.html"]);
+		this.$el.find("#teacher-info").empty();
+		this.$el.find("#comp-info, #comp2-info").empty();
+
+		if (this.action == "view") {
+			this.$el.find("#edit-teacher").removeClass("hide").show();
+			this.$el.find("#save-teacher").hide();
+		} else {
+			this.$el.find("#save-teacher").removeClass("hide").show();
+			this.$el.find("#edit-teacher").hide();
+		}
 
 		this.model.nonEditable.push("status");
 
@@ -28,7 +46,8 @@ var CreateTeacherView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #save-teacher": "saveTeacher"
+		"click #save-teacher": "saveTeacher",
+		"click #school-menu": "updateDepartments"
 	},
 
 	addRow: function() {
@@ -40,15 +59,12 @@ var CreateTeacherView = Backbone.View.extend({
 	saveTeacher: function() {
 		Backbone.Validation.bind(this);
 		var view = this;
-		this.model.set("usertype", "T");
-		this.model.set("schoolid", "412312");
+		this.model.set("schoolid", getSelectedSchool());
 		this.model.set("status",  "active");
 		console.log(this.model);
 
 		if (this.model.isValid(true)) {
-			this.model.save({
-				dataType: "json"
-			}).then(function(data) {
+			this.model.save().then(function(data) {
 				console.log(data);
 				if (typeof data == "string") {
 					data = JSON.parse(data);
@@ -64,9 +80,10 @@ var CreateTeacherView = Backbone.View.extend({
 						}
 					});
 					if (insertComp.length) {
+						console.log(insertComp);
 						$.ajax({
 							type: "POST",
-							url: view.model.addCourseCompetencyUrl(data.userid),
+							url: view.model.getCourseCompetencyUrl(data.userid),
 							data: {
 								competencies: JSON.stringify(insertComp)
 							}
@@ -78,6 +95,7 @@ var CreateTeacherView = Backbone.View.extend({
 								new TransactionResponseView({
 									message: "Teacher successfully created. " + insertComp.length + " competency levels updated."
 								});
+								view.render();
 							} else {
 								new TransactionResponseView({
 									title: "ERROR",
@@ -90,8 +108,9 @@ var CreateTeacherView = Backbone.View.extend({
 						new TransactionResponseView({
 							message: "Teacher successfully created."
 						});
+						view.render();
+
 					}
-					view.render();
 				} else {
 					new TransactionResponseView({
 						message: "Sorry, the teacher could not be created. Please try again."
@@ -126,6 +145,13 @@ var CreateTeacherRowView = Backbone.View.extend({
 		+		"<span class='help-block hidden'></span>"
 		+	"</div>"),
 
+	schoolTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+		"<select id='school-menu' class='form-control input-sm' name='schoolid'></select>"
+		+		"<span class='help-block hidden'></span>"
+		+	"</div>"),
+
+
 	initialize: function(options) {
 		this.name = options.name;
 		this.value = options.value;
@@ -134,6 +160,7 @@ var CreateTeacherRowView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var view = this;
 		this.label = capitalize(this.name);
 		this.label = splitChars(this.label);
 
@@ -162,6 +189,9 @@ var CreateTeacherRowView = Backbone.View.extend({
 			if (this.name == "status") {
 				this.$el.html(this.statusTemplate(params));
 				populateStatusMenu(this.$el.find("#status-menu"), this.model.teacherStatuses, this.value);
+			} else if (this.name == "schoolid") {
+				this.$el.html(this.schoolTemplate(params));
+				populateSchoolMenu(this.$el.find("#school-menu"), app.schoolOptions);
 			} else {
 				this.$el.html(this.editTemplate(params));
 			}
@@ -197,8 +227,7 @@ var TeacherCompetencyView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 		var school = new School();
-		var schoolid = this.model.get("schoolid");
-		console.log(this.model.get("schoolid"));
+		var schoolid = getSelectedSchool();
 		school.fetch({
 			url: school.getDepartmentsUrl(schoolid),// (this.model.get("schoolid")),
 			data: {

@@ -196,7 +196,7 @@ var DepartmentListItem = Backbone.View.extend({
 				course.fetch({
 					url: course.getCoursePrereqs(course.get("courseid"))
 				}).then(function(data) {
-					new CourseTableRowView({
+					new RCourseTableRowView({
 						el: view.addCourseRow(),
 						model: course,
 						parentView: view.parentView,
@@ -214,7 +214,7 @@ var DepartmentListItem = Backbone.View.extend({
 	}
 });
 
-var CourseTableRowView = Backbone.View.extend({
+var RCourseTableRowView = Backbone.View.extend({
 	template: _.template("<td class='details-control' data-name='<%= model.courseName %>'></td>"
 		+ 	"<td><%= model.courseName %></td>"
 		+	"<td><%= model.description %></td>"
@@ -268,7 +268,7 @@ var CourseTableRowView = Backbone.View.extend({
 			}).then(function(data) {
 				tr.addClass("shown");
 
-				new SectionSubView({
+				new RSectionSubView({
 					el: view.createSubTable(tr),
 					data: data,
 					parentView: view.parentView
@@ -284,7 +284,7 @@ var CourseTableRowView = Backbone.View.extend({
 	}
 });
 
-var SectionSubView = Backbone.View.extend({
+var RSectionSubView = Backbone.View.extend({
 	initialize: function(options) {
 		this.data = options.data;
 		this.parentView = options.parentView;
@@ -299,7 +299,7 @@ var SectionSubView = Backbone.View.extend({
 		} else {
 			_.each(this.data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				new SectionTableRowView({
+				new RSectionTableRowView({
 					el: this.addRow(),
 					model: section,
 					parentView: this.parentView
@@ -315,7 +315,7 @@ var SectionSubView = Backbone.View.extend({
 	}
 });
 
-var SectionTableRowView = Backbone.View.extend({
+var RSectionTableRowView = Backbone.View.extend({
 	template: _.template("<span><strong>Time: </strong><span><%= model.day %> <%= model.startTime %> to <%= model.endTime %></span></span>"
 		+	"<br>"
 		+	"<strong>Location: </strong><span><%= model.roomLocation %></span>"

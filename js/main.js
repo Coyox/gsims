@@ -32,10 +32,21 @@ _.extend(Backbone.Validation.callbacks, {
 
 /** On load function */
 $(function() {
-	loadLoginTemplate();
-	loadTemplates();
+	var promises = [];
 
-	setActiveSchoolYear();
+	var prom1 = $.Deferred();
+	setActiveSchoolYear(prom1);
+	promises.push(prom1);
+
+	var prom2 = $.Deferred();
+	cacheSchools(prom2);
+	promises.push(prom2);
+
+	$.when.apply($, promises).done(function () {
+	 	 // do things that need to wait until ALL gets are done
+	  	loadLoginTemplate();
+		loadTemplates();
+	});
 
 	$("body").on("click", function(e) {
 	    if ($(e.target).data('toggle') !== 'popover'
@@ -145,7 +156,7 @@ function init() {
 }
 
 /** Set the current school year (for all requests) */
-function setActiveSchoolYear() {
+function setActiveSchoolYear(def) {
 	var schoolyear = new SchoolYear();
 	schoolyear.fetch({
 		url: schoolyear.getActiveSchoolYearUrl()
@@ -153,5 +164,23 @@ function setActiveSchoolYear() {
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;
 		sessionStorage.setItem("gobind-activeSchoolYear", app.currentSchoolYearId);
+		def.resolve();
 	});
+	return def;
+}
+
+function cacheSchools(def) {
+	var school = new School();
+	school.fetch().then(function(data) {
+		var array = [];
+		_.each(data, function(option, index) {
+			array.push({
+				schoolid: option.schoolid,
+				location: option.location
+			});
+		});
+		app.schoolOptions = array;
+		def.resolve();
+	});
+	return def;
 }

@@ -362,8 +362,9 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("Create Admin", "user");
 
-        new CreateAdminView({
-            el: $("#content").html("")
+        new CreateTeacherView({
+            el: $("#content").html(""),
+            usertype: "A"
         });
     },
 
