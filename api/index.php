@@ -808,8 +808,9 @@ function getStudentSectionGrade($sectionid, $userid){
     $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectionid and fullmark is not null";
     $bindparams = array("sectionid"=>$sectionid);
     $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
-
-    if ($totalmarks==0) {
+    $sql = "SELECT count(docid) from document where sectionid=:sectionid and fullmark is not null";
+    $section_hasmark = (int) perform_query($sql,'GETCOL',$bindparams);
+    if ($totalmarks==0 || $section_hasmark == 0) {
         return -1;
     }
     $sql = "SELECT coalesce(sum(mark),0) from marks
@@ -1936,7 +1937,6 @@ function findStudentsWithAdvancedCriteria(){
         $sql = "SELECT sectionid, count(docid) as numberOfAssignments
                 from document where fullmark is not null group by sectionid";
         $sectionAsmtCount = perform_query($sql, 'GETASSO');
-        print_r($sectionAsmtCount);
 
         $sql = "SELECT m.userid as studentid, sectionid, count(sectionid) as numberOfAssignmentsDone
              from marks m, document d
@@ -1952,7 +1952,6 @@ function findStudentsWithAdvancedCriteria(){
 
                 foreach ($sectionAsmtCount as $sec){
                     if ($sec['sectionid'] == $sectionid){
-                        echo json_encode(array("sectionid"=>$sectionid));
                         $numAssignments = (int) extract_value($sectionAsmtCount, array(array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignments');
                         $numAssignmentsDone = (int) extract_value($studentAsmtCount, array(array("id_colname"=>'studentid', "id"=>$studentid), array("id_colname"=>'sectionid', "id"=>$sectionid)), 'numberOfAssignmentsDone');
                         if (($numAssignments-$numAssignmentsDone) >= (int) $assignmentcount){
@@ -1960,15 +1959,6 @@ function findStudentsWithAdvancedCriteria(){
                         }
                     }
                 }
-
-                // if (!array_key_exists($sectionid,$sectionAsmtCount)){
-                //     echo json_encode(array("sectionid"=>$sectionid));
-                //     continue;
-                // }
-                // else {
-
-                echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid, "numAssignmentsDone"=>$numAssignmentsDone, "numAssignments"=>$numAssignments));
-
             }
         }
     }
@@ -1982,10 +1972,9 @@ function findStudentsWithAdvancedCriteria(){
             if ($numsections == 0){ continue; }
             foreach ($sections as $section){
                 $sectionid = $section['sectionid'];
-                echo json_encode(array("studentid"=>$studentid, "sectionid"=>$sectionid));
-                if (getStudentSectionGrade($sectionid, $userid) < 50) {
+                $studentSectionGrade = getStudentSectionGrade($sectionid, $userid);
+                if ($studentSectionGrade < 50 && $studentSectionGrade != -1) {
                     $failed++;
-                    echo json_encode(array("failedCourse"=>"yes","studentid"=>$studentid, "sectionid"=>$sectionid));
                 }
             }
             if ($failed >= (int) $failcount) {
