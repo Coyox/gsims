@@ -24,14 +24,15 @@ var ExportView = Backbone.View.extend({
 			console.log(data);
 			_.each(data, function(object,index){
 				var option = document.createElement("option");
-				option.text = object.schoolid;
+				option.id = object.schoolid;
+				option.text = object.location + " (" + object.schoolid + ")";
 				x.add(option);
 			});
 		});
 	},
 
 	exportSections: function(){
-		var schoolid = this.$el.find("#schoolid").val();
+		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["sectionid", "courseid", "courseName", "sectionCode", "day", "startTime", "endTime", "roomCapacity", "roomLocation", "classSize", "status"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -63,7 +64,7 @@ var ExportView = Backbone.View.extend({
 		});
 	},
 	exportAdmins: function(){
-		var schoolid = this.$el.find("#schoolid").val();
+		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -88,7 +89,7 @@ var ExportView = Backbone.View.extend({
 		});
 	},
 	exportTeachers: function(){
-		var schoolid = this.$el.find("#schoolid").val();
+		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
 
 		var csvContent = "data:text/csv;charset=utf-8,";
@@ -114,7 +115,8 @@ var ExportView = Backbone.View.extend({
 	},
 
 	exportStudents: function(){
-		var schoolid = this.$el.find("#schoolid").val();
+		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
+		console.log(schoolid);
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
 		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
 		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",

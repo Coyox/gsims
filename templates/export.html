@@ -1,17 +1,62 @@
-<div>
-	<div id="container">
-		<select id="schoolid" class="selectpicker"></select>
-		<br><br>
-		<button id="exportStudents" class="btn btn-primary" type="submit">Export Students CSV</button>
-		<br><br>
-		<br><br>
-		<button id="exportTeachers" class="btn btn-primary" type="submit">Export Teachers CSV</button>
-		<br><br>
-		<br><br>
-		<button id="exportAdmins" class="btn btn-primary" type="submit">Export Administrators CSV</button>
-		<br><br>
-		<br><br>
-		<button id="exportSections" class="btn btn-primary" type="submit">Export Sections CSV</button>
-		<br><br>
-	</div>
+<div id="export-container">
+	<br>
+	<h4>Select School</h4>
+	<select id="schoolid" class="form-control input-sm selectpicker"></select>
+	<div class="divider"></div>
+
+	<h4>Download</h4>
+	<table id="export-data-table" class="table table-bordered table-striped">
+		<tbody>
+			<tr>
+				<td>
+					Download Students as CSV
+				</td>
+				<td>
+					<button id="exportStudents" class="btn btn-sm btn-primary" type="submit">Download</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Download Teachers as CSV
+				</td>
+				<td>
+					<button id="exportTeachers" class="btn btn-sm btn-primary" type="submit">Download</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Download Administrators as CSV
+				</td>
+				<td>
+					<button id="exportAdmins" class="btn btn-sm btn-primary" type="submit">Download</button>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Download Sections as CSV
+				</td>
+				<td>
+					<button id="exportSections" class="btn btn-sm btn-primary" type="submit">Download</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<!-- OLD EXPORT -->
+	<!-- <div>
+		<div id="container">
+			<select id="schoolid" class="selectpicker"></select>
+			<br><br>
+			<button id="exportStudents" class="btn btn-primary" type="submit">Download Students CSV</button>
+			<br><br>
+			<br><br>
+			<button id="exportTeachers" class="btn btn-primary" type="submit">Download Teachers CSV</button>
+			<br><br>
+			<br><br>
+			<button id="exportAdmins" class="btn btn-primary" type="submit">Download Administrators CSV</button>
+			<br><br>
+			<br><br>
+			<button id="exportSections" class="btn btn-primary" type="submit">Download Sections CSV</button>
+			<br><br>
+		</div>
+	</div> -->
 </div>
