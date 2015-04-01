@@ -480,6 +480,10 @@ tr.shown td.details-control {
 	text-align: center;
 }
 
+#filter-students-container .form-horizontal {
+	/*margin: 10px;*/
+}
+
 
 
 .easyWizardSteps {list-style:none;width:100%;overflow:hidden;margin:0;padding:0;border-bottom:1px solid #ccc;margin-bottom:20px}
