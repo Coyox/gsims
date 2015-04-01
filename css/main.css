@@ -462,6 +462,22 @@ tr.shown td.details-control {
 	padding-left: 5px;
 }
 
+#import-data-table,
+#import-template-table {
+	width: 500px;
+}
+
+#import-data-table td:first-child,
+#import-template-table td:first-child {
+	font-weight: bold;
+}
+
+#import-data-table td:last-child,
+#import-template-table td:last-child {
+	width: 100px;
+	text-align: center;
+}
+
 
 
 .easyWizardSteps {list-style:none;width:100%;overflow:hidden;margin:0;padding:0;border-bottom:1px solid #ccc;margin-bottom:20px}

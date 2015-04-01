@@ -26,6 +26,10 @@ var ImportView = Backbone.View.extend({
 				option.text = object.sectionid;
 				x.add(option);
 			});
+			// Display a message if no options are found
+			if ($(x).find("option").length == 0) {
+				$(x).append("<option disabled>-- No sections found --</option>");
+			}
 		});
 	},
 

@@ -1,6 +1,56 @@
-<div>
-	<div id="container">
-		<input type="file" id="csv-file" class="btn btn-primary">
+<div class="col-sm-8">
+	<br>
+	<h4>Data</h4>
+	<table id="import-data-table" class="table table-bordered table-striped">
+		<tbody>
+			<tr>
+				<td>
+					Import File
+					<br><input type="file" id="csv-file">
+				</td>
+				<td>
+					<button id="import" class="btn btn-sm btn-primary">Import</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<h4>Download Templates</h4>
+	<table id="import-template-table" class="table table-bordered table-striped">
+		<tbody>
+			<tr>
+				<td>
+					Attendance
+					<br>
+					<br>
+					<label>Select a section</label>
+					<select id="section" class="form-control input-sm selectpicker">
+						<option value="777778">777778</option>
+					</select>
+				</td>
+				<td>		
+					<button id="downloadAttendance" class="btn btn-sm btn-primary" type="submit">Download</button>
+				</td>
+			</tr>
+			<tr>
+				<td>Create Students</td>
+				<td>		
+					<form method="get" action="data_templates/import_students.csv">
+						<button id="downloadStudents" class="btn btn-sm btn-primary" type="submit">Download</button>
+					</form>
+				</td>
+			</tr>
+			<tr>
+				<td>Create Teachers/Administrators</td>
+				<td>		
+					<form method="get" action="data_templates/import_teachers_administrators.csv">
+						<button id="downloadTeachers" class="btn btn-sm btn-primary" type="submit">Download</button>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<!-- OLD IMPORT -->
+<!-- 		<input type="file" id="csv-file" class="btn btn-primary">
 		<br>
 		<button id="import" class="btn btn-primary">Import File</button>
         <div id="not-found" class="hide">
@@ -18,6 +68,5 @@
 		<br><br>
 		<form method="get" action="data_templates/import_teachers_administrators.csv">
 		<button id="downloadTeachers" class="btn btn-primary" type="submit">Download Create-Teachers/Administrators Template</button>
-		</form>
-	</div>
+		</form> -->
 </div>
