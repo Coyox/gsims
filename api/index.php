@@ -1804,6 +1804,7 @@ function massCreateLogins($users, $usertype){
 */
 function findUsers($schoolid, $usertype){
     $param = array();
+    $clause = "".
     $bindparams = array("schoolid"=>$schoolid);
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
@@ -1831,11 +1832,11 @@ function findUsers($schoolid, $usertype){
         if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
-                $where.=" and year(dateOfBirth) ".$yearop.":year";
+                $clause.=" and year(dateOfBirth) ".$yearop.":year";
                 $bindparams["year"] = $year;
             }
             if (isset($loweryear)){
-                $where.=" and year(dateOfBirth) between :loweryear and :upperyear";
+                $clause.=" and year(dateOfBirth) between :loweryear and :upperyear";
                 $bindparams["loweryear"] = $loweryear;
                 $bindparams["upperyear"] = $upperyear;
             }
@@ -1848,9 +1849,9 @@ function findUsers($schoolid, $usertype){
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
             if (isset($email)){ $param['emailAddr'] = $email; }
 
-            list($clause, $where_bindparams) = buildWhereClause($param);
+            list($where, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
-
+            $clause.=$where;
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
