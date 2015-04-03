@@ -31,14 +31,24 @@ var SearchStudentsView = Backbone.View.extend({
 			data.lastName = lastName;
 		}
 
-		var gender = this.$el.find("#gender-options option:selected");
-		if (!gender.is(":disabled")) {
-			data.gender = gender.val();
+		var mGender = this.$el.find("#gender-options input[value='M']");
+		if (mGender.is(":checked")) {
+			data.gender = "M";
 		}
 
-		var paid = this.$el.find("#paid-options option:selected");
-		if (!paid.is(":disabled")) {
-			data.paid = paid.val();
+		var fGender = this.$el.find("#gender-options input[value='F']");
+		if (fGender.is(":checked")) {
+			data.gender = "F";
+		}
+
+		var paid = this.$el.find("#paid-options input[value='1']");
+		if (paid.is(":checked")) {
+			data.paid = "1";
+		}
+
+		var unpaid = this.$el.find("#paid-options input[value='0']");
+		if (unpaid.is(":checked")) {
+			data.paid = "0";
 		}
 
 		var status = this.$el.find("#status-options option:selected");
