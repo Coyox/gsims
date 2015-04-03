@@ -1490,7 +1490,7 @@ function deleteTeacher($id) {
 function getTeachingSections($id){
     $sql = "SELECT c.courseid, c.courseName, c.description, s.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
     from teachingSection t, course c, section s
-    where t.userid=:id and t.sectionid=s.sectionid";
+    where t.userid=:id and t.sectionid=s.sectionid and c.courseid=s.courseid";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
