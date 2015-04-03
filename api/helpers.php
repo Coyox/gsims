@@ -197,30 +197,31 @@ function getConnection() {
 
 function buildDayClause($days){
     $clause= "";
+    $bindparams = array();
     $days = explode(',', $days);
-    foreach($days as $day) {
-        $clause.=" and find_in_set('".$day."',`day`)";
+    foreach($days as $i=> $day) {
+        $clause.=" and find_in_set(':day".$i."',`day`)";
+        $bindparams["day".$i] = $day;
     }
-    return $clause;
+    return array($clause, $bindparams);
 }
 
-function buildWhereClause($fieldArray, $clause=""){
-    foreach ($fieldArray as $key => $value) {
-        $clause.= ($clause==''? "WHERE ": " AND ");
+function buildWhereClause($fields){
+    $clause = "";
+    $bindparams = array();
+    foreach ($fields as $key=>$value) {
+        $clause.= " AND ";
         if(substr($key, -4) === 'Name'){
-            $value = "%".$value."%";
-            $clause.=$key." like '".$value."'";
-        }
-        else if ($key=='year'){
-            $clause.=$key."(dateOfBirth)".$value."'";
+            $value = "%:".$key."%";
+            $clause.=$key." like :".$key;
         }
         else {
-            $clause.=$key."='".$value."'";
+            $clause.=$key."=:".$key;
         }
+        $bindparams[$key] = $value;
     }
-    return $clause;
+    return array($clause, $bindparams);
 }
-
 
 function generatePasswordHash($password){
 	$cost = 10;

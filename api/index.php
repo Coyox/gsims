@@ -108,9 +108,9 @@ $app->put('/documents/:id/marks', 'updateMarks');
 $app->put('/documents/:id', 'updateDocument');
 $app->delete('/documents/:id', 'deleteDocument');
 
-$app->get('/search/users/:usertype', 'findUsers');
-$app->get('/search/sections', 'findSections');
-$app->get('/search/advanced', 'findStudentsWithAdvancedCriteria');
+$app->get('/search/:schoolid/users/:usertype', 'findUsers');
+$app->get('/search/:schoolid/sections', 'findSections');
+$app->get('/search/:schoolid/advanced', 'findStudentsWithAdvancedCriteria');
 
 $app->get('/login', 'validateCredentials');
 $app->put('/login/:id', 'updateLogin');
@@ -1673,15 +1673,15 @@ function deleteSuperuser($id) {
 #================================================================================================================#
 # Users
 #================================================================================================================#
-function getUsers($type){
+function getUsers($schoolid, $type){
     if ($type == "T"){
-        return getTeachers();
+        return getTeachersBySchool($schoolid);
     }
     else if ($type == "S"){
-        return getStudents();
+        return getStudentsBySchool($schoolid);
     }
     else if ($type == "A"){
-        return getAdministrators();
+        return getAdministratorsBySchool($schoolid);
     }
     else if ($type == "SU"){
         return getSuperUsers();
@@ -1801,8 +1801,9 @@ function massCreateLogins($users, $usertype){
 /*
  usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
 */
-function findUsers($usertype){
+function findUsers($schoolid, $usertype){
     $param = array();
+    $bindparams = array("schoolid"=>$schoolid);
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
     if (isset($firstname)) {
@@ -1824,12 +1825,19 @@ function findUsers($usertype){
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
         $email = $_GET['emailAddr'];
+
+
         if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
-                $param['year'] = $yearop."'".$year;
+                $where.=" and year(dateOfBirth) ".$yearop.":year";
+                $bindparams["year"] = $year;
             }
-            if (isset($loweryear)){ $param['year'] = " ".$_GET['yearop']." '".$loweryear."' and '".$upperyear; }
+            if (isset($loweryear)){
+                $where.=" and year(dateOfBirth) between :loweryear and :upperyear";
+                $bindparams["loweryear"] = $loweryear;
+                $bindparams["upperyear"] = $upperyear;
+            }
             if (isset($gender)){ $param['gender'] = $gender; }
             if (isset($paid)){ $param['paid'] = $paid; }
             if (isset($city)){ $param['city'] = $city; }
@@ -1839,25 +1847,29 @@ function findUsers($usertype){
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
             if (isset($email)){ $param['emailAddr'] = $email; }
 
-            $clause = buildWhereClause($param);
+            list($clause, $where_bindparams) = buildWhereClause($param);
+            $bindparams = $bindparams + $where_bindparams;
+
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status from student ".$clause." order by firstName asc";
-            echo json_encode(perform_query($sql,'GETALL'));
+    emergencyContactPhoneNumber, schoolid, paid, status from student where schoolid=:schoolid".$clause." order by firstName asc";
+            echo json_encode(perform_query($sql,'GETALL',$bindparams));
         }
         else{
-            return getUsers($usertype);
+            return getUsers($schoolid, $usertype);
         }
     }
     else if ($usertype=="A"|$usertype=="T"){
         if (array_key_exists('firstName', $param) || array_key_exists('lastName', $param)) {
-            $clause = buildWhereClause($param);
-            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher ".$clause." and usertype=:usertype order by firstName asc";
-            echo json_encode(perform_query($sql,'GETALL', array("usertype"=>$usertype)));
+            list($clause, $where_bindparams) = buildWhereClause($param);
+            $bindparams = $bindparams + $where_bindparams;
+            $bindparams["usertype"] = $usertype;
+            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where schoolid=:schoolid".$clause." and usertype=:usertype order by firstName asc";
+            echo json_encode(perform_query($sql,'GETALL', $bindparams));
         }
         else{
-            return getUsers($usertype);
+            return getUsers($schoolid, $usertype);
         }
     }
 }
@@ -1878,19 +1890,25 @@ function findSections(){
 
     if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
         $params = array();
+        $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
         $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
         $courseclause = " and c.schoolyearid=:schoolyear";
-        if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
-        if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
-
-        $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
-
+        if (isset($deptname)){
+            $deptclause.= " and d.deptName like '%:deptname%'";
+            $bindparam["deptname"] = $deptname;
+        }
+        if (isset($coursename)){
+            $courseclause.= " and c.courseName like '%:coursename%'";
+            $bindparam["coursename"] = $coursename;
+        }
         $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
         if (isset($day)){
-            $sql.= buildDayClause($day);
+            list($clause, $day_bindparam) = buildWhereClause($day);
+            $bindparam = $bindparam + $day_bindparam;
+            $sql.= $clause;
         }
 
         if (isset($startTime)){ " and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
@@ -1909,7 +1927,7 @@ students who
 - are failing X number of classes,
 - has average between X and Y
 */
-function findStudentsWithAdvancedCriteria(){
+function findStudentsWithAdvancedCriteria($schoolid){
     $lowergrade = $_GET['lowerGrade'];
     $uppergrade = $_GET['upperGrade'];
     $assignmentcount = $_GET['numAssignment'];
@@ -1992,8 +2010,9 @@ function findStudentsWithAdvancedCriteria(){
         province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
         parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
         emergencyContactPhoneNumber, schoolid, paid, status
-        from student where userid in ";
+        from student where schoolid=:schoolid and userid in ";
         $sql.= $sqlparens;
+        $bindparams["schoolid"]=$schoolid;
         echo json_encode(perform_query($sql,'GETALL',$bindparams));
     }
 }
