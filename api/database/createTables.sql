@@ -213,16 +213,22 @@ CREATE TABLE IF NOT EXISTS `teacherCourseCompetency` (
   FOREIGN KEY (`deptid`) REFERENCES `department` (`deptid`) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS `teaching` (
+CREATE TABLE IF NOT EXISTS `teachingSection` (
   `userid` int(11) NOT NULL,
-  `courseid` int(11) NOT NULL,
-  `sectionid` int(11),
-  PRIMARY KEY (`userid`,`courseid`,`sectionid`),
+  `sectionid` int(11) NOT NULL,
+  PRIMARY KEY (`userid`,`sectionid`),
   FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE CASCADE,
   FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS `teachingCourse` (
+  `userid` int(11) NOT NULL,
+  `courseid` int(11) NOT NULL,
+  PRIMARY KEY (`userid`,`courseid`),
+  FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE CASCADE,
+  FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
+);
 
 CREATE TABLE IF NOT EXISTS `studentCompetencyTest` (
   `userid` int(11) NOT NULL,

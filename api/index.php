@@ -476,7 +476,7 @@ function getCourseById($id){
 }
 function getCourseTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
-            FROM teacher t1, teaching t2
+            FROM teacher t1, teachingCourse t2
             where t2.courseid = :id
             and t2.userid = t1.userid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
@@ -486,11 +486,11 @@ function getCoursePrereqs($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function assignCourseTeacher($id, $tid){
-     $sql = "INSERT into teaching (userid, courseid) values (:tid, :id)";
+     $sql = "INSERT into teachingCourse (userid, courseid) values (:tid, :id)";
      echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
 }
 function unassignCourseTeacher($id, $tid){
-    $sql = "DELETE from teaching where userid=:tid and courseid=:id";
+    $sql = "DELETE from teachingCourse where userid=:tid and courseid=:id";
     echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function waitlistStudent($id){
@@ -654,7 +654,7 @@ function getStudentsEnrolled($id){
 function getSectionTeachers($id){
     $sql = "SELECT t1.userid, t1.firstName, t1.lastName, t1.emailAddr, t1.status, t1.usertype
             FROM teacher t1
-            where t1.userid in (SELECT t2.userid from teaching t2 where t2.sectionid=:id)";
+            where t1.userid in (SELECT t2.userid from teachingSection t2 where t2.sectionid=:id)";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function dropStudent($id, $sid){
@@ -674,18 +674,11 @@ function enrollStudent($id, $sid){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 function assignSectionTeacher($id, $tid){
-    $sql = "SELECT sectionid from teaching where userid=:tid";
-    $sectionid = perform_query($sql,'GETCOL',array("tid"=>$tid));
-    if ($sectionid == "NULL"){
-        $sql = "UPDATE teaching set sectionid=:id where userid=:tid";
-    }
-    else {
-        $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
-    }
-    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
+    $sql = "INSERT into teachingSection values (:tid, :id)";
+    echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
 }
 function unassignSectionTeacher($id, $tid){
-    $sql = "DELETE from teaching where userid=:tid and sectionid=:id";
+    $sql = "DELETE from teachingSection where userid=:tid and sectionid=:id";
     echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function createSection(){
@@ -1494,8 +1487,8 @@ function deleteTeacher($id) {
 * Get the sections the teacher teaches
 */
 function getTeachingSections($id){
-    $sql = "SELECT t.courseid, c.courseName, c.description, t.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
-    from teaching t, course c, section s
+    $sql = "SELECT c.courseid, c.courseName, c.description, s.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
+    from teachingSection t, course c, section s
     where t.userid=:id and t.sectionid=s.sectionid and t.courseid=c.courseid";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
