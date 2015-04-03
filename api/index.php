@@ -19,6 +19,7 @@ $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
+$app->post('/students/pendingTest', 'handlePendingTestStudents');
 $app->put('/students/:id/sections', 'approveDenyEnrollment');
 $app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
@@ -1304,11 +1305,6 @@ function handlePendingStudents(){
         $sql.=$sqlparens;
         array_push($queries, $sql);
         array_push($bindparams, $params);
-
-        $sql = "DELETE from studentCompetencyTest where userid in ";
-        $sql.=$sqlparens;
-        array_push($queries, $sql);
-        array_push($bindparams, $params);
     }
     if (isset($_POST['deniedList'])){
         $ids = json_decode($_POST['deniedList']);
@@ -1319,6 +1315,14 @@ function handlePendingStudents(){
         array_push($bindparams, $params);
     }
     echo json_encode(perform_transaction($queries, $bindparams));
+}
+
+function handlePendingTestStudents(){
+    $ids = json_decode($_POST['pendingTestList']);
+    $sql = "DELETE from studentCompetencyTest where userid in ";
+    list($sqlparens, $bindparams) = parenthesisList($ids);
+    $sql.=$sqlparens;
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 
 function getAvgGrade($id, $flag=0){
