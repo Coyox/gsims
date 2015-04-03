@@ -12,17 +12,9 @@ var SearchStudentsView = Backbone.View.extend({
 
 	events: {
 		"click #search-students": "searchStudents",
-		"click #search-all-students": "searchAllStudents",
 		"click #advanced-search-students": "advancedSearchStudents",
 		"click #clear-fields": "clearFields",
 		"change #year-operator": "changeOperator"
-	},
-
-	searchAllStudents: function(evt) {
-		var view = this;
-		new Student().fetch().then(function(data) {
-			view.changeRoute(data);
-		});
 	},
 
 	searchStudents: function(evt) {
@@ -289,8 +281,9 @@ var StudentsTableView = Backbone.View.extend({
 	          	{ sWidth: "10%", aTargets: [ 5 ] }
 	       	]
 		});
-		this.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
-		this.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh Table</button>");
+		createEmailButton(this.$el);
+		createRefreshButton(this.$el);
+		createExportButton(this.$el);
 	},
 
 	fetchAllResults: function() {
@@ -313,14 +306,14 @@ var StudentsTableView = Backbone.View.extend({
 		          	{ sWidth: "10%", aTargets: [ 5 ] }
 		       	]
 			});
-			view.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
-			view.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh</button>");
+			createEmailButton(view.$el);
+			createRefreshButton(view.$el);	
+			createExportButton(view.$el);		
 		});
 	},
 
 	refreshTable: function(evt) {
 		evt.stopImmediatePropagation();
-
 		this.table.fnDestroy();
 		this.render();
 	},
@@ -333,25 +326,17 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	openEmailModal: function(evt) {
-		var recipients = [];
-		_.each(this.table.fnGetNodes(), function(row, index) {
-			var checkbox = $(row).find("input[type='checkbox']");
-			if ($(checkbox).is(":checked")) {
-				recipients.push($(checkbox).closest("tr").data("email"));
-			}
-		}, this);
-
-		var numRecipients = recipients.length;
-		openEmailModal(recipients, numRecipients, "S");
+		openEmailWrapper(this.table.fnGetNodes());
 	},
 
 	toggleCheckboxes: function(evt) {
-		var nodes = this.table.fnGetNodes();
-		var checked = $(evt.currentTarget).is(":checked");
-		_.each(nodes, function(row, index) {
-			var checkbox = $(row).find("input[type='checkbox']");
-			checkbox.prop("checked", checked);
-		}, this);
+		toggleCheckboxes(this.table.fnGetNodes(), evt);
+	},
+
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
 	},
 });
 

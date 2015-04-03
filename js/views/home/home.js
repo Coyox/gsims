@@ -41,7 +41,8 @@ var SidebarView = Backbone.View.extend({
 
 	events: {
 		"click .sidebar-link": "updateActiveLink",
-		"change #school-year-options": "updateSelectedSchoolYear"
+		"change #school-year-options": "updateSchoolYear",
+		"change #school-options": "updateSchool"
 	},
 
 	updateActiveLink: function(evt) {
@@ -59,16 +60,28 @@ var SidebarView = Backbone.View.extend({
 				var option = $("<option></option>");
 				option.attr("id", object.schoolyearid);
 				option.attr("value", object.schoolyear);
-				option.attr("selected", object.schoolyear == app.currentSchoolYear);
+				option.attr("selected", object.schoolyearid == app.currentSchoolYearId);
 				option.text(object.schoolyear);
 				select.append(option);
 			});
 		});
 	},
 
-	updateSelectedSchoolYear: function(evt) {
-		var selected = $(evt.currentTarget).find("option:selected").attr("id");
-		app.selectedSchoolYaarId = selected;
+	updateSchoolYear: function(evt) {
+		var schoolyearid = $(evt.currentTarget).find("option:selected").attr("id");
+		sessionStorage.setItem("gobind-activeSchoolYear", schoolyearid);
+		app.Router.navigate("home", {trigger: true});
+		app.currentSchoolYearId = schoolyearid;
+		Backbone.history.loadUrl("home");
+	},
+
+	updateSchool: function(evt) {
+		var schoolid = $(evt.currentTarget).find("option:selected").val();
+		console.log(schoolid);
+		sessionStorage.setItem("gobind-schoolid", schoolid);
+		app.Router.navigate("home", {trigger: true});
+		app.currentSchool = schoolid;
+		Backbone.history.loadUrl("home");
 	}
 });
 

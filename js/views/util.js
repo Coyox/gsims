@@ -151,3 +151,40 @@ function setDateOfBirth(model) {
 		model.set("dateOfBirth", dob);
 	}
 }
+
+function addDTButtons(elem, btn) {
+	elem.find(".dataTables_filter").append(btn);
+}
+
+function createRefreshButton(elem) {
+	addDTButtons(elem, "<button id='refresh' class='btn btn-sm btn-primary dt-btn'><span class='glyphicon glyphicon-refresh'></span></button>");
+}
+
+function createEmailButton(elem) {
+	addDTButtons(elem, "<button class='send-email btn btn-sm btn-primary dt-btn'><span class='glyphicon glyphicon-envelope'></span></button>");
+}
+
+function createExportButton(elem) {
+	addDTButtons(elem, "<button id='export-table' class='btn btn-sm btn-primary dt-btn'><span class='glyphicon glyphicon-export'></span></button>");
+}
+
+function openEmailWrapper(nodes) {
+	var recipients = [];
+	_.each(nodes, function(row, index) {
+		var checkbox = $(row).find("input[type='checkbox']");
+		if ($(checkbox).is(":checked")) {
+			recipients.push($(checkbox).closest("tr").data("email"));
+		}
+	}, this);
+
+	var numRecipients = recipients.length;
+	openEmailModal(recipients);
+}
+
+function toggleCheckboxes(nodes, evt) {
+	var checked = $(evt.currentTarget).is(":checked");
+	_.each(nodes, function(row, index) {
+		var checkbox = $(row).find("input[type='checkbox']");
+		checkbox.prop("checked", checked);
+	}, this);
+}

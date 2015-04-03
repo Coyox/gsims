@@ -259,7 +259,16 @@ var StudentRecordRowView = Backbone.View.extend({
 			this.$el.html(this.viewTemplate(params));
 		} else {
 			var validationProperty = this.model.validation[this.name];
-			var isRequired = validationProperty ? validationProperty.required : false;
+			var isRequired;
+			if (validationProperty instanceof Array) {
+				_.each(validationProperty, function(rule, index) {
+					if (rule.required == true) {
+						isRequired = true;
+					}
+				}, this);
+			} else {
+				isRequired = validationProperty ? validationProperty.required : false;
+			}
 			if (isRequired) {
 				params.label = this.label + "<span class='asterisk'>*</span>";
 			}

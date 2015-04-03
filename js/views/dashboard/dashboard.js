@@ -64,22 +64,34 @@ var DashboardView = Backbone.View.extend({
 		var parent = this.$el.find("#stats-panel");
 		var count = new Count();
 		count.fetch({
-			url: count.getCountUrl("S")
+			url: count.getCountUrl("S"),
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
 		}).then(function(data) {
 			parent.find(".students").text(data);
 		});
 		count.fetch({
-			url: count.getCountUrl("T")
+			url: count.getCountUrl("T"),
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
 		}).then(function(data) {
 			parent.find(".teachers").text(data);
 		});
 		count.fetch({
-			url: count.getCountUrl("A")
+			url: count.getCountUrl("A"),
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
 		}).then(function(data) {
 			parent.find(".administrators").text(data);
 		});
 		count.fetch({
-			url: count.getCountUrl("SU")
+			url: count.getCountUrl("SU"),
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
 		}).then(function(data) {
 			parent.find(".superusers").text(data);
 		});

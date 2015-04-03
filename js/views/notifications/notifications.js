@@ -48,16 +48,24 @@ var PendingRegistrationView = Backbone.View.extend({
 					index: index
 				});
 			});
-			view.$el.find("table").dataTable({
+			view.table = view.$el.find("table").dataTable({
 		      	aoColumnDefs: [
 		          	{ bSortable: false, aTargets: [ 4 ] }
 		       	]
 			});
+			createEmailButton(view.$el);
+			createRefreshButton(view.$el);
+			createExportButton(view.$el);
+			addDTButtons(view.$el, "<button id='save-status' class='btn btn-primary btn-sm'>Save</button>");
 		});
 	},
 
 	events: {
-		"click #save-status": "saveStatuses"
+		"click #save-status": "saveStatuses",
+		"click #refresh": "refreshTable",
+		"click .send-email": "openEmailModal",
+		"click #export-table": "exportTable",
+		"change .toggle-checkboxes": "toggleCheckboxes"
 	},
 
 	addRow: function() {
@@ -146,7 +154,21 @@ var PendingRegistrationView = Backbone.View.extend({
 				}
 			}
 		});
-	}
+	},
+
+	toggleCheckAll: function(evt) {
+		toggleCheckboxes(this.table.fnGetNodes(), evt);
+	},
+
+	openEmailModal: function(evt) {
+		openEmailWrapper(this.table.fnGetNodes());
+	},
+
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
+	},
 });
 
 var PendingRowView = Backbone.View.extend({
@@ -202,17 +224,25 @@ var PendingTestView = Backbone.View.extend({
 					model: s
 				});
 			});
-			view.$el.find("table").dataTable({
+			view.table = view.$el.find("table").dataTable({
 		      	aoColumnDefs: [
-		          	{ bSortable: false, aTargets: [ 5 ] }
-		       	]				
+		          	{ bSortable: false, aTargets: [ 5 ] },
+		          	{ sClass: "center", aTargets: [ 5 ] },
+		          	{ sWidth: "10%", aTargets: [ 5 ] },
+		          	{ sWidth: "20%", aTargets: [ 4 ] }
+		       	]			
 			});
+			createEmailButton(view.$el);
+			createRefreshButton(view.$el);
+			createExportButton(view.$el);
 		});
 	},
 
 	events: {
 		"change .toggle-checkboxes": "toggleCheckAll",
-		"click #email-students": "emailStudents"
+		"click #refresh": "refreshTable",
+		"click .send-email": "openEmailModal",
+		"click #export-table": "exportTable"
 	},
 
 	addRow: function() {
@@ -222,43 +252,49 @@ var PendingTestView = Backbone.View.extend({
 	},
 
 	toggleCheckAll: function(evt) {
-		var checked = $(evt.currentTarget).is(":checked");
-		var rows = this.$el.find("table tbody tr");
-		_.each(rows, function(row, index) {
-			var checkbox = $(row).find("input[type='checkbox']");
-			checkbox.prop("checked", checked);
-		}, this);
+		toggleCheckboxes(this.table.fnGetNodes(), evt);
 	},
 
-	emailStudents: function() {
-		var recipients = [];
-		var rows = this.$el.find("table tbody tr");
-		_.each(rows, function(row, index) {
-			var checkbox = $(row).find("input[type='checkbox']");
-			if ($(checkbox).is(":checked")) {
-				recipients.push($(checkbox).closest("tr").data("email"));
-			}
-		}, this);	
-		openEmailModal(recipients, recipients.length, "S");
-	}
+	openEmailModal: function(evt) {
+		openEmailWrapper(this.table.fnGetNodes());
+	},
+
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
+	},
 });
 
 var PendingTestRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.userid %></td>"
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+   "<td><%= model.emailAddr %></td>"
-		+   "<td><%= model.courses %></td>"
-		+   "<td><input type='checkbox' name='email' id='<%= model.userid %>'/></td>"),
+		+   "<td class='course-list'></td>"
+		+   "<td><label class='radio-inline'><input type='radio' value='1'> Approve</label><label class='radio-inline'><input type='radio' value='0'> Deny</label></td>"
+		+   "<td><input type='checkbox' name='email' id='<%= model.userid %>' checked/></td>"),
 
 	initialize: function(options) {
 		this.render();
 	},
 
 	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON()
+		var view = this;
+		view.$el.html(view.template({
+			model: view.model.toJSON()
 		}));
-		this.$el.data("email", this.model.get("emailAddr"));
+		view.$el.data("email", view.model.get("emailAddr"));
+
+		var student = new Student();
+		student.fetch({
+			url: student.getPendingTestsUrl(this.model.get("userid"))
+		}).then(function(data) {
+			var courses = "";
+			_.each(data, function(course, index) {
+				courses += course.courseName + "<br>"
+			});
+			courses = courses.slice(0,-1);
+			view.$el.find(".course-list").html(courses);
+		});
 	}
 });
