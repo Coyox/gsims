@@ -218,7 +218,6 @@ CREATE TABLE IF NOT EXISTS `teachingSection` (
   `sectionid` int(11) NOT NULL,
   PRIMARY KEY (`userid`,`sectionid`),
   FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE
 );
 
@@ -227,7 +226,7 @@ CREATE TABLE IF NOT EXISTS `teachingCourse` (
   `courseid` int(11) NOT NULL,
   PRIMARY KEY (`userid`,`courseid`),
   FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE CASCADE,
-  FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE,
+  FOREIGN KEY (`courseid`) REFERENCES `course` (`courseid`) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS `studentCompetencyTest` (
