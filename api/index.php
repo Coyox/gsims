@@ -1341,18 +1341,20 @@ function handlePendingStudents(){
     }
 
     if ($purgeList){
-        $sql = "DELETE from login where userid in";
+        $sql = "DELETE from login where userid in ";
         list($sqlparens, $params) = parenthesisList($purgeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
         array_push($queries, $sql);
+        echo $sql;
     }
     if ($activeList){
-        $sql = "UPDATE student set status='active' where userid in";
+        $sql = "UPDATE student set status='active' where userid in ";
         list($sqlparens, $params) = parenthesisList($activeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
         array_push($queries, $sql);
+        echo $sql;
     }
 
     echo json_encode(perform_transaction($queries, $bindparams));
