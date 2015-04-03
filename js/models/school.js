@@ -112,6 +112,9 @@ var Course = Backbone.Model.extend({
     getCoursePrereqs: function(id) {
     	return this.urlRoot + "/" + id + "/prereqs";
     },
+	getCourseTeachersUrl: function(id) {
+		return this.urlRoot + "/" + id + "/teachers";
+	},
     assignCourseTeacherUrl: function(courseid, teacherid) {
 		return this.urlRoot + "/" + courseid + "/teachers/" + teacherid
 	},
@@ -170,9 +173,6 @@ var Section = Backbone.Model.extend({
     	return app.serverUrl + "api/search/sections";
     },
 	getSectionTeachersUrl: function(id) {
-		return this.urlRoot + "/" + id + "/teachers";
-	},
-	getCourseTeachersUrl: function(id) {
 		return this.urlRoot + "/" + id + "/teachers";
 	},
    	unassignTeacherUrl: function(sectionid, teacherid) {

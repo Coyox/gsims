@@ -674,8 +674,15 @@ function enrollStudent($id, $sid){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 function assignSectionTeacher($id, $tid){
-    $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
-    echo json_encode(perform_query($sql,'POST',array("tid"=>$tid, "id"=>$id)));
+    $sql = "SELECT sectionid from teaching where userid=:tid";
+    $sectionid = perform_query($sql,'GETCOL',array("tid"=>$tid));
+    if ($sectionid == "NULL"){
+        $sql = "UPDATE teaching set sectionid=:id where userid=:tid";
+    }
+    else {
+        $sql = "INSERT into teaching values (:tid, (SELECT courseid from section where sectionid=:id), :id)";
+    }
+    echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function unassignSectionTeacher($id, $tid){
     $sql = "DELETE from teaching where userid=:tid and sectionid=:id";

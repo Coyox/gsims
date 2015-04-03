@@ -51,7 +51,8 @@ var SearchTeachersView = Backbone.View.extend({
 			var view = new AddTeacherTableView({
 				el: this.$el,
 				results: data,
-				sectionid: this.sectionid
+				sectionid: this.sectionid,
+				courseid: this.courseid
 			});
 		} else {
 			app.Router.navigate("teachers/search");
@@ -93,19 +94,19 @@ var AddTeacherTableView = Backbone.View.extend({
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
-	      	aoColumnDefs: [
-	          	{ bSortable: false, aTargets: [ 4, 5 ] },
-	          	{ sClass: "center", aTargets: [ 4, 5 ] },
-	          	{ sWidth: "10%", aTargets: [ 5 ] }
-	       	]
+			aoColumnDefs: [
+			{ bSortable: false, aTargets: [ 4, 5 ] },
+			{ sClass: "center", aTargets: [ 4, 5 ] },
+			{ sWidth: "10%", aTargets: [ 5 ] }
+			]
 		});
 	},
 
 	addRow: function(selector, email) {
-        var container = $("<tr></tr>");
-        container.data("email", email);
-        this.$el.find(selector).first().append(container);
-        return container;
+		var container = $("<tr></tr>");
+		container.data("email", email);
+		this.$el.find(selector).first().append(container);
+		return container;
 	},
 });
 
@@ -137,42 +138,65 @@ var AddTeacherTableRowView = Backbone.View.extend({
 		var id = $(evt.currentTarget).attr("id");
 		if(typeof (this.sectionid) === 'undefined'){
 			var course = new Course();
-   			$.ajax({
- 				type: "POST",
- 				url: course.assignCourseTeacherUrl(this.courseid, id)
- 			}).then(function(data) {
- 				console.log(data);
- 				new TransactionResponseView({
- 					message: "This teacher has been added to this course."
- 				});
- 			}).fail(function(data) {
- 				new TransactionResponseView({
- 					title: "ERROR",
- 					status: "error",
- 					message: "This teacher could not be added to this course. Please try again."
- 				});
- 			});
- 		}
- 		else {
- 			var section = new Section();
- 			$.ajax({
- 				type: "POST",
- 				url: section.assignSectionTeacher(this.sectionid, id)
- 			}).then(function(data) {
- 				console.log(data);
- 				new TransactionResponseView({
- 					message: "This teacher has been added to this section."
- 				});
- 			}).fail(function(data) {
- 				new TransactionResponseView({
- 					title: "ERROR",
- 					status: "error",
- 					message: "This teacher could not be added to this section. Please try again."
- 				});
- 			});
- 		}
- 	}
- });
+			console.log(this.courseid);
+			$.ajax({
+				type: "POST",
+				url: course.assignCourseTeacherUrl(this.courseid, id)
+			}).then(function(data) {
+				console.log(data);
+				try {
+					if (typeof data == "string"){
+						data = JSON.parse(data);
+					}
+					if (data.status=="success") {
+						new TransactionResponseView({
+							message: "This teacher has been added to this course."
+						});
+					}
+					else {
+						new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "This teacher could not be added to this course. Please try again."
+						});
+					}
+				}
+				catch(err){
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "This teacher could not be added to this course. Please try again."
+					});
+
+				}
+			}).fail(function(data) {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "This teacher is already assigned to this course. Please try again."
+				});
+			});
+		}
+		else {
+			var section = new Section();
+			$.ajax({
+				type: "POST",
+				url: section.assignSectionTeacher(this.sectionid, id)
+			}).then(function(data) {
+				console.log(data);
+				new TransactionResponseView({
+					message: "This teacher has been added to this section."
+				});
+			}).fail(function(data) {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "This teacher could not be added to this section. Please try again."
+				});
+			});
+		}
+	}
+});
 
 
 var TeachersTableView = Backbone.View.extend({
@@ -207,11 +231,11 @@ var TeachersTableView = Backbone.View.extend({
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
-	      	aoColumnDefs: [
-	          	{ bSortable: false, aTargets: [ 4, 5 ] },
-	          	{ sClass: "center", aTargets: [ 4, 5 ] },
-	          	{ sWidth: "10%", aTargets: [ 5 ] }
-	       	]
+			aoColumnDefs: [
+			{ bSortable: false, aTargets: [ 4, 5 ] },
+			{ sClass: "center", aTargets: [ 4, 5 ] },
+			{ sWidth: "10%", aTargets: [ 5 ] }
+			]
 		});
 		this.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
 		this.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh</button>");
@@ -228,11 +252,11 @@ var TeachersTableView = Backbone.View.extend({
 				});
 			}, view);
 			view.table = view.$el.find("table").dataTable({
-		      	aoColumnDefs: [
-		          	{ bSortable: false, aTargets: [ 4, 5 ] },
-		          	{ sClass: "center", aTargets: [ 4, 5 ] },
-		          	{ sWidth: "10%", aTargets: [ 5 ] }
-		       	]
+				aoColumnDefs: [
+				{ bSortable: false, aTargets: [ 4, 5 ] },
+				{ sClass: "center", aTargets: [ 4, 5 ] },
+				{ sWidth: "10%", aTargets: [ 5 ] }
+				]
 			});
 			view.$el.find(".dataTables_filter").append("<button class='send-email btn btn-sm btn-primary dt-btn'>Send Email</button>");
 			view.$el.find(".dataTables_filter").append("<button id='refresh' class='btn btn-sm btn-primary dt-btn'>Refresh Table</button>");
@@ -240,10 +264,10 @@ var TeachersTableView = Backbone.View.extend({
 	},
 
 	addRow: function(selector, email) {
-        var container = $("<tr></tr>");
-        container.data("email", email);
-        this.$el.find(selector).first().append(container);
-        return container;
+		var container = $("<tr></tr>");
+		container.data("email", email);
+		this.$el.find(selector).first().append(container);
+		return container;
 	},
 
 	openEmailModal: function(evt) {

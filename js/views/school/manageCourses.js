@@ -47,10 +47,10 @@ var CourseManagement = Backbone.View.extend({
 			dom: "t",
 			bAutoWidth: false,
 			aoColumns: [
-				{ sWidth: "15%" },
-				{ sWidth: "35%" },
-				{ sWidth: "20%" },
-				{ sWidth: "30%" }
+			{ sWidth: "15%" },
+			{ sWidth: "35%" },
+			{ sWidth: "20%" },
+			{ sWidth: "30%" }
 			],
 			bSort: false
 		});
@@ -65,53 +65,53 @@ var CourseManagement = Backbone.View.extend({
 		"click #save-sections": "saveEnrolledSections",
 		"change #school-menu": "populateDepartments",
 		"click #add-course": "addCourseToDept",
-        "click #purge-courses": "purgeCourses"
+		"click #purge-courses": "purgeCourses"
 
 	},
 
-     purgeCourses: function(){
-        var course = new Course();
+	purgeCourses: function(){
+		var course = new Course();
 		course.fetch().then(function(data) {
-            var ids = [];
+			var ids = [];
 			_.each(data, function(object, index) {
-                 ids.push(object.courseid);
-            });
-            var purge = new Purge();
-            $.ajax({
-                type: "POST",
-                url: purge.purgeCourses(),
-                data: {
-                  deptids: JSON.stringify(ids)
-                }
-            }).then(function(data) {
+				ids.push(object.courseid);
+			});
+			var purge = new Purge();
+			$.ajax({
+				type: "POST",
+				url: purge.purgeCourses(),
+				data: {
+					deptids: JSON.stringify(ids)
+				}
+			}).then(function(data) {
            // if (typeof data == "string") {
            //     data = JSON.parse(data);
            // }
-                if (data.status == "success") {
-                  new TransactionResponseView({
-                      message: "The selected records have successfully been purged."
-                  });
-             } else {
-                  new TransactionResponseView({
-                    title: "ERROR",
-                    status: "error",
-                    message: "The selected could not be purged. Please try again."
-                    });
-                }
-            }).fail(function(data) {
-                new TransactionResponseView({
-                    title: "ERROR",
-                    status: "error",
-                    message: "The selected could not be purged. Please try again."
-             });
-         });
-     });
-     },
+           if (data.status == "success") {
+           	new TransactionResponseView({
+           		message: "The selected records have successfully been purged."
+           	});
+           } else {
+           	new TransactionResponseView({
+           		title: "ERROR",
+           		status: "error",
+           		message: "The selected could not be purged. Please try again."
+           	});
+           }
+       }).fail(function(data) {
+       	new TransactionResponseView({
+       		title: "ERROR",
+       		status: "error",
+       		message: "The selected could not be purged. Please try again."
+       	});
+       });
+   });
+},
 
-	populateDepartments: function(evt) {
-		var view = this;
-		var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
-			$("#school-options").find("option:selected").attr("id");
+populateDepartments: function(evt) {
+	var view = this;
+	var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
+	$("#school-options").find("option:selected").attr("id");
 
 		// temp fix
 		if (!schoolid) {
@@ -536,18 +536,18 @@ var SectionTableRowView = Backbone.View.extend({
 			this.model.get("startTime"),
 			this.model.get("endTime"),
 			"<span class='remove-section link'>Remove</span>"
-		]).draw().node();
+			]).draw().node();
 
 		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
 		$(row).attr("id", this.model.get("sectionid"))
-			.data("section", this.model.toJSON());
+		.data("section", this.model.toJSON());
 	},
 
 	removeSection: function(evt) {
 		this.parentView.enrolledTable
-			.row($(evt.currentTarget).parents("tr"))
-			.remove()
-			.draw();
+		.row($(evt.currentTarget).parents("tr"))
+		.remove()
+		.draw();
 	}
 });
 
@@ -581,6 +581,7 @@ var ViewCourse = Backbone.View.extend({
 					value: value
 				});
 			});
+			view.teachersForm(view.id);
 
 			var section = new Section();
 			section.fetch({
@@ -602,10 +603,13 @@ var ViewCourse = Backbone.View.extend({
 						el: view.addCourseSection(),
 						model: section
 					})
-				})
+				});
 			});
 		});
 	},
+
+
+
 	addRow: function() {
 		var container = $("<div class='form-group'></div>");
 		this.$el.find(".form-horizontal").append(container);
@@ -662,6 +666,13 @@ var ViewCourse = Backbone.View.extend({
 	editCourse: function(evt) {
 		// this.action = "edit";
 		// this.render();
+	},
+
+	teachersForm: function(id) {
+		new TeacherSectionView({
+			el: $("#course-teachers-form"),
+			courseid: id
+		});
 	},
 
 	addSectionToCourse: function(evt) {
@@ -725,39 +736,39 @@ var ViewCourse = Backbone.View.extend({
 				});
 			}
 		});
-	},
+},
 
-	updateSection: function(evt) {
-		var val = $(evt.currentTarget).val();
-		var name = $(evt.currentTarget).attr("name");
-		this.model.set(name, val);
-	},
+updateSection: function(evt) {
+	var val = $(evt.currentTarget).val();
+	var name = $(evt.currentTarget).attr("name");
+	this.model.set(name, val);
+},
 
-	addTeacherToCourse: function() {
-		$("#container").append(html["addTeacherToSection.html"]);
+addTeacherToCourse: function() {
+	$("#container").append(html["addTeacherToSection.html"]);
 
-		var elem = $("#add-teacher-modal");
-		var backdrop = $(".modal-backdrop");
+	var elem = $("#add-teacher-modal");
+	var backdrop = $(".modal-backdrop");
 
-		new SearchTeachersView({
-			el: $(".modal-body"),
-			redirect: false,
-			courseid: this.id
-		});
+	new SearchTeachersView({
+		el: $(".modal-body"),
+		redirect: false,
+		courseid: this.id
+	});
 
-		elem.modal({
-			show: true
-		});
+	elem.modal({
+		show: true
+	});
 
-		elem.on("hidden.bs.modal", function() {
-			elem.remove();
-			backdrop.remove();
-		});
+	elem.on("hidden.bs.modal", function() {
+		elem.remove();
+		backdrop.remove();
+	});
 
-		this.model = new Section();
-		Backbone.Validation.bind(this);
+	this.model = new Course();
+	Backbone.Validation.bind(this);
 
-	}
+}
 });
 
 
@@ -1083,7 +1094,7 @@ var SectionView = Backbone.View.extend({
 			// 	});
 			// }
 		});
-	}
+}
 
 
 });
@@ -1140,35 +1151,61 @@ var ViewSectionRow = Backbone.View.extend({
 var TeacherSectionView = Backbone.View.extend({
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
+		this.courseid = options.courseid;
 		this.render();
 	},
 
 	render: function() {
 		var view = this;
-		var section = new Section({id: this.sectionid});
-		section.fetch({
-			url: section.getSectionTeachersUrl(this.sectionid)
-		}).then(function(data) {
-			if (data.length == 0) {
-				var table = view.$el.find("table");
-				table.hide();
-				table.after("<div class='alert alert-danger'>There are currently no teachers teaching this section.</div>");
-			} else {
-				_.each(data, function(teach, index) {
-					var model = new Teacher(teach, {parse:true});
-					new TeacherSectionRowView({
-						el: view.addRow(),
-						model: model,
-						sectionid: view.sectionid,
-						parent: view
+		if(typeof (this.sectionid) === 'undefined'){
+			var course = new Course({id: this.courseid});
+			course.fetch({
+				url: course.getCourseTeachersUrl(this.courseid)
+			}).then(function(data) {
+				if (data.length == 0) {
+					var table = view.$el.find("table");
+					table.hide();
+					table.after("<div class='alert alert-danger'>There are currently no teachers teaching this course.</div>");
+				} else {
+					_.each(data, function(teach, index) {
+						var model = new Teacher(teach, {parse:true});
+						new TeacherSectionRowView({
+							el: view.addRow(),
+							model: model,
+							courseid: view.courseid,
+							parent: view
+						});
 					});
-				});
-			}
+				}
+			});
+		}
+		else{
+			var section = new Section({id: this.sectionid});
+			section.fetch({
+				url: section.getSectionTeachersUrl(this.sectionid)
+			}).then(function(data) {
+				if (data.length == 0) {
+					var table = view.$el.find("table");
+					table.hide();
+					table.after("<div class='alert alert-danger'>There are currently no teachers teaching this section.</div>");
+				} else {
+					_.each(data, function(teach, index) {
+						var model = new Teacher(teach, {parse:true});
+						new TeacherSectionRowView({
+							el: view.addRow(),
+							model: model,
+							sectionid: view.sectionid,
+							parent: view
+						});
+					});
+				}
 			// view.table = view.$el.find("table").dataTable({
 			// 	dom: "t"
 			// });
 		});
 
+
+		}
 	},
 
 	addRow: function(evt) {
@@ -1185,6 +1222,7 @@ var TeacherSectionRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
+		this.courseid = options.courseid;
 		this.parent = options.parent;
 		this.render();
 	},
@@ -1202,28 +1240,60 @@ var TeacherSectionRowView = Backbone.View.extend({
 	unassignTeacher: function(evt) {
 		var view = this;
 		var id = $(evt.currentTarget).attr("id");
-		var section = new Section();
-		$.ajax({
-			type: "DELETE",
-			url: section.unassignTeacherUrl(this.sectionid, id),
-		}).then(function(data) {
-			if (typeof data == "string") {
-				data = JSON.parse(data);
-			}
-			if (data.status=="success") {
-				new TransactionResponseView({
-					message: "Teacher was successfully unassigned."
-				});
-				view.parent.render();
-			}
-			else {
-				new TransactionResponseView({
-					title: "ERROR",
-					status: "error",
-					message: "Cound not unassign teacher. Please try again."
-				});
-			}
-		});
+		if(typeof (this.sectionid) === 'undefined'){
+			var course = new Course();
+			$.ajax({
+				type: "DELETE",
+				url: course.unassignCourseTeacherUrl(this.courseid, id),
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "Teacher was successfully unassigned."
+					});
+					view.parent.render();
+				}
+				else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Cound not unassign teacher. Please try again."
+					});
+				}
+			});
+
+
+		}
+		else {
+
+			var section = new Section();
+			$.ajax({
+				type: "DELETE",
+				url: section.unassignTeacherUrl(this.sectionid, id),
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "Teacher was successfully unassigned."
+					});
+					view.parent.render();
+				}
+				else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Cound not unassign teacher. Please try again."
+					});
+				}
+			});
+
+
+		}
+
 	}
 });
 
@@ -1256,8 +1326,8 @@ var StudentsEnrolledView = Backbone.View.extend({
 				// view.table = view.$el.find("table").dataTable({
 				// 	dom: "t"
 				// });
-			}
-		});
+	}
+});
 	},
 
 	addRow: function(evt) {
@@ -1369,8 +1439,8 @@ var AttendanceView = Backbone.View.extend({
 				//view.table = view.$el.find("table").dataTable({
 				// 	dom: "t"
 				// });
-			}
-		});
+	}
+});
 	},
 
 	events: {
@@ -1496,8 +1566,8 @@ var DocumentsView = Backbone.View.extend({
 				// view.table = view.$el.find("table").dataTable({
 				// 	dom: "t"
 				// });
-			}
-		});
+	}
+});
 	},
 
 	events: {
