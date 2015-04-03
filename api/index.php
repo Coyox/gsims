@@ -1883,7 +1883,7 @@ function findSections($schoolid){
     //Find options
     $deptname = $_GET['deptName'];
     $coursename = $_GET['courseName'];
-    $day = $_GET['day'];
+    $days = $_GET['days'];
     $startTime = $_GET['startTime'];
     $endTime = $_GET['endTime'];
 
@@ -1905,8 +1905,8 @@ function findSections($schoolid){
             from section s, course c1
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
-        if (isset($day)){
-            list($clause, $day_bindparam) = buildWhereClause($day);
+        if (isset($days)){
+            list($clause, $day_bindparam) = buildDayClause($days);
             $bindparam = $bindparam + $day_bindparam;
             $sql.= $clause;
         }
