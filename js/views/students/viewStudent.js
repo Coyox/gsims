@@ -448,18 +448,14 @@ var StudentAttendanceView = Backbone.View.extend({
 		this.$el.find("#current-month").text(currentMonthName.toUpperCase());
 
 		var nextMonthIndex = parseInt(this.currentMonth) + 1;
-		nextMonthIndex = nextMonthIndex > 12 ? 0 : nextMonthIndex;
+		nextMonthIndex = nextMonthIndex > 11 ? 0 : nextMonthIndex;
 		var nextMonthName = this.indexToMonth(nextMonthIndex);
 		this.$el.find("#next-month").text(nextMonthName + " >").data("index", nextMonthIndex);
 
 		var prevMonthIndex = parseInt(this.currentMonth) - 1;
-		prevMonthIndex = prevMonthIndex < 0 ? 12 : prevMonthIndex;
+		prevMonthIndex = prevMonthIndex < 0 ? 11 : prevMonthIndex;
 		var prevMonthName = this.indexToMonth(prevMonthIndex);
 		this.$el.find("#prev-month").text("< " + prevMonthName).data("index", prevMonthIndex);
-
-		console.log("curr", this.currentMonth);
-		console.log("next", nextMonthIndex);
-		console.log("prev", prevMonthIndex);
 
 		var view = this;
 		var student = new Student({id:this.model.get("userid")});
@@ -551,37 +547,37 @@ var StudentAttendanceView = Backbone.View.extend({
 
 var StudentAttendanceRowView = Backbone.View.extend({
 	cellTemplate: _.template("<td></td>"
-		+	"<td name='01'></td>"
-		+	"<td name='02'></td>"
-		+	"<td name='03'></td>"
-		+	"<td name='04'></td>"
-		+	"<td name='05'></td>"
-		+	"<td name='06'></td>"
-		+	"<td name='07'></td>"
-		+	"<td name='08'></td>"
-		+	"<td name='09'></td>"
-		+	"<td name='10'></td>"
-		+	"<td name='11'></td>"
-		+	"<td name='12'></td>"
-		+	"<td name='13'></td>"
-		+	"<td name='14'></td>"
-		+	"<td name='15'></td>"
-		+	"<td name='16'></td>"
-		+	"<td name='17'></td>"
-		+	"<td name='18'></td>"
-		+	"<td name='19'></td>"
-		+	"<td name='20'></td>"
-		+	"<td name='21'></td>"
-		+	"<td name='22'></td>"
-		+	"<td name='23'></td>"
-		+	"<td name='24'></td>"
-		+	"<td name='25'></td>"
-		+	"<td name='26'></td>"
-		+	"<td name='27'></td>"
-		+	"<td name='28'></td>"
-		+	"<td name='29'></td>"
-		+	"<td name='30'></td>"
-		+	"<td name='31'></td>"),
+		+	"<td class='att-cel' name='01'></td>"
+		+	"<td class='att-cel' name='02'></td>"
+		+	"<td class='att-cel' name='03'></td>"
+		+	"<td class='att-cel' name='04'></td>"
+		+	"<td class='att-cel' name='05'></td>"
+		+	"<td class='att-cel' name='06'></td>"
+		+	"<td class='att-cel' name='07'></td>"
+		+	"<td class='att-cel' name='08'></td>"
+		+	"<td class='att-cel' name='09'></td>"
+		+	"<td class='att-cel' name='10'></td>"
+		+	"<td class='att-cel' name='11'></td>"
+		+	"<td class='att-cel' name='12'></td>"
+		+	"<td class='att-cel' name='13'></td>"
+		+	"<td class='att-cel' name='14'></td>"
+		+	"<td class='att-cel' name='15'></td>"
+		+	"<td class='att-cel' name='16'></td>"
+		+	"<td class='att-cel' name='17'></td>"
+		+	"<td class='att-cel' name='18'></td>"
+		+	"<td class='att-cel' name='19'></td>"
+		+	"<td class='att-cel' name='20'></td>"
+		+	"<td class='att-cel' name='21'></td>"
+		+	"<td class='att-cel' name='22'></td>"
+		+	"<td class='att-cel' name='23'></td>"
+		+	"<td class='att-cel' name='24'></td>"
+		+	"<td class='att-cel' name='25'></td>"
+		+	"<td class='att-cel' name='26'></td>"
+		+	"<td class='att-cel' name='27'></td>"
+		+	"<td class='att-cel' name='28'></td>"
+		+	"<td class='att-cel' name='29'></td>"
+		+	"<td class='att-cel' name='30'></td>"
+		+	"<td class='att-cel' name='31'></td>"),
 
 	initialize: function(options) {
 		this.index = options.index;

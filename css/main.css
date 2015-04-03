@@ -262,7 +262,7 @@ a {
 }
 
 .red {
-	color: #CB0000;
+	color: #CB0000 !important;
 }
 
 .red-badge {
@@ -517,6 +517,10 @@ tr.shown td.details-control {
 	font-size: 24px;
 }
 
+.att-cell, .att-header {
+	width: 10px !important;
+	height: 10px !important;
+}
 
 
 .easyWizardSteps {list-style:none;width:100%;overflow:hidden;margin:0;padding:0;border-bottom:1px solid #ccc;margin-bottom:20px}
