@@ -1268,8 +1268,6 @@ function approveDenyEnrollment($id){
 
 
 function enrollStudentInTests($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
     $courseids = json_decode($_POST["courseids"]);
 
     $bindparams = array("userid" => $id);
@@ -1300,38 +1298,63 @@ function updateStudentTestScores($id){
 function handlePendingStudents(){
     $queries = array();
     $bindparams = array();
-    if (isset($_POST['approvedList'])){
-        $students = json_decode($_POST['approvedList']);
-        foreach ($students as $student){
-            $params = array("userid"=>$student->userid);
-            $sql = "UPDATE student set status='active' where userid=:userid";
-            array_push($bindparams, $params);
-            array_push($queries, $sql);
+    $purgeList = array();
+    $activeList = array();
 
-            $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
-            list($sqlparens, $param) = parenthesisList($student->sectionids);
-            $sql.=$sqlparens;
-            $params += $param;
-            array_push($bindparams, $params);
-            array_push($queries, $sql);
+    $students = json_decode($_POST['students']);
+
+    foreach ($students as $student){
+        if ($student->status == "denied"){
+            array_push($purgeList, $student->userid);
+        }
+        else {
+            array_push($activeList, $student->userid);
+            $param = array("userid"=>$student->userid);
+            if ($student->approvedList){
+                $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
+                list($sqlparens, $params) = parenthesisList($student->approvedList);
+                $sql.=$sqlparens;
+                $params += $param;
+                array_push($bindparams, $params);
+                array_push($queries, $sql);
+            }
+            if ($student->deniedList){
+                $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
+                list($sqlparens, $params) = parenthesisList($student->deniedList);
+                $sql.=$sqlparens;
+                $params += $param;
+                array_push($bindparams, $params);
+                array_push($queries, $sql);
+            }
+            if ($student->testList){
+                $params = $param;
+                $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
+                foreach (array_values($student->testList) as $i => $courseid) {
+                    $sql.= "(:userid, :courseid".$i."),";
+                    $params["courseid".$i] = $courseid;
+                }
+                $sql = rtrim($sql, ",");
+                array_push($bindparams, $params);
+                array_push($queries, $sql);
+            }
         }
     }
-    if (isset($_POST['deniedList'])){
-        $students = json_decode($_POST['deniedList']);
-        foreach ($students as $student){
-            $params = array("userid"=>$student->userid);
-            $sql = "DELETE from login where userid=:userid";
-            array_push($queries, $sql);
-            array_push($bindparams, $params);
 
-            $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
-            list($sqlparens, $param) = parenthesisList($student->sectionids);
-            $sql.=$sqlparens;
-            $params += $param;
-            array_push($bindparams, $params);
-            array_push($queries, $sql);
-        }
+    if ($purgeList){
+        $sql = "DELETE from login where userid in";
+        list($sqlparens, $params) = parenthesisList($purgeList);
+        $sql.=$sqlparens;
+        array_push($bindparams, $params);
+        array_push($queries, $sql);
     }
+    if ($activeList){
+        $sql = "UPDATE student set status='active' where userid in";
+        list($sqlparens, $params) = parenthesisList($activeList);
+        $sql.=$sqlparens;
+        array_push($bindparams, $params);
+        array_push($queries, $sql);
+    }
+
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
