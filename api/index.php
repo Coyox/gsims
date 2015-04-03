@@ -1804,7 +1804,7 @@ function massCreateLogins($users, $usertype){
 */
 function findUsers($schoolid, $usertype){
     $param = array();
-    $clause = "".
+    $clause = "";
     $bindparams = array("schoolid"=>$schoolid);
     $firstname = $_GET['firstName'];
     $lastname = $_GET['lastName'];
@@ -1851,7 +1851,7 @@ function findUsers($schoolid, $usertype){
 
             list($where, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
-            $clause.=$where;
+            $clause.= $where;
             $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,

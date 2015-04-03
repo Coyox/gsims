@@ -212,12 +212,13 @@ function buildWhereClause($fields){
     foreach ($fields as $key=>$value) {
         $clause.= " AND ";
         if(substr($key, -4) === 'Name'){
-            $clause.=$key." like '%:".$key."%'";
+            $clause.=$key." like '%".$value."%'";
         }
         else {
             $clause.=$key."=:".$key;
+            $bindparams[$key] = $value;
         }
-        $bindparams[$key] = $value;
+
     }
     return array($clause, $bindparams);
 }
