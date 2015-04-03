@@ -1300,23 +1300,23 @@ function handlePendingStudents(){
     if (isset($_POST['approvedList'])){
         $ids = json_decode($_POST['approvedList']);
         $sql = "UPDATE student set status='active' where userid in ";
-        $ret = parenthesisList($ids);
-        $sql.=$ret[0];
+        list($sqlparens, $params) = parenthesisList($ids);
+        $sql.=$sqlparens;
         array_push($queries, $sql);
-        $bindparams[0] = $ret[1];
+        array_push($bindparams, $params);
 
         $sql = "DELETE from studentCompetencyTest where userid in ";
-        $sql.=$ret[0];
+        $sql.=$sqlparens;
         array_push($queries, $sql);
-        $bindparams[1] = $ret[1];
+        array_push($bindparams, $params);
     }
     if (isset($_POST['deniedList'])){
         $ids = json_decode($_POST['deniedList']);
         $sql = "DELETE from login where userid in ";
-        $ret = parenthesisList($ids);
-        $sql.=$ret[0];
+        list($sqlparens, $params) = parenthesisList($ids);
+        $sql.=$sqlparens;
         array_push($queries, $sql);
-        $bindparams[2] = $ret[1];
+        array_push($bindparams, $params);
     }
     echo json_encode(perform_transaction($queries, $bindparams));
 }
@@ -1490,7 +1490,7 @@ function deleteTeacher($id) {
 function getTeachingSections($id){
     $sql = "SELECT c.courseid, c.courseName, c.description, s.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
     from teachingSection t, course c, section s
-    where t.userid=:id and t.sectionid=s.sectionid and t.courseid=c.courseid";
+    where t.userid=:id and t.sectionid=s.sectionid";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
