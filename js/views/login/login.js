@@ -53,7 +53,12 @@ var LoginView = Backbone.View.extend({
 					}).then(function (data) {
 						sessionStorage.setItem("gobind-email", data.emailAddr);
 						sessionStorage.setItem("gobind-user", JSON.stringify(data));
-						app.Router.navigate("home", {trigger:true});
+						if (app.usertype == "SU") {
+							app.Router.navigate("selectSchool", {trigger:true});
+						} else {
+							sessionStorage.setItem("gobind-schoolid", data.schoolid);
+							app.Router.navigate("home", {trigger:true});
+						}
 					});
 				} else {
 					setTimeout(function() {
@@ -162,6 +167,40 @@ var ResetPasswordView = Backbone.View.extend({
 					});
 				}
 			});
+		}
+	}
+});
+
+var SelectSchoolView = Backbone.View.extend({
+	template: _.template("<div id='<%= id %>' class='school-option center'>"
+		+		"<span class='glyphicon glyphicon-education'></span>"
+		+		"<br>"
+		+		"<span class='school-text'><%= location %></span>"
+		+	"</div>"),
+
+	initialize: function(options) {
+		this.$el.html(html["selectSchool.html"]);
+		this.render();
+	},
+
+	render: function() {
+		_.each(app.schoolOptions, function(option, index) {
+			this.$el.find(".options").append(this.template({
+				location: option.location,
+				id: option.schoolid
+			}))
+		}, this);
+	},
+
+	events: {
+		"click .school-option": "selectSchool"
+	},
+
+	selectSchool: function(evt) {
+		var id = $(evt.currentTarget).attr("id");
+		if (id) {
+			sessionStorage.setItem("gobind-schoolid", id);
+			app.Router.navigate("home", {trigger:true});
 		}
 	}
 });

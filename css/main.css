@@ -477,11 +477,40 @@ tr.shown td.details-control {
 #import-template-table td:last-child,
 #export-data-table td:last-child {
 	width: 100px;
-	text-align: center;
 }
 
 #filter-students-container .form-horizontal {
 	/*margin: 10px;*/
+}
+
+.school-option {
+	border: 1px solid #ddd;
+	padding: 10px;
+	float: left;
+	width: 150px;
+	height: 75px;
+	text-align: center;
+	background-color: #fff;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.school-option:hover {
+	background-color: #9d426b;
+	color: #fff;
+}
+
+.school-option .school-text {
+	font-size: 18px;
+}
+
+.school-option .select-school {
+	text-transform: uppercase;
+	font-size: 11px;
+}
+
+.school-option .glyphicon {
+	font-size: 24px;
 }
 
 

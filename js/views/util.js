@@ -127,7 +127,7 @@ function populateSchoolMenu(elem, schools, selected) {
 	$.each(schools, function(i, val) {
 		var option = $("<option></option>");
 		option.attr("value", val.schoolid);
-		option.prop("selected", val == selected);
+		option.prop("selected", val.schoolid == selected);
 		option.text(capitalize(val.location));
 		elem.append(option);
 	});

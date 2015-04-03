@@ -1,9 +1,9 @@
 /** Global application object */
 var app = {
 	serverUrl: "https://gobind-sarvar.rhcloud.com/",
-	currentSchoolYear: "2014-2015",
-	selectedSchoolYearId: "100000",
-	selectedSchoolId: "412312",
+	// currentSchoolYear: "2014-2015",
+	// selectedSchoolYearId: "100000",
+	// selectedSchoolId: "412312",
 };
 
 /** Object to hold all HTML templates (pre-loaded) */
@@ -43,19 +43,11 @@ $(function() {
 	promises.push(prom2);
 
 	$.when.apply($, promises).done(function () {
-	 	 // do things that need to wait until ALL gets are done
 	  	loadLoginTemplate();
 		loadTemplates();
 	});
 
-	$("body").on("click", function(e) {
-	    if ($(e.target).data('toggle') !== 'popover'
-	        && $(e.target).parents('.popover.in').length === 0) {
-	        $('[data-toggle="popover"]').popover('hide');
-	    }
-	});
-
-	$("body").on("click", "#back-btn", function() {
+	$(document).on("click", "#back-btn", function() {
 		history.back();
 	});
 });
@@ -133,7 +125,8 @@ function loadTemplates() {
 		"addStudentToSection.html",
 		"viewPurge.html",
 		"createDocument.html",
-		"addTeacherToSection.html"
+		"addTeacherToSection.html",
+		"selectSchool.html"
 	];
 
 	$.each(templates, function(i, name) {

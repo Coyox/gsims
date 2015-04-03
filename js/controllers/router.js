@@ -41,6 +41,7 @@ var Router = Backbone.Router.extend({
     routes: {
         "":             		"login",
         "forgotPassword": 		"forgotPassword",
+        "selectSchool":         "selectSchool",
         "reset/:id/:name":      "resetPassword",
         "home": 	    		"home",
 
@@ -524,6 +525,12 @@ var Router = Backbone.Router.extend({
         new SectionView({
             el: $("#content"),
             id: id
+        });
+    },
+
+    selectSchool: function(evt) {
+        new SelectSchoolView({
+            el: $("#container")
         });
     }
 });

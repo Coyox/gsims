@@ -35,7 +35,7 @@ var SidebarView = Backbone.View.extend({
 			usertype: sessionStorage.getItem("gobind-usertype")
 		});
 		this.$el.html(template);
-		this.populateSchoolMenu();
+		populateSchoolMenu(this.$el.find("#school-options"), app.schoolOptions, sessionStorage.getItem("gobind-schoolid"));
 		this.populateSchoolYearMenu();
 	},
 
@@ -49,19 +49,6 @@ var SidebarView = Backbone.View.extend({
 
 		var li = $(evt.currentTarget).closest("li");
 		li.addClass("active");
-	},
-
-	populateSchoolMenu: function() {
-		var select = this.$el.find("#school-options");
-		new School().fetch().then(function(data) {
-			_.each(data, function(object, index) {
-				var option = $("<option></option>");
-				option.attr("id", object.schoolid);
-				option.attr("value", object.location);
-				option.text(object.location);
-				select.append(option);
-			});
-		});
 	},
 
 	populateSchoolYearMenu: function() {
