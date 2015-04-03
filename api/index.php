@@ -1876,9 +1876,9 @@ function findUsers($schoolid, $usertype){
 }
 
 
-function findSections($schoolyearid){
+function findSections($schoolid){
     //Non-filter options
-    $schoolid = $_GET['schoolid'];
+    $schoolyearid = $_GET['schoolyearid'];
 
     //Find options
     $deptname = $_GET['deptName'];
