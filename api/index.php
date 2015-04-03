@@ -482,7 +482,7 @@ function getCourseTeachers($id){
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function getCoursePrereqs($id){
-    $sql = "SELECT courseid, prereq from prereqs where courseid=:id";
+    $sql = "SELECT prereq from prereqs where courseid=:id";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function assignCourseTeacher($id, $tid){
