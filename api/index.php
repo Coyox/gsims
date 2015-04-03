@@ -1875,9 +1875,8 @@ function findUsers($schoolid, $usertype){
 }
 
 
-function findSections(){
+function findSections($schoolyearid){
     //Non-filter options
-    $schoolyear = $_GET['schoolyearid'];
     $schoolid = $_GET['schoolid'];
 
     //Find options
@@ -1890,7 +1889,7 @@ function findSections(){
 
     if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
         $params = array();
-        $bindparam = array("schoolyear"=>$schoolyear, "schoolid"=>$schoolid);
+        $bindparam = array("schoolyear"=>$schoolyearid, "schoolid"=>$schoolid);
         $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
         $courseclause = " and c.schoolyearid=:schoolyear";
         if (isset($deptname)){
@@ -1916,7 +1915,7 @@ function findSections(){
         echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
     else {
-        return getSectionsBySchool($schoolyear, $schoolid);
+        return getSectionsBySchool($schoolyearid, $schoolid);
     }
 }
 
