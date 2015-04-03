@@ -1304,12 +1304,15 @@ function handlePendingStudents(){
     $students = json_decode($_POST['students']);
 
     foreach ($students as $student){
+        echo $student;
+        echo $student->status;
         if ($student->status == "denied"){
             array_push($purgeList, $student->userid);
         }
         else {
             array_push($activeList, $student->userid);
             $param = array("userid"=>$student->userid);
+            echo $student->approvedList;
             if ($student->approvedList){
                 $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
                 list($sqlparens, $params) = parenthesisList($student->approvedList);
@@ -1339,18 +1342,16 @@ function handlePendingStudents(){
             }
         }
     }
-    echo json_encode($purgeList);
-    echo json_encode($activeList);
 
-    if (array_filter($purgeList)){
-        $sql = "DELETE from login where userid in ";
+    if ($purgeList){
+        $sql = "DELETE from login where userid in";
         list($sqlparens, $params) = parenthesisList($purgeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
         array_push($queries, $sql);
     }
-    if (array_filter($activeList)){
-        $sql = "UPDATE student set status='active' where userid in ";
+    if ($activeList){
+        $sql = "UPDATE student set status='active' where userid in";
         list($sqlparens, $params) = parenthesisList($activeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
