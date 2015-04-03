@@ -2,6 +2,7 @@ var SearchTeachersView = Backbone.View.extend({
 	initialize: function(options) {
 		this.redirect = options.redirect;
 		this.sectionid = options.sectionid;
+		this.courseid = options.courseid;
 		this.render();
 	},
 
@@ -72,6 +73,7 @@ var AddTeacherTableView = Backbone.View.extend({
 		this.template = options.template;
 		this.results = options.results;
 		this.sectionid = options.sectionid;
+		this.courseid = options.courseid;
 		this.render();
 	},
 
@@ -86,7 +88,8 @@ var AddTeacherTableView = Backbone.View.extend({
 			new AddTeacherTableRowView({
 				model: model,
 				el: this.addRow(".results", model.get("emailAddr")),
-				sectionid: this.sectionid
+				sectionid: this.sectionid,
+				courseid: this.courseid
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
@@ -116,6 +119,7 @@ var AddTeacherTableRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
+		this.courseid = options.courseid;
 		this.render();
 	},
 
@@ -131,24 +135,44 @@ var AddTeacherTableRowView = Backbone.View.extend({
 
 	addTeacher: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
-		var section = new Section();
-		$.ajax({
-			type: "POST",
-			url: section.assignSectionTeacher(this.sectionid, id)
-		}).then(function(data) {
-			console.log(data);
-			new TransactionResponseView({
-				message: "This teacher has been added to this section."
-			});
-		}).fail(function(data) {
-			new TransactionResponseView({
-				title: "ERROR",
-				status: "error",
-				message: "This teacher could not be added to this section. Please try again."
-			});
-		})
-	}
-});
+		if(typeof (this.sectionid) === 'undefined'){
+			var course = new Course();
+   			$.ajax({
+ 				type: "POST",
+ 				url: course.assignCourseTeacherUrl(this.courseid, id)
+ 			}).then(function(data) {
+ 				console.log(data);
+ 				new TransactionResponseView({
+ 					message: "This teacher has been added to this course."
+ 				});
+ 			}).fail(function(data) {
+ 				new TransactionResponseView({
+ 					title: "ERROR",
+ 					status: "error",
+ 					message: "This teacher could not be added to this course. Please try again."
+ 				});
+ 			});
+ 		}
+ 		else {
+ 			var section = new Section();
+ 			$.ajax({
+ 				type: "POST",
+ 				url: section.assignSectionTeacher(this.sectionid, id)
+ 			}).then(function(data) {
+ 				console.log(data);
+ 				new TransactionResponseView({
+ 					message: "This teacher has been added to this section."
+ 				});
+ 			}).fail(function(data) {
+ 				new TransactionResponseView({
+ 					title: "ERROR",
+ 					status: "error",
+ 					message: "This teacher could not be added to this section. Please try again."
+ 				});
+ 			});
+ 		}
+ 	}
+ });
 
 
 var TeachersTableView = Backbone.View.extend({

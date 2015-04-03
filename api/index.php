@@ -74,13 +74,13 @@ $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->post('/courses/:id/prereqs', 'addCoursePrereqs');
-$app->post('/courses/:id/:tid', 'assignCourseTeacher');
+$app->post('/courses/:id/teachers/:tid', 'assignCourseTeacher');
 $app->post('/courses/:id', 'waitlistStudent');
 $app->post('/courses', 'createCourse');
 $app->put('/courses/:id', 'updateCourse');
 $app->delete('/courses/:id/prereqs/:preq', 'deleteCoursePrereq');
 $app->delete('/courses/:id', 'deleteCourse');
-$app->delete('/courses/:id/:tid', 'unassignCourseTeacher');
+$app->delete('/courses/:id/teachers/:tid', 'unassignCourseTeacher');
 
 $app->get('/sections', 'getSections');
 $app->get('/sections/count', 'getSectionCount');

@@ -90,11 +90,34 @@ var Course = Backbone.Model.extend({
 		status: ""
 	},
 
+	validation: {
+		couresName: {
+			required: true,
+		},
+		description: {
+			required: true,
+		},
+		schoolyearid: {
+			required: true,
+		},
+		status: {
+			required: true,
+		},
+	},
+	nonEditable: [
+   		"deptid", "schoolyearid"
+   	],
     urlRoot: app.serverUrl + "api/courses",
 
     getCoursePrereqs: function(id) {
     	return this.urlRoot + "/" + id + "/prereqs";
-    }
+    },
+    assignCourseTeacherUrl: function(courseid, teacherid) {
+		return this.urlRoot + "/" + courseid + "/teachers/" + teacherid
+	},
+	unassignCourseTeacherUrl: function(courseid, teacherid) {
+		return this.urlRoot + "/" + courseid + "/teachers/" + teacherid
+	}
 });
 
 var Section = Backbone.Model.extend({
@@ -135,6 +158,9 @@ var Section = Backbone.Model.extend({
 		},
 	},
 
+	nonEditable: [
+   		"courseid", "schoolyearid"
+   	],
     urlRoot: app.serverUrl + "api/sections",
 
     getDropStudentUrl: function(sectionid, studentid) {
@@ -143,11 +169,12 @@ var Section = Backbone.Model.extend({
     getSearchSectionsUrl: function() {
     	return app.serverUrl + "api/search/sections";
     },
-
 	getSectionTeachersUrl: function(id) {
 		return this.urlRoot + "/" + id + "/teachers";
 	},
-
+	getCourseTeachersUrl: function(id) {
+		return this.urlRoot + "/" + id + "/teachers";
+	},
    	unassignTeacherUrl: function(sectionid, teacherid) {
    		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid;
    	},
@@ -160,11 +187,9 @@ var Section = Backbone.Model.extend({
     getStudentAttendance: function(id) {
     	return this.urlRoot + "/" + id + "/attendance";
     },
-	
 	getStudentGradeForSection: function(sectionid, studentid) {
 		return this.urlRoot + "/" + sectionid + "/students/" + studentid;
 	},
-
 	assignSectionTeacher: function(sectionid, teacherid) {
 		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid
 	}
@@ -266,7 +291,7 @@ var Document = Backbone.Model.extend({
 		link: {
 			required: true,
 		}
-	},	
+	},
 
 	urlRoot: app.serverUrl + "api/documents"
 
