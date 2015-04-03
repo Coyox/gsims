@@ -290,6 +290,10 @@ a {
 	text-align: center;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 .btn {
 	background-color: #9d426b;
 	border-color: #A33566;

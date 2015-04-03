@@ -18,7 +18,11 @@ var SearchTeachersView = Backbone.View.extend({
 
 	searchAllTeachers: function(evt) {
 		var view = this;
-		new Teacher().fetch().then(function(data) {
+
+		var school = new School();
+		school.fetch({
+			url: school.getTeachersUrl(sessionStorage.getItem("gobind-schoolid"))
+		}).then(function(data) {
 			view.changeRoute(data);
 		});
 	},
@@ -36,10 +40,9 @@ var SearchTeachersView = Backbone.View.extend({
 		if (lastName != "") {
 			data.lastName = lastName;
 		}
-
-		var model = new Teacher();
-		model.fetch({
-			url: model.getSearchTeachersUrl(),
+		var teacher = new Teacher();
+		teacher.fetch({
+			url: teacher.getSearchTeachersUrl("T", sessionStorage.getItem("gobind-schoolid")),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
@@ -243,7 +246,11 @@ var TeachersTableView = Backbone.View.extend({
 
 	fetchAllResults: function() {
 		var view = this;
-		new Teacher().fetch().then(function(data) {
+
+		var school = new School();
+		school.fetch({
+			url: school.getTeachersUrl(sessionStorage.getItem("gobind-schoolid"))
+		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Teacher(object, {parse:true});
 				new TeacherTableRowView({

@@ -130,11 +130,11 @@ var Student = Backbone.Model.extend({
    		return this.urlRoot + "/" + id + "/sections";
    	},
 
-   	getSearchStudentsUrl: function() {
-   		return app.serverUrl + "api/search/users/S";
+   	getSearchStudentsUrl: function(schoolid) {
+   		return app.serverUrl + "api/search/" + schoolid + "/users/S";
    	},
-   	getAdvancedSearchUrl: function() {
-   		return app.serverUrl + "api/search/advanced";
+   	getAdvancedSearchUrl: function(schoolid) {
+   		return app.serverUrl + "api/search/" + schoolid + "/advanced";
    	},
 
    	getPendingTestsUrl: function(id) {
@@ -202,9 +202,9 @@ var Teacher = Backbone.Model.extend({
     urlRoot: app.serverUrl + "api/teachers",
     admin_urlRoot: app.serverUrl + "api/administrators",
 
-   	getSearchTeachersUrl: function(usertype) {
+   	getSearchTeachersUrl: function(usertype, schoolid) {
    		usertype = usertype || "T";
-   		return app.serverUrl + "api/search/users/" + usertype;
+   		return app.serverUrl + "api/search/" + schoolid + "/users/" + usertype;
    	},
 
    	getTeachingSectionsUrl: function(id) {

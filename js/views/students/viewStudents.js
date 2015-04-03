@@ -72,9 +72,9 @@ var SearchStudentsView = Backbone.View.extend({
 			data.city = city;
 		}
 
-		var model = new Student();
-		model.fetch({
-			url: model.getSearchStudentsUrl(),
+		var student = new Student();
+		student.fetch({
+			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
@@ -104,7 +104,7 @@ var SearchStudentsView = Backbone.View.extend({
 
 		var model = new Student();
 		model.fetch({
-			url: model.getAdvancedSearchUrl(),
+			url: model.getAdvancedSearchUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
@@ -295,7 +295,10 @@ var StudentsTableView = Backbone.View.extend({
 
 	fetchAllResults: function() {
 		var view = this;
-		new Student().fetch().then(function(data) {
+		var school = new School();
+		school.fetch({
+			url: school.getStudentsUrl(sessionStorage.getItem("gobind-schoolid"))
+		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Student(object, {parse:true});
 				new StudentTableRowView({

@@ -351,15 +351,30 @@ var EnrolledSectionsView = Backbone.View.extend({
 					studentid: id
 				});
 			});
-			view.$el.find("table").dataTable({
+			view.$el.find("#enrolled-sections-table").dataTable({
+				dom: "t"
+			});
+		});
+
+		this.model.fetch({url:this.model.getPrevEnrolledSections(id)}).then(function(data) {
+			_.each(data, function(object, index) {
+				var section = new Section(object, {parse:true});
+				new PrevEnrolledRowView({
+					el: view.addRow("#previous-sections-table"),
+					model: section,
+					studentid: id
+				});
+			});
+			view.$el.find("#previous-sections-table").dataTable({
 				dom: "t"
 			});
 		});
 	},
 
-	addRow: function() {
+	addRow: function(table) {
+		table = table || "#enrolled-sections-table";
         var container = $("<tr></tr>");
-        this.$el.find("#enrolled-sections-table .results").first().append(container);
+        this.$el.find(table + " .results").first().append(container);
         return container;
 	}
 });
@@ -398,6 +413,28 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 	}
 });
 
+
+var PrevEnrolledRowView = Backbone.View.extend({
+	template: _.template("<td>blah</td>"
+		+	"<td>blah2</td>"),
+
+	initialize: function(options) {
+		this.studentid = options.studentid;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+
+	events: {
+		"click .drop-section": "dropSection"
+	},
+
+});
+
 var StudentAttendanceView = Backbone.View.extend({
 	initialize: function(options) {
 		this.currentMonth = new Date().getMonth();
@@ -407,12 +444,22 @@ var StudentAttendanceView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["attendance.html"]);
 
-		var currMonth = this.indexToMonth(this.currentMonth);
-		var nextMonth = this.indexToMonth(parseInt(this.currentMonth) + 1);
-		var prevMonth = this.indexToMonth(parseInt(this.currentMonth) - 1);
-		this.$el.find("#current-month").text(currMonth.toUpperCase());
-		this.$el.find("#next-month").text(nextMonth + " >").attr("name", this.currentMonth + 1);
-		this.$el.find("#prev-month").text("< " + prevMonth).attr("name", this.currentMonth - 1);
+		var currentMonthName = this.indexToMonth(this.currentMonth);
+		this.$el.find("#current-month").text(currentMonthName.toUpperCase());
+
+		var nextMonthIndex = parseInt(this.currentMonth) + 1;
+		nextMonthIndex = nextMonthIndex > 12 ? 0 : nextMonthIndex;
+		var nextMonthName = this.indexToMonth(nextMonthIndex);
+		this.$el.find("#next-month").text(nextMonthName + " >").data("index", nextMonthIndex);
+
+		var prevMonthIndex = parseInt(this.currentMonth) - 1;
+		prevMonthIndex = prevMonthIndex < 0 ? 12 : prevMonthIndex;
+		var prevMonthName = this.indexToMonth(prevMonthIndex);
+		this.$el.find("#prev-month").text("< " + prevMonthName).data("index", prevMonthIndex);
+
+		console.log("curr", this.currentMonth);
+		console.log("next", nextMonthIndex);
+		console.log("prev", prevMonthIndex);
 
 		var view = this;
 		var student = new Student({id:this.model.get("userid")});
@@ -429,6 +476,7 @@ var StudentAttendanceView = Backbone.View.extend({
 			}).then(function(data) {
 				_.each(data, function(section, index) {
 					var model = new Section(section, {parse:true});
+					view.addCourseRow(model.get("courseName"));
 					new StudentAttendanceRowView({
 						el: view.addRow(),
 						model: model,
@@ -444,6 +492,12 @@ var StudentAttendanceView = Backbone.View.extend({
 	events: {
 		"click #next-month": "nextMonth",
 		"click #prev-month": "prevMonth",
+	},
+
+	addCourseRow: function(courseName) {
+		var container = $("<tr><td colspan='32'><strong>" + courseName + "</strong></td></tr>");
+		this.$el.find(".table").append(container);
+		return container;
 	},
 
 	addRow: function() {
@@ -485,18 +539,18 @@ var StudentAttendanceView = Backbone.View.extend({
 	},
 
 	nextMonth: function(evt) {
-		this.currentMonth = $(evt.currentTarget).attr("name");
+		this.currentMonth = $(evt.currentTarget).data("index");
 		this.render();
 	},
 
 	prevMonth: function(evt) {
-		this.currentMonth = $(evt.currentTarget).attr("name");
+		this.currentMonth = $(evt.currentTarget).data("index");
 		this.render();
 	}
 });
 
 var StudentAttendanceRowView = Backbone.View.extend({
-	template: _.template("<td><%= section %></td>"
+	cellTemplate: _.template("<td></td>"
 		+	"<td name='01'></td>"
 		+	"<td name='02'></td>"
 		+	"<td name='03'></td>"
@@ -541,9 +595,7 @@ var StudentAttendanceRowView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
-		this.$el.html(this.template({
-			section: this.courseName
-		}));
+		this.$el.html(this.cellTemplate());
 
 		_.each(this.attendance, function(att, index) {
 			if (att.sectionid == this.sectionid) {

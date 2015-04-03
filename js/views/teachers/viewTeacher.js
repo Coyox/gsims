@@ -7,7 +7,6 @@ var TeacherRecordView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
-		console.log(this.id);
 		var teacher = new Teacher({id:this.id});
 		teacher.fetch().then(function(data) {
 			console.log(data);

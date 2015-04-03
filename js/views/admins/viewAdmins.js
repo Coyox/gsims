@@ -15,9 +15,9 @@ var SearchAdminsView = Backbone.View.extend({
 
 	searchAllAdmins: function(evt) {
 		var view = this;
-		var model = new Teacher();
-		model.fetch({
-			url: model.getSearchTeachersUrl("A")
+		var school = new School();
+		school.fetch({
+			url: school.getAdminsUrl(sessionStorage.getItem("gobind-schoolid"), "A")
 		}).then(function(data) {
 			view.changeRoute(data);
 		});
@@ -37,9 +37,9 @@ var SearchAdminsView = Backbone.View.extend({
 			data.lastName = lastName;
 		}
 
-		var model = new Teacher();
-		model.fetch({
-			url: model.getSearchTeachersUrl("A"),
+		var teacher = new Teacher();
+		teacher.fetch({
+			url: teacher.getSearchTeachersUrl("A", sessionStorage.getItem("gobind-schoolid")),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
@@ -84,6 +84,7 @@ var AdminsTableView = Backbone.View.extend({
 	},
 
 	populateQueryResults: function(data) {
+		var view = this;
 		_.each(data, function(object, index) {
 			var model = new Teacher(object, {parse:true});
 			new AdminTableRowView({
@@ -104,9 +105,9 @@ var AdminsTableView = Backbone.View.extend({
 
 	fetchAllResults: function() {
 		var view = this;
-		var model = new Teacher();
-		model.fetch({
-			url: model.getSearchTeachersUrl("A"),
+		var school = new School();
+		school.fetch({
+			url: school.getAdminsUrl(sessionStorage.getItem("gobind-schoolid"), "A")
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Teacher(object, {parse:true});
