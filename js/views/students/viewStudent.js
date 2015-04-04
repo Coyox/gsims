@@ -664,10 +664,6 @@ var ReportCardRowView = Backbone.View.extend({
 		this.render();
 	},
 
-	//events: {
-	//	"click #dl-report-card-csv": "dlReport",
-	//},
-
 	render: function() {
 		var view = this;
 		var sid = this.id;
