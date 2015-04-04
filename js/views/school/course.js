@@ -1,4 +1,4 @@
-var CourseView = Backbone.View.extend({
+/*var CourseView = Backbone.View.extend({
     initialize: function (options) {
         this.model = new Dept();
         this.render();
@@ -270,4 +270,4 @@ var CourseRowView = Backbone.View.extend({
             view.render(); 
         });
     }
-});
+});*/

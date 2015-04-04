@@ -1,4 +1,4 @@
-var DepartmentView = Backbone.View.extend({
+/*var DepartmentView = Backbone.View.extend({
     initialize: function (options) {
         this.model = new Dept();
         this.render();
@@ -190,4 +190,4 @@ var DepartmentRowView = Backbone.View.extend({
             view.render(); 
         });
     }
-});
+});*/
