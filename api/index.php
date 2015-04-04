@@ -483,7 +483,7 @@ function getCourseTeachers($id){
 }
 function getCoursePrereqs($id){
     $sql = "SELECT c.courseid, c.courseName, c.description from prereqs p, course c
-            where p.courseid=:id and p.courseid=c.courseid";
+            where p.courseid=:id and p.prereq=c.courseid";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 function assignCourseTeacher($id, $tid){
@@ -521,7 +521,12 @@ function createCourse(){
         "schoolyearid" => $course->schoolyearid,
         "status" => $course->status
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+
+    $resp = perform_query($sql,'POST',$bindparams);
+    if ($resp["status"] == "success"){
+        $resp["courseid"] = $courseid;
+    }
+    echo json_encode($resp);
 }
 
 function addCoursePrereqs($id){
@@ -588,13 +593,14 @@ function getSections(){
     }
 }
 function getSectionsBySchool($schoolyear, $schoolid){
-    $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s, course c1
+    $sql = "SELECT s.sectionid, s.courseid, d1.deptName, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s, course c1, department d1
             where s.courseid in (select c.courseid from course c
                 where c.deptid in (select d.deptid from department d where d.schoolid=:schoolid and d.schoolyearid=:schoolyear)
                 and c.schoolyearid=:schoolyear)
             and s.schoolyearid=:schoolyear
             and s.courseid = c1.courseid
+            and c1.deptid = d1.deptid
             order by s.sectionCode asc";
     $bindparam = array("schoolid"=>$schoolid,"schoolyear"=>$schoolyear);
     echo json_encode(perform_query($sql,'GETALL',$bindparam));
@@ -685,7 +691,6 @@ function createSection(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $section = json_decode($body);
-
     $sql = "SELECT sectionid from section where sectionid=:sectionid";
     $sectionid = generateUniqueID($sql, "sectionid");
 
@@ -705,7 +710,13 @@ function createSection(){
         "schoolyearid" => $section->schoolyearid,
         "status" => $section->status
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+
+    $resp = perform_query($sql,'POST',$bindparams);
+    if ($resp["status"] == "success"){
+        $resp["sectionid"] = $sectionid;
+    }
+    echo json_encode($resp);
+
 }
 
 function updateSection($id) {
@@ -1948,10 +1959,11 @@ function findSections($schoolid){
         $courseclause = " and c.schoolyearid=:schoolyear";
         if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
         if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
-        $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
-            from section s, course c1
+        $sql = "SELECT s.sectionid, s.courseid, d1.deptName, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
+            from section s, course c1, department d1
             where s.courseid in (select c.courseid from course c
-                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.") and s.schoolyearid=:schoolyear and s.courseid=c1.courseid";
+                where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")
+                and s.schoolyearid=:schoolyear and s.courseid=c1.courseid and d1.deptid=c1.deptid";
         if (isset($days)){
             list($clause, $day_bindparam) = buildDayClause($days);
             $bindparam = $bindparam + $day_bindparam;
