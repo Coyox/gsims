@@ -280,11 +280,6 @@ a {
 	background-color: #fff;
 }
 
-#content {
-	border: 1px dotted #ddd;
-	padding: 10px;
-}
-
 .invalid-login {
 	color: red;
 	text-align: center;
