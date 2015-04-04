@@ -685,7 +685,6 @@ function createSection(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $section = json_decode($body);
-
     $sql = "SELECT sectionid from section where sectionid=:sectionid";
     $sectionid = generateUniqueID($sql, "sectionid");
 
@@ -705,7 +704,10 @@ function createSection(){
         "schoolyearid" => $section->schoolyearid,
         "status" => $section->status
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    $resp = perform_query($sql,'POST',$bindparams);
+    $resp["sectionid"] = $sectionid;
+
+    echo json_encode($resp);
 }
 
 function updateSection($id) {
