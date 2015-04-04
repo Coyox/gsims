@@ -26,6 +26,7 @@ var CreateTeacherView = Backbone.View.extend({
 		}
 
 		this.model.nonEditable.push("status");
+		this.model.nonEditable.push("schoolid");
 
 		_.each(this.model.toJSON(), function(value, name) {
 			if (this.model.nonEditable.indexOf(name) == -1) {
@@ -59,17 +60,16 @@ var CreateTeacherView = Backbone.View.extend({
 	saveTeacher: function() {
 		Backbone.Validation.bind(this);
 		var view = this;
-		this.model.set("schoolid", getSelectedSchool());
+		this.model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 		this.model.set("status",  "active");
-		console.log(this.model);
 
 		if (this.model.isValid(true)) {
 			this.model.save().then(function(data) {
-				console.log(data);
 				if (typeof data == "string") {
 					data = JSON.parse(data);
 				}
 				if (data.status == "success") {
+					var userid = data.userid;
 					var insertComp = [];
 					_.each(view.model.competency, function(dept, index) {
 						if (dept.level != 0) {
@@ -80,7 +80,6 @@ var CreateTeacherView = Backbone.View.extend({
 						}
 					});
 					if (insertComp.length) {
-						console.log(insertComp);
 						$.ajax({
 							type: "POST",
 							url: view.model.getCourseCompetencyUrl(data.userid),
@@ -95,7 +94,7 @@ var CreateTeacherView = Backbone.View.extend({
 								new TransactionResponseView({
 									message: "Teacher successfully created. " + insertComp.length + " competency levels updated."
 								});
-								view.render();
+								app.Router.navigate("teachers/" + userid, {trigger:true});
 							} else {
 								new TransactionResponseView({
 									title: "ERROR",
@@ -108,8 +107,7 @@ var CreateTeacherView = Backbone.View.extend({
 						new TransactionResponseView({
 							message: "Teacher successfully created."
 						});
-						view.render();
-
+						app.Router.navigate("teachers/" + userid, {trigger:true});
 					}
 				} else {
 					new TransactionResponseView({
@@ -227,9 +225,9 @@ var TeacherCompetencyView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 		var school = new School();
-		var schoolid = getSelectedSchool();
+		var schoolid = sessionStorage.getItem("gobind-schoolid");
 		school.fetch({
-			url: school.getDepartmentsUrl("412312"),// (this.model.get("schoolid")),
+			url: school.getDepartmentsUrl(schoolid),
 			data: {
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}

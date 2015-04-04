@@ -1,13 +1,14 @@
 <div id="pending-test">
-	<table class="table table-striped table-bordered">
+	<div class="alert alert-info">The following students are waiting to take a test for a course that they currently do not have a pre-req for. Approving them will enroll them in the course, and denying them will withdraw them from the course.</div>
+	<table id="pending-test-table" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th>ID</th>
 				<th>First Name</th>
 				<th>Last Name</th>
-				<th>Course(s)</th>
+				<th>Status</th>
 				<th>Approve/Deny</th>
-				<th>Email <input type='checkbox' class='toggle-checkboxes' name='all' checked/></th>
+				<th><input type='checkbox' class='toggle-checkboxes' name='all' checked/></th>
 			</tr>
 		</thead>
 		<tbody class="results"></tbody>

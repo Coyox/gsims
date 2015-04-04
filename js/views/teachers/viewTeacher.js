@@ -12,16 +12,6 @@ var TeacherRecordView = Backbone.View.extend({
 			console.log(data);
 
 	        view.$el.html(html["viewTeacher.html"]);
-			view.$el.find("#teacher-info-table").empty();
-			view.$el.find("#comp-info, #comp2-info").empty();
-
-			if (view.action == "view") {
-				view.$el.find("#edit-teacher").removeClass("hide").show();
-				view.$el.find("#save-teacher").hide();
-			} else {
-				view.$el.find("#save-teacher").removeClass("hide").show();
-				view.$el.find("#edit-teacher").hide();
-			}
 
 			view.model = new Teacher(data, {parse:true});
 			view.model.set("userid", view.id);
@@ -34,15 +24,31 @@ var TeacherRecordView = Backbone.View.extend({
 	events: {
 		"click #edit-teacher": "editTeacher",
 		"click #save-teacher": "saveTeacher",
+		"click #cancel": "cancelSave",
 		"click #set-admin": "setAsAdmin"
 	},
 
 	teacherInformationTab: function() {
+		var view = this;
+		view.$el.find("#teacher-info-table").empty();
+		view.$el.find("#comp-info, #comp2-info").empty();
+
+		if (view.action == "view") {
+			view.$el.find("#edit-teacher").removeClass("hide").show();
+			view.$el.find("#cancel").hide();
+			view.$el.find("#save-teacher").hide();
+		} else {
+			view.$el.find("#save-teacher").removeClass("hide").show();
+			view.$el.find("#cancel").removeClass("hide").show();
+			view.$el.find("#edit-teacher").hide();
+		}
+
 		_.each(this.model.toJSON(), function(value, name) {
 			if (this.model.nonEditable.indexOf(name) == -1) {
 				new CreateTeacherRowView({
 					el: this.addRow(),
 					model: this.model,
+					untouched: JSON.stringify(this.model.attributes),
 					name: name,
 					value: value,
 					action: this.action
@@ -76,7 +82,14 @@ var TeacherRecordView = Backbone.View.extend({
 
 	editTeacher: function(evt) {
 		this.action = "edit";
-		this.render();
+		this.model.untouched = JSON.stringify(this.model.toJSON());
+		this.teacherInformationTab();
+	},
+
+	cancelSave: function() {
+		this.model.attributes = JSON.parse(this.model.untouched);
+		this.action = "view";
+		this.teacherInformationTab();
 	},
 
 	saveTeacher: function() {
@@ -219,9 +232,7 @@ var TeachingSectionsView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["enrolledSections.html"]);
-
-		$("#add-course").hide();
+		this.$el.html(html["teachingSections.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
@@ -229,6 +240,7 @@ var TeachingSectionsView = Backbone.View.extend({
 		this.model.fetch({
 			url: this.model.getTeachingSectionsUrl(id)
 		}).then(function(data) {
+			console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
 				new TeachingSectionsRowView({

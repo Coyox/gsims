@@ -351,7 +351,12 @@ var EnrolledSectionsView = Backbone.View.extend({
 
 		var view = this;
 		var id = this.model.get("userid");
-		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
+		this.model.fetch({
+			url: this.model.getEnrolledSectionsUrl(id),
+			data: {
+				status: "active"
+			}
+		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
 				new EnrolledSectionsRowView({
@@ -365,7 +370,9 @@ var EnrolledSectionsView = Backbone.View.extend({
 			});
 		});
 
-		this.model.fetch({url:this.model.getPrevEnrolledSections(id)}).then(function(data) {
+		this.model.fetch({
+			url: this.model.getPrevEnrolledSections(id)
+		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
 				new PrevEnrolledRowView({

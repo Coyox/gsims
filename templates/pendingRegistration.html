@@ -1,12 +1,15 @@
 <div id="pending-reg">
-	<table class="table table-striped table-bordered">
+	<div class="alert alert-info">The student will be approved into the school if one or more sections below are approved. If no sections are approved, then the student will be denied and removed from the school. If you believe the student requires a proficiency test, select the
+		'Test' box.</div>
+	<table id="pending-reg-table" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th>ID</th>
 				<th>First Name</th>
 				<th>Last Name</th>
 				<th>Status</th>
-				<th>Approve</th>
+				<th>Sections</th>	
+				<th><input type='checkbox' class='toggle-checkboxes center' checked></th>	
 			</tr>
 		</thead>
 		<tbody class="results"></tbody>

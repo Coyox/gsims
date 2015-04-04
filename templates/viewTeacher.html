@@ -1,5 +1,4 @@
 <div id="teacher-content">
-	<br>
 	<ul id="teacher-tabs" class="nav nav-tabs nav-justified">
 		<li class="active">
 			<a data-toggle="tab" data-target="#teacher-info">
@@ -18,17 +17,18 @@
 		</li>
 	</ul>
 	<div class="tab-content">
-		<br>
 		<div id="teacher-info" class="tab-pane active o-auto">
-			<div class="col-sm-12">				
-				<button id="edit-teacher" class="btn btn-primary btn-sm hide">Edit Teacher</button>
-				<button id="save-teacher" class="btn btn-primary btn-sm hide">Save Teacher</button>
-				<!-- <button id="delete-teacher" class="btn btn-primary btn-sm">Delete Teacher</button> -->
-				<button id="set-admin" class="btn btn-primary btn-sm">Set As Administrator</button>
-			</div>
 			<div class="col-sm-6">
 				<br>
-				<h4>Teacher Information</h4>
+				<h4>Teacher Information
+					<div class="pull-right">
+						<button id="edit-teacher" class="btn btn-primary btn-sm hide">Edit</button>
+						<button id="save-teacher" class="btn btn-primary btn-sm hide">Save</button>
+						<button id="cancel" class="btn btn-primary btn-sm hide">Cancel</button>
+						<!-- <button id="delete-teacher" class="btn btn-primary btn-sm">Delete Teacher</button> -->
+						<button id="set-admin" class="btn btn-primary btn-sm">Set As Admin</button>
+					</div>
+				</h4>
 				<div id="teacher-info-table" class="form-horizontal well property-table"></div>
 			</div>
 			<div class="col-sm-12">

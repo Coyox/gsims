@@ -26,7 +26,8 @@ var DashboardView = Backbone.View.extend({
 		count.fetch({
 			url: count.getCountUrl("S"),
 			data: {
-				status: "pending"
+				status: "pending",
+				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-stats");
@@ -40,7 +41,8 @@ var DashboardView = Backbone.View.extend({
 		count.fetch({
 			url: count.getCountUrl("S"),
 			data: {
-				status: "pending-test"
+				status: "pending-test",
+				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-test-stats");
@@ -99,7 +101,7 @@ var DashboardView = Backbone.View.extend({
 			url: count.getSectionCountURL(),
 			data: {
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-				schoolid: 412312//TODO
+				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
 			parent.find(".sections").text(data);

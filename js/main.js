@@ -126,7 +126,8 @@ function loadTemplates() {
 		"viewPurge.html",
 		"createDocument.html",
 		"addTeacherToSection.html",
-		"selectSchool.html"
+		"selectSchool.html",
+		"teachingSections.html"
 	];
 
 	$.each(templates, function(i, name) {

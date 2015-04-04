@@ -196,7 +196,7 @@ var Teacher = Backbone.Model.extend({
 	},
 
 	nonEditable: [
-   		"lastAccessed", "userid", "usertype"
+   		"lastAccessed", "userid", "usertype", "schoolid"
    	],
 
     urlRoot: app.serverUrl + "api/teachers",

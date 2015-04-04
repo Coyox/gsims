@@ -1326,8 +1326,8 @@ var StudentsEnrolledView = Backbone.View.extend({
 				// view.table = view.$el.find("table").dataTable({
 				// 	dom: "t"
 				// });
-	}
-});
+			}
+		});
 	},
 
 	addRow: function(evt) {
