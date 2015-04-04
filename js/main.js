@@ -80,6 +80,7 @@ function loadTemplates() {
 		"footer.html",
 		"email.html",
 		"enrolledSections.html",
+		"searchSections.html",
 		"searchStudents.html",
 		"searchTeachers.html",
 		"viewTeachers.html",

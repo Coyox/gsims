@@ -32,7 +32,8 @@
 	</li>
 	<% } %>
 
-	<!-- STUDENTS -->
+
+	<!-- TEACHERS -->
 	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#students" class="collapsed">
 		<a class="sidebar-link">
@@ -55,10 +56,7 @@
 			<a href="#createStudent">Create a Student</a>
 		</li>
 	</ul>
-	<% } %>
 
-	<!-- TEACHERS -->
-	<% if (usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#teachers" class="collapsed">
 		<a class="sidebar-link" data-link="teachers">
 			<span class="glyphicon glyphicon-user"></span>
@@ -105,10 +103,7 @@
 			<a href="#createAdmin">Create an Administrator</a>
 		</li>
 	</ul>
-	<% } %>
 
-	<!-- SUPERUSERS -->
-	<% if (usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#superusers" class="collapsed">
 		<a class="sidebar-link" data-link="superusers">
 			<span class="glyphicon glyphicon-user"></span>
@@ -137,6 +132,10 @@
 		</a>
 	</li>
 	<ul class="sub-menu collapse" id="courses-tools">
+		<li>
+			<span class="glyphicon glyphicon-search"></span>
+			<a href="#filterSections">Search Sections</a>
+		</li>
 		<li>
 			<span class="glyphicon glyphicon-th-list"></span>
 			<a href="#departments">Manage Departments</a>
@@ -188,7 +187,7 @@
 			<a href="#import">Import Data</a>
 		</li>
 	</ul>
-	
+
 
 	<!-- EMAIL -->
 	<li>
