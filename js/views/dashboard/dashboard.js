@@ -5,13 +5,11 @@ var DashboardView = Backbone.View.extend({
 
 	render: function() {
 		var template = html["dashboard.html"];
+		var usertype = sessionStorage.getItem("gobind-usertype");
 		template = template({
-			usertype: sessionStorage.getItem("gobind-usertype")
+			usertype: usertype
 		});
 		this.$el.html(template);
-
-
-		var usertype = sessionStorage.getItem("gobind-usertype");
 
 		// User info (all users)
 		this.populateUser();
@@ -22,9 +20,12 @@ var DashboardView = Backbone.View.extend({
 			this.populateNotifications();
 		}
 
-		// Calendar
 		if (usertype == "SU" || usertype == "A" || usertype == "T") {
 			this.calendarWidget(usertype);
+		}
+		
+		if (usertype == "SU") {
+			this.studentGeoGraph();
 		}
 	},
 
@@ -181,25 +182,31 @@ var DashboardView = Backbone.View.extend({
 						center: 'title',
 						right: 'month,agendaWeek,agendaDay'
 					},
-					defaultView: "agendaWeek",
+					defaultView: "basicWeek",
 					editable: false,
+					eventLimit: true,
+					views: {
+						agenda: {
+							eventLimit: 3
+						}
+					},
 					eventRender: function(event, element) {
-     			 		element.popover({
-     			 			title: event.title,
-     			 			placement:'auto',
-     			 			html:true,
-     			 			trigger : 'click',
-     			 			animation : 'true',
-     			 			content: event.description,
-     			 			container:'body'
-     			 		});
-     			 		$('body').on('click', function (e) {
-     			 			if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-     			 				element.popover('hide');
-     			 		});
-     				}
+						element.popover({
+							title: event.title,
+							placement:'auto',
+							html:true,
+							trigger : 'click',
+							animation : 'true',
+							content: event.description,
+							container:'body'
+						});
+						$('body').on('click', function (e) {
+							if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+								element.popover('hide');
+						});
+					}
 
-     				});
+				});
 
 				view.$el.find("#calendar").fullCalendar( 'addEventSource',
 					function(start, end, status, callback) {
@@ -210,16 +217,16 @@ var DashboardView = Backbone.View.extend({
 							loop = loop + (24 * 60 * 60 * 1000)) {
 							var test_date = new Date(loop);
 
-							var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-							_.each(day, function(section, index) {
-								events.push({
-									title: section.courseName,
-									start: view.getStartTime(test_date, section),
-									end: view.getEndTime(test_date, section),
-									description: section.description,
+						var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
+						_.each(day, function(section, index) {
+							events.push({
+								title: section.courseName,
+								start: view.getStartTime(test_date, section),
+								end: view.getEndTime(test_date, section),
+								description: section.description,
 									//sectionCode: section.sectionCode
 
-							});
+								});
 						});
 					}
 					callback( events );
@@ -227,16 +234,15 @@ var DashboardView = Backbone.View.extend({
 				);
 			});
 
-	}
-	else {
-
-		var section = new Section();
-		section.fetch({
-			data: {
-				schoolid: sessionStorage.getItem("gobind-schoolid"),
-				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-			}
-		}).then(function(data) {
+		}
+		else {
+	var section = new Section();
+	section.fetch({
+		data: {
+			schoolid: sessionStorage.getItem("gobind-schoolid"),
+			schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+		}
+	}).then(function(data) {
 			// Get all sections
 			_.each(data, function(section, index) {
 				// Get all days for a section
@@ -281,23 +287,29 @@ var DashboardView = Backbone.View.extend({
 					center: 'title',
 					right: 'month,agendaWeek,agendaDay'
 				},
-				defaultView: "agendaWeek",
+				defaultView: "basicWeek",
 				editable: false,
+				eventLimit: true,
+				views: {
+					agenda: {
+						eventLimit: 3
+					}
+				},
 				eventRender: function(event, element) {
-     			 	element.popover({
-     			 		title: event.title,
-     			 		placement:'auto',
-     			 		html:true,
-     			 		trigger : 'click',
-     			 		animation : 'true',
-     			 		content: event.description,
-     			 		container:'body'
-     			 	});
-     			 	$('body').on('click', function (e) {
-     			 		if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-     			 			element.popover('hide');
-     			 	});
-     			}
+					element.popover({
+						title: event.title,
+						placement:'auto',
+						html:true,
+						trigger : 'click',
+						animation : 'true',
+						content: event.description,
+						container:'body'
+					});
+					$('body').on('click', function (e) {
+						if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+							element.popover('hide');
+					});
+				}
 			});
 
 			view.$el.find("#calendar").fullCalendar( 'addEventSource',
@@ -323,22 +335,58 @@ var DashboardView = Backbone.View.extend({
 			}
 			);
 		});
-}
-},
+		}
+	},
 
-getStartTime: function(test_date, section) {
+	getStartTime: function(test_date, section) {
 	var start = new Date(test_date.getTime());
 	var str = section.start.split(":");
 	start.setHours(str[0]);
 	start.setMinutes(str[1]);
 	return start;
-},
+	},
 
-getEndTime: function(test_date, section) {
-	var end = new Date(test_date.getTime());
-	var str = section.end.split(":");
-	end.setHours(str[0]);
-	end.setMinutes(str[1]);
-	return end;
-}
+	getEndTime: function(test_date, section) {
+		var end = new Date(test_date.getTime());
+		var str = section.end.split(":");
+		end.setHours(str[0]);
+		end.setMinutes(str[1]);
+		return end;
+	},
+	studentGeoGraph:function(){
+	    var data = google.visualization.arrayToDataTable([
+	          ['Country',   'Latitude'],
+	          ['Algeria', 36], ['Angola', -8], ['Benin', 6], ['Botswana', -24],
+	          ['Burkina Faso', 12], ['Burundi', -3], ['Cameroon', 3],
+	          ['Canary Islands', 28], ['Cape Verde', 15],
+	          ['Central African Republic', 4], ['Ceuta', 35], ['Chad', 12],
+	          ['Comoros', -12], ['Cote d\'Ivoire', 6],
+	          ['Democratic Republic of the Congo', -3], ['Djibouti', 12],
+	          ['Egypt', 26], ['Equatorial Guinea', 3], ['Eritrea', 15],
+	          ['Ethiopia', 9], ['Gabon', 0], ['Gambia', 13], ['Ghana', 5],
+	          ['Guinea', 10], ['Guinea-Bissau', 12], ['Kenya', -1],
+	          ['Lesotho', -29], ['Liberia', 6], ['Libya', 32], ['Madagascar', -18],
+	          ['Madeira', 33], ['Malawi', -14], ['Mali', 12], ['Mauritania', 18],
+	          ['Mauritius', -20], ['Mayotte', -13], ['Melilla', 35],
+	          ['Morocco', 32], ['Mozambique', -25], ['Namibia', -22],
+	          ['Niger', 14], ['Nigeria', 8], ['Republic of the Congo', -1],
+	          ['Réunion', -21], ['Rwanda', -2], ['Saint Helena', -16],
+	          ['São Tomé and Principe', 0], ['Senegal', 15],
+	          ['Seychelles', -5], ['Sierra Leone', 8], ['Somalia', 2],
+	          ['Sudan', 15], ['South Africa', -30], ['South Sudan', 5],
+	          ['Swaziland', -26], ['Tanzania', -6], ['Togo', 6], ['Tunisia', 34],
+	          ['Uganda', 1], ['Western Sahara', 25], ['Zambia', -15],
+	          ['Zimbabwe', -18]
+	    ]);
+
+        var options = {
+          region: '002', // Africa
+          colorAxis: {colors: ['#00853f', 'black', '#e31b23']},
+          backgroundColor: '#81d4fa',
+          datalessRegionColor: '#f8bbd0'
+        };
+
+        var chart = new google.visualization.GeoChart(this.$el.find('#geochart-colors').get(0));
+        chart.draw(data, options);
+	}
 });
