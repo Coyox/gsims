@@ -11,17 +11,16 @@ $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
-$app->get('/students/:id/tests', 'getEnrolledTests');
+// $app->get('/students/:id/tests', 'getEnrolledTests');
 $app->get('/students/:id/avgGrade', 'getAvgGrade');
 $app->get('/students/:id/attendance', 'getStudentAttendance');
-$app->get('/students/tests', 'getAllEnrolledTests');
+// $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->post('/students/pendingTest', 'handlePendingTestStudents');
 $app->put('/students/:id/sections', 'approveDenyEnrollment');
-$app->put('/students/:id/tests', 'updateStudentTestScores');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
@@ -662,6 +661,7 @@ function dropStudent($id, $sid){
     echo json_encode(perform_query($sql,'', array("id"=>$id, "sid"=>$sid)));
 }
 function enrollStudent($id, $sid){
+    $status = $_POST['status'];
     $schoolyearid = $_POST['schoolyearid'];
     $sql = "INSERT into enrollment (userid, sectionid, schoolyearid, status)
             values (:userid, :sectionid, :schoolyearid, :status )";
@@ -984,30 +984,35 @@ function getStudentById($id) {
 
 // flag=1: return array
 // flag=0: echo json
-function getEnrolledSections($id, $flag=0){
+// Require status
+function getEnrolledSections($id, $flag=0, $status="active"){
+    if (isset($_GET['status'])){
+        $status = $_GET['status'];
+    }
+    $bindparams = array("id"=>$id, "status"=>$status);
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
     FROM section s, course c
-    WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id)
+    WHERE s.sectionid in (SELECT e.sectionid from enrollment e where e.userid=:id and e.status=:status)
     and s.courseid = c.courseid";
     if ($flag==1){
-        return perform_query($sql,'GETASSO',array("id"=>$id));
+        return perform_query($sql,'GETASSO',$bindparams);
     }
-    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
+    echo json_encode(perform_query($sql, 'GETALL', $bindparams));
 }
 
-function getEnrolledTests($id){
-    $sql = "SELECT c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
-    FROM course c, department d, studentCompetencyTest t
-    WHERE t.userid = :id and c.courseid = t.courseid and c.deptid = d.deptid";
-    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
-}
+// function getEnrolledTests($id){
+//     $sql = "SELECT c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status,
+//     FROM course c, department d, enrollment e
+//     WHERE e.userid = :userid and c.courseid = t.courseid and c.deptid = d.deptid";
+//     echo json_encode(perform_query($sql, 'GETALL', array("userid"=>$id)));
+// }
 
-function getAllEnrolledTests(){
-    $sql = "SELECT s.userid, s.firstName, s.lastName, s.status, s.emailAddr, c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
-    FROM course c, department d, studentCompetencyTest t, student s
-    WHERE t.userid = s.userid and c.courseid = t.courseid and c.deptid = d.deptid and s.status='pending-test'";
-    echo json_encode(perform_query($sql, 'GETALL'));
-}
+// function getAllEnrolledTests(){
+//     $sql = "SELECT s.userid, s.firstName, s.lastName, s.status, s.emailAddr, c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
+//     FROM course c, department d, studentCompetencyTest t, student s
+//     WHERE t.userid = s.userid and c.courseid = t.courseid and c.deptid = d.deptid and s.status='pending-test'";
+//     echo json_encode(perform_query($sql, 'GETALL'));
+// }
 
 function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
@@ -1267,33 +1272,19 @@ function approveDenyEnrollment($id){
 }
 
 
-function enrollStudentInTests($id){
-    $courseids = json_decode($_POST["courseids"]);
+// function enrollStudentInTests($id){
+//     $courseids = json_decode($_POST["courseids"]);
 
-    $bindparams = array("userid" => $id);
-    $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
-    foreach (array_values($courseids) as $i => $courseid) {
-        $sql.= "(:userid, :courseid".$i."),";
-        $bindparams["courseid".$i] = $courseid;
-    }
-    $sql = rtrim($sql, ",");
+//     $bindparams = array("userid" => $id);
+//     $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
+//     foreach (array_values($courseids) as $i => $courseid) {
+//         $sql.= "(:userid, :courseid".$i."),";
+//         $bindparams["courseid".$i] = $courseid;
+//     }
+//     $sql = rtrim($sql, ",");
 
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-}
-
-function updateStudentTestScores($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $results = json_decode($body);
-    $queries = array();
-    $bindparams = array();
-    foreach (array_values($results) as $i => $result){
-        $bindparams[$i] = array("userid" => $id, "courseid".$i=>$result->courseid, "mark".$i=>$result->mark);
-        $sql = "UPDATE studentCompetencyTest set mark=:mark".$i." where userid=:userid and courseid=:courseid".$i;
-        array_push($queries, $sql);
-    }
-    echo json_encode(perform_transaction($queries, $bindparams));
-}
+//     echo json_encode(perform_query($sql,'POST',$bindparams));
+// }
 
 function handlePendingStudents(){
     $queries = array();
@@ -1328,27 +1319,24 @@ function handlePendingStudents(){
             }
             if ($student->testList){
                 $params = $param;
-                $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
-                foreach (array_values($student->testList) as $i => $courseid) {
-                    $sql.= "(:userid, :courseid".$i."),";
-                    $params["courseid".$i] = $courseid;
-                }
-                $sql = rtrim($sql, ",");
+                $sql = "UPDATE enrollment set status='pending-test' where userid=:userid and sectionid in ";
+                list($sqlparens, $params) = parenthesisList($student->testList);
+                $sql.=$sqlparens;
+                $params += $param;
                 array_push($bindparams, $params);
                 array_push($queries, $sql);
             }
         }
     }
-
     if ($purgeList){
-        $sql = "DELETE from login where userid in";
+        $sql = "DELETE from login where userid in ";
         list($sqlparens, $params) = parenthesisList($purgeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
         array_push($queries, $sql);
     }
     if ($activeList){
-        $sql = "UPDATE student set status='active' where userid in";
+        $sql = "UPDATE student set status='active' where userid in ";
         list($sqlparens, $params) = parenthesisList($activeList);
         $sql.=$sqlparens;
         array_push($bindparams, $params);
@@ -1359,11 +1347,30 @@ function handlePendingStudents(){
 }
 
 function handlePendingTestStudents(){
-    $ids = json_decode($_POST['pendingTestList']);
-    $sql = "DELETE from studentCompetencyTest where userid in ";
-    list($sqlparens, $bindparams) = parenthesisList($ids);
-    $sql.=$sqlparens;
-    echo json_encode(perform_query($sql,'',$bindparams));
+    $queries = array();
+    $bindparams = array();
+    $students = json_decode($_POST['students']);
+
+    foreach ($students as $student){
+        $param = array("userid"=>$student->userid);
+        if ($student->status == "denied"){
+            $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
+            list($sqlparens, $params) = parenthesisList($student->deniedList);
+            $sql.=$sqlparens;
+            $params += $param;
+            array_push($bindparams, $params);
+            array_push($queries, $sql);
+        }
+        else {
+            $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
+            list($sqlparens, $params) = parenthesisList($student->approvedList);
+            $sql.=$sqlparens;
+            $params += $param;
+            array_push($bindparams, $params);
+            array_push($queries, $sql);
+       }
+    }
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 function getAvgGrade($id, $flag=0){
