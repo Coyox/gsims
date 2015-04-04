@@ -17,7 +17,7 @@ $app->get('/students/:id/attendance', 'getStudentAttendance');
 // $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
-$app->post('/students/:id/tests', 'enrollStudentInTests');
+// $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->post('/students/pendingTest', 'handlePendingTestStudents');
 $app->put('/students/:id/sections', 'approveDenyEnrollment');
