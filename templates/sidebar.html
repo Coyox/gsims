@@ -132,6 +132,12 @@
 		</a>
 	</li>
 	<ul class="sub-menu collapse" id="courses-tools">
+		<% if(usertype == "T") { %>
+		<li>
+			<span class="glyphicon glyphicon-briefcase"></span>
+			<a href="#home">My Courses</a>
+		</li>
+		<% } %>
 		<li>
 			<span class="glyphicon glyphicon-search"></span>
 			<a href="#filterSections">Search Sections</a>
