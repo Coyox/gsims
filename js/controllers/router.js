@@ -78,6 +78,7 @@ var Router = Backbone.Router.extend({
         "courses":              "courses",
         "sections":             "sections",
         "filterSections":       "filterSections",
+        "sections/search":      "viewFilteredSections",
 
         "notifications":        "notifications",
 
@@ -462,6 +463,19 @@ var Router = Backbone.Router.extend({
         }
     },
 
+    viewFilteredSections: function() {
+        this.loadHome();
+        this.updatePageBreadcrumb("Sections", "th-list");
+
+        var sectionResults = $("#hidden").find("#sections-table-container");
+        if (sectionResults.length) {
+            sectionResults.detach().appendTo($("#content").empty());
+        } else {
+            new SectionsTableView({
+                el: $("#content")
+            });
+        }
+    },
     notifications: function() {
         this.loadHome();
         this.updatePageBreadcrumb("Notifications", "bell");

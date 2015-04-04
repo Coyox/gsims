@@ -1,52 +1,48 @@
 <div id="filter-sections-container">
-	<div class="form-horizontal col-sm-6">
+	<div class="form-horizontal col-sm-9">
 		<h5 class="col-offset-2">Search Sections</h5>
 		<hr>
 		<div class="form-group">
 			<label class="control-label col-sm-3">Department Name</label>
 			<div class="col-sm-9">
-				<input type="text" id="first-name" class="form-control input-sm">
+				<input type="text" id="dept-name" class="form-control input-sm">
 			</div>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-3">Course Name</label>
 			<div class="col-sm-9">
-				<input type="text" id="last-name" class="form-control input-sm">
+				<input type="text" id="course-name" class="form-control input-sm">
 			</div>
 		</div>
 		<div class="form-group">
             <label class="col-sm-3 control-label">Day</label>
-            <div class="col-sm-8">
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="mon">MON
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="tue">TUE
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="wed">WED
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="thu">THU
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="fri">FRI
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="sat">SAT
-              </label>
-              <label class="radio-inline">
-                <input type="checkbox" class="day form-control input-sm" name="day" data-day="sun">SUN
-              </label>
-              <span class="help-block hidden"></span>
-            </div>
-          </div>
+            <div class="col-sm-9">
+           		<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="mon">MON</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="tue">TUE</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="wed">WED</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="thu">THU</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="fri">FRI</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="sat">SAT</label>
+            	<label class="checkbox-inline"><input type="checkbox" class="day" name ="day" data-day="sun">SUN</label>
+        	</div>
+        </div>
+ 		<div class="form-group" id="class-times">
+			<label class="control-label col-sm-3">Start Time</label>
+			<label class="control-label col-sm-2">End Time</label>
+			<div class="col-sm-9">
+			 <input id="start-time" type="text" class="time ui-timepicker-input" autocomplete="off">
+    		<input id="end-time" type="text" class="time ui-timepicker-input" autocomplete="off">
+    		<div id="alert-both" class="alert alert-danger hide">Must select both a Start and End Time</div>
+    		<div id="alert-larger" class="alert alert-danger hide">End Time must be larger than Start Time</div>
+    		</div>
+		</div>
 		<div class="form-group">
 			<label class="control-label col-sm-3"></label>
 			<div class="col-sm-9">
 				<button id="clear-fields" class="btn btn-sm">Clear</button>
-				<button id="search-teachers" class="btn btn-sm">Search</button>
+				<button id="search-sections" class="btn btn-sm">Search</button>
 			</div>
 		</div>
 	</div>
 </div>
+
