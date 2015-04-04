@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS `document` (
   `userid` int(11),
   `sectionid` int(11) NOT NULL,
   `schoolyearid` int(11) NOT NULL,
-  `status` char(8) NOT NULL,
+  `status` char(15) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `schoolyearid`),
   FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE SET NULL,

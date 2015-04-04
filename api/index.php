@@ -1946,14 +1946,8 @@ function findSections($schoolid){
         $bindparam = array("schoolyear"=>$schoolyearid, "schoolid"=>$schoolid);
         $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
         $courseclause = " and c.schoolyearid=:schoolyear";
-        if (isset($deptname)){
-            $deptclause.= " and d.deptName like '%:deptname%'";
-            $bindparam["deptname"] = $deptname;
-        }
-        if (isset($coursename)){
-            $courseclause.= " and c.courseName like '%:coursename%'";
-            $bindparam["coursename"] = $coursename;
-        }
+        if (isset($deptname)){ $deptclause.= " and d.deptName like '%".$deptname."%'"; }
+        if (isset($coursename)){ $courseclause.= " and c.courseName like '%".$coursename."%'"; }
         $sql = "SELECT s.sectionid, s.courseid, c1.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.status
             from section s, course c1
             where s.courseid in (select c.courseid from course c
