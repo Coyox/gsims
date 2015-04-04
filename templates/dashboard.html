@@ -33,6 +33,7 @@
 				</div>
 			</div>
 		</div>
+		<% if (usertype == "A" || usertype == "SU") { %>
 		<div id="stats-panel" class="col-sm-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">School Usage</div>
@@ -62,6 +63,7 @@
 				</div>
 			</div>
 		</div>
+		<% } %>
 	</div>
 	<div id="calendar-widget" class="col-sm-12">
 		<div id="calendar"></div>
