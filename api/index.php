@@ -135,6 +135,7 @@ $app->post('/purge/document', 'purgeDocuments');
 $app->delete('/purge/inactive', 'purgeInactive');
 
 $app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
+$app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
 $app->get('/stats/attendance/:schoolyearid', 'getAttendanceStats');
 
 $app->get('/keys/:name', 'getKeyByName');
@@ -2261,6 +2262,10 @@ function getStudentGeographics($schoolid){
 function getAttendanceStats($schoolyearid){
     $sql = "SELECT `date`, count(*) as totalAttendance from attendance where schoolyearid=:schoolyearid group by `date`";
     echo json_encode(perform_query($sql,'GETASSO',array("schoolyearid"=>$schoolyearid)));
+}
+function getStudentGenderStats($schoolid){
+    $sql = "SELECT gender, count(*) as studentCount from student where schoolid=:schoolid group by gender";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
 }
 #================================================================================================================#
 # Key

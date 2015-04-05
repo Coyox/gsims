@@ -34,7 +34,7 @@ var School = Backbone.Model.extend({
     },
     getAdminsUrl: function(id){
     	return this.urlRoot + "/" + id + "/administrators"
-    }
+    },
 });
 
 var SchoolYear = Backbone.Model.extend({
@@ -294,4 +294,25 @@ var Document = Backbone.Model.extend({
 
 	urlRoot: app.serverUrl + "api/documents"
 
+});
+
+var Stats = Backbone.Model.extend({
+	defaults: {
+		city: "",
+		gender: "",
+		studentCount: "",
+		date: "",
+		totalAttendance: "",
+	},
+    urlRoot: app.serverUrl + "api/stats/",
+
+    getGeoStatsUrl: function(schoolid) {
+    	return this.urlRoot + "geographic/" + schoolid + "/students";
+    },
+    getGenderStatsUrl: function(schoolid) {
+    	return this.urlRoot + "gender/" + schoolid + "/students";
+    },
+    getAttendanceStatsUrl: function(schoolyearid) {
+    	return this.urlRoot + "attendance/" + schoolyearid;
+    }
 });
