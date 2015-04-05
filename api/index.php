@@ -937,7 +937,12 @@ function createDocument(){
         "schoolyearid" => $doc->schoolyearid,
         "status" => $doc->status
     );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+
+    $resp = perform_query($sql,'POST',$bindparams);
+    if ($resp["status"] == "success"){
+        $resp["docid"] = $docid;
+    }
+    echo json_encode($resp);
 }
 
 function deleteDocument($id) {
