@@ -1,8 +1,18 @@
 var EmailView = Backbone.View.extend({
 	initialize: function(options) {
+		var view = this;
 		this.emailAddr = options.emailAddr;
-		areYouAlive();
-		this.render();
+		this.model = new Key();
+		this.model.fetch({
+			url: this.model.getKeyByName("Mandrill"),
+		}).then(function(data) {
+			console.log(data);
+			view.key = data;
+			areYouAlive(view.key);
+			view.render();
+		}).fail(function(data){
+			alert("error retrieving API keys from server.");
+		});
 	},
 
 	render: function() {
@@ -34,7 +44,7 @@ var EmailView = Backbone.View.extend({
 	checkAccountStatus: function(evt){
 		var parent = this.$el.find("#stats-panel");
 		console.log("Checking Mandrill account status");
-		var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+		var apiKey = this.key;
 
 		$.ajax({
 			type: 'POST',
@@ -59,7 +69,7 @@ var EmailView = Backbone.View.extend({
 		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
 		var body = this.$el.find("#email-message").val();
-		var apiKey = 'C_s6D7OmZEgKBIspAvuBcw'
+		var apiKey = this.key;
 		var from = this.$el.find("#email-from").val();
 		var self = this.$el.find("#self").prop("checked");
 		
@@ -110,9 +120,9 @@ var EmailView = Backbone.View.extend({
 	}
 });
 
-function areYouAlive(){
+function areYouAlive(key){
 	console.log("Checking Mandrill status");
-	var apiKey = "C_s6D7OmZEgKBIspAvuBcw";
+	var apiKey = key;
 
 	$.ajax({
 		type: 'POST',
