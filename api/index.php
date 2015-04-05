@@ -952,7 +952,7 @@ function deleteDocument($id) {
 function getMarks($id) {
     $schoolyearid = $_GET["schoolyearid"];
     $sql = "SELECT `userid`, `mark` from marks where docid=:docid and schoolyearid=:schoolyearid";
-    return perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid));   
+    echo json_encode(perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid)));   
 }
 
 function inputMarks($id){
