@@ -951,8 +951,9 @@ function deleteDocument($id) {
 function inputMarks($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $students = json_decode($body);
+    //$students = json_decode($body);
     $schoolyearid = $_POST["schoolyearid"];
+    $students = json_decode($_POST["students"]);
 
     $bindparams = array(
         "docid" => $id,
