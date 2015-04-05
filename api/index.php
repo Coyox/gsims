@@ -989,7 +989,10 @@ function inputMarks($id){
 }
 
 function updateMarks($id){
-    $students = json_decode($_POST["students"]);
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    $students = json_decode($body);
+    $students = $students->students;
     $queries = array();
     $bindparams = array();
     foreach (array_values($students) as $i => $student){
