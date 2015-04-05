@@ -35,7 +35,7 @@ var SearchSectionsView = Backbone.View.extend({
 				days.push($(day).data("day").toUpperCase());
 			}
 		});
-		var day = days.join(",");
+		var day = days.join("-");
 		if (day != ""){
 			data.days = day;
 		}

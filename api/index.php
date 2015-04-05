@@ -72,6 +72,7 @@ $app->delete('/departments/:id', 'deleteDepartment');
 
 $app->get('/courses/:id', 'getCourseById');
 $app->get('/courses/:id/prereqs', 'getCoursePrereqs');
+$app->get('/courses/:id/waitlist', 'getWaitlistedStudents');
 $app->get('/courses/:id/teachers', 'getCourseTeachers');
 $app->post('/courses/:id/prereqs', 'addCoursePrereqs');
 $app->post('/courses/:id/teachers/:tid', 'assignCourseTeacher');
@@ -87,7 +88,7 @@ $app->get('/sections/count', 'getSectionCount');
 $app->get('/sections/:id', 'getSectionById');
 $app->get('/sections/:id/students/:userid', 'getStudentGradeForSection');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
-$app->get('/sections/:id/students/count', 'getStudentCount');
+$app->get('/sections/:id/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
 $app->get('/sections/:id/attendance', 'getSectionAttendance');
@@ -507,6 +508,10 @@ function waitlistStudent($id){
     $sql = "INSERT into waitlisted (userid, waitlistid) values (:userid, :id)";
     $bindparams = array("userid"=>$student->userid, "id"=>$id);
     echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+function getWaitlistedStudents($id){
+    $sql = "SELECT userid from waitlisted where waitlistid=:waitlistid";
+    echo json_encode(perform_query($sql,'GETALL',array("waitlistid"=>$id)));
 }
 function createCourse(){
     $request = \Slim\Slim::getInstance()->request();
@@ -1984,7 +1989,7 @@ function findSections($schoolid){
     $endTime = $_GET['endTime'];
 
 
-    if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
+    if(isset($deptname)||isset($coursename)||isset($days)||isset($startTime)||isset($endTime)){
         $params = array();
         $bindparam = array("schoolyear"=>$schoolyearid, "schoolid"=>$schoolid);
         $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
@@ -1997,11 +2002,12 @@ function findSections($schoolid){
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")
                 and s.schoolyearid=:schoolyear and s.courseid=c1.courseid and d1.deptid=c1.deptid";
         if (isset($days)){
-            list($clause, $day_bindparam) = buildDayClause($days);
-            $bindparam = $bindparam + $day_bindparam;
-            $sql.= $clause;
+            $days = explode('-', $days);
+            foreach($days as $i=> $day) {
+                $sql.=" and find_in_set(':day".$i."', s.day)";
+                $bindparam["day".$i] = $day;
+            }
         }
-
         if (isset($startTime)){ " and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
         $sql.= " order by s.sectionCode asc";
         echo json_encode(perform_query($sql,'GETALL',$bindparam));

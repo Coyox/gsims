@@ -198,9 +198,9 @@ function getConnection() {
 function buildDayClause($days){
     $clause= "";
     $bindparams = array();
-    $days = explode(',', $days);
+    $days = explode('-', $days);
     foreach($days as $i=> $day) {
-        $clause.=" and find_in_set(':day".$i."',`day`)";
+        $clause.=" and find_in_set(':day".$i."', s.day)";
         $bindparams["day".$i] = $day;
     }
     return array($clause, $bindparams);

@@ -71,11 +71,6 @@ var CourseEnrollmentView = Backbone.View.extend({
 		var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
 			$("#school-options").find("option:selected").attr("id");
 
-		// temp fix
-		if (!schoolid) {
-			schoolid = "412312";
-		}
-
 		this.schoolid = schoolid;
 		
 		var school = new School();
@@ -91,7 +86,8 @@ var CourseEnrollmentView = Backbone.View.extend({
 					el: view.addDepartmentListItem(),
 					model: dept,
 					parent: view.$el,
-					parentView: view
+					parentView: view,
+					schoolid: view.schoolid
 				});
 			});
 		});
@@ -161,6 +157,7 @@ var DepartmentListItem = Backbone.View.extend({
 		var view = this;
 		this.parent = options.parent;
 		this.parentView = options.parentView;
+		this.schoolid = options.schoolid;
 		this.render();
 	},
 
@@ -185,7 +182,7 @@ var DepartmentListItem = Backbone.View.extend({
 		dept.fetch({
 			url: dept.getCoursesUrl(id),
 			data: {
-				schoolyearid: app.selectedSchoolYearId
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			var table = $("#course-list");
@@ -200,7 +197,8 @@ var DepartmentListItem = Backbone.View.extend({
 						el: view.addCourseRow(),
 						model: course,
 						parentView: view.parentView,
-						prereqs: data
+						prereqs: data,
+						schoolid: view.schoolid
 					});
 				});
 			});
@@ -223,6 +221,7 @@ var RCourseTableRowView = Backbone.View.extend({
 	initialize: function(options) {
 		this.parentView = options.parentView;
 		this.prereqs = options.prereqs;
+		this.schoolid = options.schoolid;
 		this.render();
 	},
 
@@ -230,7 +229,7 @@ var RCourseTableRowView = Backbone.View.extend({
 		var prereqs;
 		if (this.prereqs && this.prereqs.length) {
 			prereqs = $.map(this.prereqs, function(object) {
-				return object.prereq;
+				return object.courseName;
 			}).join(",");
 		} else {
 			prereqs = "None";
@@ -259,10 +258,10 @@ var RCourseTableRowView = Backbone.View.extend({
 			var courseName = $(evt.currentTarget).data("name");
 			var section = new Section();
 			section.fetch({
-				url: section.getSearchSectionsUrl(),
+				url: section.getSearchSectionsUrl(view.schoolid),
 				data: {
-					schoolyearid: app.selectedSchoolYearId,
-					schoolid: app.selectedSchoolId,
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+					schoolid: view.schoolid,
 					courseName: courseName
 				}
 			}).then(function(data) {
@@ -292,6 +291,7 @@ var RSectionSubView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var view = this;
 		this.$el.find("td").html(html["subSection.html"]);
 
 		if (this.data.length == 0) {
@@ -299,10 +299,18 @@ var RSectionSubView = Backbone.View.extend({
 		} else {
 			_.each(this.data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				new RSectionTableRowView({
-					el: this.addRow(),
-					model: section,
-					parentView: this.parentView
+
+				section.fetch({
+					url: section.getStudentCount(section.get("sectionid"))
+				}).then(function(data) {
+					console.log(data);
+					var full = data.count >= section.get("classSize");
+					new RSectionTableRowView({
+						el: view.addRow(),
+						model: section,
+						parentView: view.parentView,
+						isFull: full
+					});
 				});
 			}, this);
 		}

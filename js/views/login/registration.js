@@ -205,10 +205,9 @@ var RegSearchView = Backbone.View.extend({
 
 			var student = new Student();
 			student.fetch({
-				url: student.getSearchStudentsUrl(),
+				url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 				data: params
 			}).then(function(data) {
-				console.log(data);
 				var ret;
 				if (data.length == 0) {
 					ret = true;
