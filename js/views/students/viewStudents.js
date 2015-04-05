@@ -2,6 +2,9 @@ var SearchStudentsView = Backbone.View.extend({
 	initialize: function(options) {
 		this.redirect = options.redirect;
 		this.sectionid = options.sectionid;
+		this.backdrop = options.backdrop;
+		this.elem = options.elem;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -118,7 +121,10 @@ var SearchStudentsView = Backbone.View.extend({
 			var view = new AddTableView({
 				el: this.$el,
 				results: data,
-				sectionid: this.sectionid
+				sectionid: this.sectionid,
+				elem: this.elem,
+				backdrop: this.backdrop,
+				parentView: this.parentView
 			});
 		} else {
 			app.Router.navigate("students/search");
@@ -163,6 +169,9 @@ var AddTableView = Backbone.View.extend({
 		this.template = options.template;
 		this.results = options.results;
 		this.sectionid = options.sectionid;
+		this.elem = options.elem;
+		this.backdrop = options.backdrop;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -177,7 +186,10 @@ var AddTableView = Backbone.View.extend({
 			new AddTableRowView({
 				model: model,
 				el: this.addRow(".results", model.get("emailAddr")),
-				sectionid: this.sectionid
+				sectionid: this.sectionid,
+				elem: this.elem,
+				backdrop: this.backdrop,
+				parentView: this.parentView
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
@@ -207,6 +219,9 @@ var AddTableRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
+		this.elem = options.elem;
+		this.backdrop = options.backdrop;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -221,6 +236,7 @@ var AddTableRowView = Backbone.View.extend({
 	},
 
 	addStudent: function(evt) {
+		var view = this;
 		var id = $(evt.currentTarget).attr("id");
 		var student = new Student({id: id});
 		$.ajax({
@@ -237,13 +253,16 @@ var AddTableRowView = Backbone.View.extend({
 			new TransactionResponseView({
 				message: "This student has been added to this section."
 			});
+			view.elem.remove();
+			view.backdrop.remove();
+			view.parentView.render();
 		}).fail(function(data) {
 			new TransactionResponseView({
 				title: "ERROR",
 				status: "error",
 				message: "This student could not be added to this section. Please try again."
 			});
-		})
+		});
 	}
 });
 

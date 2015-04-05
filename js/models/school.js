@@ -90,10 +90,7 @@ var Course = Backbone.Model.extend({
 	},
 
 	validation: {
-		couresName: {
-			required: true,
-		},
-		description: {
+		courseName: {
 			required: true,
 		},
 		schoolyearid: {
@@ -119,7 +116,17 @@ var Course = Backbone.Model.extend({
 	},
 	unassignCourseTeacherUrl: function(courseid, teacherid) {
 		return this.urlRoot + "/" + courseid + "/teachers/" + teacherid
-	}
+	},
+	addCoursePrereqs: function(id) {
+		return this.urlRoot + "/" + id + "/prereqs";
+	},
+	deleteCoursePrereq: function(cid, pid) {
+		return this.urlRoot + "/" + cid + "/prereqs/" + pid;
+	},
+	courseStatuses: [
+		"active", "inactive"
+	]
+
 });
 
 var Section = Backbone.Model.extend({

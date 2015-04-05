@@ -88,7 +88,7 @@ var Router = Backbone.Router.extend({
         "export":               "exportData",
         "purge":                "purgeData",
 
-        "viewCourse/:id":       "viewCourse",
+        "viewCourse/:id/:did":  "viewCourse",
 
         "viewSection/:id":      "viewSection"
     },
@@ -537,13 +537,14 @@ var Router = Backbone.Router.extend({
         })
     },
 
-    viewCourse: function(id) {
+    viewCourse: function(id, deptid) {
         this.loadHome();
         this.updatePageBreadcrumb("View Course", "th-list");
 
         new ViewCourse({
             el: $("#content"),
-            id: id
+            id: id,
+            deptid: deptid
         });
     },
 

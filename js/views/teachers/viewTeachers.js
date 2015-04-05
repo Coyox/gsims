@@ -3,6 +3,9 @@ var SearchTeachersView = Backbone.View.extend({
 		this.redirect = options.redirect;
 		this.sectionid = options.sectionid;
 		this.courseid = options.courseid;
+		this.backdrop = options.backdrop;
+		this.elem = options.elem;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -43,7 +46,10 @@ var SearchTeachersView = Backbone.View.extend({
 				el: this.$el,
 				results: data,
 				sectionid: this.sectionid,
-				courseid: this.courseid
+				courseid: this.courseid,
+				elem: this.elem,
+				backdrop: this.backdrop,
+				parentView: this.parentView
 			});
 		} else {
 			app.Router.navigate("teachers/search");
@@ -66,6 +72,9 @@ var AddTeacherTableView = Backbone.View.extend({
 		this.results = options.results;
 		this.sectionid = options.sectionid;
 		this.courseid = options.courseid;
+		this.elem = options.elem;
+		this.backdrop = options.backdrop;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -81,7 +90,10 @@ var AddTeacherTableView = Backbone.View.extend({
 				model: model,
 				el: this.addRow(".results", model.get("emailAddr")),
 				sectionid: this.sectionid,
-				courseid: this.courseid
+				courseid: this.courseid,
+				elem: this.elem,
+				backdrop: this.backdrop,
+				parentView: this.parentView
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
@@ -112,6 +124,9 @@ var AddTeacherTableRowView = Backbone.View.extend({
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
 		this.courseid = options.courseid;
+		this.elem = options.elem;
+		this.backdrop = options.backdrop;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -126,6 +141,7 @@ var AddTeacherTableRowView = Backbone.View.extend({
 	},
 
 	addTeacher: function(evt) {
+		var view = this;
 		var id = $(evt.currentTarget).attr("id");
 		if(typeof (this.sectionid) === 'undefined'){
 			var course = new Course();
@@ -158,12 +174,18 @@ var AddTeacherTableRowView = Backbone.View.extend({
 					});
 
 				}
+				view.elem.remove();
+				view.backdrop.remove();
+				view.parentView.render();
 			}).fail(function(data) {
 				new TransactionResponseView({
 					title: "ERROR",
 					status: "error",
 					message: "This teacher is already assigned to this course. Please try again."
 				});
+				view.elem.remove();
+				view.backdrop.remove();
+				view.parentView.render();
 			});
 		}
 		else {
@@ -172,16 +194,21 @@ var AddTeacherTableRowView = Backbone.View.extend({
 				type: "POST",
 				url: section.assignSectionTeacher(this.sectionid, id)
 			}).then(function(data) {
-				console.log(data);
 				new TransactionResponseView({
 					message: "This teacher has been added to this section."
 				});
+				view.elem.remove();
+				view.backdrop.remove();
+				view.parentView.render();
 			}).fail(function(data) {
 				new TransactionResponseView({
 					title: "ERROR",
 					status: "error",
 					message: "This teacher could not be added to this section. Please try again."
 				});
+				view.elem.remove();
+				view.backdrop.remove();
+				view.parentView.render();
 			});
 		}
 	}

@@ -134,13 +134,13 @@ var DepartmentView = Backbone.View.extend({
 
 var DepartmentRowView = Backbone.View.extend({
     template: _.template("<td><%= model.deptName %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button> <button class='delete-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Delete Department</button></td>"),
+        + "<td><span class='edit-dept primary-link pull-left center-block' id='<%= model.userid %>'>[ Edit ] </span> <span class='delete-dept primary-link center-block' id='<%= model.deptid %>'>[ Delete ]</span></td>"),
 
     otherusertemplate: _.template("<td><%= model.deptName %></td>"
-        + "<td><button class='edit-dept btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit Department</button></td>"),
+        + "<td><span class='edit-dept primary-link pull-left center-block' id='<%= model.userid %>'>[ Edit ] </span></td>"),
 
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.deptName %>' name='deptName'></td>"
-		+ "<td> <button class='save-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Save Department</button> <button class='cancel-dept btn btn-xs btn-primary center-block' id='<%= model.deptid %>'>Cancel Edit</button></td>"),
+		+ "<td> <span class='save-dept primary-link center-block' id='<%= model.deptid %>'>[ Save ]</span> <span class='cancel-dept primary-link center-block' id='<%= model.deptid %>'>[ Cancel ]</span></td>"),
 
     initialize: function (options) {
         this.action = "view";
