@@ -105,8 +105,7 @@ $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
 $app->get('/documents/:id/marks', 'getMarks');
-$app->post('/documents/:id/marks', 'inputMarks');
-$app->put('/documents/:id/marks', 'updateMarks');
+$app->post('/documents/:id/marks', 'handleMarks');
 $app->put('/documents/:id', 'updateDocument');
 $app->delete('/documents/:id', 'deleteDocument');
 
@@ -968,39 +967,37 @@ function getMarks($id) {
     echo json_encode(perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 
-function inputMarks($id){
+function handleMarks($id){
     $schoolyearid = $_POST["schoolyearid"];
     $students = json_decode($_POST["students"]);
+    $op = $_POST["op"];
 
-    $bindparams = array(
-        "docid" => $id,
-        "schoolyearid" => $schoolyearid,
-        "status" => 'active'
-    );
+    if ($op == "POST"){ //inputMarks
+        $bindparams = array(
+            "docid" => $id,
+            "schoolyearid" => $schoolyearid,
+            "status" => 'active'
+            );
 
-    $sql = "INSERT INTO marks(docid, userid, mark, schoolyearid, status) values ";
-     foreach (array_values($students) as $i => $student) {
-        $sql.= "(:docid, :userid".$i.", :mark".$i.", :schoolyearid, :status),";
-        $bindparams["userid".$i] = $student->userid;
-        $bindparams["mark".$i] = $student->mark;
+        $sql = "INSERT INTO marks(docid, userid, mark, schoolyearid, status) values ";
+        foreach (array_values($students) as $i => $student) {
+            $sql.= "(:docid, :userid".$i.", :mark".$i.", :schoolyearid, :status),";
+            $bindparams["userid".$i] = $student->userid;
+            $bindparams["mark".$i] = $student->mark;
+        }
+        $sql = rtrim($sql, ",");
+        echo json_encode(perform_query($sql,'POST',$bindparams));
     }
-    $sql = rtrim($sql, ",");
-    echo json_encode(perform_query($sql,'POST',$bindparams));
-}
-
-function updateMarks($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $students = json_decode($body);
-    $students = $students->students;
-    $queries = array();
-    $bindparams = array();
-    foreach (array_values($students) as $i => $student){
-        $bindparams[$i] = array("docid" => $id, "userid".$i=>$student->userid, "mark".$i=>$student->mark);
-        $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and docid=:docid";
-        array_push($queries, $sql);
+    else { // update marks
+        $queries = array();
+        $bindparams = array();
+        foreach (array_values($students) as $i => $student){
+            $bindparams[$i] = array("docid" => $id, "userid".$i=>$student->userid, "mark".$i=>$student->mark);
+            $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and docid=:docid";
+            array_push($queries, $sql);
+        }
+        echo json_encode(perform_transaction($queries, $bindparams));
     }
-    echo json_encode(perform_transaction($queries, $bindparams));
 }
 #================================================================================================================#
 # Students
