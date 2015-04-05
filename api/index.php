@@ -1989,7 +1989,7 @@ function findSections($schoolid){
     $endTime = $_GET['endTime'];
 
 
-    if(isset($deptname)||isset($coursename)||isset($day)||isset($startTime)||isset($endTime)){
+    if(isset($deptname)||isset($coursename)||isset($days)||isset($startTime)||isset($endTime)){
         $params = array();
         $bindparam = array("schoolyear"=>$schoolyearid, "schoolid"=>$schoolid);
         $deptclause = " where d.schoolyearid=:schoolyear and d.schoolid=:schoolid";
