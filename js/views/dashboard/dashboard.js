@@ -27,6 +27,7 @@ var DashboardView = Backbone.View.extend({
 		if (usertype == "SU") {
 			this.studentGeoGraph();
 			this.studentGenderGraph();
+			this.studentAgeGraph();
 			this.attendanceCalendar();
 		}
 	},
@@ -376,6 +377,7 @@ var DashboardView = Backbone.View.extend({
           		legend: {
           			position: "bottom"
           		},
+
       		}
         	var chart = new google.visualization.PieChart(this.$el.find('#student-location-piechart').get(0));
         	chart.draw(data, options);
@@ -402,10 +404,62 @@ var DashboardView = Backbone.View.extend({
           		legend: {
           			position: "bottom"
           		},
+
           		colors:['#00B88A','#9d426b']
 
       		}
         	var chart = new google.visualization.PieChart(this.$el.find('#student-gender-piechart').get(0));
+        	chart.draw(data, options);
+		}
+	},
+	studentAgeGraph:function(){
+		var stats = new Stats();
+		var kids = 3; //0-17
+		var teens = 41; //18-24
+		var youngadults = 8; //25-34
+		var adults = 20; //35-44
+		var oldadults = 4; //45-54
+		var seniors = 5; //55-64
+		var elderly = 1; //65+
+
+		var dataArray = [['Age Range', 'Student Count']];
+		stats.fetch({
+			url: stats.getAgeStatsUrl(sessionStorage.getItem("gobind-schoolid"))
+		}).then(function(data) {
+			_.each(data, function(object, index) {
+				var model = new Stats(object, {parse:true});
+				var age = parseInt(model.get("age"));
+				var studentcount = parseInt(model.get("studentCount"));
+				if (age <= 17){ kids += studentcount; }
+				if (18 <= age && age <= 24){ teens += studentcount; }
+				if (25 <= age && age <= 34){ youngadults += studentcount; }
+				if (35 <= age && age <= 44){ adults += studentcount; }
+				if (45 <= age && age <= 54){ oldadults += studentcount; }
+				if (55 <= age && age <= 64){ seniors += studentcount; }
+				if (age >= 65){ elderly += studentcount; }
+			});
+		});
+
+		dataArray.push(['0-17', kids]);
+		dataArray.push(['18-24', teens]);
+		dataArray.push(['25-32', youngadults]);
+		dataArray.push(['35-44', adults]);
+		dataArray.push(['45-54', oldadults]);
+		dataArray.push(['55-64', seniors]);
+		dataArray.push(['65+', elderly]);
+
+
+		if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
+			this.$el.find("#demographics-label").removeClass("hide").show();
+			var data = google.visualization.arrayToDataTable(dataArray);
+        	var options = {
+          		title: "Age",
+          		is3D: true,
+          		legend: {
+          			position: "bottom"
+          		},
+      		}
+        	var chart = new google.visualization.PieChart(this.$el.find('#student-age-piechart').get(0));
         	chart.draw(data, options);
 		}
 	},

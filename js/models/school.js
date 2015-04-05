@@ -298,6 +298,7 @@ var Document = Backbone.Model.extend({
 
 var Stats = Backbone.Model.extend({
 	defaults: {
+		age: "",
 		city: "",
 		gender: "",
 		studentCount: "",
