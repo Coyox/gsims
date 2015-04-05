@@ -1,4 +1,4 @@
-USE testDatabase2;
+USE gobind;
 
 INSERT into apikeys(`keyid`, `name`) values ('C_s6D7OmZEgKBIspAvuBcw', 'mandrill');
 
