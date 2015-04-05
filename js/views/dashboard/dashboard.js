@@ -27,6 +27,7 @@ var DashboardView = Backbone.View.extend({
 		if (usertype == "SU") {
 			this.studentGeoGraph();
 			this.studentGenderGraph();
+			this.attendanceCalendar();
 		}
 	},
 
@@ -356,45 +357,88 @@ var DashboardView = Backbone.View.extend({
 	},
 	studentGeoGraph:function(){
 		var stats = new Stats();
-		var dataArray = [['City', 'Student Count']];
+		var dataArray = [['City', 'Student Count'],['Vancouver',1000],['Richmond',20000]];
 		stats.fetch({
 			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Stats(object, {parse:true});
 				var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
-				dataArray.push(section);
+				dataArray.push(city);
 			});
 		});
 		if (dataArray.length > 1){
 			this.$el.find("#demographics-label").removeClass("hide").show();
 			var data = google.visualization.arrayToDataTable(dataArray);
         	var options = {
-          		title: "Location"
+          		title: "Location",
+          		is3D: true,
+          		legend: {
+          			position: "bottom"
+          		},
       		}
         	var chart = new google.visualization.PieChart(this.$el.find('#student-location-piechart').get(0));
         	chart.draw(data, options);
 		}
 	},
 	studentGenderGraph:function(){
-		// var stats = new Stats();
-		// var dataArray = [['Gender', 'Student Count']];
-		// stats.fetch({
-		// 	url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
-		// }).then(function(data) {
-		// 	_.each(data, function(object, index) {
-		// 		var model = new Stats(object, {parse:true});
-		// 		var city = [model.get("gender"), parseInt(model.get("studentCount"))];
-		// 		dataArray.push(section);
-		// 	});
-		// });
-		// if (dataArray.length > 1){
-		// 	var data = google.visualization.arrayToDataTable(dataArray);
-  //       	var options = {
-  //         		title: "Gender"
-  //     		}
-  //       	var chart = new google.visualization.PieChart(this.$el.find('#student-gender-piechart').get(0));
-  //       	chart.draw(data, options);
-		// }
+		var stats = new Stats();
+		var dataArray = [['Gender', 'Student Count'], ['F',1000],['M',20000]];
+		stats.fetch({
+			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
+		}).then(function(data) {
+			_.each(data, function(object, index) {
+				var model = new Stats(object, {parse:true});
+				var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
+				dataArray.push(gender);
+			});
+		});
+		if (dataArray.length > 1){
+			this.$el.find("#demographics-label").removeClass("hide").show();
+			var data = google.visualization.arrayToDataTable(dataArray);
+        	var options = {
+          		title: "Gender",
+          		is3D: true,
+          		legend: {
+          			position: "bottom"
+          		},
+          		colors:['#00B88A','#9d426b']
+
+      		}
+        	var chart = new google.visualization.PieChart(this.$el.find('#student-gender-piechart').get(0));
+        	chart.draw(data, options);
+		}
+	},
+	attendanceCalendar:function(){
+		var stats = new Stats();
+		var dataArray = [[ new Date(2012, 3, 13), 37032 ],
+          [ new Date(2012, 3, 14), 38024 ],
+          [ new Date(2012, 3, 15), 38024 ],
+          [ new Date(2012, 3, 16), 38108 ],
+          [ new Date(2012, 3, 17), 38229 ]];
+
+		stats.fetch({
+			url: stats.getAttendanceStatsUrl(sessionStorage.getItem("gobind-activeSchoolYear"))
+		}).then(function(data) {
+			_.each(data, function(object, index) {
+				var model = new Stats(object, {parse:true});
+				var city = [new Date(model.get("date")), parseInt(model.get("totalAttendance"))];
+				dataArray.push(section);
+			});
+		});
+		if (dataArray){
+			var dataTable = new google.visualization.DataTable();
+			dataTable.addColumn({ type: 'date', id: 'Date' });
+       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
+       		dataTable.addRows(dataArray);
+
+	    	var options = {
+          		title: "School Attendance",
+          		height: 350,
+      		}
+
+        	var chart = new google.visualization.Calendar(this.$el.find('#calendar_basic').get(0));
+        	chart.draw(dataTable, options);
+		}
 	},
 });

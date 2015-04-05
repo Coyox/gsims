@@ -136,6 +136,7 @@ $app->delete('/purge/inactive', 'purgeInactive');
 
 $app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
 $app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
+$app->get('/stats/age/:schoolid/students', 'getStudentAgeStats');
 $app->get('/stats/attendance/:schoolyearid', 'getAttendanceStats');
 
 $app->get('/keys/:name', 'getKeyByName');
@@ -2265,6 +2266,10 @@ function getAttendanceStats($schoolyearid){
 }
 function getStudentGenderStats($schoolid){
     $sql = "SELECT gender, count(*) as studentCount from student where schoolid=:schoolid group by gender";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
+}
+function getStudentAgeStats($schoolid){
+    $sql = "SELECT (year(Now())-year(dateOfBirth)) as age, count(*) as studentCount from student where schoolid=:schoolid group by year(dateOfBirth)";
     echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
 }
 #================================================================================================================#

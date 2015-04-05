@@ -312,6 +312,9 @@ var Stats = Backbone.Model.extend({
     getGenderStatsUrl: function(schoolid) {
     	return this.urlRoot + "gender/" + schoolid + "/students";
     },
+    getAgeStatsUrl: function(schoolid) {
+    	return this.urlRoot + "age/" + schoolid + "/students";
+    },
     getAttendanceStatsUrl: function(schoolyearid) {
     	return this.urlRoot + "attendance/" + schoolyearid;
     }
