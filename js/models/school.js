@@ -356,3 +356,13 @@ var Stats = Backbone.Model.extend({
     	return this.urlRoot + "attendance/" + schoolyearid;
     }
 });
+
+var Notif = Backbone.Model.extend({
+	urlRoot: app.serverUrl + "api/notif",
+
+	missingInputAttendance: function() {
+		return this.urlRoot + "/missingInputAttendance";
+	}
+})
+
+

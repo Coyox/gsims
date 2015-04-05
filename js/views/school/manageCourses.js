@@ -1671,7 +1671,7 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 
 var AttendanceView = Backbone.View.extend({
 	template: _.template("<div class='col-sm-6'>"
-		+	"<h4 class='o-auto'>Number of Students: <span class='num-students'></span>"
+		+	"<h4 class='o-auto'>Number of Students: <span class='num-students'></span> <br> <small> Average: <span class='avg-attendance'></span></small>"
 		+		"<div class='pull-right'>"
 		+			"<button id='add-attendance' class='btn btn-primary btn-sm'>Add Attendance</button>"
 		+		"</div>"
@@ -1726,6 +1726,13 @@ var AttendanceView = Backbone.View.extend({
 			view.enrolledStudents = data;
 		});
 
+		// Get avg attendance for section
+		section.fetch({
+			url: section.getAverageAttendance(view.sectionid)
+		}).then(function(data) {
+			view.$el.find(".avg-attendance").text(data.avgAttendance);
+		});	
+
 		// Get all the attendance records for each unique date
 		section.fetch({
 			url: section.getSectionDates(this.sectionid),
@@ -1744,25 +1751,20 @@ var AttendanceView = Backbone.View.extend({
 							attendedStudents++;
 						}
 					});
-				
-					section.fetch({
-						url: section.getAverageAttendance(view.sectionid)
-					}).then(function(avgAttendance) {
 
-						var numStudents = enrolledStudents.length;
-						var avg = (attendedStudents / numStudents) * 100;
-						var avgString = attendedStudents + " / " + numStudents + " = " + avg;
+					var numStudents = enrolledStudents.length;
+					var avg = (attendedStudents / numStudents) * 100;
+					var avgString = attendedStudents + " / " + numStudents + " = " + avg;
 
-						new AttendanceRowView({
-							el: view.addRow(),
-							date: obj.date,
-							numStudents: numStudents,
-							attendedStudents: attendedStudents,
-							avg: avgString + "%",
-							sectionid: view.sectionid,
-							enrolledStudents: view.enrolledStudents
-						});
-					});	
+					new AttendanceRowView({
+						el: view.addRow(),
+						date: obj.date,
+						numStudents: numStudents,
+						attendedStudents: attendedStudents,
+						avg: avgString + "%",
+						sectionid: view.sectionid,
+						enrolledStudents: view.enrolledStudents
+					});
 				});
 			});
 		});
@@ -2175,7 +2177,8 @@ var DocumentsView = Backbone.View.extend({
 				url: doc.inputMarks(docid),
 				data: {
 					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-					students: JSON.stringify(marks)
+					students: JSON.stringify(marks),
+					op: "POST"
 				}
 			}).then(function(data) {
 				if (typeof data == "string") {
@@ -2400,11 +2403,11 @@ var DocumentRowView = Backbone.View.extend({
 		if (marks.length) {
 			var doc = new Document();
 			$.ajax({
-				type: "PUT",
+				type: "POST",
 				url: doc.updateMarks(docid),
 				data: {
-					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-					students: JSON.stringify(marks)
+					students: JSON.stringify(marks),
+					op: "PUT"
 				}
 			}).then(function(data) {
 				if (typeof data == "string") {
