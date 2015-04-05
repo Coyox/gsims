@@ -13,7 +13,7 @@ var EmailView = Backbone.View.extend({
 		this.$el.find("#pre").hide();
 
 
-		var userEmail = sessionStorage.getItem('gobind-email') ; // TODO: Get the email of the logged in user
+		var userEmail = sessionStorage.getItem('gobind-email') ;
 		this.$el.find("#email-from").val(userEmail);
 	},
 
@@ -102,8 +102,8 @@ var EmailView = Backbone.View.extend({
   			url: "https://mandrillapp.com/api/1.0/messages/send.json",
   			data: JSON.stringify(request.data),
 		}).done(function(response) {
-   		console.log(response);
-   		alert("Message sent successfully!");
+   		//console.log(response);
+   			alert("Message(s) sent successfully!"); //TODO: Change to use in-page alert
  		}).fail(function(xhr, textStatus, errorThrown){
  			alert("Error sending email:\n\n" + xhr.responseText);
  		});
