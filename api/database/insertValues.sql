@@ -1,6 +1,4 @@
-USE testDatabase2;
-
-INSERT into apikeys(`keyid`, `name`) values ('C_s6D7OmZEgKBIspAvuBcw', 'mandrill');
+USE gobind;
 
 
 -- Insert Schoolyear --
