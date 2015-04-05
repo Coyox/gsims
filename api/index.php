@@ -802,7 +802,7 @@ function getSectionAttendance($id){
     $sql = "SELECT temp.userid, temp.firstName, temp.lastName, temp.T as usertype  from
             ((SELECT t.userid, t.firstName, t.lastName, 'T'
             from attendance a, teacher t
-            where a.sectionid=777778 and a.date='2015-03-22' and a.userid=t.userid)
+            where a.sectionid=:sectionid and a.date=:classdate and a.userid=t.userid)
             UNION
             (SELECT s.userid, s.firstName, s.lastName, 'S'
             from attendance a, student s
