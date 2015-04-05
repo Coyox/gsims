@@ -477,7 +477,7 @@ var DashboardView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var model = new Stats(object, {parse:true});
 				var city = [new Date(model.get("date")), parseInt(model.get("totalAttendance"))];
-				dataArray.push(section);
+				dataArray.push(city);
 			});
 		});
 		if (dataArray){
