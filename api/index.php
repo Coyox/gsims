@@ -104,6 +104,7 @@ $app->delete('/sections/:id/teachers/:tid', 'unassignSectionTeacher');
 $app->get('/documents', 'getDocuments');
 $app->get('/documents/:id', 'getDocumentById');
 $app->post('/documents', 'createDocument');
+$app->get('/documents/:id/marks', 'getMarks');
 $app->post('/documents/:id/marks', 'inputMarks');
 $app->put('/documents/:id/marks', 'updateMarks');
 $app->put('/documents/:id', 'updateDocument');
