@@ -1,5 +1,5 @@
 <div id="filter-sections-container">
-	<div class="form-horizontal col-sm-9">
+	<div class="form-horizontal col-sm-8">
 		<h5 class="col-offset-2">Search Sections</h5>
 		<hr>
 		<div class="form-group">
@@ -27,13 +27,12 @@
         	</div>
         </div>
  		<div class="form-group" id="class-times">
-			<label class="control-label col-sm-3">Start Time</label>
-			<label class="control-label col-sm-2">End Time</label>
-			<div class="col-sm-9">
-			 <input id="start-time" type="text" class="time ui-timepicker-input" autocomplete="off">
-    		<input id="end-time" type="text" class="time ui-timepicker-input" autocomplete="off">
-    		<div id="alert-both" class="alert alert-danger hide">Must select both a Start and End Time</div>
-    		<div id="alert-larger" class="alert alert-danger hide">End Time must be larger than Start Time</div>
+ 			<label class="col-sm-3 control-label">Time</label>
+ 			<div class="col-sm-9 form-inline">
+				<input id="start-time" type="text" class="form-control input-sm time ui-timepicker-input" autocomplete="off" placeholder="Start Time">
+	    		<input id="end-time" type="text" class="form-control input-sm time ui-timepicker-input" autocomplete="off" placeholder="End Time">
+	    		<div id="alert-both" class="alert alert-danger hide">Must select both a Start and End Time</div>
+	    		<div id="alert-larger" class="alert alert-danger hide">End Time must be larger than Start Time</div>
     		</div>
 		</div>
 		<div class="form-group">

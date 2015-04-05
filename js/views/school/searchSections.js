@@ -170,7 +170,7 @@ var SectionsTableView = Backbone.View.extend({
 
 	addRow: function(selector, email) {
 		var container = $("<tr></tr>");
-		this.$el.find(".results").append(row);
+		this.$el.find(".results").append(container);
 		return container;
 	},
 
@@ -187,8 +187,7 @@ var SectionsTableView = Backbone.View.extend({
 
 
 var SectionTableRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.userid %></td>"
-		+	"<td><%= model.sectionCode %></td>"
+	template: _.template("<td><%= model.sectionCode %></td>"
 		+	"<td><%= model.deptName %></td>"
 		+	"<td><%= model.courseName %></td>"
 		+	"<td><%= model.day %></td>"
@@ -217,8 +216,3 @@ var SectionTableRowView = Backbone.View.extend({
 		app.Router.navigate("viewSection/" + id, {trigger:true});
 	}
 });
-
-
-function storeContent() {
-	$("#content").children().detach().appendTo($("#hidden"));
-}
