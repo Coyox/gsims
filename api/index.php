@@ -2003,12 +2003,11 @@ function findSections($schoolid){
                 and s.schoolyearid=:schoolyear and s.courseid=c1.courseid and d1.deptid=c1.deptid";
         if (isset($days)){
             $days = explode('-', $days);
-            foreach($days as $i=> $day) {
-                $sql.=" and find_in_set(':day".$i."', s.day)";
-                $bindparam["day".$i] = $day;
+            foreach($days as $day) {
+                $sql.=" and find_in_set('".$day."', s.day)";
             }
         }
-        if (isset($startTime)){ " and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
+        if (isset($startTime)&& isset($endTime)){ $sql.=" and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
         $sql.= " order by s.sectionCode asc";
         echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
