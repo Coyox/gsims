@@ -198,6 +198,15 @@ var Section = Backbone.Model.extend({
 	},
 	assignSectionTeacher: function(sectionid, teacherid) {
 		return this.urlRoot + "/" + sectionid + "/teachers/" + teacherid
+	},
+	getSectionDates: function(id) {
+		return this.urlRoot + "/" + id + "/dates";
+	},
+	getSectionAttendance: function(id) {
+		return this.urlRoot + "/" + id + "/attendance";
+	},
+	getAverageAttendance: function(id) {
+		return this.urlRoot + "/" + id + "/avgAttendance";
 	}
 });
 

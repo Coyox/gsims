@@ -1670,61 +1670,120 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 
 
 var AttendanceView = Backbone.View.extend({
+	template: _.template("<div class='col-sm-6'>"
+		+	"<h4 class='o-auto'>Number of Students: <span class='num-students'></span>"
+		+		"<div class='pull-right'>"
+		+			"<button id='add-attendance' class='btn btn-primary btn-sm'>Add Attendance</button>"
+		+		"</div>"
+		+	"</h4>"
+		+	"<table id='attendance-table' class='table table-striped table-bordered'>"
+		+		"<thead>"
+		+			"<tr>"
+		+				"<th>Date</th>"
+		+				"<th># Attended</th>"
+		+				"<th>Average Attendance</th>"
+		+				"<th></th>"
+		+			"</tr>"
+		+		"</thead>"
+		+		"<tbody class='results'></tbody>"
+		+	"</table>"
+		+ "</div>"),
+
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
 		this.render();
 	},
 
 	events: {
-		"click #update-attendance": "updateAttendance"
-	},
-
-	render: function() {
-		this.$el.find("table tbody").empty();
-		$("#date").datepicker({
-			dateFormat: "yy-mm-dd"
-		});
-
-		var view = this;
-		var section = new Section();
-		section.fetch({
-			url: section.getStudentsEnrolled(this.sectionid),
-		}).then(function(data) {
-			if (data.length == 0) {
-				var table = view.$el.find("table");
-				table.hide();
-				table.after("<div class='alert alert-danger'>There are currently no registered in this section.</div>");
-			} else {
-				_.each(data, function(student, index) {
-					var model = new Student(student, {parse:true});
-					new AttendanceRowView({
-						el: view.addRow(model.get("userid")),
-						model: model,
-						userid: model.get("userid")
-					});
-				});
-				//view.table = view.$el.find("table").dataTable({
-				// 	dom: "t"
-				// });
-			}
-		});
-	},
-
-	events: {
+		"click #update-attendance": "updateAttendance",
+		"click #add-attendance": "addAttendance",
 		"change .toggle-checkboxes": "toggleCheckboxes",
 		"click #update-attendance": "updateAttendance"
 	},
 
-	addRow: function(id) {
+	render: function() {
+		this.$el.html(this.template());
+
+		var view = this;
+
+		// Get enrolled students
+		var enrolledStudents = [];
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentsEnrolled(this.sectionid),
+		}).then(function(data) {
+			view.$el.find(".num-students").text(data.length);
+			_.each(data, function(user, index) {
+				enrolledStudents.push(user.userid);
+
+				var model = new Student(user, {parse:true});
+				new AttendanceRecordView({
+					el: view.addAttendanceRow(model.get("userid")),
+					model: model,
+					userid: model.get("userid")
+				});				
+			});
+			view.enrolledStudents = data;
+		});
+
+		// Get all the attendance records for each unique date
+		section.fetch({
+			url: section.getSectionDates(this.sectionid),
+		}).then(function(sectionDates) {
+			_.each(sectionDates, function(obj, index) {
+
+				section.fetch({
+					url: section.getSectionAttendance(view.sectionid),
+					data: {
+						date: obj.date
+					}
+				}).then(function(attendanceRecords) {
+					var attendedStudents = 0;
+					_.each(attendanceRecords, function(record, index) {
+						if (record.usertype == "S" && enrolledStudents.indexOf(record.userid) > -1) {
+							attendedStudents++;
+						}
+					});
+				
+					section.fetch({
+						url: section.getAverageAttendance(view.sectionid)
+					}).then(function(avgAttendance) {
+
+						var numStudents = enrolledStudents.length;
+						var avg = (attendedStudents / numStudents) * 100;
+						var avgString = attendedStudents + " / " + numStudents + " = " + avg;
+
+						new AttendanceRowView({
+							el: view.addRow(),
+							date: obj.date,
+							numStudents: numStudents,
+							attendedStudents: attendedStudents,
+							avg: avgString + "%",
+							sectionid: view.sectionid,
+							enrolledStudents: view.enrolledStudents
+						});
+					});	
+				});
+			});
+		});
+	},
+
+	addRow: function() {
 		var container = $("<tr></tr>");
-		container.attr("id", id);
-		this.$el.find("table tbody").append(container);
+		this.$el.find("#attendance-table tbody").append(container);
 		return container;
 	},
 
-	updateAttendance: function() {
+	addAttendanceRow: function(id) {
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		this.$el.find("#enrolled-table tbody").append(container);
+		return container;	
+	},
+
+	updateAttendance: function(elem, backdrop) {
 		var view = this;
-		var rows = this.$el.find("table tbody tr");
+		var rows = this.$el.find("#enrolled-table tbody tr");
 		var attended = [];
 		_.each(rows, function(row, index) {
 			if ($(row).find("input[type='checkbox']").is(":checked")) {
@@ -1749,8 +1808,6 @@ var AttendanceView = Backbone.View.extend({
 				new TransactionResponseView({
 					message: "Attendance successfully inputted."
 				});
-				view.table.fnDestroy();
-				view.render();
 			}
 			else {
 				new TransactionResponseView({
@@ -1759,12 +1816,18 @@ var AttendanceView = Backbone.View.extend({
 					message: "Could not input attendance. Please try again."
 				});
 			}
+			view.render();
+			elem.remove();
+			backdrop.remove();
 		}).fail(function(data) {
 			new TransactionResponseView({
 				title: "ERROR",
 				status: "error",
 				message: "Could not input attendance. Please try again."
 			});
+			view.render();
+			elem.remove();
+			backdrop.remove();
 		});
 	},
 
@@ -1776,16 +1839,160 @@ var AttendanceView = Backbone.View.extend({
 			checkbox.prop("checked", checked);
 		}, this);
 	},
+
+	addAttendance: function(evt) {
+		var view = this;
+
+		this.$el.append(html["addAttendance.html"]);
+
+		var elem = $("#add-attendnace-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.find("#date").datepicker({
+			dateFormat: "yy-mm-dd"
+		});
+
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentsEnrolled(this.sectionid),
+		}).then(function(data) {
+			view.$el.find(".num-students").text(data.length);
+			_.each(data, function(user, index) {
+				var model = new Student(user, {parse:true});
+				new AttendanceRecordView({
+					el: view.addAttendanceRow(model.get("userid")),
+					model: model,
+					userid: model.get("userid")
+				});				
+			});
+		});
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+
+		elem.on("click", "#save", function() {
+			view.updateAttendance(elem, backdrop);
+		});
+	}
 });
 
 var AttendanceRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.userid %></td>"
-		+	"<td><%= model.firstName %></td>"
+	template: _.template("<td><%= date %></td>"
+		+	"<td><%= attendedStudents %></td>"
+		// +	"<td><%= numStudents %></td>"
+		+	"<td><%= avg %></td>"
+		+	"<td><span data-date='<%= date %>' class='view-attendance primary-link'>[ View ]</span></td>"),
+
+	initialize: function(options) {
+		this.sectionid = options.sectionid;
+		this.date = options.date;
+		this.numStudents = options.numStudents;
+		this.attendedStudents = options.attendedStudents;
+		this.avg = options.avg;
+		this.enrolledStudents = options.enrolledStudents;
+		this.render();
+	},
+
+	events: {
+		"click .view-attendance": "viewAttendance"
+	},
+
+	render: function() {
+		var view = this;
+		this.$el.html(this.template({
+			date: this.date,
+			numStudents: this.numStudents,
+			attendedStudents: this.attendedStudents,
+			avg: this.avg
+		}));
+	},
+
+	viewAttendance: function(evt) {
+		var view = this;
+		var date = $(evt.currentTarget).data("date");
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentAttendance(this.sectionid),
+			data: {
+				date: date
+			}
+		}).then(function(data) {
+			view.viewAttendanceRecord(view.enrolledStudents, data, date);
+		});
+	},
+
+	viewAttendanceRecord: function(all, attended, date) {
+		var view = this;
+
+		this.$el.append(html["addAttendance.html"]);
+
+		var elem = $("#add-attendnace-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.find("#date").remove();
+		elem.find("h4").append(" for " + date)
+
+		_.each(all, function(user, index) {
+			var model = new Student(user, {parse:true});
+			var userid = model.get("userid");
+
+			var checked = false;
+			_.each(attended, function(student, index) {
+				if (student.userid == user.userid) {
+					checked = true;
+				}
+			});
+
+			new AttendanceRecordView({
+				el: view.addAttendanceRow(userid),
+				model: model,
+				userid: userid,
+				checked: checked == true ? "P" : "A",
+				action: "view"
+			});				
+		});
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+
+		elem.on("click", "#save", function() {
+			view.updateAttendance(elem, backdrop);
+		});
+	},
+
+	addAttendanceRow: function(id) {
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		this.$el.find("#enrolled-table tbody").append(container);
+		return container;	
+	}
+});
+
+var AttendanceRecordView = Backbone.View.extend({
+	template: _.template("<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+	"<td><input type='checkbox' class='attendnace' checked></td>"),
+		+	"<td><input id='<%= model.userid %>' type='checkbox' class='attendance' checked></td>"),
+
+	viewTemplate: _.template("<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= attended %></td>"),
 
 	initialize: function(options) {
 		this.userid = options.userid;
+		this.checked = options.checked;
+		this.action = options.action;
 		this.render();
 	},
 
@@ -1794,9 +2001,16 @@ var AttendanceRowView = Backbone.View.extend({
 		var sectionid = this.model.get("sectionid");
 		var userid = this.userid;
 
-		view.$el.html(view.template({
-			model: view.model.toJSON()
-		}));
+		if (this.action == "view") {
+			this.$el.html(this.viewTemplate({
+				model: this.model.toJSON(),
+				attended: this.checked
+			}));
+		} else {
+			this.$el.html(this.template({
+				model: this.model.toJSON(),
+			}));
+		}
 	}
 });
 
