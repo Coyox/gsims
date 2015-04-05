@@ -6,7 +6,6 @@ var EmailView = Backbone.View.extend({
 		this.model.fetch({
 			url: this.model.getKeyByName("Mandrill"),
 		}).then(function(data) {
-			console.log(data);
 			view.key = data;
 			areYouAlive(view.key);
 			view.render();
