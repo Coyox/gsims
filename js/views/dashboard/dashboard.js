@@ -25,6 +25,7 @@ var DashboardView = Backbone.View.extend({
 		}
 
 		if (usertype == "SU" || usertype == "A") {
+			this.teacherAttendanceReminder();
 			this.studentGeoGraph();
 			this.studentGenderGraph();
 			this.studentAgeGraph();
@@ -128,6 +129,32 @@ var DashboardView = Backbone.View.extend({
 			}
 		}).then(function(data) {
 			parent.find(".sections").text(data);
+		});
+	},
+
+	teacherAttendanceReminder: function(evt) {
+		var numdays = evt ? $(evt.currentTarget).attr("value") : 7;
+		for (var i = 1; i < 31; i++) {
+			var option = $("<option></option>");
+			option.attr("value", i);
+			option.text(i);
+			option.prop("selected", i == numdays);
+			this.$el.find("#day-menu").append(option);
+		}
+
+		var view = this;
+		var notif = new Notif();
+		notif.fetch({
+			url: notif.missingInputAttendance(),
+			data: {
+				numdays: 7,
+				today: "2015-04-05"
+			}
+		}).then(function(data) {
+			_.each(data, function(teacher, index) {
+				var row = "<tr><td>" + teacher.firstName + " " + teacher.lastLame + "</td><td>Email</td></tr>"
+				view.find("#teacher-reminder-table").append(row);
+			});
 		});
 	},
 
@@ -363,8 +390,9 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	studentGeoGraph:function(){
+		var view = this;
 		var stats = new Stats();
-		var dataArray = [['City', 'Student Count'],['Vancouver',1000],['Richmond',20000]];
+		var dataArray = [['City', 'Student Count']];
 		stats.fetch({
 			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
@@ -373,27 +401,29 @@ var DashboardView = Backbone.View.extend({
 				var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
 				dataArray.push(city);
 			});
-		});
-		if (dataArray.length > 1){
-			this.$el.find("#demographics-label").removeClass("hide").show();
-			var data = google.visualization.arrayToDataTable(dataArray);
-        	var options = {
-          		//title: "Location",
-          		is3D: true,
-          		legend: {
-          			position: "bottom"
-          		},
-          		chartArea:{left:0,right:0,top:0}
+		
+			if (dataArray.length > 1){
+				view.$el.find("#demographics-label").removeClass("hide").show();
+				var data = google.visualization.arrayToDataTable(dataArray);
+	        	var options = {
+	          		//title: "Location",
+	          		is3D: true,
+	          		legend: {
+	          			position: "bottom"
+	          		},
+	          		chartArea:{left:0,right:0,top:0}
 
-      		}
-        	var chart = new google.visualization.PieChart(this.$el.find('#student-location-piechart').get(0));
-        	chart.draw(data, options);
-		}
+	      		}
+	        	var chart = new google.visualization.PieChart(view.$el.find('#student-location-piechart').get(0));
+	        	chart.draw(data, options);
+			}
+		});
 	},
 
 	studentGenderGraph:function(){
+		var view = this;
 		var stats = new Stats();
-		var dataArray = [['Gender', 'Student Count'], ['F',1000],['M',20000]];
+		var dataArray = [['Gender', 'Student Count']];
 		stats.fetch({
 			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
@@ -402,35 +432,44 @@ var DashboardView = Backbone.View.extend({
 				var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
 				dataArray.push(gender);
 			});
-		});
-		if (dataArray.length > 1){
-			this.$el.find("#demographics-label").removeClass("hide").show();
-			var data = google.visualization.arrayToDataTable(dataArray);
-        	var options = {
-          		//title: "Gender",
-          		is3D: true,
-          		legend: {
-          			position: "bottom"
-          		},
-          		chartArea:{left:0,right:0,top:0},
-          		// chartArea:{left:10,top:20,width:"100%",height:"100%"},
-          		colors:['#00B88A','#9d426b']
+			if (dataArray.length > 1){
+				view.$el.find("#demographics-label").removeClass("hide").show();
+				var data = google.visualization.arrayToDataTable(dataArray);
+	        	var options = {
+	          		//title: "Gender",
+	          		is3D: true,
+	          		legend: {
+	          			position: "bottom"
+	          		},
+	          		chartArea:{left:0,right:0,top:0},
+	          		// chartArea:{left:10,top:20,width:"100%",height:"100%"},
+	          		colors:['#00B88A','#9d426b']
 
-      		}
-        	var chart = new google.visualization.PieChart(this.$el.find('#student-gender-piechart').get(0));
-        	chart.draw(data, options);
-		}
+	      		}
+	        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
+	        	chart.draw(data, options);
+			}		
+		});
 	},
 
 	studentAgeGraph:function(){
+		var view = this;
 		var stats = new Stats();
-		var kids = 3; //0-17
-		var teens = 41; //18-24
-		var youngadults = 8; //25-34
-		var adults = 20; //35-44
-		var oldadults = 4; //45-54
-		var seniors = 5; //55-64
-		var elderly = 1; //65+
+		// var kids = 3; //0-17
+		// var teens = 41; //18-24
+		// var youngadults = 8; //25-34
+		// var adults = 20; //35-44
+		// var oldadults = 4; //45-54
+		// var seniors = 5; //55-64
+		// var elderly = 1; //65+
+
+		var kids = 0; //0-17
+		var teens = 0; //18-24
+		var youngadults = 0; //25-34
+		var adults = 0; //35-44
+		var oldadults = 0; //45-54
+		var seniors = 0; //55-64
+		var elderly = 0; //65+
 
 		var dataArray = [['Age Range', 'Student Count']];
 		stats.fetch({
@@ -448,65 +487,74 @@ var DashboardView = Backbone.View.extend({
 				if (55 <= age && age <= 64){ seniors += studentcount; }
 				if (age >= 65){ elderly += studentcount; }
 			});
+		
+			dataArray.push(['0-17', kids]);
+			dataArray.push(['18-24', teens]);
+			dataArray.push(['25-32', youngadults]);
+			dataArray.push(['35-44', adults]);
+			dataArray.push(['45-54', oldadults]);
+			dataArray.push(['55-64', seniors]);
+			dataArray.push(['65+', elderly]);
+
+
+			if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
+				view.$el.find("#demographics-label").removeClass("hide").show();
+				var data = google.visualization.arrayToDataTable(dataArray);
+	        	var options = {
+	          		//title: "Age",
+	          		is3D: true,
+	          		legend: {
+	          			position: "bottom"
+	          		},
+	          		chartArea:{left:0,right:0,top:0}
+	          		// chartArea:{left:10,top:20,width:"100%",height:"100%"}
+	      		}
+	        	var chart = new google.visualization.PieChart(view.$el.find('#student-age-piechart').get(0));
+	        	chart.draw(data, options);
+			}
 		});
-
-		dataArray.push(['0-17', kids]);
-		dataArray.push(['18-24', teens]);
-		dataArray.push(['25-32', youngadults]);
-		dataArray.push(['35-44', adults]);
-		dataArray.push(['45-54', oldadults]);
-		dataArray.push(['55-64', seniors]);
-		dataArray.push(['65+', elderly]);
-
-
-		if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
-			this.$el.find("#demographics-label").removeClass("hide").show();
-			var data = google.visualization.arrayToDataTable(dataArray);
-        	var options = {
-          		//title: "Age",
-          		is3D: true,
-          		legend: {
-          			position: "bottom"
-          		},
-          		chartArea:{left:0,right:0,top:0}
-          		// chartArea:{left:10,top:20,width:"100%",height:"100%"}
-      		}
-        	var chart = new google.visualization.PieChart(this.$el.find('#student-age-piechart').get(0));
-        	chart.draw(data, options);
-		}
 	},
 
 	attendanceCalendar:function(){
+		var view = this;
 		var stats = new Stats();
-		var dataArray = [[ new Date(2012, 3, 13), 37032 ],
-          [ new Date(2012, 3, 14), 38024 ],
-          [ new Date(2012, 3, 15), 38024 ],
-          [ new Date(2012, 3, 16), 38108 ],
-          [ new Date(2012, 3, 17), 38229 ]];
+		// var dataArray = [[ new Date(2012, 3, 13), 37032 ],
+  //         [ new Date(2012, 3, 14), 38024 ],
+  //         [ new Date(2012, 3, 15), 38024 ],
+  //         [ new Date(2012, 3, 16), 38108 ],
+  //         [ new Date(2012, 3, 17), 38229 ]];
+
+  		var dataArray = [];
 
 		stats.fetch({
 			url: stats.getAttendanceStatsUrl(sessionStorage.getItem("gobind-activeSchoolYear"))
 		}).then(function(data) {
 			_.each(data, function(object, index) {
+				console.log(object);
 				var model = new Stats(object, {parse:true});
-				var city = [new Date(model.get("date")), parseInt(model.get("totalAttendance"))];
-				dataArray.push(city);
+				var date = model.get("date").split("-");
+				var year = date[0];
+				var month = date[1];
+				var day = date[2];
+				var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
+				dataArray.push(stat);
 			});
+		
+			if (dataArray){
+				var dataTable = new google.visualization.DataTable();
+				dataTable.addColumn({ type: 'date', id: 'Date' });
+	       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
+	       		dataTable.addRows(dataArray);
+
+		    	var options = {
+	          		title: "School Attendance",
+	          		height: 200,
+	          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
+	      		}
+
+	        	var chart = new google.visualization.Calendar(view.$el.find('#calendar_basic').get(0));
+	        	chart.draw(dataTable, options);
+			}
 		});
-		if (dataArray){
-			var dataTable = new google.visualization.DataTable();
-			dataTable.addColumn({ type: 'date', id: 'Date' });
-       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
-       		dataTable.addRows(dataArray);
-
-	    	var options = {
-          		title: "School Attendance",
-          		height: 350,
-          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
-      		}
-
-        	var chart = new google.visualization.Calendar(this.$el.find('#calendar_basic').get(0));
-        	chart.draw(dataTable, options);
-		}
 	},
 });
