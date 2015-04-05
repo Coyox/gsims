@@ -131,7 +131,8 @@ function loadTemplates() {
 		"teachingSections.html",
 		"addPreReq.html",
 		"addAttendance.html",
-		"inputMarks.html"
+		"inputMarks.html",
+		"viewCalendar.html"
 	];
 
 	$.each(templates, function(i, name) {

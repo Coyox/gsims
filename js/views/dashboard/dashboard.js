@@ -33,7 +33,8 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	events: {
-		"click .view-notification": "viewNotification"
+		"click .view-notification": "viewNotification",
+		"click #toggle-calendar": "toggleCalendar"
 	},
 
 	viewNotification: function() {
@@ -130,8 +131,22 @@ var DashboardView = Backbone.View.extend({
 		});
 	},
 
-	calendarWidget: function(usertype) {
+	toggleCalendar: function(evt) {
+		this.$el.append(html["viewCalendar.html"]);
+
+		var elem = $("#calendar-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.modal({
+			show: true
+		});
+
+		this.calendarWidget(sessionStorage.getItem("gobind-usertype"), elem.find("#calendar"));		
+	},
+
+	calendarWidget: function(usertype, elem) {
 		var view = this;
+		var elem = elem || view.$el.find("#calendar")
 		var mon = [], tue = [], wed = [], thu = [], fri = [], sat = [], sun = [];
 
 		if (usertype == "T") {
@@ -179,7 +194,7 @@ var DashboardView = Backbone.View.extend({
 				});
 			});
 
-				view.$el.find("#calendar").fullCalendar({
+				elem.fullCalendar({
 					defaultView: "basicWeek",
 					editable: false,
 					eventLimit: true,
@@ -206,7 +221,7 @@ var DashboardView = Backbone.View.extend({
 
 				});
 
-				view.$el.find("#calendar").fullCalendar( 'addEventSource',
+				elem.fullCalendar( 'addEventSource',
 					function(start, end, status, callback) {
 						var events = [];
 
@@ -279,7 +294,7 @@ var DashboardView = Backbone.View.extend({
 				});
 			});
 
-			view.$el.find("#calendar").fullCalendar({
+			elem.fullCalendar({
 				defaultView: "basicWeek",
 				editable: false,
 				eventLimit: true,
@@ -305,7 +320,7 @@ var DashboardView = Backbone.View.extend({
 				}
 			});
 
-			view.$el.find("#calendar").fullCalendar( 'addEventSource',
+			elem.fullCalendar( 'addEventSource',
 				function(start, end, status, callback) {
 					var events = [];
 
@@ -332,11 +347,11 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	getStartTime: function(test_date, section) {
-	var start = new Date(test_date.getTime());
-	var str = section.start.split(":");
-	start.setHours(str[0]);
-	start.setMinutes(str[1]);
-	return start;
+		var start = new Date(test_date.getTime());
+		var str = section.start.split(":");
+		start.setHours(str[0]);
+		start.setMinutes(str[1]);
+		return start;
 	},
 
 	getEndTime: function(test_date, section) {
@@ -346,6 +361,7 @@ var DashboardView = Backbone.View.extend({
 		end.setMinutes(str[1]);
 		return end;
 	},
+
 	studentGeoGraph:function(){
 		var stats = new Stats();
 		var dataArray = [['City', 'Student Count'],['Vancouver',1000],['Richmond',20000]];
@@ -374,6 +390,7 @@ var DashboardView = Backbone.View.extend({
         	chart.draw(data, options);
 		}
 	},
+
 	studentGenderGraph:function(){
 		var stats = new Stats();
 		var dataArray = [['Gender', 'Student Count'], ['F',1000],['M',20000]];
@@ -404,6 +421,7 @@ var DashboardView = Backbone.View.extend({
         	chart.draw(data, options);
 		}
 	},
+
 	studentAgeGraph:function(){
 		var stats = new Stats();
 		var kids = 3; //0-17
@@ -457,6 +475,7 @@ var DashboardView = Backbone.View.extend({
         	chart.draw(data, options);
 		}
 	},
+
 	attendanceCalendar:function(){
 		var stats = new Stats();
 		var dataArray = [[ new Date(2012, 3, 13), 37032 ],
