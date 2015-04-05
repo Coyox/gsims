@@ -24,7 +24,7 @@ var DashboardView = Backbone.View.extend({
 			this.calendarWidget(usertype);
 		}
 
-		if (usertype == "SU") {
+		if (usertype == "SU" || usertype == "A") {
 			this.studentGeoGraph();
 			this.studentGenderGraph();
 			this.studentAgeGraph();

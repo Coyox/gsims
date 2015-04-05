@@ -90,6 +90,7 @@ $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/students/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
 $app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
+$app->get('/sections/:id/attendance', 'getSectionAttendance');
 $app->get('/sections/:id/dates', 'getSectionDates');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
 $app->post('/sections', 'createSection');
@@ -796,12 +797,22 @@ function getAvgAttendance($id){
         echo json_encode(array("avgAttendance"=>"N/A"));
     }
 }
-
+function getSectionAttendance($id){
+    $classdate = $_GET["date"];
+    $sql = "(SELECT t.userid, t.firstName, t.lastName
+            from attendance a, teacher t
+            where a.sectionid=:sectionid and a.date=:classdate and a.userid=t.userid)
+            UNION
+            (SELECT s.userid, s.firstName, s.lastName
+            from attendance a, student s
+            where a.sectionid=:sectionid and a.date=:classdate and a.userid=s.userid)
+            ";
+    echo json_encode(perform_query($sql, 'GETALL', array("sectionid"=>$id, "classdate"=>$classdate)));
+}
 function getSectionDates($id){
-    $sql = "SELECT distinct `date` from attendance where sectionid=:id";
+    $sql = "SELECT distinct `date` from attendance where sectionid=:id order by `date` asc";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
-
 function deleteSection($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
