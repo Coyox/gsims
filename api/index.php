@@ -858,6 +858,7 @@ function getDocuments(){
     $schoolyear = $_GET['schoolyearid'];
     $sectionid = $_GET['sectionid'];
     $courseid = $_GET['courseid'];
+
     if (isset($schoolyearid)) {
         return getDocumentsBySchoolYear($schoolyearid);
     }
@@ -882,8 +883,15 @@ function getDocumentsBySchoolYear($schoolyearid){
 }
 
 function getDocumentsBySection($sectionid){
-    $sql = "SELECT * from document where sectionid=:sectionid order by lastAccessed desc";
-    echo json_encode(perform_query($sql,'GETALL', array("sectionid"=>$sectionid)));
+    $status = $_GET['status'];
+    $bindparams = array("sectionid"=>$sectionid);
+    if (isset($status)){
+        $clause = "and status=:status ";
+        $bindparams["status"]=$status;
+    }
+    else { $clause = ""; }
+    $sql = "SELECT * from document where sectionid=:sectionid ".$clause."order by lastAccessed desc";
+    echo json_encode(perform_query($sql,'GETALL', $bindparams));
 }
 
 function getDocumentsByCourse($courseid){
@@ -957,13 +965,10 @@ function deleteDocument($id) {
 function getMarks($id) {
     $schoolyearid = $_GET["schoolyearid"];
     $sql = "SELECT `userid`, `mark` from marks where docid=:docid and schoolyearid=:schoolyearid";
-    echo json_encode(perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid)));   
+    echo json_encode(perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 
 function inputMarks($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    //$students = json_decode($body);
     $schoolyearid = $_POST["schoolyearid"];
     $students = json_decode($_POST["students"]);
 
@@ -984,13 +989,11 @@ function inputMarks($id){
 }
 
 function updateMarks($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $results = json_decode($body);
+    $students = json_decode($_POST["students"]);
     $queries = array();
     $bindparams = array();
-    foreach (array_values($results) as $i => $result){
-        $bindparams[$i] = array("docid" => $id, "userid".$i=>$result->userid, "mark".$i=>$result->mark);
+    foreach (array_values($students) as $i => $student){
+        $bindparams[$i] = array("docid" => $id, "userid".$i=>$student->userid, "mark".$i=>$student->mark);
         $sql = "UPDATE marks set mark=:mark".$i." where userid=:userid".$i." and docid=:docid";
         array_push($queries, $sql);
     }
