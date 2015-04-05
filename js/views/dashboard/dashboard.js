@@ -180,11 +180,6 @@ var DashboardView = Backbone.View.extend({
 			});
 
 				view.$el.find("#calendar").fullCalendar({
-					header: {
-						left: 'prev,next today',
-						center: 'title',
-						right: 'month,agendaWeek,agendaDay'
-					},
 					defaultView: "basicWeek",
 					editable: false,
 					eventLimit: true,
@@ -285,11 +280,6 @@ var DashboardView = Backbone.View.extend({
 			});
 
 			view.$el.find("#calendar").fullCalendar({
-				header: {
-					left: 'prev,next today',
-					center: 'title',
-					right: 'month,agendaWeek,agendaDay'
-				},
 				defaultView: "basicWeek",
 				editable: false,
 				eventLimit: true,
@@ -372,11 +362,12 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#demographics-label").removeClass("hide").show();
 			var data = google.visualization.arrayToDataTable(dataArray);
         	var options = {
-          		title: "Location",
+          		//title: "Location",
           		is3D: true,
           		legend: {
           			position: "bottom"
           		},
+          		chartArea:{left:0,right:0,top:0}
 
       		}
         	var chart = new google.visualization.PieChart(this.$el.find('#student-location-piechart').get(0));
@@ -399,12 +390,13 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#demographics-label").removeClass("hide").show();
 			var data = google.visualization.arrayToDataTable(dataArray);
         	var options = {
-          		title: "Gender",
+          		//title: "Gender",
           		is3D: true,
           		legend: {
           			position: "bottom"
           		},
-
+          		chartArea:{left:0,right:0,top:0},
+          		// chartArea:{left:10,top:20,width:"100%",height:"100%"},
           		colors:['#00B88A','#9d426b']
 
       		}
@@ -453,11 +445,13 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#demographics-label").removeClass("hide").show();
 			var data = google.visualization.arrayToDataTable(dataArray);
         	var options = {
-          		title: "Age",
+          		//title: "Age",
           		is3D: true,
           		legend: {
           			position: "bottom"
           		},
+          		chartArea:{left:0,right:0,top:0}
+          		// chartArea:{left:10,top:20,width:"100%",height:"100%"}
       		}
         	var chart = new google.visualization.PieChart(this.$el.find('#student-age-piechart').get(0));
         	chart.draw(data, options);
@@ -489,6 +483,7 @@ var DashboardView = Backbone.View.extend({
 	    	var options = {
           		title: "School Attendance",
           		height: 350,
+          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
       		}
 
         	var chart = new google.visualization.Calendar(this.$el.find('#calendar_basic').get(0));
