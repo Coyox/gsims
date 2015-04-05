@@ -2002,11 +2002,12 @@ function findSections($schoolid){
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")
                 and s.schoolyearid=:schoolyear and s.courseid=c1.courseid and d1.deptid=c1.deptid";
         if (isset($days)){
-            list($clause, $day_bindparam) = buildDayClause($days);
-            $bindparam += $day_bindparam;
-            $sql.= $clause;
+            $days = explode('-', $days);
+            foreach($days as $i=> $day) {
+                $sql.=" and find_in_set(':day".$i."', s.day)";
+                $bindparam["day".$i] = $day;
+            }
         }
-
         if (isset($startTime)){ " and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
         $sql.= " order by s.sectionCode asc";
         echo json_encode(perform_query($sql,'GETALL',$bindparam));
