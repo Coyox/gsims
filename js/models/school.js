@@ -317,8 +317,19 @@ var Document = Backbone.Model.extend({
 		}
 	},
 
-	urlRoot: app.serverUrl + "api/documents"
+	urlRoot: app.serverUrl + "api/documents",
 
+	inputMarks: function(id) {
+		return this.urlRoot + "/" + id + "/marks"
+	},
+
+	getMarks: function(id) {
+		return this.urlRoot + "/" + id + "/marks"
+	},
+
+	updateMarks: function(id) {
+		return this.urlRoot + "/" + id + "/marks"
+	}
 });
 
 var Stats = Backbone.Model.extend({

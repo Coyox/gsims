@@ -130,7 +130,8 @@ function loadTemplates() {
 		"selectSchool.html",
 		"teachingSections.html",
 		"addPreReq.html",
-		"addAttendance.html"
+		"addAttendance.html",
+		"inputMarks.html"
 	];
 
 	$.each(templates, function(i, name) {

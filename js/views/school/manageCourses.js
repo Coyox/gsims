@@ -2016,13 +2016,28 @@ var AttendanceRecordView = Backbone.View.extend({
 
 
 var DocumentsView = Backbone.View.extend({
+	template: _.template("<button id='add-document' class='btn btn-sm btn-primary'>Add Assignment</button><br><br>"
+		+	"<table class='table table-striped table-bordered'>"
+		+		"<thead>"
+		+			"<tr>"
+		+				"<th>Assignment Name</th>"
+		+				"<th>Description</th>"
+		+				"<th>Link</th>"
+		+				"<th>Total Marks</th>"
+		+				"<th>Marks</th>"
+		+				"<th>Delete</th>"
+		+			"</tr>"
+		+		"</thead>"
+		+		"<tbody class='results'></tbody>"
+		+	"</table>"),
+
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
 		this.render();
 	},
 
 	render: function() {
-		this.$el.find("table tbody").empty();
+		this.$el.html(this.template());
 
 		var view = this;
 		var doc = new Document();
@@ -2042,13 +2057,11 @@ var DocumentsView = Backbone.View.extend({
 					new DocumentRowView({
 						el: view.addRow(),
 						model: d1,
+						sectionid: view.sectionid
 					});
 				});
-				// view.table = view.$el.find("table").dataTable({
-				// 	dom: "t"
-				// });
-	}
-});
+			}
+		});
 	},
 
 	events: {
@@ -2065,54 +2078,66 @@ var DocumentsView = Backbone.View.extend({
 		return container;
 	},
 
-	createDocument: function() {
+	createDocument: function(evt) {
 		this.$el.append(html["createDocument.html"]);
+
 		var view = this;
 		var elem = $("#create-doc-modal");
 		var backdrop = $(".modal-backdrop");
 
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentsEnrolled(this.sectionid),
+		}).then(function(data) {
+			_.each(data, function(user, index) {
+				var model = new Student(user, {parse:true});
+				new StudentMarkRow({
+					el: view.addMarkRow(model.get("userid")),
+					model: model,
+					userid: model.get("userid")
+				});				
+			});
+		});
+
 		elem.modal({
 			show: true
 		});
-
-		elem.on("hidden.bs.modal", function() {
-			elem.remove();
-			backdrop.remove();
-		});
-
-		Backbone.Validation.bind(this);
 
 		elem.on("click", "#save", function() {
 			view.model.set("sectionid", view.sectionid);
 			view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
 			view.model.set("userid", JSON.parse(sessionStorage.getItem("gobind-user")).userid);
 			view.model.set("status", "active");
-			if (view.model.isValid(true)) {
-				elem.remove();
-				backdrop.remove();
-				view.model.save().then(function(data) {
-					if (data.status=="success") {
-						new TransactionResponseView({
-							message: "New document successfully created."
-						});
-						view.table.fnDestroy();
-						view.render();
-					}
-					else {
-						new TransactionResponseView({
-							title: "ERROR",
-							status: "error",
-							message: "Could not create a new document."
-						});
-					}
-				}).fail(function(data) {
+			view.model.save().then(function(data) {
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "New document successfully created."
+					});
+					view.saveMarks(data.docid);
+				}
+				else {
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
 						message: "Could not create a new document."
 					});
+				}
+				elem.remove();
+				backdrop.remove();
+			}).fail(function(data) {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Could not create a new document."
 				});
-			}
+				elem.remove();
+				backdrop.remove();
+			});
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
 		});
 	},
 
@@ -2120,7 +2145,65 @@ var DocumentsView = Backbone.View.extend({
 		var val = $(evt.currentTarget).val();
 		var name = $(evt.currentTarget).attr("name");
 		this.model.set(name, val);
-	}
+	},
+
+	addMarkRow: function(id) {
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		this.$el.find("#marks-table tbody").append(container);
+		return container;
+	},
+
+	saveMarks: function(docid) {
+		var view = this;
+		var rows = this.$el.find("#marks-table tbody tr");
+		var marks = [];
+		_.each(rows, function(row, index) {
+			var mark = $(row).find(".mark").val();
+			if (mark != "") {
+				marks.push({
+					userid: $(row).attr("id"),
+					mark: mark
+				})
+			}
+		}, this);
+
+		if (marks.length) {
+			var doc = new Document();
+			$.ajax({
+				type: "POST",
+				url: doc.inputMarks(docid),
+				data: {
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+					students: JSON.stringify(marks)
+				}
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "Marks successfully inputted."
+					});
+				}
+				else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Could not input marks. Please try again."
+					});
+				}
+				view.render();
+			}).fail(function(data) {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Could not input marks. Please try again."
+				});
+				view.render();
+			});
+		}
+	},
 });
 
 var DocumentRowView = Backbone.View.extend({
@@ -2128,18 +2211,21 @@ var DocumentRowView = Backbone.View.extend({
 		+	"<td><%= model.description %></td>"
 		+	"<td><%= model.link %></td>"
 		+	"<td><%= model.fullmark %></td>"
-		+	"<td><%= model.status %></td>"
-		// +	"<td><span id='<%= model.docid %>' class='edit-doc primary-link'>[ Edit ]</span></td>"
+		+	"<td><span id='<%= model.docid %>' class='view-marks primary-link'>[ View Marks ]</span> <span id='<%= model.docid %>' class='edit-marks primary-link'>[ Edit Marks ]</span></td>"
 		+	"<td><span id='<%= model.docid %>' class='delete-doc primary-link'>[ Delete ]</span></td>"),
 
 	initialize: function(options) {
 		this.userid = options.userid;
+		this.sectionid = options.sectionid;
+		this.action = options.action;
 		this.render();
 	},
 
 	events: {
-		//"click .edit-doc": "editDocument",
-		"click .delete-doc": "deleteDocument"
+		"click .delete-doc": "deleteDocument",
+		"click .add-marks": "inputMarks",
+		"click .view-marks": "viewMarks",
+		"click .edit-marks": "editMarks"
 	},
 
 	render: function() {
@@ -2150,11 +2236,6 @@ var DocumentRowView = Backbone.View.extend({
 		view.$el.html(view.template({
 			model: view.model.toJSON()
 		}));
-	},
-
-	editDocument: function(evt) {
-		var id = $(evt.currentTarget).attr("id");
-
 	},
 
 	deleteDocument: function(evt) {
@@ -2185,8 +2266,213 @@ var DocumentRowView = Backbone.View.extend({
 				message: "Could not delete the document."
 			});
 		});
+	},
+
+	addRow: function(id) {
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		this.$el.find("#marks-table tbody").append(container);
+		return container;
+	},
+
+	viewMarks: function(evt) {
+		var view = this;
+		var docid = $(evt.currentTarget).attr("id");
+
+		this.$el.append(html["inputMarks.html"]);
+
+		var elem = $("#input-marks-modal");
+		var backdrop = $(".modal-backdrop");
+
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentsEnrolled(this.sectionid),
+		}).then(function(data) {
+			_.each(data, function(user, index) {
+				
+				var doc = new Document();
+				doc.fetch({
+					url: doc.getMarks(docid),
+					data: {
+						schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+					}
+				}).then(function(data) {
+					var mark = 0;
+					_.each(data, function(marks, index) {
+						if (marks.userid == user.userid) {
+							mark = marks.mark;
+						}
+					});
+
+					var model = new Student(user, {parse:true});
+					new StudentMarkRow({
+						el: view.addRow(model.get("userid")),
+						model: model,
+						userid: model.get("userid"),
+						action: "view",
+						mark: mark
+					});	
+				});			
+			});
+		});
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+	},
+
+	editMarks: function(evt) {
+		var view = this;
+		var docid = $(evt.currentTarget).attr("id");
+
+		this.$el.append(html["inputMarks.html"]);
+
+		var elem = $("#input-marks-modal");
+		var backdrop = $(".modal-backdrop");
+
+		elem.find("#save").removeClass("hide").show();
+
+		var section = new Section();
+		section.fetch({
+			url: section.getStudentsEnrolled(this.sectionid),
+		}).then(function(data) {
+			_.each(data, function(user, index) {
+				
+				var doc = new Document();
+				doc.fetch({
+					url: doc.getMarks(docid),
+					data: {
+						schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+					}
+				}).then(function(data) {
+					var mark = 0;
+					_.each(data, function(marks, index) {
+						if (marks.userid == user.userid) {
+							mark = marks.mark;
+						}
+					});
+
+					var model = new Student(user, {parse:true});
+					new StudentMarkRow({
+						el: view.addRow(model.get("userid")),
+						model: model,
+						userid: model.get("userid"),
+						action: "edit",
+						mark: mark
+					});	
+				});			
+			});
+		});
+
+		elem.modal({
+			show: true
+		});
+
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
+			backdrop.remove();
+		});
+
+		elem.on("click", "#save", function() {
+			view.updateMarks(docid, elem, backdrop);
+		});
+	},
+
+	updateMarks: function(docid, elem,backdrop) {
+		var view = this;
+		var rows = this.$el.find("#marks-table tbody tr");
+		var marks = [];
+		_.each(rows, function(row, index) {
+			var mark = $(row).find(".mark").val();
+			if (mark != "") {
+				marks.push({
+					userid: $(row).attr("id"),
+					mark: mark
+				})
+			}
+		}, this);
+
+		if (marks.length) {
+			var doc = new Document();
+			$.ajax({
+				type: "PUT",
+				url: doc.updateMarks(docid),
+				data: {
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+					students: JSON.stringify(marks)
+				}
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "Marks successfully inputted."
+					});
+				}
+				else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Could not input marks. Please try again."
+					});
+				}
+				elem.remove();
+				backdrop.remove();
+			}).fail(function(data) {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Could not input marks. Please try again."
+				});
+				elem.remove();
+				backdrop.remove();
+			});
+		}
+	},
+
+});
+
+var StudentMarkRow = Backbone.View.extend({
+	template: _.template("<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><input id='<%= model.userid %>' type='text' class='mark form-control input-sm' value='<%= mark %>'></td>"),
+
+	viewTemplate: _.template("<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= mark %></td>"),
+
+	initialize: function(options) {
+		this.userid = options.userid;
+		this.mark = options.mark;
+		this.action = options.action;
+		this.render();
+	},
+
+	render: function() {
+		var view = this;
+		var sectionid = this.model.get("sectionid");
+		var userid = this.userid;
+
+		if (this.action == "view") {
+			this.$el.html(this.viewTemplate({
+				model: this.model.toJSON(),
+				mark: this.mark
+			}));
+		} else {
+			this.$el.html(this.template({
+				model: this.model.toJSON(),
+				mark: this.mark || ""
+			}));
+		}
 	}
 });
+
 
 
 
