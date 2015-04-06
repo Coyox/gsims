@@ -123,6 +123,9 @@ var Course = Backbone.Model.extend({
 	deleteCoursePrereq: function(cid, pid) {
 		return this.urlRoot + "/" + cid + "/prereqs/" + pid;
 	},
+    getCourseWaitlist: function(cid) {
+		return this.urlRoot + "/" + cid + "/waitlist";
+	},
 	courseStatuses: [
 		"active", "inactive"
 	]
@@ -355,8 +358,8 @@ var Stats = Backbone.Model.extend({
     getAgeStatsUrl: function(schoolid) {
     	return this.urlRoot + "age/" + schoolid + "/students";
     },
-    getAttendanceStatsUrl: function(schoolyearid) {
-    	return this.urlRoot + "attendance/" + schoolyearid;
+    getAttendanceStatsUrl: function(schoolid) {
+    	return this.urlRoot + "attendance/" + schoolid;
     }
 });
 
