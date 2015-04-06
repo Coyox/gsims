@@ -918,7 +918,6 @@ var CourseSectionView = Backbone.View.extend({
         +	"<table id='waitlist-table' class='table table-striped table-bordered'>"
 		+		"<thead>"
 		+			"<tr>"
-		+				"<th>View</th>"
 		+				"<th>First Name</th>"
         +				"<th>Last Name</th>"
         +				"<th>User ID</th>"
@@ -953,6 +952,7 @@ var CourseSectionView = Backbone.View.extend({
 				courseName: this.courseName
 			}
 		}).then(function(data) {
+            var sections = data;
 			if (data.length == 0) {
 				var table = view.$el.find("#sections-table");
 				table.hide();
@@ -963,24 +963,30 @@ var CourseSectionView = Backbone.View.extend({
 				new CourseSectionRowView({
 					el: view.addCourseSection(),
 					model: section
+                    
 				})
 			});
+
+
+            var course = new Course();
+            console.log(view.courseid);
+            course.fetch({
+                url: course.getCourseWaitlist(view.courseid)
+               }).then(function(data){
+                    console.log(data);
+                    console.log(sections);
+                    _.each(data, function(sec, index) {
+			            var student = new Student(sec, {parse:true});
+			            new CourseWaitlistRowView({
+			                el: view.addCourseWaitlist(),
+			                model: student,
+                            results: data
+			            })
+		            });
+                });
+
 		});
 
-        var course = new Course();
-        console.log(this.courseid);
-        course.fetch({
-            url: course.getCourseWaitlist(this.courseid)
-        }).then(function(data){
-            console.log(data);
-            _.each(data, function(sec, index) {
-			    var student = new Student(sec, {parse:true});
-			    new CourseWaitlistRowView({
-			    el: view.addCourseWaitlist(),
-			    model: student
-			    })
-		    });
-        });
 	},
 
 	addCourseSection: function() {
@@ -1074,13 +1080,16 @@ var CourseSectionView = Backbone.View.extend({
 
 
 var CourseWaitlistRowView = Backbone.View.extend({
-	template: _.template("<td>view student</td>"
-		+	"<td><%= model.firstName %></td>"
+	template: _.template("<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.userid %></td>"
-		+	"<td>something</td>"),
+		+	"<td class='section-links'></td>"),
+
+         sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionid %>'>[ <%= model.courseName %> ]</span>"),
+
 
 	initialize: function(options) {
+        this.data = options.results
 		this.render();
 	},
 
@@ -1088,6 +1097,18 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
+
+    var links = "";
+  _.each(this.data, function(section, index) {
+   var model = new Section(section, {parse:true});
+   var link = this.sectionLink({
+    model: this.model.toJSON()
+   });
+   links += link;
+  }, this);
+
+  this.$el.find(".section-links").html(links);
+
 	},
 });
 
