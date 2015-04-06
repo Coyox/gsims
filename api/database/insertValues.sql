@@ -311,7 +311,7 @@ VALUES
 
 -- INSERT STUDENTS --
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234567', 'kseager34567', '$2a$10$QNm2LeUUHB/FnJ9JvzNZcO48o86K/Gcljk/PukXAXy.a.gCbrw9Vu', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234567', 'kseager34567', ' $2a$10$w87uze5Z0GpUyeD7lgtceuT/fArvkkr.w8R3OBF1S.F36IzAmCLsy', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234567, "Kyle", "Seager", "1980-09-24", "M", "123 4th St", "", "Surrey",
@@ -321,7 +321,7 @@ values(1234567, "Kyle", "Seager", "1980-09-24", "M", "123 4th St", "", "Surrey",
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234568', 'rcano34568', '$2a$10$hZNXhfhAcPk36SkGEhGn4.7cTkSbOlXrbetCOISLaQz6L2BBM7fSS', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234568', 'rcano34568', '$2a$10$UZFtfifsqQiA3kV7iVsSq.jkLkH2TLG8kKq6BQsEtvn7FhPwTl/zm', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234568, "Robinson", "Cano", "1982-05-13", "M", "888 4th St", "", "Richmond",
@@ -331,7 +331,7 @@ values(1234568, "Robinson", "Cano", "1982-05-13", "M", "888 4th St", "", "Richmo
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234569', 'arodriguez34569', 'pass1', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234569', 'arodriguez34569', '$2a$10$pJaq4xWfC6siLVQCIm2kqujUT8UiQmXijNWnzhDOoLghx/o0l8P02', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234569, "Alex", "Rodriguez", "1973-02-17", "F", "123 10th Ave", "", "Burnaby",
@@ -341,7 +341,7 @@ values(1234569, "Alex", "Rodriguez", "1973-02-17", "F", "123 10th Ave", "", "Bur
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234571', 'kkardashian34571', '$2a$10$8bVPWBhrzuDuwwruxNlBjuodN/Y3cD97H7e9/7gXbtcsz.yDRq.i6', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234571', 'kkardashian34571', '$2a$10$vK6hnyKcml.SogSlaOgTx./daJUiTnyxaSVrRITsodYC6dqPZEJkW', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234571, "Kim", "Kardashian", "1980-09-24", "F", "1234 Rodeo Dr", "", "Beverly Hills",
@@ -351,7 +351,7 @@ values(1234571, "Kim", "Kardashian", "1980-09-24", "F", "1234 Rodeo Dr", "", "Be
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234572', 'kwest34572', '$2a$2a$10$Gfj84CsS8XOunp8xzacxke8ET5e/yVh.k5WBR2y8KqZe6nwqkJylW', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234572', 'kwest34572', '$2a$10$uFruLLNFELbNZbjQM0EBhu5WtkhwFauEhhh2Vvd8hVUg.6z4zYbG6', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234572, "Kanye", "West", "1980-03-12", "M", "1234 Rodeo Dr", "", "Beverly Hills",
@@ -361,7 +361,7 @@ values(1234572, "Kanye", "West", "1980-03-12", "M", "1234 Rodeo Dr", "", "Beverl
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234573', 'rsherman34573', '$2a$2a$2a$10$vKNZ62QcIR3gkkJKDOLoFe/hu.qx77KBr1yKychMR46DpqtY92BSy', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234573', 'rsherman34573', '$2a$10$WnCpxGDFp4TvpS1LEJ8sUO9kiw3VCCk3TCf6QctM43mbS7/XJeJei', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234573, "Richard", "Sherman", "1987-03-11", "M", "43134 5th Ave", "", "Vancouver",
@@ -371,7 +371,7 @@ values(1234573, "Richard", "Sherman", "1987-03-11", "M", "43134 5th Ave", "", "V
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234574', 'rwilson34574', '$2a$2a$2a$2a$10$7ZUbK7J6eoVD6EvhyLZOGemuqPZRG9j7Lf3jU9AXhvG5XDyr0atHq', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234574', 'rwilson34574', '$2a$10$n5NAL4spONWlCPEMobt4W.7OXaxiH58LsQTiR4uKZkPDB4poW67vG', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234574, "Russell", "Wilson", "1980-03-12", "M", "1234 Rodeo Dr", "", "Delta",
@@ -381,7 +381,7 @@ values(1234574, "Russell", "Wilson", "1980-03-12", "M", "1234 Rodeo Dr", "", "De
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234575', 'bdylan34575', '$2a$2a$2a$2a$2a$10$s/LZPNjpMrRcSgTtsudXPO.F6EnRg3RgrKUOynNYoxphKGJY8/neC', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234575', 'bdylan34575', '$2a$10$65aZx1OM1i4Yy/Dp7y8fE.NpquKBTYW5qxefGkRuVlftS7FpaLYli', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234575, "Bob", "Dylan", "1980-03-12", "F", "1234 Seahawks Way", "", "Vancouver",
@@ -391,7 +391,7 @@ values(1234575, "Bob", "Dylan", "1980-03-12", "F", "1234 Seahawks Way", "", "Van
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('1234576', 'ethomas34576', '$2a$2a$2a$2a$2a$2a$10$bXJD5jY0KLLRn0LrvRnAheOnBdeRVOrauCADFYHY74ssE98QDWxki', 'S', CURRENT_TIMESTAMP);
+VALUES ('1234576', 'ethomas34576', '$2a$10$/q5R.xuhTS7qwUudmOIYjeMrGx1E36zJ9/mHasuP9NDoqKu8TCmrG', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(1234576, "Earl", "Thomas", "1980-03-12", "M", "1234 Rodeo Dr", "", "Vancouver",
@@ -401,7 +401,7 @@ values(1234576, "Earl", "Thomas", "1980-03-12", "M", "1234 Rodeo Dr", "", "Vanco
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('2234573', 'rastley34573', '$2a$2a$2a$2a$2a$2a$2a$10$K34J6IvgHr9JgrAh8fWvAOMN84j9IxViSHAvPZHptP3ksK.Cve/OC', 'S', CURRENT_TIMESTAMP);
+VALUES ('2234573', 'rastley34573', '$2a$10$ShUEvMxnbJ.o3D/QOn02Ku2D14tmUpoywGipK87kb4S5fWRHcaVpK', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(2234573, "Rick", "Astley", "1987-03-11", "M", "43134 5th Ave", "", "Vancouver",
@@ -411,7 +411,7 @@ values(2234573, "Rick", "Astley", "1987-03-11", "M", "43134 5th Ave", "", "Vanco
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('2234574', 'aketchum34574', '$2a$2a$2a$2a$2a$2a$2a$2a$10$AKA7oYyWVIjzpCtjm0UR/eoaJ5SP0VVhOXElokOgfMg.hmWDqEGCW', 'S', CURRENT_TIMESTAMP);
+VALUES ('2234574', 'aketchum34574', '$2a$10$RCkjlPm4g7lEQeQ4tnDr2..PBFNAZwn4hwr5d7LfievTEaNSSfuxW', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(2234574, "Ash", "Ketchum", "1980-03-12", "M", "1234 Rodeo Dr", "", "Delta",
@@ -421,7 +421,7 @@ values(2234574, "Ash", "Ketchum", "1980-03-12", "M", "1234 Rodeo Dr", "", "Delta
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('2234575', 'rpieces34575', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$dmqMlDeLETNTEqihSy/YGuMIT6FtVjXIKEd/yfHmQ5HBsc4n.ocjm', 'S', CURRENT_TIMESTAMP);
+VALUES ('2234575', 'rpieces34575', '$2a$10$J6/gn3P9HsU4kk0GcqJ6fuXEip6ruc6aAAip4qdI1aa/nxRwosG8a', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(2234575, "Reese", "Pieces", "1980-03-12", "F", "1234 Seahawks Way", "", "Vancouver",
@@ -431,7 +431,7 @@ values(2234575, "Reese", "Pieces", "1980-03-12", "F", "1234 Seahawks Way", "", "
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('2234576', 'narmstrong34576', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$hSJy4J2EpJD0LdXrVuWjeuKacdLvitM5NGmZ8c6aAYPcE2EzXjeN2', 'S', CURRENT_TIMESTAMP);
+VALUES ('2234576', 'narmstrong34576', '$2a$10$TkFf6r2252Cay7wJwSdIeu1wGx5VCFYCHc..lAX3Z4Xbvotc/Rz5e', 'S', CURRENT_TIMESTAMP);
 
 INSERT INTO student (`userid`, `firstName`, `lastName`, `dateOfBirth`, `gender`, `streetAddr1`, `streetAddr2`, `city`, `province`, `country`, `postalCode`, `phoneNumber`, `emailAddr`, `allergies`, `prevSchools`, `parentFirstName`, `parentLastName`, `parentPhoneNumber`, `parentEmailAddr`, `emergencyContactFirstName`, `emergencyContactLastName`, `emergencyContactRelation`, `emergencyContactPhoneNumber`, `schoolid`, `paid`, `status`, `lastAccessed`)
 values(2234576, "Neil", "Armstrong", "1980-03-12", "M", "1234 Rodeo Dr", "", "Vancouver",
@@ -443,44 +443,44 @@ values(2234576, "Neil", "Armstrong", "1980-03-12", "M", "1234 Rodeo Dr", "", "Va
 -- INSERT STAFF --
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534576', 'poak34576', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$v4WOkIDuUu5XDqtbFjWy8.TxhA6y9RMzvf3MReoGOTTWhzPcQR.8C', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534576', 'poak34576', '$2a$10$oZDJ1JTdZVzRzgV16.Xc1.P7iThnuGO0IiaD7YTF5EbQF4uTIRsu2', 'SU', CURRENT_TIMESTAMP);
 INSERT INTO superuser (`userid`, `firstName`, `lastName`, `emailAddr`, `status`)
 VALUES(5534576, "Professor", "Oak", "test@gmail.com", "active");
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534577', 'nuzumaki34577', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$qDeXAcgWWrW8v1uzfYo37.VFlVAqjCE9rHIGtvFq1aOzwJR3dR/IS', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534577', 'nuzumaki34577', '$2a$10$Ifd29dKM7d3Zzj0aOOv4x.wIPlOuCBT8D0Kc6OjSvXY7Ypfw0AM42', 'T', CURRENT_TIMESTAMP);
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
 VALUES(5534577, 863941, "Naruto", "Uzumaki", "test@gmail.com", "active", "T");
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5512345', 'ssnape12345', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$AvGs8YHoQZQHwUpwEbZbJOJuKrj9plGukvxz7k2QICM4/ehnWlpeW', 'S', CURRENT_TIMESTAMP);
+VALUES ('5512345', 'ssnape12345', '$2a$10$dF/rkKbzGpioaZ1Dglo/duiO.Dt0RLMov0b9FzAk7glbr0tjbDPWu', 'SU', CURRENT_TIMESTAMP);
 INSERT INTO superuser (`userid`, `firstName`, `lastName`, `emailAddr`, `status`)
 VALUES(5512345, "Severus", "Snape", "test@gmail.com", "active");
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534579', 'njones34579', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$8SST9XfxMr7/Mgyij0Gicu1ON4Mn2c9FMf5f0B.0jR7zaUbQ90mSq', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534579', 'njones34579', '$2a$10$D090Xal7xI/tdAdPdeLfeuAAf5H78G/iBZoIT5WIVGlFy6hhd.Cgi', 'T', CURRENT_TIMESTAMP);
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
 VALUES(5534579, 863941, "Nebraska", "Jones", "test@gmail.com", "active", "T");
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534580', 'adumbledore34580', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$tU38ESEg1vO8XyPx9cxsT.QNZDnrGZNaxPR5x40e2AY/BEMHYIn/i', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534580', 'adumbledore34580', '$2a$10$QcTDQywZ7geqiUBVWfiAJerxKOXnO0RjeLLiTF8HX.pDEj.AZk54C', 'T', CURRENT_TIMESTAMP);
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
 VALUES(5534580, 863941, "Albus", "Dumbledore", "test@gmail.com", "active", "T");
 
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534581', 'tcruise34581', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$qy.TXbubasWjnFQzUg5eo.IY2LLrqLfJ6MBfcK4qrgEQKVI9eMlCe', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534581', 'tcruise34581', '$2a$10$5su1OtTnzVv9EiAnrVkI2.ZrQqZ6JI2hl0mX7Pchd1IIrJf1fUsZ6', 'T', CURRENT_TIMESTAMP);
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
 VALUES(5534581, 863941, "Tom", "Cruise", "test@gmail.com", "active", "T");
 
 INSERT INTO login (`userid`, `username`, `password`, `usertype`, `lastLogin`)
-VALUES ('5534582', 'ymoto34582', '$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$2a$10$1Qm6nycDObz4Nut1nTh5UuH0d.wesIEinU5TYmExdrZbCSJWoJF7m', 'S', CURRENT_TIMESTAMP);
+VALUES ('5534582', 'ymoto34582', '$2a$10$fetLW9De7G0DgtMDp1chNu2tIz8KsybJqToiEloO.frMUfye8p/kq', 'T', CURRENT_TIMESTAMP);
 INSERT INTO teacher (`userid`, `schoolid`, `firstName`, `lastName`, `emailAddr`, `status`, `usertype`)
-VALUES(5534582, 863941, "Yugi", "Moto", "test@gmail.com", "active", "T");
+VALUES(5534582, 863941, "Yugi", "Moto", "test@gmail.com", "active", "A");
 
 
 -- INSERT TEACHER COMPETENCY --

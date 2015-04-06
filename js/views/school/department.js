@@ -15,12 +15,11 @@ var DepartmentView = Backbone.View.extend({
         var department = new Dept();
         var school = new School();
         school.fetch({
-            url: school.getDepartmentsUrl("412312"),
+            url: school.getDepartmentsUrl(sessionStorage.getItem("gobind-schoolid")),
             data: {
             schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")}}).then(function(data) {
                 _.each(data, function (object, index) {
                     var dept1 = new Dept(object, { parse: true });
-                    console.log("creating deptrowview");
                     new DepartmentRowView({
                         el: view.addRow(),
                         model: dept1,
@@ -83,7 +82,6 @@ var DepartmentView = Backbone.View.extend({
      });
      },
     createDept: function (evt) {
-        console.log("in create dept");
         var view = this;
         Backbone.Validation.bind(this);
 
@@ -100,13 +98,11 @@ var DepartmentView = Backbone.View.extend({
         $("#create-dept-modal").on("click", "#save", function () {
             view.model.set("deptName", $("#deptName").val());
             view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
-            view.model.set("schoolid", "412312");
+            view.model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 
             if (view.model.isValid(true)) {
-                console.log("model is valid");
                 $("#create-dept-modal").remove();
                 $(".modal-backdrop").remove();
-                console.log(view.model.toJSON());
 
                 view.model.save().then(function (data) {
                     if (data) {
@@ -177,7 +173,6 @@ var DepartmentRowView = Backbone.View.extend({
     },
     
     cancelDept: function(evt) {
-        console.log("cancelled dept change");
         this.model.attributes = JSON.parse(this.untouchedModel);
         this.action = "view";
         this.render();
@@ -219,12 +214,10 @@ var DepartmentRowView = Backbone.View.extend({
         var id = $(evt.currentTarget).attr("id");
         this.model.set("id", id);
         this.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
-        this.model.set("schoolid", "412312");
-        console.log(this.model);
+        this.model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 
         this.model.save().then(function(data){
             if(data){
-                console.log("savedmodel");
                 view.untouchedModel = JSON.stringify(view.model.toJSON());
                 new TransactionResponseView({
                     message: "Department was successfully saved."

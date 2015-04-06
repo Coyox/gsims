@@ -12,15 +12,22 @@ function randomNumber($digits){
 
 function generateLogin($firstname, $lastname){
     // 6 digit userid
-
     $sql = "SELECT userid from login where userid=:userid";
     $userid = generateUniqueID($sql, "userid");
+    $username = generateUsername($userid, $firstname, $lastname);
+    $password = generatePassword();
 
+    return array($userid, $username, $password);
+}
+
+// wrapper
+function generateUsername($userid, $firstname, $lastname){
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
     $lastname = strtolower($lastname);
-    $username = $firstname[0].$lastname.substr($userid, -5);
-
+    return $firstname[0].$lastname.substr($userid, -5);
+}
+function generatePassword(){
     // password to be hashed
     $password='';
     $chars = pwchars;
@@ -30,9 +37,8 @@ function generateLogin($firstname, $lastname){
      $index = rand(0, $count-1);
      $password .= $chars[$index];
     }
-    return array($userid, $username, $password);
+    return $password;
 }
-
 function generateUniqueID($sql, $param, $digit=IDdigits){
     $id = randomNumber($digit);
     $bindparam = array($param=>$id);
@@ -185,7 +191,6 @@ function perform_transaction($queries, $bindparams=array()){
  */
 function getConnection() {
     $dbhost = "127.4.196.130";
-    $dbname = "testdb";
     $dbuser = "adminpVaqD1a";
     $dbpass = "GpFqpeavU2dT";
     $dbname = "thefinaltest";
@@ -194,17 +199,6 @@ function getConnection() {
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
-}
-
-function buildDayClause($days){
-    $clause= "";
-    $bindparams = array();
-    $days = explode('-', $days);
-    foreach($days as $i=> $day) {
-        $clause.=" and find_in_set(':day".$i."', s.day)";
-        $bindparams["day".$i] = $day;
-    }
-    return array($clause, $bindparams);
 }
 
 function buildWhereClause($fields){
