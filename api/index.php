@@ -2334,8 +2334,8 @@ function getStudentGeographics($schoolid){
     $sql = "SELECT city, count(*) as studentCount from student where schoolid=:schoolid group by city";
     echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
 }
-function getAttendanceStats($schoolyearid){
-    $schoolid = $_GET["schoolid"];
+function getAttendanceStats($schoolid){
+    $schoolyearid = $_GET["schoolyearid"];
     $sql = "SELECT `date`, count(*) as totalAttendance from attendance where schoolid=:schoolid and schoolyearid=:schoolyearid group by `date`";
     echo json_encode(perform_query($sql,'GETASSO',array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid)));
 }
