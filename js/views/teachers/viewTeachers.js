@@ -273,12 +273,16 @@ var TeachersTableView = Backbone.View.extend({
 					el: view.addRow(".results", model.get("emailAddr"))
 				});
 			}, view);
-			view.table = view.$el.find("table").dataTable({
+			view.table = view.$el.find("table").DataTable({
 				aoColumnDefs: [
 				{ bSortable: false, aTargets: [ 4, 5 ] },
 				{ sClass: "center", aTargets: [ 4, 5 ] },
 				{ sWidth: "10%", aTargets: [ 5 ] }
-				]
+				],
+				dom: 'T<"clear">lfrtip',
+				tableTools: {
+           			 "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf"
+        		}
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);

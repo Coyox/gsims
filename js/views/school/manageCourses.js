@@ -560,7 +560,7 @@ var ViewCourse = Backbone.View.extend({
 
 			view.teachersForm(view.id);
 
-			view.sectionsForm(view.model.get("courseName"));
+			view.sectionsForm(view.model.get("courseName"), courseid);
 		});
 	},
 
@@ -634,12 +634,13 @@ var ViewCourse = Backbone.View.extend({
 		});
 	},
 
-	sectionsForm: function(courseName) {
-		new CourseSectionView({
-			el: $("#course-sections"),
-			courseName: courseName,
-		});
-	},
+	sectionsForm: function(courseName, courseid) {
+        new CourseSectionView({
+            el: $("#course-sections"),
+            courseName: courseName,
+            courseid: courseid
+        });
+    },
 
 	updateCourse: function(evt) {
 		var val = $(evt.currentTarget).val();
@@ -849,6 +850,7 @@ var CoursePreReqsRowView = Backbone.View.extend({
 	template: _.template("<li><%= courseName %> <span id='<%= courseid %>' class='delete-prereq pull-right primary-link'>[ Delete ]</span></li>"),
 
 	initialize: function(options) {
+        
 		this.courseName = options.course;
 		this.pid = options.pid;
 		this.courseid = options.courseid;
@@ -912,13 +914,27 @@ var CourseSectionView = Backbone.View.extend({
 		+			"</tr>"
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
-		+	"</table>"),
+		+	"</table>"
+        +	"<table id='waitlist-table' class='table table-striped table-bordered'>"
+		+		"<thead>"
+		+			"<tr>"
+		+				"<th>View</th>"
+		+				"<th>First Name</th>"
+        +				"<th>Last Name</th>"
+        +				"<th>User ID</th>"
+		+				"<th>Enrol to Section</th>"
+		+			"</tr>"
+		+		"</thead>"
+		+		"<tbody class='results'></tbody>"
+		+	"</table>"
+        ),
 
 	initialize: function(options) {
-		this.courseName = options.courseName;
-		this.model = new Section();
-		this.render();
-	},
+        this.courseName = options.courseName;
+        this.courseid = options.courseid;
+        this.model = new Section();
+        this.render();
+ },
 
 	events: {
 		"click #add-section": "addSectionToCourse",
@@ -950,11 +966,32 @@ var CourseSectionView = Backbone.View.extend({
 				})
 			});
 		});
+
+        var course = new Course();
+        console.log(this.courseid);
+        course.fetch({
+            url: course.getCourseWaitlist(this.courseid)
+        }).then(function(data){
+            console.log(data);
+            _.each(data, function(sec, index) {
+			    var student = new Student(sec, {parse:true});
+			    new CourseWaitlistRowView({
+			    el: view.addCourseWaitlist(),
+			    model: student
+			    })
+		    });
+        });
 	},
 
 	addCourseSection: function() {
 		var container = $("<tr></tr>");
 		this.$el.find("#sections-table tbody").append(container);
+		return container;
+	},
+
+    addCourseWaitlist: function() {
+		var container = $("<tr></tr>");
+		this.$el.find("#waitlist-table tbody").append(container);
 		return container;
 	},
 
@@ -1036,6 +1073,24 @@ var CourseSectionView = Backbone.View.extend({
 });
 
 
+var CourseWaitlistRowView = Backbone.View.extend({
+	template: _.template("<td>view student</td>"
+		+	"<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= model.userid %></td>"
+		+	"<td>something</td>"),
+
+	initialize: function(options) {
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+	},
+});
+
 var CourseSectionRowView = Backbone.View.extend({
 	template: _.template("<td><span id='<%= model.sectionid %>' class='view-section primary-link'>[ View Section ]</span></td>"
 		+	"<td><%= model.sectionCode %></td>"
@@ -1063,7 +1118,6 @@ var CourseSectionRowView = Backbone.View.extend({
 		app.Router.navigate("viewSection/" + id, {trigger:true});
 	}
 });
-
 
 
 // VIEW SECTION ===========================================
