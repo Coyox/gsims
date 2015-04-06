@@ -763,6 +763,7 @@ function inputAttendance($id){
     $bindparams = array(
         "classdate" => $date,
         "sectionid" => $id,
+        "schoolid" => $schoolid,
         "schoolyearid" => $schoolyearid,
         "status" => 'active'
     );
