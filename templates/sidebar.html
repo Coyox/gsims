@@ -124,6 +124,7 @@
 	<% } %>
 
 	<!-- COURSES -->
+	<% if(usertype == "T" || usertype == "A" || usertype == "SU") { %>
 	<li data-toggle="collapse" data-target="#courses-tools" class="collapsed">
 		<a class="sidebar-link" data-link="admin-tools">
 			<span class="glyphicon glyphicon-th-list"></span>
@@ -135,13 +136,14 @@
 		<% if(usertype == "T") { %>
 		<li>
 			<span class="glyphicon glyphicon-briefcase"></span>
-			<a href="#myCourses">My Courses</a>
+			<a href="#myCourses">My Sections</a>
 		</li>
 		<% } %>
 		<li>
 			<span class="glyphicon glyphicon-search"></span>
 			<a href="#filterSections">Search Sections</a>
 		</li>
+		<% if (usertype == "A" || usertype == "SU") { %>
 		<li>
 			<span class="glyphicon glyphicon-th-list"></span>
 			<a href="#departments">Manage Departments</a>
@@ -150,18 +152,27 @@
 			<span class="glyphicon glyphicon-th-list"></span>
 			<a href="#manageCourses">Manage Courses and Sections</a>
 		</li>
+		<% } %>
 	</ul>
+	<% } %>
 
 	<% if (usertype == "S") { %>
 	<li>
+		<a href="#filterSections" class="sidebar-link" data-link="sections">
+			<span class="glyphicon glyphicon-search"></span>
+			<span class="text">Search Sections</span>
+		</a>
+	</li>
+	<li>
 		<a href="#courseEnrollment" class="sidebar-link" data-link="courses">
 			<span class="glyphicon glyphicon-th-list"></span>
-			<span class="text"> Course Enrollment</span>
+			<span class="text">Course Enrollment</span>
 		</a>
 	</li>
 	<% } %>
 
 	<!-- ADMIN TOOLS -->
+	<% if (usertype == "A" || usertype == "SU" || usertype == "T") { %>
 	<li data-toggle="collapse" data-target="#admin-tools" class="collapsed">
 		<a class="sidebar-link" data-link="admin-tools">
 			<span class="glyphicon glyphicon-wrench"></span>
@@ -170,7 +181,6 @@
 		</a>
 	</li>
 	<ul class="sub-menu collapse" id="admin-tools">
-	<% if (usertype == "A" || usertype == "SU" || usertype == "T") { %>
 		<li>
 			<span class="glyphicon glyphicon-calendar"></span>
 			<a href="#schoolyears">Manage School Years</a>
@@ -187,13 +197,12 @@
 			<span class="glyphicon glyphicon-export"></span>
 			<a href="#export">Export Data</a>
 		</li>
-		<% } %>
 		<li>
 			<span class="glyphicon glyphicon-import"></span>
 			<a href="#import">Import Data</a>
 		</li>
 	</ul>
-
+	<% } %>
 
 	<!-- EMAIL -->
 	<li>

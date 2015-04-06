@@ -18,15 +18,17 @@ var DashboardView = Backbone.View.extend({
 		if (usertype == "SU" || usertype == "A") {
 			this.populateStats();
 			this.populateNotifications();
+			this.attendanceCalendar();
 		} else {
-			this.$el.find("#admin-attendance-calendar").remove();
+			this.$el.find("#admin-attendance-calendar").find("#teacher-reminder-panel").remove();
 			this.$el.find("#school-usage").remove();
+			this.$el.find("#admin-attendance").remove();
 		}
 
 		if (usertype == "SU" || usertype == "A" || usertype == "T") {
 			this.calendarWidget(usertype);
 		} else {
-			this.$el.find("#admin-attendance").remove();
+			this.$el.find("#calendar-panel").remove();
 		}
 
 		if (usertype == "SU" || usertype == "A") {
@@ -34,7 +36,6 @@ var DashboardView = Backbone.View.extend({
 			this.studentGeoGraph();
 			this.studentGenderGraph();
 			this.studentAgeGraph();
-			this.attendanceCalendar();
 		} else {
 			this.$el.find("#pie-charts").remove();
 		}
@@ -208,113 +209,30 @@ var DashboardView = Backbone.View.extend({
 		var elem = elem || view.$el.find("#calendar")
 		var mon = [], tue = [], wed = [], thu = [], fri = [], sat = [], sun = [];
 
+		var def = $.Deferred();
 		if (usertype == "T") {
 			var user = JSON.parse(sessionStorage.getItem("gobind-user"));
 			var userid = user.userid;
 			var teacher = new Teacher();
 			teacher.fetch({
 				url: teacher.getTeachingSectionsUrl(userid)
-			}).then(function(data){
-				// Get all sections
-				_.each(data, function(section, index) {
-				// Get all days for a section
-				var days = section.day.split(",");
-				_.each(days, function(day, index) {
-					var obj = {
-						start: section.startTime,
-						end: section.endTime,
-						courseName: section.courseName,
-					};
-					switch (day) {
-						case "MON":
-						mon.push(obj);
-						break;
-						case "TUE":
-						tue.push(obj);
-						break;
-						case "WED":
-						wed.push(obj);
-						break;
-						case "THU":
-						thu.push(obj);
-						break;
-						case "FRI":
-						fri.push(obj);
-						break;
-						case "SAT":
-						sat.push(obj);
-						break;
-						case "SUN":
-						sun.push(obj);
-						break;
-						default:
-						break;
-					}
-				});
+			}).then(function(data) {
+				def.resolve(data);
 			});
-
-				elem.fullCalendar({
-					defaultView: "basicWeek",
-					editable: false,
-					eventLimit: true,
-					views: {
-						agenda: {
-							eventLimit: 3
-						}
-					},
-					eventRender: function(event, element) {
-						element.popover({
-							title: event.title,
-							placement:'auto',
-							html:true,
-							trigger : 'click',
-							animation : 'true',
-							content: event.description,
-							container:'body'
-						});
-						$('body').on('click', function (e) {
-							if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-								element.popover('hide');
-						});
-					}
-
-				});
-
-				elem.fullCalendar( 'addEventSource',
-					function(start, end, status, callback) {
-						var events = [];
-
-						for (loop = start._d.getTime();
-							loop <= end._d.getTime();
-							loop = loop + (24 * 60 * 60 * 1000)) {
-							var test_date = new Date(loop);
-
-						var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-						_.each(day, function(section, index) {
-							events.push({
-								title: section.courseName,
-								start: view.getStartTime(test_date, section),
-								end: view.getEndTime(test_date, section),
-								description: section.description,
-									//sectionCode: section.sectionCode
-
-								});
-						});
-					}
-					callback( events );
+		} else {
+			var section = new Section();
+			section.fetch({
+				data: {
+					schoolid: sessionStorage.getItem("gobind-schoolid"),
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 				}
-				);
+			}).then(function(data) {
+				def.resolve(data);
 			});
+		}
 
-		}
-		else {
-	var section = new Section();
-	section.fetch({
-		data: {
-			schoolid: sessionStorage.getItem("gobind-schoolid"),
-			schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-		}
-	}).then(function(data) {
+		$.when(def).then(function(data) {
+			console.log(data);
 			// Get all sections
 			_.each(data, function(section, index) {
 				// Get all days for a section
@@ -397,12 +315,208 @@ var DashboardView = Backbone.View.extend({
 						});
 					});
 				}
-
 				callback( events );
-			}
+				}
 			);
 		});
-		}
+
+
+	// 		var teacher = new Teacher();
+	// 		teacher.fetch({
+	// 			url: teacher.getTeachingSectionsUrl(userid)
+	// 		}).then(function(data){
+	// 			console.log(data);
+	// 			// Get all sections
+	// 			_.each(data, function(section, index) {
+	// 			// Get all days for a section
+	// 			var days = section.day.split(",");
+	// 			_.each(days, function(day, index) {
+	// 					var obj = {
+	// 						start: section.startTime,
+	// 						end: section.endTime,
+	// 						courseName: section.courseName,
+	// 					};
+	// 					switch (day) {
+	// 						case "MON":
+	// 						mon.push(obj);
+	// 						break;
+	// 						case "TUE":
+	// 						tue.push(obj);
+	// 						break;
+	// 						case "WED":
+	// 						wed.push(obj);
+	// 						break;
+	// 						case "THU":
+	// 						thu.push(obj);
+	// 						break;
+	// 						case "FRI":
+	// 						fri.push(obj);
+	// 						break;
+	// 						case "SAT":
+	// 						sat.push(obj);
+	// 						break;
+	// 						case "SUN":
+	// 						sun.push(obj);
+	// 						break;
+	// 						default:
+	// 						break;
+	// 					}
+	// 				});
+	// 			});
+
+	// 			elem.fullCalendar({
+	// 				defaultView: "basicWeek",
+	// 				editable: false,
+	// 				eventLimit: true,
+	// 				views: {
+	// 					agenda: {
+	// 						eventLimit: 3
+	// 					}
+	// 				},
+	// 				eventRender: function(event, element) {
+	// 					element.popover({
+	// 						title: event.title,
+	// 						placement:'auto',
+	// 						html:true,
+	// 						trigger : 'click',
+	// 						animation : 'true',
+	// 						content: event.description,
+	// 						container:'body'
+	// 					});
+	// 					$('body').on('click', function (e) {
+	// 						if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+	// 							element.popover('hide');
+	// 					});
+	// 				}
+
+	// 			});
+
+	// 			console.log(mon,tue,wed,thu,fri,sat,sun);
+
+	// 			elem.fullCalendar( 'addEventSource',
+	// 				function(start, end, status, callback) {
+	// 					var events = [];
+
+	// 					for (loop = start._d.getTime();
+	// 						loop <= end._d.getTime();
+	// 						loop = loop + (24 * 60 * 60 * 1000)) {
+	// 						var test_date = new Date(loop);
+
+	// 					var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
+	// 					_.each(day, function(section, index) {
+	// 						events.push({
+	// 							title: section.courseName,
+	// 							start: view.getStartTime(test_date, section),
+	// 							end: view.getEndTime(test_date, section),
+	// 							description: section.description,
+	// 								//sectionCode: section.sectionCode
+
+	// 							});
+	// 					});
+	// 					console.log(events);
+	// 				}
+	// 				callback( events );
+	// 				}
+	// 			);
+	// 		});
+
+	// 	}
+	// 	else {
+	// var section = new Section();
+	// section.fetch({
+	// 	data: {
+	// 		schoolid: sessionStorage.getItem("gobind-schoolid"),
+	// 		schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+	// 	}
+	// }).then(function(data) {
+	// 		// Get all sections
+	// 		_.each(data, function(section, index) {
+	// 			// Get all days for a section
+	// 			var days = section.day.split(",");
+	// 			_.each(days, function(day, index) {
+	// 				var obj = {
+	// 					start: section.startTime,
+	// 					end: section.endTime,
+	// 					courseName: section.courseName
+	// 				};
+	// 				switch (day) {
+	// 					case "MON":
+	// 					mon.push(obj);
+	// 					break;
+	// 					case "TUE":
+	// 					tue.push(obj);
+	// 					break;
+	// 					case "WED":
+	// 					wed.push(obj);
+	// 					break;
+	// 					case "THU":
+	// 					thu.push(obj);
+	// 					break;
+	// 					case "FRI":
+	// 					fri.push(obj);
+	// 					break;
+	// 					case "SAT":
+	// 					sat.push(obj);
+	// 					break;
+	// 					case "SUN":
+	// 					sun.push(obj);
+	// 					break;
+	// 					default:
+	// 					break;
+	// 				}
+	// 			});
+	// 		});
+
+	// 		elem.fullCalendar({
+	// 			defaultView: "basicWeek",
+	// 			editable: false,
+	// 			eventLimit: true,
+	// 			views: {
+	// 				agenda: {
+	// 					eventLimit: 3
+	// 				}
+	// 			},
+	// 			eventRender: function(event, element) {
+	// 				element.popover({
+	// 					title: event.title,
+	// 					placement:'auto',
+	// 					html:true,
+	// 					trigger : 'click',
+	// 					animation : 'true',
+	// 					content: event.description,
+	// 					container:'body'
+	// 				});
+	// 				$('body').on('click', function (e) {
+	// 					if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+	// 						element.popover('hide');
+	// 				});
+	// 			}
+	// 		});
+
+	// 		elem.fullCalendar( 'addEventSource',
+	// 			function(start, end, status, callback) {
+	// 				var events = [];
+
+	// 				for (loop = start._d.getTime();
+	// 					loop <= end._d.getTime();
+	// 					loop = loop + (24 * 60 * 60 * 1000)) {
+	// 					var test_date = new Date(loop);
+	// 				var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
+	// 				_.each(day, function(section, index) {
+	// 					events.push({
+	// 						title: section.courseName,
+	// 						start: view.getStartTime(test_date, section),
+	// 						end: view.getEndTime(test_date, section),
+	// 						description: section.description,
+	// 					});
+	// 				});
+	// 			}
+
+	// 			callback( events );
+	// 		}
+	// 		);
+	// 	});
+	// 	}
 	},
 
 	getStartTime: function(test_date, section) {
