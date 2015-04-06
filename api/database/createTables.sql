@@ -160,10 +160,12 @@ CREATE TABLE IF NOT EXISTS `document` (
   `userid` int(11) NOT NULL,
   `sectionid` int(11) NOT NULL,
   `schoolyearid` int(11) NOT NULL,
+  `schoolid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userid`, `sectionid`, `date`),
   FOREIGN KEY (`userid`) REFERENCES `login` (`userid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`) ON DELETE CASCADE,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );

@@ -200,7 +200,7 @@ var DashboardView = Backbone.View.extend({
 			show: true
 		});
 
-		this.calendarWidget(sessionStorage.getItem("gobind-usertype"), elem.find("#calendar"));		
+		this.calendarWidget(sessionStorage.getItem("gobind-usertype"), elem.find("#calendar"));
 	},
 
 	calendarWidget: function(usertype, elem) {
@@ -433,7 +433,7 @@ var DashboardView = Backbone.View.extend({
 				var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
 				dataArray.push(city);
 			});
-		
+
 			if (dataArray.length > 1){
 				view.$el.find("#demographics-label").removeClass("hide").show();
 				var data = google.visualization.arrayToDataTable(dataArray);
@@ -480,7 +480,7 @@ var DashboardView = Backbone.View.extend({
 	      		}
 	        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
 	        	chart.draw(data, options);
-			}		
+			}
 		});
 	},
 
@@ -511,7 +511,7 @@ var DashboardView = Backbone.View.extend({
 				if (55 <= age && age <= 64){ seniors += studentcount; }
 				if (age >= 65){ elderly += studentcount; }
 			});
-		
+
 			dataArray.push(['0-17', kids]);
 			dataArray.push(['18-24', teens]);
 			dataArray.push(['25-32', youngadults]);
@@ -545,7 +545,10 @@ var DashboardView = Backbone.View.extend({
   		var dataArray = [];
 
 		stats.fetch({
-			url: stats.getAttendanceStatsUrl(sessionStorage.getItem("gobind-activeSchoolYear"))
+			url: stats.getAttendanceStatsUrl(sessionStorage.getItem("gobind-schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Stats(object, {parse:true});
@@ -556,7 +559,7 @@ var DashboardView = Backbone.View.extend({
 				var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
 				dataArray.push(stat);
 			});
-		
+
 			if (dataArray){
 				var dataTable = new google.visualization.DataTable();
 				dataTable.addColumn({ type: 'date', id: 'Date' });

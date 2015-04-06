@@ -16,31 +16,29 @@ var ImportView = Backbone.View.extend({
 
 	loadOptions: function(){
 		var tid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid
-		var x = document.getElementById("section");
+		var select = this.$el.find("#section");
 		var teacher = new Teacher();
 		teacher.fetch({
 			url: teacher.getTeachingSectionsUrl(tid),
 		}).then(function(data){
 			_.each(data, function(object,index){
-				var option = document.createElement("option");
-				option.text = object.sectionid;
-				x.add(option);
+				var option = $("<option></option>");
+				option.text(object.courseName + " - " + object.sectionid);
+				option.attr("value", object.sectionid);
+				select.append(option);
 			});
 			// Display a message if no options are found
-			if ($(x).find("option").length == 0) {
-				$(x).append("<option disabled>-- No sections found --</option>");
+			if (select.find("option").length == 0) {
+				select.append("<option disabled>-- No sections found --</option>");
 			}
 		});
 	},
 
 	constructCSV: function(){
 		var teacherid = (JSON.parse(sessionStorage.getItem("gobind-user"))).userid;
-		var section = this.$el.find("#section").val();
-		console.log(section);
-		//var sectionid = 777778; // TODO
-		var sectionid = section;
 
-		var dataRows = [["date", "teacherid", "sectionid","studentid","firstName","lastName","present"]];
+		var sectionid = this.$el.find("#section").val();;
+		var dataRows = [["date", "teacherid", "sectionid", "schoolid", "schoolyearid", "studentid","firstName","lastName","present"]];
 		var csvContent = "data:text/csv;charset=utf-8,";
 		var section = new Section();
 		section.fetch({
@@ -49,10 +47,10 @@ var ImportView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var model = new Student(object, {parse:true});
 				if (index == 0){
-					dataRows.push(["", teacherid, sectionid, model.get("userid"), model.get("firstName"), model.get("lastName")]);
+					dataRows.push(["", teacherid, sectionid, sessionStorage.getItem("gobind-schoolid"), sessionStorage.getItem("gobind-activeSchoolYear"), model.get("userid"), model.get("firstName"), model.get("lastName")]);
 					return true;
 				}
-				var student = ["","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
+				var student = ["","","","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
 				dataRows.push(student);
 			});
 			dataRows.forEach(function(lineArray, index){
@@ -277,6 +275,8 @@ var ImportView = Backbone.View.extend({
 							var attendancedate = results.data[0].date;
 							var teacherid =  results.data[0].teacherid;
 							var sectionid =  results.data[0].sectionid;
+							var schoolid =  results.data[0].schoolid;
+							var schoolyearid = results.data[0].schoolyearid;
 
 						$.each(results.data, function(i, row) {
 							if (i==0 || i==1) {	return true; }
@@ -309,7 +309,8 @@ var ImportView = Backbone.View.extend({
 								url: section.inputAttendance(sectionid),
 								data: {
 									date: attendancedate,
-									schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+									schoolid: schoolid,
+									schoolyearid: schoolyearid,
 									userids: JSON.stringify(studentids)
 								}
 							}).then(function(data) {
