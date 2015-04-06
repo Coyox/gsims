@@ -560,7 +560,7 @@ var ViewCourse = Backbone.View.extend({
 
 			view.teachersForm(view.id);
 
-			view.sectionsForm(view.model.get("courseName"));
+			view.sectionsForm(view.model.get("courseName"), courseid);
 		});
 	},
 
@@ -634,12 +634,13 @@ var ViewCourse = Backbone.View.extend({
 		});
 	},
 
-	sectionsForm: function(courseName) {
-		new CourseSectionView({
-			el: $("#course-sections"),
-			courseName: courseName,
-		});
-	},
+	sectionsForm: function(courseName, courseid) {
+        new CourseSectionView({
+            el: $("#course-sections"),
+            courseName: courseName,
+            courseid: courseid
+        });
+    },
 
 	updateCourse: function(evt) {
 		var val = $(evt.currentTarget).val();
@@ -849,6 +850,7 @@ var CoursePreReqsRowView = Backbone.View.extend({
 	template: _.template("<li><%= courseName %> <span id='<%= courseid %>' class='delete-prereq pull-right primary-link'>[ Delete ]</span></li>"),
 
 	initialize: function(options) {
+        
 		this.courseName = options.course;
 		this.pid = options.pid;
 		this.courseid = options.courseid;
@@ -912,13 +914,25 @@ var CourseSectionView = Backbone.View.extend({
 		+			"</tr>"
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
-		+	"</table>"),
+		+	"</table>"
+        +	"<table id='waitlist-table' class='table table-striped table-bordered'>"
+		+		"<thead>"
+		+			"<tr>"
+		+				"<th>View</th>"
+		+				"<th>Student</th>"
+		+				"<th>Enrol to Section</th>"
+		+			"</tr>"
+		+		"</thead>"
+		+		"<tbody class='results'></tbody>"
+		+	"</table>"
+        ),
 
 	initialize: function(options) {
-		this.courseName = options.courseName;
-		this.model = new Section();
-		this.render();
-	},
+        this.courseName = options.courseName;
+        this.courseid = options.courseid;
+        this.model = new Section();
+        this.render();
+ },
 
 	events: {
 		"click #add-section": "addSectionToCourse",
@@ -950,6 +964,14 @@ var CourseSectionView = Backbone.View.extend({
 				})
 			});
 		});
+
+        var course = new Course();
+        console.log(this.courseid);
+        course.fetch({
+            url: course.getCourseWaitlist(this.courseid)
+        }).then(function(data){
+            console.log(data);
+        });
 	},
 
 	addCourseSection: function() {
