@@ -156,7 +156,6 @@ var DashboardView = Backbone.View.extend({
 		var day = today.getDate();
 
 		today = year + "-" + month + "-" + day;
-		console.log(today);
 
 		var view = this;
 		var notif = new Notif();
@@ -168,6 +167,7 @@ var DashboardView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
+			console.log(data);
 			_.each(data, function(teacher, index) {
 				var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
 				view.$el.find("#teacher-reminder-table").append(row);
