@@ -508,7 +508,7 @@ function waitlistStudent($id){
     echo json_encode(perform_query($sql,'POST',array("userid"=>$studentid, "id"=>$id)));
 }
 function getWaitlistedStudents($id){
-    $sql = "SELECT userid from waitlisted where waitlistid=:waitlistid";
+    $sql = "SELECT s.userid, s.firstName, s.lastName from waitlisted w, student s where w.waitlistid=:waitlistid and w.userid=s.userid";
     echo json_encode(perform_query($sql,'GETALL',array("waitlistid"=>$id)));
 }
 function createCourse(){
