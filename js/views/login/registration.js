@@ -117,6 +117,8 @@ var RegistrationFormView = Backbone.View.extend({
 		var view = this;
 		var studentModel = this.regStudentInfo.model;
 		var sections = this.regSectionsView.sections;
+		console.log(studentModel);
+		console.log(sections);
 		var sectionids = [];
 		var schoolid = this.regSectionsView.courseEnrollmentView.schoolid;
 		_.each(sections, function(section, index) {
@@ -147,6 +149,18 @@ var RegistrationFormView = Backbone.View.extend({
 							redirect: true,
 							url: view.regType == "online" ? "" : "home"
 						});
+
+						sendEmail({
+							from: "info@gobindsarvar.com",
+							to: [{
+								email: studentModel.get("emailAddr"),
+								name: "Gobind Sarvar",
+								type: "to"
+							}],
+							subject: "Gobind Sarvar - Account Information",
+							body: "We have receieved your application and will notify you when your student account gets approved. Thank you."
+						});
+
 					} else {
 						new TransactionResponseView({
 							title: "ERROR",
@@ -208,6 +222,7 @@ var RegSearchView = Backbone.View.extend({
 				url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 				data: params
 			}).then(function(data) {
+				console.log(data);
 				var ret;
 				if (data.length == 0) {
 					ret = true;

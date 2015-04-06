@@ -139,9 +139,11 @@ var DashboardView = Backbone.View.extend({
 			this.reminderTable.fnDestroy();
 		}
 
-		this.$el.find("#teacher-reminder-table tbody").empty();
-
 		var numdays = evt ? $(evt.currentTarget).find("option:selected").attr("value") : 7;
+
+		this.$el.find("#teacher-reminder-table tbody").empty();
+		this.$el.find("#day-menu").empty();
+
 		for (var i = 1; i < 31; i++) {
 			var option = $("<option></option>");
 			option.attr("value", i);
@@ -167,7 +169,6 @@ var DashboardView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
-			console.log(data);
 			_.each(data, function(teacher, index) {
 				var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
 				view.$el.find("#teacher-reminder-table").append(row);

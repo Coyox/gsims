@@ -209,7 +209,7 @@ var Section = Backbone.Model.extend({
 		return this.urlRoot + "/" + id + "/avgAttendance";
 	},
 	getStudentCount: function(id) {
-		return this.urlRoot + "/" + id + "/students/count";
+		return this.urlRoot + "/" + id + "/count";
 	}
 });
 

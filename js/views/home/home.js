@@ -111,6 +111,11 @@ var HeaderView = Backbone.View.extend({
 			}
 			this.$el.find(".usertype").html(text);
 		}
+		var login = sessionStorage.getItem("gobind-login");
+		var lastLoggedIn = JSON.parse(login).lastLogin;
+		lastLoggedIn = new Date(lastLoggedIn);
+		lastLoggedIn = lastLoggedIn.toDateString();
+		this.$el.find(".last-logged-in").text(lastLoggedIn);
 	},
 
 	events: {
