@@ -1542,6 +1542,13 @@ var TeacherSectionRowView = Backbone.View.extend({
 	unassignTeacher: function(evt) {
 		var view = this;
 		var id = $(evt.currentTarget).attr("id");
+		var usertype = sessionStorage.getItem("gobind-usertype")
+
+		if(usertype != "A" && usertype != "SU"){
+			alert("Only Administrators and Superusers can remove a teacher from a section.");
+			return;
+		}
+
 		if (typeof (this.sectionid) === 'undefined'){
 			var course = new Course();
 			$.ajax({
@@ -1561,7 +1568,7 @@ var TeacherSectionRowView = Backbone.View.extend({
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
-						message: "Cound not unassign teacher. Please try again."
+						message: "Could not unassign teacher. Please try again."
 					});
 				}
 			});
