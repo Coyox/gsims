@@ -1793,44 +1793,54 @@ var AttendanceView = Backbone.View.extend({
 			}
 		}, this);
 
-		var section = new Section();
-		$.ajax({
-			type: "POST",
-			url: section.inputAttendance(this.sectionid),
-			data: {
-				date: this.$el.find("#date").val(),
-				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-				userids: JSON.stringify(attended)
-			}
-		}).then(function(data) {
-			if (typeof data == "string") {
-				data = JSON.parse(data);
-			}
-			if (data.status=="success") {
-				new TransactionResponseView({
-					message: "Attendance successfully inputted."
-				});
-			}
-			else {
+		if (attended.length) {
+			var section = new Section();
+			$.ajax({
+				type: "POST",
+				url: section.inputAttendance(this.sectionid),
+				data: {
+					date: this.$el.find("#date").val(),
+					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+					userids: JSON.stringify(attended)
+				}
+			}).then(function(data) {
+				if (typeof data == "string") {
+					data = JSON.parse(data);
+				}
+				if (data.status=="success") {
+					new TransactionResponseView({
+						message: "Attendance successfully inputted."
+					});
+				}
+				else {
+					new TransactionResponseView({
+						title: "ERROR",
+						status: "error",
+						message: "Could not input attendance. Please try again."
+					});
+				}
+				view.render();
+				elem.remove();
+				backdrop.remove();
+			}).fail(function(data) {
 				new TransactionResponseView({
 					title: "ERROR",
 					status: "error",
 					message: "Could not input attendance. Please try again."
 				});
-			}
-			view.render();
-			elem.remove();
-			backdrop.remove();
-		}).fail(function(data) {
-			new TransactionResponseView({
-				title: "ERROR",
-				status: "error",
-				message: "Could not input attendance. Please try again."
+				view.render();
+				elem.remove();
+				backdrop.remove();
 			});
+		} else {
+			new TransactionResponseView({
+				message: "Attendance successfully inputted."
+			});
+			
 			view.render();
 			elem.remove();
 			backdrop.remove();
-		});
+		}
 	},
 
 	toggleCheckboxes: function(evt) {
@@ -2110,7 +2120,12 @@ var DocumentsView = Backbone.View.extend({
 			view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
 			view.model.set("userid", JSON.parse(sessionStorage.getItem("gobind-user")).userid);
 			view.model.set("status", "active");
-			view.model.save().then(function(data) {
+
+			var doc = new Document();
+			view.model.save({
+				type: "POST",
+				url: doc.urlRoot
+			}).then(function(data) {
 				if (data.status=="success") {
 					new TransactionResponseView({
 						message: "New document successfully created."

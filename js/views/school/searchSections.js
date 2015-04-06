@@ -45,20 +45,24 @@ var SearchSectionsView = Backbone.View.extend({
 
 		if (startTime != "" && endTime != ""){
 			view.$el.find("#alert-both").addClass("hide");
+			view.$el.find("#alert-larger").addClass("hide");
+			startTime = moment(startTime, ["h:mmA"]).format("HH-mm-00");
+			endTime = moment(endTime, ["h:mmA"]).format("HH-mm-00");
 			if (endTime > startTime) {
-				data.startTime = moment(startTime, ["h:mmA"]).format("HH:mm:00");
-				data.endTime = moment(endTime, ["h:mmA"]).format("HH:mm:00");
+				data.startTime = startTime;
+				data.endTime = endTime;
 				console.log(data.startTime);
 				console.log(data.endTime);
-				view.$el.find("#alert-larger").addClass("hide");
 			}
 			else {
 				view.$el.find("#alert-larger").removeClass("hide");
+				view.$el.find("#search-sections").addClass("disabled");
 			}
 		}
 		else {
 			if (startTime != "" || endTime !=""){
 				view.$el.find("#alert-both").removeClass("hide");
+				view.$el.find("#search-sections").addClass("disabled");
 			}
 		}
 		data.schoolyearid = sessionStorage.getItem("gobind-activeSchoolYear");
