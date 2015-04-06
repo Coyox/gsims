@@ -150,13 +150,21 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#day-menu").append(option);
 		}
 
+		var today = new Date();
+		var year = today.getFullYear();
+		var month = today.getMonth() + 1;
+		var day = today.getDate();
+
+		today = year + "-" + month + "-" + day;
+		console.log(today);
+
 		var view = this;
 		var notif = new Notif();
 		notif.fetch({
 			url: notif.missingInputAttendance(),
 			data: {
-				numdays: 7,
-				today: "2015-04-05",
+				numdays: numdays,
+				today: today,
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
