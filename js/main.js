@@ -6,6 +6,12 @@ var app = {
 	// selectedSchoolId: "412312",
 };
 
+var dataTables = {
+	"sSwfPath": "http://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf",
+	"exportDom": "lfrtipT",
+	"buttons": [ "csv", "pdf" ]
+}
+
 /** Object to hold all HTML templates (pre-loaded) */
 var html = {};
 

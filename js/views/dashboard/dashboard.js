@@ -40,7 +40,7 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#pie-charts").remove();
 		}
 	},
-
+	
 	events: {
 		"click .view-notification": "viewNotification",
 		"click #toggle-calendar": "toggleCalendar",
