@@ -65,6 +65,10 @@ var LoginView = Backbone.View.extend({
 						view.$el.find(".alert").removeClass("hide");
 					}, 300);
 				}
+			}).fail(function() {
+				setTimeout(function() {
+					view.$el.find(".alert").removeClass("hide");
+				}, 300);
 			});
 		}
 	},

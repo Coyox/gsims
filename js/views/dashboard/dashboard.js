@@ -18,10 +18,15 @@ var DashboardView = Backbone.View.extend({
 		if (usertype == "SU" || usertype == "A") {
 			this.populateStats();
 			this.populateNotifications();
+		} else {
+			this.$el.find("#admin-attendance-calendar").remove();
+			this.$el.find("#school-usage").remove();
 		}
 
 		if (usertype == "SU" || usertype == "A" || usertype == "T") {
 			this.calendarWidget(usertype);
+		} else {
+			this.$el.find("#admin-attendance").remove();
 		}
 
 		if (usertype == "SU" || usertype == "A") {
@@ -30,6 +35,8 @@ var DashboardView = Backbone.View.extend({
 			this.studentGenderGraph();
 			this.studentAgeGraph();
 			this.attendanceCalendar();
+		} else {
+			this.$el.find("#pie-charts").remove();
 		}
 	},
 
