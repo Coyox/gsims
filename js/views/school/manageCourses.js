@@ -1121,7 +1121,6 @@ var CourseSectionRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.render();
-		console.log(options);
 	},
 
 	render: function() {
