@@ -973,14 +973,16 @@ var CourseSectionView = Backbone.View.extend({
             course.fetch({
                 url: course.getCourseWaitlist(view.courseid)
                }).then(function(data){
+                    console.log("coursesectionview data" + data);
                     console.log(data);
+                    console.log("coursesectionview sections");
                     console.log(sections);
                     _.each(data, function(sec, index) {
 			            var student = new Student(sec, {parse:true});
 			            new CourseWaitlistRowView({
 			                el: view.addCourseWaitlist(),
 			                model: student,
-                            results: data
+                            results: sections
 			            })
 		            });
                 });
@@ -1085,11 +1087,11 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		+	"<td><%= model.userid %></td>"
 		+	"<td class='section-links'></td>"),
 
-         sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionid %>'>[ <%= model.courseName %> ]</span>"),
-
+    sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionCode %>'>[<%= model.sectionCode %>]</span>"),
+    //sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionid %>'></span>"),
 
 	initialize: function(options) {
-        this.data = options.results
+        this.sdata = options.results
 		this.render();
 	},
 
@@ -1098,16 +1100,19 @@ var CourseWaitlistRowView = Backbone.View.extend({
 			model: this.model.toJSON()
 		}));
 
-    var links = "";
-  _.each(this.data, function(section, index) {
-   var model = new Section(section, {parse:true});
-   var link = this.sectionLink({
-    model: this.model.toJSON()
-   });
-   links += link;
-  }, this);
+        var links = "";
+        _.each(this.sdata, function(section, index) {
+            var secmodel = new Section(section, {parse:true});
+            //console.log(secmodel.toJSON());
+            var link = this.sectionLink({
+                model: secmodel.toJSON()
+            });
+            //console.log("this is the sectioncode");
+            //console.log(secmodel.sectionCode);
+            links += link;
+        }, this);
 
-  this.$el.find(".section-links").html(links);
+        this.$el.find(".section-links").html(links);
 
 	},
 });
