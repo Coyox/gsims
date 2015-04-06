@@ -39,6 +39,13 @@ var DashboardView = Backbone.View.extend({
 		} else {
 			this.$el.find("#pie-charts").remove();
 		}
+
+		if (usertype == "S") {
+			this.displayStudentDashboard();
+		} else {
+			this.$el.find("#student-attendance").remove();
+			this.$el.find("#student-report-card").remove();
+		}
 	},
 	
 	events: {
@@ -691,4 +698,24 @@ var DashboardView = Backbone.View.extend({
 			}
 		});
 	},
+
+	displayStudentDashboard: function() {
+		var view = this;
+		var user = JSON.parse(sessionStorage.getItem("gobind-user"));
+		var userid = user.userid;
+		var student = new Student({id: userid});
+		student.fetch().then(function(data) {
+			var model = new Student(data, {parse:true});
+			console.log(model);
+			new StudentAttendanceView({
+				el: view.$el.find("#attendance"),
+				model: model
+			});
+
+			new ReportCardView({
+				el: view.$el.find("#report-card"),
+				model: model,
+			});
+		});
+	}
 });
