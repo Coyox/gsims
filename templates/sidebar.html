@@ -135,13 +135,14 @@
 		<% if(usertype == "T") { %>
 		<li>
 			<span class="glyphicon glyphicon-briefcase"></span>
-			<a href="#myCourses">My Courses</a>
+			<a href="#myCourses">My Sections</a>
 		</li>
 		<% } %>
 		<li>
 			<span class="glyphicon glyphicon-search"></span>
 			<a href="#filterSections">Search Sections</a>
 		</li>
+		<% if (usertype == "A" || usertype == "SU") { %>
 		<li>
 			<span class="glyphicon glyphicon-th-list"></span>
 			<a href="#departments">Manage Departments</a>
@@ -150,6 +151,7 @@
 			<span class="glyphicon glyphicon-th-list"></span>
 			<a href="#manageCourses">Manage Courses and Sections</a>
 		</li>
+		<% } %>
 	</ul>
 
 	<% if (usertype == "S") { %>
