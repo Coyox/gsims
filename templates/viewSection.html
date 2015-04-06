@@ -33,11 +33,13 @@
 		<div id="section-info" class="tab-pane active">
 			<div class="col-sm-6">
 				<h4 class="o-auto">General Information
+				<% if (usertype == "A" || usertype == "SU") { %>
 					<div class="pull-right">
 						<button id="edit-section" class="btn btn-sm btn-primary">Edit</button>
 						<button id="save-section" class="btn btn-sm btn-primary hide">Save</button>
 						<button id="delete-section" class="btn btn-sm btn-primary">Delete</button>
 					</div>
+				<% } %>
 				</h4>
 				<div id="section-form">
 					<div class="form-horizontal well"></div>

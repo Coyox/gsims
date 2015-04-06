@@ -1045,6 +1045,7 @@ var CourseSectionRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.render();
+		console.log(options);
 	},
 
 	render: function() {
@@ -1077,7 +1078,14 @@ var SectionView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["viewSection.html"]);
+		
+		var template = html["viewSection.html"];
+		var usertype = sessionStorage.getItem("gobind-usertype");
+
+		template = template({
+			usertype: usertype
+		});
+		this.$el.html(template);
 
 		if (this.action == "view") {
 			this.$el.find("#edit-section").removeClass("hide").show();
