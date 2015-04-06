@@ -502,12 +502,10 @@ function unassignCourseTeacher($id, $tid){
     echo json_encode(perform_query($sql,'',array("tid"=>$tid, "id"=>$id)));
 }
 function waitlistStudent($id){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $student = json_decode($body);
+    $studentid = $_POST["userid"];
     $sql = "INSERT into waitlisted (userid, waitlistid) values (:userid, :id)";
-    $bindparams = array("userid"=>$student->userid, "id"=>$id);
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    $bindparams = array("userid"=>$studentid, "id"=>$id);
+    echo json_encode(perform_query($sql,'POST',array("userid"=>$studentid, "id"=>$id)));
 }
 function getWaitlistedStudents($id){
     $sql = "SELECT userid from waitlisted where waitlistid=:waitlistid";
@@ -1339,7 +1337,8 @@ function handlePendingStudents(){
     $bindparams = array();
     $purgeList = array();
     $activeList = array();
-
+    $sqlparens = "";
+    $params = array();
     $students = json_decode($_POST['students']);
 
     foreach ($students as $student){
@@ -1390,8 +1389,32 @@ function handlePendingStudents(){
         array_push($bindparams, $params);
         array_push($queries, $sql);
     }
+    $transaction_result = perform_transaction($queries, $bindparams);
+    if ($transaction_result["status"] == "success" && $activeList){
+        $sql = "SELECT userid, firstName, lastName, emailAddr from student where userid in ";
+        $sql.=$sqlparens;
+        $students = perform_query($sql,"GETALL", $params);
+        $emailparams = array();
+        $queries = array();
+        $bindparams = array();
 
-    echo json_encode(perform_transaction($queries, $bindparams));
+        foreach($students as $user){
+            // new creds
+            $username = generateUsername($user["userid"], $user["firstName"], $user["lastName"]);
+            $password = generatePassword();
+            $passwordhash = generatePasswordHash($password);
+            array_push($emailparams, array("emailAddr"=>$user["emailAddr"], "username"=>$username, "password"=>$password, "firstName"=>$user["firstName"], "lastName"=>$user["lastName"]));
+            $sql = "UPDATE login set password=:password where userid=:userid";
+            array_push($queries, $sql);
+            array_push($bindparams, array("userid"=>$user["userid"], "password"=>$passwordhash));
+        }
+        $transaction_result = perform_transaction($queries, $bindparams);
+        if ($transaction_result["status"] == "success"){
+            massEmailLogin($emailparams);
+        }
+    }
+    echo json_encode($transaction_result);
+
 }
 
 function handlePendingTestStudents(){
