@@ -1542,7 +1542,7 @@ var TeacherSectionRowView = Backbone.View.extend({
 	unassignTeacher: function(evt) {
 		var view = this;
 		var id = $(evt.currentTarget).attr("id");
-		var usertype = sessionStorage.getItem("gobind-usertype")
+		var usertype = sessionStorage.getItem("gobind-usertype");
 
 		if(usertype != "A" && usertype != "SU"){
 			alert("Only Administrators and Superusers can remove a teacher from a section.");
