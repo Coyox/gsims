@@ -2019,7 +2019,11 @@ function findSections($schoolid){
             }
             $sql.= ($notclause=="")? "" : ")";
         }
-        if (isset($startTime)&& isset($endTime)){ $sql.=" and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
+        if (isset($startTime) && isset($endTime)){
+            $startTime = str_replace('-', ':', $startTime);
+            $startTime = str_replace('-', ':', $endTime);
+            $sql.=" and '".$startTime."' <= s.startTime and '".$endTime."' >= s.endTime";
+        }
         $sql.= " order by s.sectionCode asc";
         echo json_encode(perform_query($sql,'GETALL',$bindparam));
     }
