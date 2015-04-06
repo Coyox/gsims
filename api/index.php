@@ -2002,10 +2002,22 @@ function findSections($schoolid){
                 where c.deptid in (select d.deptid from department d".$deptclause.")".$courseclause.")
                 and s.schoolyearid=:schoolyear and s.courseid=c1.courseid and d1.deptid=c1.deptid";
         if (isset($days)){
-            $days = explode('-', $days);
-            foreach($days as $day) {
-                $sql.=" and find_in_set('".$day."', s.day)";
+            $fulldays = array("MON","TUE","WED","THU","FRI","SAT","SUN");
+            $filterdays = explode('-', $days);
+            $sql.=" and (";
+            foreach($filterdays as $day) {
+                $sql.="find_in_set('".$day."', s.day) or ";
             }
+            $sql = rtrim($sql, "or ");
+            $sql.= ")";
+            $notclause = "";
+            foreach ($fulldays as $day){
+                if(!in_array($day, $filterdays)){
+                    $notclause = ($notclause=="")? " and not (" : " or";
+                    $sql.= $notclause." find_in_set('".$day."', s.day)";
+                }
+            }
+            $sql.= ($notclause=="")? "" : ")";
         }
         if (isset($startTime)&& isset($endTime)){ $sql.=" and ".$startTime."<= s.startTime and ".$endTime." >= s.endTime"; }
         $sql.= " order by s.sectionCode asc";
