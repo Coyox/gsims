@@ -303,13 +303,13 @@ var RSectionSubView = Backbone.View.extend({
 				section.fetch({
 					url: section.getStudentCount(section.get("sectionid"))
 				}).then(function(data) {
-					console.log(data);
-					var full = data.count >= section.get("classSize");
+					var full = parseInt(data) >= parseInt(section.get("classSize"));
 					new RSectionTableRowView({
 						el: view.addRow(),
 						model: section,
 						parentView: view.parentView,
-						isFull: full
+						isFull: full,
+						enrolledStudents: data
 					});
 				});
 			}, this);
@@ -328,20 +328,27 @@ var RSectionTableRowView = Backbone.View.extend({
 		+	"<br>"
 		+	"<strong>Location: </strong><span><%= model.roomLocation %></span>"
 		+	"<br>"
-		+	"<strong>Registered Students: <%= model.classSize %> (<%= model.roomCapacity %> spaces available)" 
+		+	"<strong>Registered Students: <%= enrolledStudents %> (<%= model.classSize %> spaces available)" 
 		+	"<br>"
 		+	"<a class='enroll-link'>Enroll in this section</a>"
 		+	"<br>"),
 
 	initialize: function(options) {
 		this.parentView = options.parentView;
+		this.isFull = options.isFull;
+		this.enrolledStudents = options.enrolledStudents;
 		this.render();
 	},
 
 	render: function() {
 		this.$el.html(this.template({
-			model: this.model.toJSON()
+			model: this.model.toJSON(),
+			enrolledStudents: this.enrolledStudents
 		}));
+
+		if (this.isFull) {
+			this.$el.find(".enroll-link").text("THIS SECTION IS FULL - Enroll in wait list");
+		}
 	},
 
 	events: {
