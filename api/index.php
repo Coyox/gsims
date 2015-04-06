@@ -20,7 +20,7 @@ $app->post('/students/:id/sections', 'enrollStudentInSections');
 // $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->post('/students/pendingTest', 'handlePendingTestStudents');
-$app->put('/students/:id/sections', 'approveDenyEnrollment');
+// $app->put('/students/:id/sections', 'approveDenyEnrollment');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
