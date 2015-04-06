@@ -40,7 +40,8 @@ var PendingRegistrationView = Backbone.View.extend({
 		student.fetch({
 			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
-				status: "pending"
+				status: "pending",
+				pendingEnrollment: "1"
 			}
 		}).then(function(data) {
 			_.each(data, function(object, index) {
@@ -166,7 +167,7 @@ var PendingRegistrationView = Backbone.View.extend({
 
 						var approvedBody = "";
 						approvedBody += "Your student account at Gobind Sarvar has been approved.<br><br>";
-						
+
 						var emailbody = "The following sections have been approved:<br>";
 						_.each(tempApproved, function(name, index) {
 							emailbody += name + ",";
@@ -199,7 +200,7 @@ var PendingRegistrationView = Backbone.View.extend({
 								name: "",
 								type: "to"
 							});
-						});					
+						});
 
 						sendEmail({
 							from: "info@gobindsarvar.com",
@@ -210,7 +211,7 @@ var PendingRegistrationView = Backbone.View.extend({
 
 						new TransactionResponseView({
 							message: "Students successfully approved and/or denied. An email has been sent to notify the student of their status change."
-						});	
+						});
 
 						view.render();
 					}
@@ -329,7 +330,7 @@ var PendingTestView = Backbone.View.extend({
 		          	{ bSortable: false, aTargets: [ 5 ] },
 		          	{ sClass: "center", aTargets: [ 0, 5 ] },
 		          	{ sWidth: "5%", aTargets: [ 5 ] },
-		       	]			
+		       	]
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
@@ -440,7 +441,7 @@ var PendingTestView = Backbone.View.extend({
 
 					var approvedBody = "";
 					approvedBody += "Your student account at Gobind Sarvar has been approved.<br><br>";
-					
+
 					var emailbody = "The following sections have been approved:<br>";
 					_.each(tempApproved, function(name, index) {
 						emailbody += name + ",";
@@ -473,7 +474,7 @@ var PendingTestView = Backbone.View.extend({
 							name: "",
 							type: "to"
 						});
-					});					
+					});
 
 					sendEmail({
 						from: "info@gobindsarvar.com",
@@ -484,13 +485,13 @@ var PendingTestView = Backbone.View.extend({
 
 					new TransactionResponseView({
 						message: "Students successfully approved and/or denied. An email has been sent to notify the student of their status change."
-					});	
+					});
 
 					view.render();
 				}
 			}
 		});
-		
+
 	},
 });
 

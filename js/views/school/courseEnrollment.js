@@ -24,7 +24,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 					option.text(object.location);
 					menu.append(option);
 				});
-			});	
+			});
 		} else {
 			this.$el.html(html["courseEnrollment.html"]);
 			this.populateDepartments();
@@ -68,11 +68,12 @@ var CourseEnrollmentView = Backbone.View.extend({
 
 	populateDepartments: function(evt) {
 		var view = this;
+
 		var schoolid = evt ? $(evt.currentTarget).find("option:selected").attr("value") :
-			$("#school-options").find("option:selected").attr("id");
+			($("#school-options").find("option:selected").attr("id")? $("#school-options").find("option:selected").attr("id"): sessionStorage.getItem("gobind-schoolid"));
 
 		this.schoolid = schoolid;
-		
+
 		var school = new School();
 		school.fetch({
 			url: school.getDepartmentsUrl(schoolid),
@@ -111,7 +112,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 				sections.push($(row).data("section").sectionid);
 			}
 		}, this);
-		
+
 		if (!valid) {
 			new TransactionResponseView({
 				title: "Course Selection",
@@ -272,7 +273,7 @@ var RCourseTableRowView = Backbone.View.extend({
 					data: data,
 					parentView: view.parentView
 				});
-			});			
+			});
 		}
 	},
 
@@ -328,7 +329,7 @@ var RSectionTableRowView = Backbone.View.extend({
 		+	"<br>"
 		+	"<strong>Location: </strong><span><%= model.roomLocation %></span>"
 		+	"<br>"
-		+	"<strong>Registered Students: <%= enrolledStudents %> (<%= model.classSize %> spaces available)" 
+		+	"<strong>Registered Students: <%= enrolledStudents %> (<%= model.classSize %> spaces available)"
 		+	"<br>"
 		+	"<a class='enroll-link'>Enroll in this section</a>"
 		+	"<br>"),
