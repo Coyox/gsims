@@ -188,7 +188,8 @@ function getConnection() {
     $dbname = "testdb";
     $dbuser = "adminpVaqD1a";
     $dbpass = "GpFqpeavU2dT";
-    $dbname = "gobind";
+    $dbname = "thefinaltest";
+    //$dbname = "gobind";
     //$dbname = "testdb";
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
