@@ -141,7 +141,7 @@ var DashboardView = Backbone.View.extend({
 
 		this.$el.find("#teacher-reminder-table tbody").empty();
 
-		var numdays = evt ? $(evt.currentTarget).attr("value") : 7;
+		var numdays = evt ? $(evt.currentTarget).find("option:selected").attr("value") : 7;
 		for (var i = 1; i < 31; i++) {
 			var option = $("<option></option>");
 			option.attr("value", i);
