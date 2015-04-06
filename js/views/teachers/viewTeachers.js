@@ -252,7 +252,12 @@ var TeachersTableView = Backbone.View.extend({
 			{ bSortable: false, aTargets: [ 4, 5 ] },
 			{ sClass: "center", aTargets: [ 4, 5 ] },
 			{ sWidth: "10%", aTargets: [ 5 ] }
-			]
+			],
+			dom: dataTables.exportDom,
+			tableTools: {
+				 aButtons: dataTables.buttons,
+       			 sSwfPath: dataTables.sSwfPath
+    		}
 		});
 		createEmailButton(this.$el);
 		createRefreshButton(this.$el);
@@ -279,9 +284,10 @@ var TeachersTableView = Backbone.View.extend({
 				{ sClass: "center", aTargets: [ 4, 5 ] },
 				{ sWidth: "10%", aTargets: [ 5 ] }
 				],
-				dom: 'T<"clear">lfrtip',
+				dom: dataTables.exportDom,
 				tableTools: {
-           			 "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf"
+           			 aButtons: dataTables.buttons,
+       			 	 sSwfPath: dataTables.sSwfPath
         		}
 			});
 			createEmailButton(view.$el);

@@ -87,7 +87,12 @@ var AdminsTableView = Backbone.View.extend({
 	          	{ bSortable: false, aTargets: [ 4, 5 ] },
 	          	{ sClass: "center", aTargets: [ 4, 5 ] },
 	          	{ sWidth: "10%", aTargets: [ 5 ] }
-	       	]
+	       	],
+			dom: dataTables.exportDom,
+			tableTools: {
+       			 aButtons: dataTables.buttons,
+   			 	 sSwfPath: dataTables.sSwfPath
+    		}
 		});
 		createEmailButton(this.$el);
 		createRefreshButton(this.$el);
@@ -112,7 +117,12 @@ var AdminsTableView = Backbone.View.extend({
 		          	{ bSortable: false, aTargets: [ 4, 5 ] },
 		          	{ sClass: "center", aTargets: [ 4, 5 ] },
 		          	{ sWidth: "10%", aTargets: [ 5 ] }
-		       	]
+		       	],
+				dom: dataTables.exportDom,
+				tableTools: {
+           			 aButtons: dataTables.buttons,
+       			 	 sSwfPath: dataTables.sSwfPath
+        		}
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
