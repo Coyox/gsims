@@ -1293,7 +1293,7 @@ function enrollStudentInSections($id){
 }
 
 // Approve/deny sections enrolled by a student
-function approveDenyEnrollment($id){
+/*function approveDenyEnrollment($id){
     $queries = array();
     $bindparams = array();
     $param = array("userid"=>$id);
@@ -1316,7 +1316,7 @@ function approveDenyEnrollment($id){
         array_push($queries, $sql);
     }
     echo json_encode(perform_transaction($queries, $bindparams));
-}
+}*/
 
 
 // function enrollStudentInTests($id){
@@ -1347,7 +1347,6 @@ function handlePendingStudents(){
             array_push($purgeList, $student->userid);
         }
         else {
-            array_push($activeList, $student->userid);
             $param = array("userid"=>$student->userid);
             if ($student->approvedList){
                 $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
@@ -1356,16 +1355,20 @@ function handlePendingStudents(){
                 $params += $param;
                 array_push($bindparams, $params);
                 array_push($queries, $sql);
+                if ($student->status == "pending"){
+                    array_push($activeList, $student->userid);
+                }
             }
-            if ($student->deniedList){
+            if ($student->deniedList && $student->status == "pending"){
                 $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
                 list($sqlparens, $params) = parenthesisList($student->deniedList);
                 $sql.=$sqlparens;
                 $params += $param;
                 array_push($bindparams, $params);
                 array_push($queries, $sql);
+                array_push($activeList, $student->userid);
             }
-            if ($student->testList){
+            if ($student->testList && $student->status == "pending"){
                 $params = $param;
                 $sql = "UPDATE enrollment set status='pending-test' where userid=:userid and sectionid in ";
                 list($sqlparens, $params) = parenthesisList($student->testList);
@@ -1373,6 +1376,7 @@ function handlePendingStudents(){
                 $params += $param;
                 array_push($bindparams, $params);
                 array_push($queries, $sql);
+                array_push($activeList, $student->userid);
             }
         }
     }

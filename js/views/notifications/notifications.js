@@ -134,7 +134,7 @@ var PendingRegistrationView = Backbone.View.extend({
 						user.status = "denied";
 						approvedEmails.push(user.emailAddr);
 					} else {
-						user.status = "active";
+						user.status = $(row).data("status");
 						deniedEmails.push(user.emailAddr);
 					}
 					students.push(user);
