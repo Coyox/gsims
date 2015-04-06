@@ -123,6 +123,9 @@ var Course = Backbone.Model.extend({
 	deleteCoursePrereq: function(cid, pid) {
 		return this.urlRoot + "/" + cid + "/prereqs/" + pid;
 	},
+    getCourseWaitlist: function(cid) {
+		return this.urlRoot + "/" + cid + "/waitlist";
+	},
 	courseStatuses: [
 		"active", "inactive"
 	]
