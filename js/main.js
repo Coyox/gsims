@@ -122,7 +122,7 @@ function loadTemplates() {
 		"attendance.html",
 		"manageCourses.html",
 		"viewCourse.html",
-		"myCourses.html",
+		"mySections.html",
 		"viewSection.html",
 		"addStudentToSection.html",
 		"viewPurge.html",
