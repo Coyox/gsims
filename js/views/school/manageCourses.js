@@ -963,7 +963,7 @@ var CourseSectionView = Backbone.View.extend({
 				new CourseSectionRowView({
 					el: view.addCourseSection(),
 					model: section
-                    
+
 				})
 			});
 
@@ -1182,7 +1182,7 @@ var SectionView = Backbone.View.extend({
 	},
 
 	render: function() {
-		
+
 		var template = html["viewSection.html"];
 		var usertype = sessionStorage.getItem("gobind-usertype");
 
@@ -1913,6 +1913,12 @@ var AttendanceView = Backbone.View.extend({
 			}
 		}, this);
 
+		//teacher's attendance
+		if (this.$el.find("#teacher-present").is(":checked")){
+			attended.push((JSON.parse(sessionStorage.getItem("gobind-user"))).userid);
+		}
+
+
 		if (attended.length) {
 			var section = new Section();
 			$.ajax({
@@ -2068,16 +2074,23 @@ var AttendanceRowView = Backbone.View.extend({
 		var elem = $("#add-attendnace-modal");
 		var backdrop = $(".modal-backdrop");
 
-		elem.find("#date").remove();
-		elem.find("h4").append(" for " + date)
+		elem.find("#mark-teacher").remove();
+		elem.find("#date").remove()
+		elem.find("#teacher").append("Teacher Present: ")
 
+		elem.find("h4").append(" for " + date)
+		var markedTeacher = 0;
 		_.each(all, function(user, index) {
 			var model = new Student(user, {parse:true});
 			var userid = model.get("userid");
 
 			var checked = false;
 			_.each(attended, function(student, index) {
-				if (student.userid == user.userid) {
+				if (student.usertype == "T" && markedTeacher==0){
+					markedTeacher =1;
+					elem.find("#teacher").append(student.firstName + " " + student.lastName);
+				}
+				else if (student.userid == user.userid) {
 					checked = true;
 				}
 			});
