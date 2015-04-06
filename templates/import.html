@@ -28,6 +28,7 @@
 		</tbody>
 	</table>
 	<br>
+	<% if (usertype == "A" || usertype == "SU") { %>
 	<h4>Students</h4>
 	<table id="import-template-table" class="table table-bordered table-striped">
 		<tbody>
@@ -73,6 +74,7 @@
 			</tr>
 		</tbody>
 	</table>
+	<% } %>
 	<!-- OLD IMPORT -->
 <!-- 		<input type="file" id="csv-file" class="btn btn-primary">
 		<br>

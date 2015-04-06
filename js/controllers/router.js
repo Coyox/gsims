@@ -76,7 +76,7 @@ var Router = Backbone.Router.extend({
         "schools":              "schools",
         "departments":          "departments",
         "courses":              "courses",
-        "myCourses":            "myCourses",
+        "mySections":           "mySections",
         "sections":             "sections",
         "filterSections":       "filterSections",
         "sections/search":      "viewFilteredSections",
@@ -441,11 +441,11 @@ var Router = Backbone.Router.extend({
         });
     },
 
-    myCourses: function() {
+    mySections: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("My Courses", "th-list");
+        this.updatePageBreadcrumb("My Sections", "th-list");
 
-        new MyCoursesView({
+        new MySectionsView({
             el: $("#content")
         });
     },    
