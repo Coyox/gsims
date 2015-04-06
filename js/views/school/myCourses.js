@@ -1,8 +1,8 @@
 var MyCoursesView = Backbone.View.extend({
+
     initialize: function (options) {
         this.model = new Section();
         this.render();
-        //console.log(user["userid"]);
     },
      
     events: {
@@ -20,7 +20,7 @@ var MyCoursesView = Backbone.View.extend({
         }).then(function(data){
             console.log(data);
             if (data.length == 0) {
-                var table = view.$el.find("#sections-table-container");
+                var table = view.$el.find("#sections-table");
                 table.hide();
                 table.after("<br><div class='alert alert-danger'>This teacher is not assigned to any sections.</div>");
             }
@@ -30,7 +30,6 @@ var MyCoursesView = Backbone.View.extend({
                     el: view.addCourseSection(),
                     model: section
                 })
-                console.log(section);
             });
         });
         
@@ -38,7 +37,7 @@ var MyCoursesView = Backbone.View.extend({
 
     addCourseSection: function() {
         var container = $("<tr></tr>");
-        this.$el.find("#sections-list tbody").append(container);
+        this.$el.find("#sections-table tbody").append(container);
         return container;
     },
 
