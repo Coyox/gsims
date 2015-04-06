@@ -2,6 +2,7 @@ var EmailView = Backbone.View.extend({
 	initialize: function(options) {
 		var view = this;
 		this.emailAddr = options.emailAddr;
+		this.deferred = options.def;
 		this.model = new Key();
 		this.model.fetch({
 			url: this.model.getKeyByName("Mandrill"),
@@ -9,6 +10,7 @@ var EmailView = Backbone.View.extend({
 			view.key = data;
 			areYouAlive(view.key);
 			view.render();
+			view.deferred.resolve();
 		}).fail(function(data){
 			alert("error retrieving API keys from server.");
 		});
@@ -20,7 +22,6 @@ var EmailView = Backbone.View.extend({
 			this.$el.find("#email-to").val(this.emailAddr);
 		}
 		this.$el.find("#pre").hide();
-
 
 		var userEmail = sessionStorage.getItem('gobind-email') ;
 		this.$el.find("#email-from").val(userEmail);
@@ -205,29 +206,32 @@ function openEmailModal(recipients) {
 	var elem = $("#email-modal");
 	var backdrop = $(".modal-backdrop");
 
-	console.log("recipients", recipients);
-
 	elem.find(".modal-body").html(html["email.html"]);
-
-	elem.modal({
-		show: true
-	});
-
 
 	elem.on("hidden.bs.modal", function() {
 		elem.remove();
 		backdrop.remove();
 	});
 
+	var def = $.Deferred();
 	var emailView = new EmailView({
 		el: elem.find(".modal-body"),
-		emails: recipients
+		emails: recipients,
+		def: def
 	});
-	elem.find("#stats-panel").hide();
-	var form = elem.find(".form-horizontal");
-	form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
-	form.parent().addClass("o-auto");
 
-	// Populate the "to" input field (comma separated string)
-	form.find("#email-to").val(recipients.join(", "));
+	$.when(def).then(function() {
+		elem.modal({
+			show: true
+		});
+
+		elem.find("#stats-panel").remove();
+		
+		var form = elem.find(".form-horizontal");
+		form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
+		form.parent().addClass("o-auto");
+
+		// Populate the "to" input field (comma separated string)
+		form.find("#email-to").val(recipients.join(", "));
+	});
 }

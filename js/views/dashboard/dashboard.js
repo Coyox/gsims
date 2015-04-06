@@ -35,7 +35,9 @@ var DashboardView = Backbone.View.extend({
 
 	events: {
 		"click .view-notification": "viewNotification",
-		"click #toggle-calendar": "toggleCalendar"
+		"click #toggle-calendar": "toggleCalendar",
+		"click #email": "openEmailModal",
+		"change #day-menu": "teacherAttendanceReminder"
 	},
 
 	viewNotification: function() {
@@ -133,6 +135,12 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	teacherAttendanceReminder: function(evt) {
+		if (this.reminderTable) {
+			this.reminderTable.fnDestroy();
+		}
+
+		this.$el.find("#teacher-reminder-table tbody").empty();
+
 		var numdays = evt ? $(evt.currentTarget).attr("value") : 7;
 		for (var i = 1; i < 31; i++) {
 			var option = $("<option></option>");
@@ -148,14 +156,22 @@ var DashboardView = Backbone.View.extend({
 			url: notif.missingInputAttendance(),
 			data: {
 				numdays: 7,
-				today: "2015-04-05"
+				today: "2015-04-05",
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			_.each(data, function(teacher, index) {
-				var row = "<tr><td>" + teacher.firstName + " " + teacher.lastLame + "</td><td>Email</td></tr>"
-				view.find("#teacher-reminder-table").append(row);
+				var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
+				view.$el.find("#teacher-reminder-table").append(row);
+			});
+			view.reminderTable = view.$el.find("#teacher-reminder-table").dataTable({
+				dom: "t"
 			});
 		});
+	},
+
+	openEmailModal: function(evt) {
+		openEmailWrapper(this.reminderTable.fnGetNodes());
 	},
 
 	toggleCalendar: function(evt) {
@@ -455,14 +471,6 @@ var DashboardView = Backbone.View.extend({
 	studentAgeGraph:function(){
 		var view = this;
 		var stats = new Stats();
-		// var kids = 3; //0-17
-		// var teens = 41; //18-24
-		// var youngadults = 8; //25-34
-		// var adults = 20; //35-44
-		// var oldadults = 4; //45-54
-		// var seniors = 5; //55-64
-		// var elderly = 1; //65+
-
 		var kids = 0; //0-17
 		var teens = 0; //18-24
 		var youngadults = 0; //25-34
@@ -518,19 +526,12 @@ var DashboardView = Backbone.View.extend({
 	attendanceCalendar:function(){
 		var view = this;
 		var stats = new Stats();
-		// var dataArray = [[ new Date(2012, 3, 13), 37032 ],
-  //         [ new Date(2012, 3, 14), 38024 ],
-  //         [ new Date(2012, 3, 15), 38024 ],
-  //         [ new Date(2012, 3, 16), 38108 ],
-  //         [ new Date(2012, 3, 17), 38229 ]];
-
   		var dataArray = [];
 
 		stats.fetch({
 			url: stats.getAttendanceStatsUrl(sessionStorage.getItem("gobind-activeSchoolYear"))
 		}).then(function(data) {
 			_.each(data, function(object, index) {
-				console.log(object);
 				var model = new Stats(object, {parse:true});
 				var date = model.get("date").split("-");
 				var year = date[0];
