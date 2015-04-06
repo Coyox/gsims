@@ -10,7 +10,9 @@ var EmailView = Backbone.View.extend({
 			view.key = data;
 			areYouAlive(view.key);
 			view.render();
-			view.deferred.resolve();
+			if (view.deferred) {
+				view.deferred.resolve();
+			}
 		}).fail(function(data){
 			alert("error retrieving API keys from server.");
 		});
