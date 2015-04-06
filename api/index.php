@@ -1391,29 +1391,36 @@ function handlePendingStudents(){
         array_push($queries, $sql);
     }
     $transaction_result = perform_transaction($queries, $bindparams);
-    // if ($transaction_result["status"] == "success" && $activeList){
-    //     $sql = "SELECT userid, firstName, lastName, emailAddr from student where userid in ";
-    //     $sql.=$sqlparens;
-    //     $students = perform_query($sql,"GETALL", $params);
-    //     $emailparams = array();
-    //     $queries = array();
-    //     $bindparams = array();
 
-    //     foreach($students as $user){
-    //         // new creds
-    //         $username = generateUsername($user["userid"], $user["firstName"], $user["lastName"]);
-    //         $password = generatePassword();
-    //         $passwordhash = generatePasswordHash($password);
-    //         array_push($emailparams, array("emailAddr"=>$user["emailAddr"], "username"=>$username, "password"=>$password, "firstName"=>$user["firstName"], "lastName"=>$user["lastName"]));
-    //         $sql = "UPDATE login set password=:password where userid=:userid";
-    //         array_push($queries, $sql);
-    //         array_push($bindparams, array("userid"=>$user["userid"], "password"=>$passwordhash));
-    //     }
-    //     $transaction_result = perform_transaction($queries, $bindparams);
-    //     if ($transaction_result["status"] == "success"){
-    //         massEmailLogin($emailparams);
-    //     }
-    // }
+    /*************************************************************************/
+
+    if ($transaction_result["status"] == "success" && $activeList){
+        $sql = "SELECT userid, firstName, lastName, emailAddr from student where userid in ";
+        $sql.=$sqlparens;
+        $students = perform_query($sql,"GETASSO", $params);
+        $emailparams = array();
+        $queries = array();
+        $bindparams = array();
+
+        foreach($students as $user){
+            // new creds
+            $username = generateUsername($user["userid"], $user["firstName"], $user["lastName"]);
+            $password = generatePassword();
+            $passwordhash = generatePasswordHash($password);
+            array_push($emailparams, array("emailAddr"=>$user["emailAddr"], "username"=>$username, "password"=>$password, "firstName"=>$user["firstName"], "lastName"=>$user["lastName"]));
+            $sql = "UPDATE login set password=:password where userid=:userid";
+            array_push($queries, $sql);
+            array_push($bindparams, array("userid"=>$user["userid"], "password"=>$passwordhash));
+        }
+        $transaction_result = perform_transaction($queries, $bindparams);
+        if ($transaction_result["status"] == "success"){
+            massEmailLogin($emailparams);
+        }
+    }
+
+    /*************************************************************************/
+
+
     echo json_encode($transaction_result);
 
 }

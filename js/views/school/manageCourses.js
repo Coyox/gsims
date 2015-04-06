@@ -215,7 +215,7 @@ var CourseManagement = Backbone.View.extend({
 							console.log(option);
 							ids.push($(option).attr("id"));
 						});
-	
+
 						// Add pre reqs (if any)
 						if (ids.length) {
 							$.ajax({
@@ -245,7 +245,7 @@ var CourseManagement = Backbone.View.extend({
 					backdrop.remove();
 				}).fail(function(data) {
 					elem.remove();
-					backdrop.remove();					
+					backdrop.remove();
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
@@ -850,7 +850,7 @@ var CoursePreReqsRowView = Backbone.View.extend({
 	template: _.template("<li><%= courseName %> <span id='<%= courseid %>' class='delete-prereq pull-right primary-link'>[ Delete ]</span></li>"),
 
 	initialize: function(options) {
-        
+
 		this.courseName = options.course;
 		this.pid = options.pid;
 		this.courseid = options.courseid;
@@ -1067,7 +1067,7 @@ var CourseSectionView = Backbone.View.extend({
 	updateModel: function(evt) {
 		var val = $(evt.currentTarget).val();
 		var name = $(evt.currentTarget).attr("name");
-		this.model.set(name, val);		
+		this.model.set(name, val);
 	}
 
 });
@@ -1783,7 +1783,7 @@ var AttendanceView = Backbone.View.extend({
 					el: view.addAttendanceRow(model.get("userid")),
 					model: model,
 					userid: model.get("userid")
-				});				
+				});
 			});
 			view.enrolledStudents = data;
 		});
@@ -1793,7 +1793,7 @@ var AttendanceView = Backbone.View.extend({
 			url: section.getAverageAttendance(view.sectionid)
 		}).then(function(data) {
 			view.$el.find(".avg-attendance").text(data.avgAttendance);
-		});	
+		});
 
 		// Get all the attendance records for each unique date
 		section.fetch({
@@ -1842,7 +1842,7 @@ var AttendanceView = Backbone.View.extend({
 		var container = $("<tr></tr>");
 		container.attr("id", id);
 		this.$el.find("#enrolled-table tbody").append(container);
-		return container;	
+		return container;
 	},
 
 	updateAttendance: function(elem, backdrop) {
@@ -1862,6 +1862,7 @@ var AttendanceView = Backbone.View.extend({
 				url: section.inputAttendance(this.sectionid),
 				data: {
 					date: this.$el.find("#date").val(),
+					schoolid: sessionStorage.getItem("gobind-schoolid"),
 					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
 					userids: JSON.stringify(attended)
 				}
@@ -1898,7 +1899,7 @@ var AttendanceView = Backbone.View.extend({
 			new TransactionResponseView({
 				message: "Attendance successfully inputted."
 			});
-			
+
 			view.render();
 			elem.remove();
 			backdrop.remove();
@@ -1937,7 +1938,7 @@ var AttendanceView = Backbone.View.extend({
 					el: view.addAttendanceRow(model.get("userid")),
 					model: model,
 					userid: model.get("userid")
-				});				
+				});
 			});
 		});
 
@@ -2029,7 +2030,7 @@ var AttendanceRowView = Backbone.View.extend({
 				userid: userid,
 				checked: checked == true ? "P" : "A",
 				action: "view"
-			});				
+			});
 		});
 
 		elem.modal({
@@ -2050,7 +2051,7 @@ var AttendanceRowView = Backbone.View.extend({
 		var container = $("<tr></tr>");
 		container.attr("id", id);
 		this.$el.find("#enrolled-table tbody").append(container);
-		return container;	
+		return container;
 	}
 });
 
@@ -2169,7 +2170,7 @@ var DocumentsView = Backbone.View.extend({
 					el: view.addMarkRow(model.get("userid")),
 					model: model,
 					userid: model.get("userid")
-				});				
+				});
 			});
 		});
 
@@ -2369,7 +2370,7 @@ var DocumentRowView = Backbone.View.extend({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
 			_.each(data, function(user, index) {
-				
+
 				var doc = new Document();
 				doc.fetch({
 					url: doc.getMarks(docid),
@@ -2391,8 +2392,8 @@ var DocumentRowView = Backbone.View.extend({
 						userid: model.get("userid"),
 						action: "view",
 						mark: mark
-					});	
-				});			
+					});
+				});
 			});
 		});
 
@@ -2422,7 +2423,7 @@ var DocumentRowView = Backbone.View.extend({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
 			_.each(data, function(user, index) {
-				
+
 				var doc = new Document();
 				doc.fetch({
 					url: doc.getMarks(docid),
@@ -2444,8 +2445,8 @@ var DocumentRowView = Backbone.View.extend({
 						userid: model.get("userid"),
 						action: "edit",
 						mark: mark
-					});	
-				});			
+					});
+				});
 			});
 		});
 
