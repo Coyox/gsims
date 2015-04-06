@@ -41,12 +41,11 @@ var LoginView = Backbone.View.extend({
 					password: this.model.get("password")
 				}
 			}).then(function(data) {
-				console.log(data);
 				view.$el.find(".alert").addClass("hide");
 				if (typeof data == "string") {
 					data = JSON.parse(data);
 				}
-				if (data.status == "success") {
+				if (data.userid) {
 					app.username = data.username;
 					app.usertype = data.usertype;
 					sessionStorage.setItem("gobind-username", app.username);

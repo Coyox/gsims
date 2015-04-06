@@ -139,7 +139,7 @@ $app->delete('/purge/inactive', 'purgeInactive');
 $app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
 $app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
 $app->get('/stats/age/:schoolid/students', 'getStudentAgeStats');
-$app->get('/stats/attendance/:schoolyearid', 'getAttendanceStats');
+$app->get('/stats/attendance/:schoolid', 'getAttendanceStats');
 
 $app->get('/keys/:name', 'getKeyByName');
 
@@ -757,6 +757,7 @@ function updateSection($id) {
 function inputAttendance($id){
     $date = $_POST["date"];
     $schoolyearid = $_POST["schoolyearid"];
+    $schoolid = $_POST["schoolid"];
     $userids = json_decode($_POST["userids"]);
 
     $bindparams = array(
@@ -766,9 +767,9 @@ function inputAttendance($id){
         "status" => 'active'
     );
 
-    $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `status`) values ";
+    $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `schoolid`, `status`) values ";
     foreach (array_values($userids) as $i => $userid) {
-        $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :status),";
+        $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :schoolid, :status),";
         $bindparams["userid".$i] = $userid;
     }
     $sql = rtrim($sql, ",");
@@ -2165,7 +2166,7 @@ function getTeachersWithMissingInputAttendance(){
     $sql = "SELECT t.userid, t.firstName, t.lastName, t.emailAddr, a.maxdate, a.sectionid
             from teacher t,
                     (SELECT * from
-                        (SELECT userid, max(`date`) as maxdate, sectionid from attendance where schoolyearid=:schoolyearid group by userid)temp
+                        (SELECT userid, max(`date`) as maxdate, sectionid from attendance where schoolyearid=:schoolyearid and schoolid=:schoolid group by userid)temp
                          where datediff(:today, temp.maxdate)>= :numdays)a where t.userid=a.userid";
 
     $bindparams = array(
@@ -2333,9 +2334,10 @@ function getStudentGeographics($schoolid){
     $sql = "SELECT city, count(*) as studentCount from student where schoolid=:schoolid group by city";
     echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
 }
-function getAttendanceStats($schoolyearid){
-    $sql = "SELECT `date`, count(*) as totalAttendance from attendance where schoolyearid=:schoolyearid group by `date`";
-    echo json_encode(perform_query($sql,'GETASSO',array("schoolyearid"=>$schoolyearid)));
+function getAttendanceStats($schoolid){
+    $schoolyearid = $_GET["schoolyearid"];
+    $sql = "SELECT `date`, count(*) as totalAttendance from attendance where schoolid=:schoolid and schoolyearid=:schoolyearid group by `date`";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid)));
 }
 function getStudentGenderStats($schoolid){
     $sql = "SELECT gender, count(*) as studentCount from student where schoolid=:schoolid group by gender";
