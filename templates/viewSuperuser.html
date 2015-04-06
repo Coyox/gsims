@@ -1,9 +1,11 @@
 <div id="superuser-info" class="tab-pane active o-auto">
+	<% if(usertype == "SU") { %>
 	<div class="col-sm-12">
 		<button id="edit-superuser" class="btn btn-primary btn-sm hide">Edit Superuser</button>
 		<button id="save-superuser" class="btn btn-primary btn-sm hide">Save Superuser</button>
 		<!-- <button id="delete-superuser" class="btn btn-primary btn-sm">Delete Superuser</button> -->
 	</div>
+	<% } %>
 	<div class="col-sm-6">
 		<br>
 		<h4>Superuser Information</h4>

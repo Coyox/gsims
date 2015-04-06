@@ -10,9 +10,16 @@ var SuperuserRecordView = Backbone.View.extend({
 		console.log(this.id);
 		var superuser = new Superuser({id:this.id});
 		superuser.fetch().then(function(data) {
-			console.log(data);
+			//console.log(data);
+			var template = html["viewSuperuser.html"];
+			var usertype = sessionStorage.getItem("gobind-usertype");
 
-	        view.$el.html(html["viewSuperuser.html"]);
+			template = template({
+				usertype: usertype
+			});
+
+
+	        view.$el.html(template);
 			view.$el.find("#superuser-info-table").empty();
 			view.$el.find("#comp-info, #comp2-info").empty();
 
