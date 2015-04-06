@@ -2138,11 +2138,13 @@ function getTeachersWithMissingInputAttendance(){
     $numdays = $_GET['numdays'];
     $today = $_GET['today'];
     $schoolyearid = $_GET['schoolyearid'];
+
     $sql = "SELECT t.userid, t.firstName, t.lastName, t.emailAddr, a.maxdate, a.sectionid
             from teacher t,
-                    (select userid, max(`date`) as maxdate, sectionid from attendance
-                        where datediff(:today, `date`) >= :numdays and schoolyearid=:schoolyearid group by userid) a
-            where t.userid = a.userid";
+                    (SELECT * from
+                        (SELECT userid, max(`date`) as maxdate, sectionid from attendance where schoolyearid=:schoolyearid group by userid)temp
+                         where datediff(:today, temp.maxdate)>= :numdays)a where t.userid=a.userid";
+
     $bindparams = array(
         "today"  => $today,
         "numdays" => $numdays,
