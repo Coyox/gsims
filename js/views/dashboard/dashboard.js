@@ -47,7 +47,7 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#student-report-card").remove();
 		}
 	},
-	
+
 	events: {
 		"click .view-notification": "viewNotification",
 		"click #toggle-calendar": "toggleCalendar",
@@ -68,7 +68,8 @@ var DashboardView = Backbone.View.extend({
 			url: count.getCountUrl("S"),
 			data: {
 				status: "pending",
-				schoolid: sessionStorage.getItem("gobind-schoolid")
+				schoolid: sessionStorage.getItem("gobind-schoolid"),
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-stats");
@@ -83,7 +84,8 @@ var DashboardView = Backbone.View.extend({
 			url: count.getCountUrl("S"),
 			data: {
 				status: "pending-test",
-				schoolid: sessionStorage.getItem("gobind-schoolid")
+				schoolid: sessionStorage.getItem("gobind-schoolid"),
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-test-stats");
