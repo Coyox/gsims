@@ -172,7 +172,7 @@
 		</a>
 	</li>
 	<ul class="sub-menu collapse" id="admin-tools">
-	<% if (usertype == "A" || usertype == "SU" || usertype == "T") { %>
+	<% if (usertype == "A" || usertype == "SU") { %>
 		<li>
 			<span class="glyphicon glyphicon-calendar"></span>
 			<a href="#schoolyears">Manage School Years</a>
@@ -190,10 +190,12 @@
 			<a href="#export">Export Data</a>
 		</li>
 		<% } %>
+		<% if (usertype == "A" || usertype == "SU" || usertype == "T") { %>
 		<li>
 			<span class="glyphicon glyphicon-import"></span>
 			<a href="#import">Import Data</a>
 		</li>
+		<% } %>
 	</ul>
 
 

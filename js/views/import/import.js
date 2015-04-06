@@ -5,7 +5,13 @@ var ImportView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["import.html"]);
+		var template = html["import.html"];
+		var usertype = sessionStorage.getItem("gobind-usertype");
+
+		template = template({
+			usertype: usertype
+		});
+		this.$el.html(template);
 		this.loadOptions();
 	},
 
