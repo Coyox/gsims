@@ -1369,7 +1369,7 @@ function handlePendingStudents(){
                 array_push($queries, $sql);
                 array_push($activeList, $student->userid);
             }
-            if ($student->testList && $student->status == "pending"){
+            if ($student->testList){
                 $params = $param;
                 $sql = "UPDATE enrollment set status='pending-test' where userid=:userid and sectionid in ";
                 list($sqlparens, $params) = parenthesisList($student->testList);
