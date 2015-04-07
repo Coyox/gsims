@@ -7,7 +7,7 @@ var app = {
 };
 
 var dataTables = {
-	"sSwfPath": "http://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf",
+	"sSwfPath": "https://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf",
 	"exportDom": "lfrtipT",
 	"buttons": [
 		{"sExtends":"csv",
