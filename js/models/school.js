@@ -213,7 +213,15 @@ var Section = Backbone.Model.extend({
 	},
 	getStudentCount: function(id) {
 		return this.urlRoot + "/" + id + "/count";
-	}
+	},
+
+    getSectionById: function(id)  {
+        return this.urlRoot + "/" + id;
+    },
+
+    enrollStudent: function(id, sid)   {
+        return this.urlRoot + "/students/" + id + "/" + sid;
+    }
 });
 
 var Prereq = Backbone.Model.extend({

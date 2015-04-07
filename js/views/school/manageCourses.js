@@ -1087,7 +1087,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		+	"<td><%= model.userid %></td>"
 		+	"<td class='section-links'></td>"),
 
-    sectionLink: _.template("<span class='enrol-waitlist primary-link center-block' id='<%= model.sectionCode %>'>[<%= model.sectionCode %>]</span>"),
+    sectionLink: _.template("<span class='enrol-waitlist primary-link center-block' id='<%= model.sectionid %>'>[<%= model.sectionCode %>]</span>"),
     //sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionid %>'></span>"),
 
 	initialize: function(options) {
@@ -1099,25 +1099,43 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		"click .enrol-waitlist": "enrollWaitlist"
 	},
     
-    enrollWaitlist: function() {
-		$("#container").append(html["addTeacherToSection.html"]);
+    enrollWaitlist: function(evt) {
+		console.log($(evt.currentTarget));
+        console.log($(evt.currentTarget).attr("id"));
 
-		var elem = $("#add-teacher-modal");
-		var backdrop = $(".modal-backdrop");
+        var section = new Section();
 
-		new SearchTeachersView({
-			el: $(".modal-body"),
-			redirect: false,
-			sectionid: this.sectionid,
-			courseid: this.courseid,
-			elem: elem,
-			backdrop: backdrop,
-			parentView: this
-		});
-
-		elem.modal({
-			show: true
-		});
+        var uid = this.model.get("userid");
+        var sectionid = $(evt.currentTarget).attr("id");
+        var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
+        
+        //console.log(this.model.toJSON());
+        //console.log(this.model.get("userid"));
+        //console.log(this.model.attr("userid"));
+        console.log(uid);
+        
+			$.ajax({
+				type: "POST",
+				url: section.enrollStudent(sectionid, uid),
+                data: {
+                    schoolyearid: schoolyear,
+                    status: "active"}
+			}).then(function(data) {
+					if(data.status=="success"){
+						new TransactionResponseView({
+                            title: "SUCCESS",
+                            status: "success",
+							message: "Student successfuly enrolled."
+						});
+					} else {
+						new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "Could not add to section."
+						});
+					}
+			});
+          
 	},
 
 	render: function() {
@@ -1128,7 +1146,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
         var links = "";
         _.each(this.sdata, function(section, index) {
             var secmodel = new Section(section, {parse:true});
-            //console.log(secmodel.toJSON());
+            console.log(secmodel.toJSON());
             var link = this.sectionLink({
                 model: secmodel.toJSON()
             });
@@ -1143,7 +1161,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
 });
 
 var CourseSectionRowView = Backbone.View.extend({
-	template: _.template("<td><span id='<%= model.sectionid %>' class='view-section primary-link'>[ View Section ]</span></td>"
+	template: _.template("<td><span id='<%= model.sectioncode %>' class='view-section primary-link'>[ View Section ]</span></td>"
 		+	"<td><%= model.sectionCode %></td>"
 		+	"<td><%= model.day %></td>"
 		+	"<td><%= model.startTime %></td>"
