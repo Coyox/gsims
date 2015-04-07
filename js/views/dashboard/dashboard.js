@@ -31,6 +31,11 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#calendar-panel").remove();
 		}
 
+		if (usertype == "T"){
+			this.mySectionsWidget();
+		} else
+			this.$el.find("#my-sections").remove();
+
 		if (usertype == "SU" || usertype == "A") {
 			this.teacherAttendanceReminder();
 			this.studentGeoGraph();
@@ -53,6 +58,13 @@ var DashboardView = Backbone.View.extend({
 		"click #toggle-calendar": "toggleCalendar",
 		"click #email": "openEmailModal",
 		"change #day-menu": "teacherAttendanceReminder"
+	},
+
+	mySectionsWidget: function(){
+		console.log("MY SECTIONS WIDGET");
+		new MySectionsView({
+            el: this.$el.find("#my-sections").find("#sections")
+        });
 	},
 
 	viewNotification: function() {
