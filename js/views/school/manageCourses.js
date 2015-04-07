@@ -1185,7 +1185,6 @@ var CourseSectionRowView = Backbone.View.extend({
 
 	viewSection: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
-		console.log($(evt.currentTarget));
 		app.Router.navigate("viewSection/" + id, {trigger:true});
 	}
 });
