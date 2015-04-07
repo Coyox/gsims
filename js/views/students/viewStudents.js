@@ -374,6 +374,7 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	openEmailModal: function(evt) {
+		console.log("email called");
 		openEmailWrapper(this.table.fnGetNodes());
 	},
 

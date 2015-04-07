@@ -1654,7 +1654,8 @@ var TeacherSectionRowView = Backbone.View.extend({
 var StudentsEnrolledView = Backbone.View.extend({
 	template: _.template("<button id='add-student' class='btn btn-sm btn-primary'>Add Student</button>"
 		+	"<br><br>"
-		+	"<table class='table table-striped table-bordered'>"
+		+	"<button class='send-email btn btn-sm btn-primary dt-btn pull-right'><span class='glyphicon glyphicon-envelope'></span></button>"
+		+	"<table id='students-table' class='table table-striped table-bordered'>"
 		+		"<thead>"
 		+			"<tr>"
 		+				"<th>ID</th>"
@@ -1663,6 +1664,7 @@ var StudentsEnrolledView = Backbone.View.extend({
 		+				"<th>Email Address</th>"
 		+				"<th>Grade</th>"
 		+				"<th>Drop</th>"
+		+				"<th>Email <input type='checkbox' class='toggle-checkboxes center' checked></th>"
 		+			"</tr>"
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
@@ -1675,6 +1677,8 @@ var StudentsEnrolledView = Backbone.View.extend({
 
 	events: {
 		"click #add-student": "addStudent",
+		"click .toggle-checkboxes": "toggleCheckboxes",
+		"click .send-email": "openEmailModal"
 	},
 
 	render: function() {
@@ -1693,22 +1697,20 @@ var StudentsEnrolledView = Backbone.View.extend({
 				_.each(data, function(student, index) {
 					var model = new Student(student, {parse:true});
 					new StudentsEnrolledRowView({
-						el: view.addRow(),
+						el: view.addRow(model.get("emailAddr")),
 						model: model,
 						userid: model.get("userid"),
 						sectionid: view.sectionid,
 						parentView: view
 					});
 				});
-				// view.table = view.$el.find("table").dataTable({
-				// 	dom: "t"
-				// });
 			}
 		});
 	},
 
-	addRow: function(evt) {
+	addRow: function(email) {
 		var container = $("<tr></tr>");
+		container.data("email", email);
 		this.$el.find("table tbody").append(container);
 		return container;
 	},
@@ -1741,6 +1743,27 @@ var StudentsEnrolledView = Backbone.View.extend({
 			backdrop.remove();
 		});
 	},
+
+	toggleCheckboxes: function(evt) {
+		var checked = $(evt.currentTarget).is(":checked");
+		_.each(this.$el.find("#students-table tbody tr"), function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			checkbox.prop("checked", checked);
+		}, this);
+	},
+
+	openEmailModal: function() {
+		var recipients = [];
+		_.each(this.$el.find("#students-table tbody tr"), function(row, index) {
+			var checkbox = $(row).find("input[type='checkbox']");
+			if ($(checkbox).is(":checked")) {
+				recipients.push($(checkbox).closest("tr").data("email"));
+			}
+		}, this);
+
+		var numRecipients = recipients.length;
+		openEmailModal(recipients);
+	}
 });
 
 var StudentsEnrolledRowView = Backbone.View.extend({
@@ -1749,7 +1772,8 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
 		+	"<td><%= grade %></td>"
-		+   "<td><span class='drop-student primary-link center-block' id='<%= model.userid %>'>[ Drop Student ]</span></td>"),
+		+   "<td><span class='drop-student primary-link center-block' id='<%= model.userid %>'>[ Drop Student ]</span></td>"
+		+	"<td><input type='checkbox' class='user-row' checked></td>"),
 
 	initialize: function(options) {
 		this.userid = options.userid;
@@ -1835,10 +1859,8 @@ var AttendanceView = Backbone.View.extend({
 	},
 
 	events: {
-		"click #update-attendance": "updateAttendance",
 		"click #add-attendance": "addAttendance",
 		"change .toggle-checkboxes": "toggleCheckboxes",
-		"click #update-attendance": "updateAttendance"
 	},
 
 	render: function() {
@@ -1903,7 +1925,8 @@ var AttendanceView = Backbone.View.extend({
 						attendedStudents: attendedStudents,
 						avg: avgString + "%",
 						sectionid: view.sectionid,
-						enrolledStudents: view.enrolledStudents
+						enrolledStudents: view.enrolledStudents,
+						parentView: view
 					});
 				});
 			});
@@ -1923,7 +1946,7 @@ var AttendanceView = Backbone.View.extend({
 		return container;
 	},
 
-	updateAttendance: function(elem, backdrop) {
+	saveAttendance: function(elem, backdrop, op, date) {
 		var view = this;
 		var rows = this.$el.find("#enrolled-table tbody tr");
 		var attended = [];
@@ -1945,10 +1968,11 @@ var AttendanceView = Backbone.View.extend({
 				type: "POST",
 				url: section.inputAttendance(this.sectionid),
 				data: {
-					date: this.$el.find("#date").val(),
+					date: date || this.$el.find("#date").val(),
 					schoolid: sessionStorage.getItem("gobind-schoolid"),
 					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
-					userids: JSON.stringify(attended)
+					userids: JSON.stringify(attended),
+					op: op || "POST"
 				}
 			}).then(function(data) {
 				if (typeof data == "string") {
@@ -2036,7 +2060,7 @@ var AttendanceView = Backbone.View.extend({
 		});
 
 		elem.on("click", "#save", function() {
-			view.updateAttendance(elem, backdrop);
+			view.saveAttendance(elem, backdrop);
 		});
 	}
 });
@@ -2046,7 +2070,7 @@ var AttendanceRowView = Backbone.View.extend({
 		+	"<td><%= attendedStudents %></td>"
 		// +	"<td><%= numStudents %></td>"
 		+	"<td><%= avg %></td>"
-		+	"<td><span data-date='<%= date %>' class='view-attendance primary-link'>[ View ]</span></td>"),
+		+	"<td><span data-date='<%= date %>' class='view-attendance primary-link'>[ View ]</span> <span data-date='<%= date %>' data-action='edit' class='edit-attendance primary-link'>[ Edit ]</span></td>"),
 
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
@@ -2055,11 +2079,13 @@ var AttendanceRowView = Backbone.View.extend({
 		this.attendedStudents = options.attendedStudents;
 		this.avg = options.avg;
 		this.enrolledStudents = options.enrolledStudents;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
 	events: {
-		"click .view-attendance": "viewAttendance"
+		"click .view-attendance": "viewAttendance",
+		"click .edit-attendance": "viewAttendance"
 	},
 
 	render: function() {
@@ -2075,6 +2101,7 @@ var AttendanceRowView = Backbone.View.extend({
 	viewAttendance: function(evt) {
 		var view = this;
 		var date = $(evt.currentTarget).data("date");
+		var action = $(evt.currentTarget).data("action") || "view";
 		var section = new Section();
 		section.fetch({
 			url: section.getStudentAttendance(this.sectionid),
@@ -2082,11 +2109,11 @@ var AttendanceRowView = Backbone.View.extend({
 				date: date
 			}
 		}).then(function(data) {
-			view.viewAttendanceRecord(view.enrolledStudents, data, date);
+			view.viewAttendanceRecord(view.enrolledStudents, data, date, action);
 		});
 	},
 
-	viewAttendanceRecord: function(all, attended, date) {
+	viewAttendanceRecord: function(all, attended, date, action) {
 		var view = this;
 
 		this.$el.append(html["addAttendance.html"]);
@@ -2120,9 +2147,13 @@ var AttendanceRowView = Backbone.View.extend({
 				model: model,
 				userid: userid,
 				checked: checked == true ? "P" : "A",
-				action: "view"
+				action: action
 			});
 		});
+
+		if (action == "view") {
+			this.$el.find("#save").remove();
+		}
 
 		elem.modal({
 			show: true
@@ -2134,7 +2165,7 @@ var AttendanceRowView = Backbone.View.extend({
 		});
 
 		elem.on("click", "#save", function() {
-			view.updateAttendance(elem, backdrop);
+			view.parentView.saveAttendance(elem, backdrop, "PUT", date);
 		});
 	},
 
@@ -2147,9 +2178,9 @@ var AttendanceRowView = Backbone.View.extend({
 });
 
 var AttendanceRecordView = Backbone.View.extend({
-	template: _.template("<td><%= model.firstName %></td>"
+	editTemplate: _.template("<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+	"<td><input id='<%= model.userid %>' type='checkbox' class='attendance' checked></td>"),
+		+	"<td><input id='<%= model.userid %>' type='checkbox' class='attendance'></td>"),
 
 	viewTemplate: _.template("<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
@@ -2173,9 +2204,13 @@ var AttendanceRecordView = Backbone.View.extend({
 				attended: this.checked
 			}));
 		} else {
-			this.$el.html(this.template({
+			this.$el.html(this.editTemplate({
 				model: this.model.toJSON(),
 			}));
+
+			if (this.checked == "P") {
+				this.$el.find(".attendance").prop("checked", true);
+			}
 		}
 	}
 });
@@ -2208,6 +2243,9 @@ var DocumentsView = Backbone.View.extend({
 		var view = this;
 		var doc = new Document();
 		this.model = doc;
+
+		Backbone.Validation.bind(this);
+
 		doc.fetch({
 			data: {
 				sectionid: this.sectionid
@@ -2276,34 +2314,36 @@ var DocumentsView = Backbone.View.extend({
 			view.model.set("status", "active");
 
 			var doc = new Document();
-			view.model.save({
-				type: "POST",
-				url: doc.urlRoot
-			}).then(function(data) {
-				if (data.status=="success") {
-					new TransactionResponseView({
-						message: "New document successfully created."
-					});
-					view.saveMarks(data.docid);
-				}
-				else {
+			if (view.model.isValid(true)) {
+				view.model.save({
+					type: "POST",
+					url: doc.urlRoot
+				}).then(function(data) {
+					if (data.status=="success") {
+						new TransactionResponseView({
+							message: "New document successfully created."
+						});
+						view.saveMarks(data.docid);
+					}
+					else {
+						new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "Could not create a new document."
+						});
+					}
+					elem.remove();
+					backdrop.remove();
+				}).fail(function(data) {
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
 						message: "Could not create a new document."
 					});
-				}
-				elem.remove();
-				backdrop.remove();
-			}).fail(function(data) {
-				new TransactionResponseView({
-					title: "ERROR",
-					status: "error",
-					message: "Could not create a new document."
+					elem.remove();
+					backdrop.remove();
 				});
-				elem.remove();
-				backdrop.remove();
-			});
+			}
 		});
 
 		elem.on("hidden.bs.modal", function() {
@@ -2374,6 +2414,8 @@ var DocumentsView = Backbone.View.extend({
 				});
 				view.render();
 			});
+		} else {
+			view.render();
 		}
 	},
 });

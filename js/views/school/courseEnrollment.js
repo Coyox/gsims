@@ -399,6 +399,7 @@ var RSectionTableRowView = Backbone.View.extend({
 			this.model.get("endTime"),
 			"<span class='remove-section link'>Remove</span>"
 			]).draw().node();
+
 			$(row).attr("id", this.model.get("sectionid")).data("section", this.model.toJSON());
 		}
 
@@ -407,6 +408,7 @@ var RSectionTableRowView = Backbone.View.extend({
 	},
 
 	removeSection: function(evt) {
+		console.log("test");
 		this.parentView.enrolledTable
 			.row($(evt.currentTarget).parent("tr"))
 			.remove()
