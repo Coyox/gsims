@@ -177,7 +177,6 @@ var AddTableView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["viewStudents.html"]);
-		console.log("Addd table view hereee");
 		this.populateQueryResults(this.results);
 	},
 

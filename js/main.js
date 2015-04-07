@@ -9,7 +9,16 @@ var app = {
 var dataTables = {
 	"sSwfPath": "http://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf",
 	"exportDom": "lfrtipT",
-	"buttons": [ "csv", "pdf" ]
+	"buttons": [
+		{"sExtends":"csv",
+		  "sButtonText": "csv",
+		  "mColumns": [0,1,2,3]
+		},
+		{  "sExtends":"pdf",
+		  "sButtonText": "pdf",
+		  "mColumns": [0,1,2,3]
+		},
+	]
 }
 
 /** Object to hold all HTML templates (pre-loaded) */
