@@ -131,8 +131,13 @@ var SectionsTableView = Backbone.View.extend({
 	      	aoColumnDefs: [
 	          	{ bSortable: false, aTargets: [ 4, 5 ] },
 	          	{ sClass: "center", aTargets: [ 4, 5 ] },
-	          	{ sWidth: "10%", aTargets: [ 5 ] }
-	       	]
+	          	{ sWidth: "10%", aTargets: [ 5 ] },
+	       	],
+	       	dom: dataTables.exportDom,
+			tableTools: {
+				 aButtons: dataTables.buttons,
+       			 sSwfPath: dataTables.sSwfPath
+    		}
 		});
 		createRefreshButton(this.$el);
 		createExportButton(this.$el);
@@ -159,7 +164,12 @@ var SectionsTableView = Backbone.View.extend({
 		          	{ bSortable: false, aTargets: [ 4, 5 ] },
 		          	{ sClass: "center", aTargets: [ 4, 5 ] },
 		          	{ sWidth: "10%", aTargets: [ 5 ] }
-		       	]
+		       	],
+		       	dom: dataTables.exportDom,
+				tableTools: {
+           			 aButtons: dataTables.buttons,
+       			 	 sSwfPath: dataTables.sSwfPath
+        		}
 			});
 			createRefreshButton(view.$el);
 			createExportButton(view.$el);
