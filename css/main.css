@@ -290,9 +290,14 @@ a {
 }
 
 .btn {
-	background-color: #9d426b;
+/*	background-color: #9d426b;
 	border-color: #A33566;
-	color: #fff;
+	color: #fff;*/
+
+	background-color: #fff;
+	border-color: #ccc;
+	color: #9d426b !important;
+	font-weight: bold;
 }
 
 .btn:focus {
@@ -300,10 +305,14 @@ a {
 	color: #fff;
 }
 
-.btn:hover {
-	background-color: #B0507B;
+.btn:hover, .btn:active, .btn.active, .btn:focus {
+/*	background-color: #B0507B;
 	border-color: #B0507B;
-	color: #fff;
+	color: #fff;*/
+
+	background-color: #EDEDED;
+	border-color: #ccc;
+	color: #333;
 }
 
 .property-table {

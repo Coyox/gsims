@@ -47,8 +47,9 @@ var PendingRegistrationView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var s = new Student(object, {parse:true});
 				view.list.push(s);
+				console.log(s.toJSON());
 				new PendingRowView({
-					el: view.addRow(s.get("userid"), s.get("emailAddr")),
+					el: view.addRow(s.get("userid"), s.get("emailAddr"), s.get("status")),
 					model: s,
 					index: index
 				});
@@ -75,8 +76,8 @@ var PendingRegistrationView = Backbone.View.extend({
 		"change .toggle-checkboxes": "toggleCheckboxes"
 	},
 
-	addRow: function(userid, email) {
-		var container = $("<tr data-userid='" + userid + "' data-email='" + email + "'></tr>");
+	addRow: function(userid, email, status) {
+		var container = $("<tr data-userid='" + userid + "' data-email='" + email + "' data-status='" + status + "'></tr>");
 		this.$el.find(".results").append(container);
 		return container;
 	},
