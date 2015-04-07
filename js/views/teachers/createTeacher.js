@@ -234,6 +234,7 @@ var TeacherCompetencyView = Backbone.View.extend({
 		}).then(function(data) {
 			_.each(data, function(dept, index) {
 				var level = 0;
+				console.log(dept.deptid);
 				_.each(view.existingLevels, function(existing, index) {
 					if (existing.deptid == dept.deptid) {
 						level = existing.level;

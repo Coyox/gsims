@@ -69,7 +69,6 @@ var RegistrationFormView = Backbone.View.extend({
 					return true; // ?
 				}
 				else if (thisID == "info-form" && nextID == "sections-form") {
-					return true;
 					return view.regStudentInfo.validate();
 				}
 				else if (thisID == "sections-form" && nextID == "terms-form") {
@@ -118,8 +117,7 @@ var RegistrationFormView = Backbone.View.extend({
 		var view = this;
 		var studentModel = this.regStudentInfo.model;
 		var sections = this.regSectionsView.sections;
-		console.log(studentModel);
-		console.log(sections);
+
 		var sectionids = [];
 		var schoolid = this.regSectionsView.courseEnrollmentView.schoolid;
 		_.each(sections, function(section, index) {
@@ -127,6 +125,10 @@ var RegistrationFormView = Backbone.View.extend({
 		}, this);
 		studentModel.set("schoolid", schoolid);
 		studentModel.set("status", this.status);
+
+		console.log("final", studentModel);
+		console.log("sections", sections);
+
 		studentModel.save().then(function(data) {
 			if (typeof data == "string") {
 				data = JSON.parse(data);
