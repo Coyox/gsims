@@ -42,9 +42,9 @@ var TeacherRecordView = Backbone.View.extend({
 			view.$el.find("#cancel").removeClass("hide").show();
 			view.$el.find("#edit-teacher").hide();
 		}
-
+		console.log(this.model.toJSON())
 		_.each(this.model.toJSON(), function(value, name) {
-			if (this.model.nonEditable.indexOf(name) == -1) {
+			if (this.model.nonEditable.indexOf(name) == -1 && !isNumber(name)) {
 				new CreateTeacherRowView({
 					el: this.addRow(),
 					model: this.model,

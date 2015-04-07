@@ -188,3 +188,7 @@ function toggleCheckboxes(nodes, evt) {
 		checkbox.prop("checked", checked);
 	}, this);
 }
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
