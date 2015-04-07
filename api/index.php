@@ -679,15 +679,26 @@ function dropStudent($id, $sid){
 function enrollStudent($id, $sid){
     $status = $_POST['status'];
     $schoolyearid = $_POST['schoolyearid'];
+    $courseid = $_POST['courseid'];
+
+    $queries = array();
+    $bindparams = array();
+
     $sql = "INSERT into enrollment (userid, sectionid, schoolyearid, status)
             values (:userid, :sectionid, :schoolyearid, :status )";
-    $bindparams = array(
+    array_push($bindparams, array(
         "userid" => $sid,
         "sectionid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => "active",
-    );
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    ));
+    array_push($queries, $sql);
+
+    if (isset($courseid)){
+        array_push($queries, "DELETE from waitlisted where userid=:userid and waitlistid=:courseid");
+        array_push($bindparams, array("userid"=>$sid, "courseid"=>$courseid));
+    }
+    echo json_encode(perform_transaction($queries,$bindparams));
 }
 function assignSectionTeacher($id, $tid){
     $sql = "INSERT into teachingSection values (:tid, :id)";
@@ -1279,8 +1290,9 @@ function enrollStudentInSections($id){
     $schoolyearid = $_POST["schoolyearid"];
     $status = $_POST["status"];
     $sectionids = json_decode($_POST["sectionids"]);
-
-    $bindparams = array(
+    $bindparams = array();
+    $queries = array();
+    $param = array(
         "userid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => $status,
@@ -1288,10 +1300,21 @@ function enrollStudentInSections($id){
     $sql = "INSERT INTO enrollment (userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
-        $bindparams["sectionid".$i] = $sectionid;
+        $param["sectionid".$i] = $sectionid;
     }
     $sql = rtrim($sql, ",");
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    array_push($queries, $sql);
+    array_push($bindparams, $param);
+
+    if (isset($_POST["courseids"])){
+        $courseids = json_decode($_POST["courseids"]);
+        $sql = "DELETE from waitlisted where userid=:userid and waitlistid in ";
+        list($sqlparens, $param) = parenthesisList($courseids);
+        $sql.=$sqlparens;
+        array_push($queries, $sql);
+        array_push($bindparams, $param);
+    }
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 function enrollStudentInWaitlists($id){
