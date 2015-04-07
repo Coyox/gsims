@@ -45,7 +45,6 @@ var EmailView = Backbone.View.extend({
 
 	checkAccountStatus: function(evt){
 		var parent = this.$el.find("#stats-panel");
-		console.log("Checking Mandrill account status");
 		var apiKey = this.key;
 
 		$.ajax({
@@ -123,7 +122,6 @@ var EmailView = Backbone.View.extend({
 });
 
 function areYouAlive(key){
-	console.log("Checking Mandrill status");
 	var apiKey = key;
 
 	$.ajax({
