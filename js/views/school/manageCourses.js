@@ -1163,7 +1163,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
 });
 
 var CourseSectionRowView = Backbone.View.extend({
-	template: _.template("<td><span id='<%= model.sectioncode %>' class='view-section primary-link'>[ View Section ]</span></td>"
+	template: _.template("<td><span id='<%= model.sectionid %>' class='view-section primary-link'>[ View Section ]</span></td>"
 		+	"<td><%= model.sectionCode %></td>"
 		+	"<td><%= model.day %></td>"
 		+	"<td><%= model.startTime %></td>"
@@ -1185,6 +1185,7 @@ var CourseSectionRowView = Backbone.View.extend({
 
 	viewSection: function(evt) {
 		var id = $(evt.currentTarget).attr("id");
+		console.log($(evt.currentTarget));
 		app.Router.navigate("viewSection/" + id, {trigger:true});
 	}
 });
