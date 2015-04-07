@@ -1101,55 +1101,59 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		"click .enrol-waitlist": "enrollWaitlist"
 	},
 
-    enrollWaitlist: function(evt) {
-		//console.log($(evt.currentTarget));
-        //console.log($(evt.currentTarget).attr("id"));
+	enrollWaitlist: function(evt) {
         var section = new Section();
         var courseid = this.tdata;
         var uid = this.model.get("userid");
         var sectionid = $(evt.currentTarget).attr("id");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
-        //console.log(courseid);
-        //console.log($(evt.currentTarget).attr("id"));
-        //console.log(this.model.toJSON());
+        var section = new Section(object, {parse:true});
+        section.fetch({
+        	url: section.getStudentCount(section.get("sectionid"))
+        }).then(function(data) {
+        	var full = parseInt(data) >= parseInt(section.get("classSize"));
+        	if (!full){
 
-			$.ajax({
-				type: "POST",
-				url: section.enrollStudent(sectionid, uid),
-                data: {
-                    schoolyearid: schoolyear,
-                    courseid: courseid,
-                    status: "active"}
-			}).then(function(data) {
-				if (typeof data == "string"){
-					data = JSON.parse(data);
-				}
-				console.log(data);
-					if(data.status=="success"){
-						new TransactionResponseView({
-                            title: "SUCCESS",
-                            status: "success",
-							message: "Student successfuly enrolled."
-						});
+        		$.ajax({
+        			type: "POST",
 
-                        this.render();
-					} else {
-						new TransactionResponseView({
-							title: "ERROR",
-							status: "error",
-							message: "Could not add to section."
-						});
-					}
-			}).fail(function(){
-				new TransactionResponseView({
-							title: "ERROR",
-							status: "error",
-							message: "Could not add to section."
-						});
+        			url: section.enrollStudent(sectionid, uid),
+        			data: {
+        				schoolyearid: schoolyear,
+        				courseid: courseid,
+        				status: "active"}
+        			}).then(function(data) {
+        				if (typeof data == "string"){
+        					data = JSON.parse(data);
+        				}
+        				console.log(data);
+        				if(data.status=="success"){
+        					new TransactionResponseView({
+        						title: "SUCCESS",
+        						status: "success",
+        						message: "Student successfuly enrolled."
+        					});
 
-			});
+        					this.render();
+        				} else {
+        					new TransactionResponseView({
+        						title: "ERROR",
+        						status: "error",
+        						message: "Could not add to section."
+        					});
+        				}
+        			}).fail(function(){
+        				new TransactionResponseView({
+        					title: "ERROR",
+        					status: "error",
+        					message: "Could not add to section."
+        				});
 
-	},
+        			});
+        		}
+
+        	});
+},
 
 	render: function() {
 		this.$el.html(this.template({
