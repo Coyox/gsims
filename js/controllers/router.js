@@ -107,10 +107,20 @@ var Router = Backbone.Router.extend({
     },
 
 
+        // if(typeof sessionStorage.getItem("gobind-user") != null){
+
+            
+        // }
+//      if(sessionStorage.getItem("gobind-usertype") != null){
+//        } else this.login();
+
     loadHome: function() {
-      	if ($("#container").html() == "") {
-    		this.home();
-    	}
+        if(sessionStorage.getItem("gobind-usertype") != null){
+            if ($("#container").html() == "") {
+             this.home();
+           }
+        } else
+            this.login();
     },
 
     createChild: function() {
@@ -118,6 +128,8 @@ var Router = Backbone.Router.extend({
     },
 
     home: function(isHome) {
+        if(sessionStorage.getItem("gobind-usertype") != null){
+
         this.updatePageBreadcrumb("Home", "home");
 
     	new HomePageView({
@@ -129,6 +141,8 @@ var Router = Backbone.Router.extend({
                 el: $("#content")
             });
         }
+      } else
+        this.login();
 
         // $("#main-content .left").affix({
         //     offset: {
@@ -143,7 +157,7 @@ var Router = Backbone.Router.extend({
 
         new EmailView({
             el: $("#content"),
-        });
+        });    
     },
 
     forgotPassword: function() {

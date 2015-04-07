@@ -125,6 +125,7 @@ var HeaderView = Backbone.View.extend({
 
 	logout: function(evt) {
 		app.Router.navigate("", {trigger:true});
+		sessionStorage.clear();
 	},
 
 	displayNotifications: function(evt) {
