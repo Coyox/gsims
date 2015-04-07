@@ -125,7 +125,12 @@ var HeaderView = Backbone.View.extend({
 
 	logout: function(evt) {
 		app.Router.navigate("", {trigger:true});
-		sessionStorage.clear();
+		sessionStorage.removeItem("gobind-email");
+		sessionStorage.removeItem("gobind-login");
+		sessionStorage.removeItem("gobind-schoolid");
+		sessionStorage.removeItem("gobind-user");
+		sessionStorage.removeItem("gobind-username");
+		sessionStorage.removeItem("gobind-usertype");
 	},
 
 	displayNotifications: function(evt) {
