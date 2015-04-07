@@ -783,14 +783,20 @@ function inputAttendance($id){
             $bindparams["userid".$i] = $userid;
         }
         $sql = rtrim($sql, ",");
+        $resp = perform_query($sql,'',$bindparams);
+        if ($resp["status"]=="success"){
+            $resp["userids"] = $userids;
+        }
+        echo json_encode($resp);
     }
     else { // put
         $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and userid not in ";
         list($sqlparens, $params) = parenthesisList($userids);
         $sql.=$sqlparens;
         $bindparams = $bindparams + $params;
+        echo json_encode(perform_query($sql,'',$bindparams));
     }
-    echo json_encode(perform_query($sql,'',$bindparams));
+
 }
 
 function getAvgAttendance($id){

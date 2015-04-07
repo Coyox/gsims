@@ -56,7 +56,7 @@ var ImportView = Backbone.View.extend({
 					dataRows.push(["", teacherid, sectionid, sessionStorage.getItem("gobind-schoolid"), sessionStorage.getItem("gobind-activeSchoolYear"), model.get("userid"), model.get("firstName"), model.get("lastName")]);
 					return true;
 				}
-				var student = ["","","","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
+				var student = ["","","","","",,model.get("userid"), model.get("firstName"), model.get("lastName")];
 				dataRows.push(student);
 			});
 			dataRows.forEach(function(lineArray, index){
@@ -151,7 +151,7 @@ var ImportView = Backbone.View.extend({
 						console.log("list of students", studentList);
 					}
 					// TEACHER/Admin
-					else if (results.data[0].schoolid) {
+					else if (results.data[0].usertype) {
 						$.each(results.data, function(i, row) {
 							var teacher = new Teacher(row, {parse:true});
 							console.log(teacher.toJSON());
@@ -287,6 +287,7 @@ var ImportView = Backbone.View.extend({
 						$.each(results.data, function(i, row) {
 							if (i==0 || i==1) {	return true; }
 							if (row.studentid && row.present == "P"){
+								console.log('test');
 								studentids.push(row.studentid);
 								console.log(row.studentid);
 							}
@@ -308,7 +309,6 @@ var ImportView = Backbone.View.extend({
 									studentids.splice(index, 1);
 								}
 							});
-
 							studentids.push(teacherid);
 							$.ajax({
 								type: "POST",
@@ -316,6 +316,8 @@ var ImportView = Backbone.View.extend({
 								data: {
 									date: attendancedate,
 									schoolid: schoolid,
+									status: "active",
+									op: "POST",
 									schoolyearid: schoolyearid,
 									userids: JSON.stringify(studentids)
 								}
