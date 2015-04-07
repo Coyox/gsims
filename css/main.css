@@ -376,8 +376,9 @@ li.paginate_button.active a {
 }
 
 #department-list span:hover {
-	background-color: #9d426b;
-	color: #fff;
+	background-color: #EDEDED;
+	border-color: #ccc;
+	color: #333;
 	cursor: pointer;
 }
 

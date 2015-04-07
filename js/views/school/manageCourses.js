@@ -2060,7 +2060,8 @@ var AttendanceView = Backbone.View.extend({
 				new AttendanceRecordView({
 					el: view.addAttendanceRow(model.get("userid")),
 					model: model,
-					userid: model.get("userid")
+					userid: model.get("userid"),
+					checked: "P"
 				});
 			});
 		});
