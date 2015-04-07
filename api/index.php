@@ -788,7 +788,7 @@ function inputAttendance($id){
         $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and not in ";
         list($sqlparens, $params) = parenthesisList($userids);
         $sql.=$sqlparens;
-        $bindparmas = $bindparams + $params;
+        $bindparams = $bindparams + $params;
     }
     echo json_encode(perform_query($sql,'',$bindparams));
 }
