@@ -962,8 +962,7 @@ var CourseSectionView = Backbone.View.extend({
 				var section = new Section(sec, {parse:true});
 				new CourseSectionRowView({
 					el: view.addCourseSection(),
-					model: section
-
+					model: section,
 				})
 			});
 
@@ -982,7 +981,8 @@ var CourseSectionView = Backbone.View.extend({
 			            new CourseWaitlistRowView({
 			                el: view.addCourseWaitlist(),
 			                model: student,
-                            results: sections
+                            results: sections,
+                            courseid: view.courseid
 			            })
 		            });
                 });
@@ -1092,6 +1092,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
 
 	initialize: function(options) {
         this.sdata = options.results
+        this.tdata = options.courseid
 		this.render();
 	},
 
@@ -1100,25 +1101,23 @@ var CourseWaitlistRowView = Backbone.View.extend({
 	},
     
     enrollWaitlist: function(evt) {
-		console.log($(evt.currentTarget));
-        console.log($(evt.currentTarget).attr("id"));
-
+		//console.log($(evt.currentTarget));
+        //console.log($(evt.currentTarget).attr("id"));
         var section = new Section();
-
+        var courseid = this.tdata;
         var uid = this.model.get("userid");
         var sectionid = $(evt.currentTarget).attr("id");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
-        
+        //console.log(courseid);
+        //console.log($(evt.currentTarget).attr("id"));
         //console.log(this.model.toJSON());
-        //console.log(this.model.get("userid"));
-        //console.log(this.model.attr("userid"));
-        console.log(uid);
         
 			$.ajax({
 				type: "POST",
 				url: section.enrollStudent(sectionid, uid),
                 data: {
                     schoolyearid: schoolyear,
+                    courseid: courseid,
                     status: "active"}
 			}).then(function(data) {
 					if(data.status=="success"){
@@ -1127,6 +1126,8 @@ var CourseWaitlistRowView = Backbone.View.extend({
                             status: "success",
 							message: "Student successfuly enrolled."
 						});
+
+                        this.render();
 					} else {
 						new TransactionResponseView({
 							title: "ERROR",
@@ -1135,14 +1136,15 @@ var CourseWaitlistRowView = Backbone.View.extend({
 						});
 					}
 			});
-          
+         
 	},
 
 	render: function() {
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
-
+        console.log("from render");
+        console.log(this.tdata);
         var links = "";
         _.each(this.sdata, function(section, index) {
             var secmodel = new Section(section, {parse:true});
