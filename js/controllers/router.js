@@ -91,7 +91,9 @@ var Router = Backbone.Router.extend({
 
         "viewCourse/:id/:did":  "viewCourse",
 
-        "viewSection/:id":      "viewSection"
+        "viewSection/:id":      "viewSection",
+
+        "help":                 "help"
     },
 
     updatePageBreadcrumb: function(text, icon) {
@@ -567,6 +569,15 @@ var Router = Backbone.Router.extend({
             id: id
         });
     },
+
+    help: function(id) {
+        this.loadHome();
+        this.updatePageBreadcrumb("Help", "th-list");
+
+        new HelpView({
+            el: $("#content"),
+        });
+    },    
 
     selectSchool: function(evt) {
         new SelectSchoolView({
