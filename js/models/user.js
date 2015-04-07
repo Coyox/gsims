@@ -148,7 +148,9 @@ var Student = Backbone.Model.extend({
    	enrollStudentInSections: function(id) {
    		return this.urlRoot + "/" + id + "/sections";
    	},
-
+   	enrollStudentInWaitlists: function(id) {
+   		return this.urlRoot + "/" + id + "/waitlists";
+   	},
    	getPrevEnrolledSections: function(id) {
    		return this.urlRoot + "/" + id + "/prevSections";
    	},

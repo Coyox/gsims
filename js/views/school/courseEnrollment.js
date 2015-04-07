@@ -63,7 +63,6 @@ var CourseEnrollmentView = Backbone.View.extend({
 	events: {
 		"click #save-sections": "saveEnrolledSections",
 		"change #school-menu": "populateDepartments",
-		"click #save-sections": "saveEnrolledSections"
 	},
 
 	populateDepartments: function(evt) {
@@ -102,6 +101,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 
 	saveEnrolledSections: function() {
 		var sections = [];
+		var waitlists = [];
 		var rows = this.$el.find("#enrolled-list tbody tr");
 		var valid = false;
 		_.each(rows, function(row, index) {
@@ -109,7 +109,12 @@ var CourseEnrollmentView = Backbone.View.extend({
 				valid = false;
 			} else {
 				valid = true;
-				sections.push($(row).data("section").sectionid);
+				if ($(row).data("waitlist")){
+					waitlists.push($(row).data("waitlist").courseid);
+				}
+				else {
+					sections.push($(row).data("section").sectionid);
+				}
 			}
 		}, this);
 
@@ -121,32 +126,52 @@ var CourseEnrollmentView = Backbone.View.extend({
 		} else {
 			var view = this;
 			var student = new Student();
-			$.ajax({
-				type: "POST",
-				url: student.enrollStudentInSections(this.userid),
-				data: {
-					sectionids: JSON.stringify(sections),
-					status: "pending",
-					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-				}
-			}).then(function(data) {
-				if (typeof data == "string") {
-					data = JSON.parse(data);
-				}
-				if (data.status == "success") {
-					new TransactionResponseView({
-						message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
-						redirect: true,
-						url: view.regType == "online" ? "" : "home"
-					});
-				} else {
-					new TransactionResponseView({
-						title: "ERROR",
-						status: "error",
-						message: "Sorry, we could not process your request. Please try again."
-					});
-				}
-			});
+			var success =1;
+			if (sections.length > 0){
+				$.ajax({
+					type: "POST",
+					url: student.enrollStudentInSections(this.userid),
+					data: {
+						sectionids: JSON.stringify(sections),
+						status: "pending",
+						schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+					}
+				}).then(function(data) {
+					if (typeof data == "string") {
+						data = JSON.parse(data);
+					}
+					success = (data.status == "success")? 1 : 0;
+				});
+			}
+			if (waitlists.length > 0){
+				$.ajax({
+					type: "POST",
+					url: student.enrollStudentInWaitlists(this.userid),
+					data: {
+						courseids: JSON.stringify(waitlists),
+					}
+				}).then(function(data) {
+					if (typeof data == "string") {
+						data = JSON.parse(data);
+					}
+					success = (data.status == "success")? success&&1 : 0;
+				});
+
+			}
+			if (success == 1){
+				new TransactionResponseView({
+							message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
+							redirect: true,
+							url: view.regType == "online" ? "" : "home"
+				});
+			}
+			else {
+				new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "Sorry, we could not process your request. Please try again."
+						});
+			}
 		}
 	}
 });
@@ -358,23 +383,32 @@ var RSectionTableRowView = Backbone.View.extend({
 	},
 
 	enrollInSection: function(evt) {
-		var row = this.parentView.enrolledTable.row.add([
+		if (this.isFull){
+			var row = this.parentView.enrolledTable.row.add([
+			this.model.get("courseName") + " Waitlist",
+			"","","","","<span class='remove-section link'>Remove</span>"
+			]).draw().node();
+			$(row).attr("id", this.model.get("courseid")).data("waitlist", this.model.toJSON());
+		}
+		else {
+			var row = this.parentView.enrolledTable.row.add([
 			this.model.get("courseName"),
 			this.model.get("sectionCode"),
 			this.model.get("day"),
 			this.model.get("startTime"),
 			this.model.get("endTime"),
 			"<span class='remove-section link'>Remove</span>"
-		]).draw().node();
+			]).draw().node();
+			$(row).attr("id", this.model.get("sectionid")).data("section", this.model.toJSON());
+		}
 
 		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
-		$(row).attr("id", this.model.get("sectionid"))
-			.data("section", this.model.toJSON());
+
 	},
 
 	removeSection: function(evt) {
 		this.parentView.enrolledTable
-			.row($(evt.currentTarget).parents("tr"))
+			.row($(evt.currentTarget).parent("tr"))
 			.remove()
 			.draw();
 	}

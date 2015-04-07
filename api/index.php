@@ -17,6 +17,7 @@ $app->get('/students/:id/attendance', 'getStudentAttendance');
 // $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
+$app->post('/students/:id/waitlists', 'enrollStudentInWaitlists');
 // $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->post('/students/pendingTest', 'handlePendingTestStudents');
@@ -1288,6 +1289,18 @@ function enrollStudentInSections($id){
     foreach (array_values($sectionids) as $i => $sectionid) {
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
         $bindparams["sectionid".$i] = $sectionid;
+    }
+    $sql = rtrim($sql, ",");
+    echo json_encode(perform_query($sql,'POST',$bindparams));
+}
+
+function enrollStudentInWaitlists($id){
+    $courseids = json_decode($_POST["courseids"]);
+    $bindparams = array("userid" => $id);
+    $sql = "INSERT INTO waitlisted (userid, waitlistid) values ";
+    foreach (array_values($courseids) as $i => $courseid) {
+        $sql.= "(:userid, :waitlistid".$i."),";
+        $bindparams["waitlistid".$i] = $courseid;
     }
     $sql = rtrim($sql, ",");
     echo json_encode(perform_query($sql,'POST',$bindparams));

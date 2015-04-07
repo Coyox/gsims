@@ -627,6 +627,10 @@ var ReportCardView = Backbone.View.extend({
 		this.render();
 	},
 
+		events: {
+		"click #report-card-pdf":  "reportCardPDF",
+		},
+
 	render: function() {
 		//console.log("render");
 		this.$el.html(html["reportCard.html"]);
@@ -651,8 +655,61 @@ var ReportCardView = Backbone.View.extend({
         var container = $("<tr></tr>");
         this.$el.find("#report-card-table .results").first().append(container);
         return container;
-	}
+	},
+
+	reportCardPDF: function() {
+		var table = tableToJson($('#report-card-table').get(0));
+		var id = this.model.get("userid");
+		var fname = this.model.get("firstName");
+		var lname = this.model.get("lastName");
+		console.log(table);
+
+		var doc = new jsPDF('p', 'pt', 'a4');
+		doc.setFontSize(22);
+        doc.text(35, 25, "Gobind Sarvar Report Card");
+        doc.setFontSize(18);
+        doc.text(40, 50, fname + " " + lname);
+		doc.setFontSize(12);
+		//doc.table(20,20, table, ['coursename', 'sectioncode', 'teachername', 'grade'], {printHeaders: true, autoSize:true});
+		doc.cellInitialize();
+		$.each(table, function (i, row){
+			$.each(row, function(j, cell){
+				doc.cell(10,100,145,20,cell,i);
+			})
+		})
+
+        doc.save("Reportcard-" +id+ ".pdf");
+	},
+
+
 });
+
+function tableToJson(table) {
+    var data = [];
+
+    // first row needs to be headers
+    var headers = [];
+    for (var i=0; i<table.rows[0].cells.length; i++) {
+        headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
+    }
+
+    // go through cells
+    for (var i=1; i<table.rows.length; i++) {
+
+        var tableRow = table.rows[i];
+        var rowData = {};
+
+        for (var j=0; j<tableRow.cells.length; j++) {
+
+            rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
+
+        }
+
+        data.push(rowData);
+    }       
+
+    return data;
+}
 
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
@@ -663,6 +720,7 @@ var ReportCardRowView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
 	},
+
 
 	render: function() {
 		var view = this;
