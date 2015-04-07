@@ -785,7 +785,7 @@ function inputAttendance($id){
         $sql = rtrim($sql, ",");
     }
     else { // put
-        $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and not in ";
+        $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and userid not in ";
         list($sqlparens, $params) = parenthesisList($userids);
         $sql.=$sqlparens;
         $bindparams = $bindparams + $params;
