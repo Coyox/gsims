@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `document` (
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`userid`) REFERENCES `teacher` (`userid`) ON DELETE SET NULL,
+  FOREIGN KEY (`userid`) REFERENCES `login` (`userid`) ON DELETE SET NULL,
   FOREIGN KEY (`sectionid`) REFERENCES `section` (`sectionid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
 );

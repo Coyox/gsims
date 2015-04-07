@@ -771,22 +771,26 @@ function inputAttendance($id){
     $schoolyearid = $_POST["schoolyearid"];
     $schoolid = $_POST["schoolid"];
     $userids = json_decode($_POST["userids"]);
+    $status = $_POST["status"];
+    $op = $_POST["op"];
+    $bindparams = array("classdate"=>$date, "sectionid"=>$id);
 
-    $bindparams = array(
-        "classdate" => $date,
-        "sectionid" => $id,
-        "schoolid" => $schoolid,
-        "schoolyearid" => $schoolyearid,
-        "status" => 'active'
-    );
-
-    $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `schoolid`, `status`) values ";
-    foreach (array_values($userids) as $i => $userid) {
-        $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :schoolid, :status),";
-        $bindparams["userid".$i] = $userid;
+    if ($op == "POST") {
+        $bindparams = $bindparams + array("schoolid" => $schoolid, "schoolyearid" => $schoolyearid, "status" => $status);
+        $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `schoolid`, `status`) values ";
+        foreach (array_values($userids) as $i => $userid) {
+            $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :schoolid, :status),";
+            $bindparams["userid".$i] = $userid;
+        }
+        $sql = rtrim($sql, ",");
     }
-    $sql = rtrim($sql, ",");
-    echo json_encode(perform_query($sql,'POST',$bindparams));
+    else { // put
+        $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and not in ";
+        list($sqlparens, $params) = parenthesisList($userids);
+        $sql.=$sqlparens;
+        $bindparmas = $bindparams + $params;
+    }
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 
 function getAvgAttendance($id){
