@@ -179,7 +179,7 @@ function setActiveSchoolYear(def) {
 	}).then(function(data) {
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;
-		sessionStorage.setItem("gobind-activeSchoolYear", app.currentSchoolYearId);
+		sessionStorage.setItem("gobind-activeSchoolYear", data.schoolyearid);
 		def.resolve();
 	});
 	return def;

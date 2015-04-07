@@ -915,7 +915,8 @@ var CourseSectionView = Backbone.View.extend({
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
 		+	"</table>"
-        +	"<table id='waitlist-table' class='table table-striped table-bordered'>"
+        +	"<h4> Waitlisted Students </h4>"
+        +      "<table id='waitlist-table' class='table table-striped table-bordered'>"
 		+		"<thead>"
 		+			"<tr>"
 		+				"<th>First Name</th>"
@@ -1099,7 +1100,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
     events: {
 		"click .enrol-waitlist": "enrollWaitlist"
 	},
-    
+
     enrollWaitlist: function(evt) {
 		//console.log($(evt.currentTarget));
         //console.log($(evt.currentTarget).attr("id"));
@@ -1111,7 +1112,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
         //console.log(courseid);
         //console.log($(evt.currentTarget).attr("id"));
         //console.log(this.model.toJSON());
-        
+
 			$.ajax({
 				type: "POST",
 				url: section.enrollStudent(sectionid, uid),
@@ -1120,6 +1121,10 @@ var CourseWaitlistRowView = Backbone.View.extend({
                     courseid: courseid,
                     status: "active"}
 			}).then(function(data) {
+				if (typeof data == "string"){
+					data = JSON.parse(data);
+				}
+				console.log(data);
 					if(data.status=="success"){
 						new TransactionResponseView({
                             title: "SUCCESS",
@@ -1135,8 +1140,15 @@ var CourseWaitlistRowView = Backbone.View.extend({
 							message: "Could not add to section."
 						});
 					}
+			}).fail(function(){
+				new TransactionResponseView({
+							title: "ERROR",
+							status: "error",
+							message: "Could not add to section."
+						});
+
 			});
-         
+
 	},
 
 	render: function() {
