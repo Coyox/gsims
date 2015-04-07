@@ -109,8 +109,12 @@ var CourseEnrollmentView = Backbone.View.extend({
 				valid = false;
 			} else {
 				valid = true;
-				sections.push($(row).data("section").sectionid);
-				waitlists.push($(row).data("course").courseid);
+				if ($(row).data("waitlist")){
+					waitlists.push($(row).data("waitlist").courseid);
+				}
+				else {
+					sections.push($(row).data("section").sectionid);
+				}
 			}
 		}, this);
 
@@ -122,8 +126,8 @@ var CourseEnrollmentView = Backbone.View.extend({
 		} else {
 			var view = this;
 			var student = new Student();
-			var success;
-			if (sections){
+			var success =1;
+			if (sections.length > 0){
 				$.ajax({
 					type: "POST",
 					url: student.enrollStudentInSections(this.userid),
@@ -139,7 +143,7 @@ var CourseEnrollmentView = Backbone.View.extend({
 					success = (data.status == "success")? 1 : 0;
 				});
 			}
-			if (waitlists){
+			if (waitlists.length > 0){
 				$.ajax({
 					type: "POST",
 					url: student.enrollStudentInWaitlists(this.userid),
@@ -384,7 +388,7 @@ var RSectionTableRowView = Backbone.View.extend({
 			this.model.get("courseName") + " Waitlist",
 			"","","","","<span class='remove-section link'>Remove</span>"
 			]).draw().node();
-			$(row).attr("id", this.model.get("courseid")).data("course", this.model.toJSON());
+			$(row).attr("id", this.model.get("courseid")).data("waitlist", this.model.toJSON());
 		}
 		else {
 			var row = this.parentView.enrolledTable.row.add([
