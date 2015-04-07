@@ -177,6 +177,7 @@ var AddTableView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["viewStudents.html"]);
+		console.log("Addd table view hereee");
 		this.populateQueryResults(this.results);
 	},
 
@@ -274,6 +275,7 @@ var StudentsTableView = Backbone.View.extend({
 	initialize: function(options) {
 		this.template = options.template;
 		this.results = options.results;
+		this.students =[];
 		this.render();
 	},
 
@@ -296,11 +298,14 @@ var StudentsTableView = Backbone.View.extend({
 	events: {
 		"click #refresh": "refreshTable",
 		"click .send-email": "openEmailModal",
-		"change .toggle-checkboxes": "toggleCheckboxes"
+		"change .toggle-checkboxes": "toggleCheckboxes",
+		"click #export-table": "exportTable",
 	},
 
 	populateQueryResults: function(data) {
+		var view = this;
 		_.each(data, function(object, index) {
+			view.students = data;
 			var model = new Student(object, {parse:true});
 			new StudentTableRowView({
 				model: model,
@@ -330,6 +335,7 @@ var StudentsTableView = Backbone.View.extend({
 		school.fetch({
 			url: school.getStudentsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
+			view.students = data;
 			_.each(data, function(object, index) {
 				var model = new Student(object, {parse:true});
 				new StudentTableRowView({
@@ -350,8 +356,8 @@ var StudentsTableView = Backbone.View.extend({
         		}
 			});
 			createEmailButton(view.$el);
-			createRefreshButton(view.$el);	
-			createExportButton(view.$el);		
+			createRefreshButton(view.$el);
+			createExportButton(view.$el);
 		});
 	},
 
@@ -381,6 +387,29 @@ var StudentsTableView = Backbone.View.extend({
 		this.table.fnDestroy();
 		this.render();
 	},
+
+	exportTable: function(evt){
+		console.log('export table called');
+		var view = this;
+		var csvContent = "data:text/csv;charset=utf-8,";
+		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
+		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
+		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",
+		"emergencyContactPhoneNumber", "schoolid", "paid", "status"]];
+		_.each(view.students, function(object, index) {
+				var student = $.map(object, function(element) { return element; });
+				dataRows.push(student);
+			});
+			dataRows.forEach(function(lineArray, index){
+				dataString = lineArray.join(",");
+				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
+			});
+			var encodedUri = encodeURI(csvContent);
+			var link = document.createElement("a");
+			link.setAttribute("href", encodedUri);
+			link.setAttribute("download", "students.csv");
+			link.click();
+	}
 });
 
 var StudentTableRowView = Backbone.View.extend({
