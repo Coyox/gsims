@@ -1107,7 +1107,6 @@ var CourseWaitlistRowView = Backbone.View.extend({
         var uid = this.model.get("userid");
         var sectionid = $(evt.currentTarget).attr("id");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
-        var section = new Section(object, {parse:true});
         section.fetch({
         	url: section.getStudentCount(section.get("sectionid"))
         }).then(function(data) {
