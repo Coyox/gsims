@@ -61,7 +61,6 @@ var DashboardView = Backbone.View.extend({
 	},
 
 	mySectionsWidget: function(){
-		console.log("MY SECTIONS WIDGET");
 		new MySectionsView({
             el: this.$el.find("#my-sections").find("#sections")
         });
