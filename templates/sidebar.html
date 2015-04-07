@@ -23,7 +23,7 @@
 	</li>
 
 	<!-- NOTIFICATIONS -->
-	<% if (usertype !== "S") { %>
+	<% if (usertype == "A" || usertype == "SU") { %>
 	<li>
 		<a href="#notifications" class="sidebar-link" data-link="notifications">
 			<span class="glyphicon glyphicon-bell"></span>

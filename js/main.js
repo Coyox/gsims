@@ -11,11 +11,11 @@ var dataTables = {
 	"exportDom": "lfrtipT",
 	"buttons": [
 		{"sExtends":"csv",
-		  "sButtonText": "csv",
+		  "sButtonText": "CSV",
 		  "mColumns": [0,1,2,3]
 		},
 		{  "sExtends":"pdf",
-		  "sButtonText": "pdf",
+		  "sButtonText": "PDF",
 		  "mColumns": [0,1,2,3]
 		},
 	]
