@@ -1804,11 +1804,9 @@ var StudentsEnrolledRowView = Backbone.View.extend({
 	render: function() {
 		this.$el.find("tbody").empty();
 		var view = this;
-		var sectionid = this.model.get("sectionid");
-		var userid = this.userid;
 		var section = new Section();
 		section.fetch({
-			url: section.getStudentGradeForSection(sectionid, userid)
+			url: section.getStudentGradeForSection(this.sectionid, this.userid)
 		}).then(function(data) {
 			view.$el.html(view.template({
 				model: view.model.toJSON(),
