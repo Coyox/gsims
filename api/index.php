@@ -766,37 +766,50 @@ function updateSection($id) {
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 
+/*
+To input/update attendance records
+@param:
+  route param: section id
+  request param:
+    - date
+    - schoolid
+    - schoolyearid
+    - status
+    - list of userids(users who are present)
+@return: json encoded status array
+*/
 function inputAttendance($id){
     $date = $_POST["date"];
     $schoolyearid = $_POST["schoolyearid"];
     $schoolid = $_POST["schoolid"];
-    $userids = json_decode($_POST["userids"]);
     $status = $_POST["status"];
-    $op = $_POST["op"];
-    $bindparams = array("classdate"=>$date, "sectionid"=>$id);
 
-    if ($op == "POST") {
-        $bindparams = $bindparams + array("schoolid" => $schoolid, "schoolyearid" => $schoolyearid, "status" => $status);
-        $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `schoolid`, `status`) values ";
-        foreach (array_values($userids) as $i => $userid) {
-            $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :schoolid, :status),";
-            $bindparams["userid".$i] = $userid;
-        }
-        $sql = rtrim($sql, ",");
-        $resp = perform_query($sql,'',$bindparams);
-        if ($resp["status"]=="success"){
-            $resp["userids"] = $userids;
-        }
-        echo json_encode($resp);
-    }
-    else { // put
-        $sql = "DELETE from attendance where sectionid=:sectionid and `date`=:classdate and userid not in ";
-        list($sqlparens, $params) = parenthesisList($userids);
-        $sql.=$sqlparens;
-        $bindparams = $bindparams + $params;
-        echo json_encode(perform_query($sql,'',$bindparams));
-    }
+    $userids = json_decode($_POST["userids"]);
+    $bindparams = array();
+    $queries = array();
 
+    $params = array("classdate"=>$date, "sectionid"=>$id);
+
+    // 1. Clear attendance records for section @ date first
+    array_push($queries, "DELETE from attendance where sectionid=:sectionid and `date`=:classdate");
+    array_push($bindparams, $params);
+
+    // 2. Insert new attendance records
+    $params = $params + array("schoolid" => $schoolid, "schoolyearid" => $schoolyearid, "status" => $status);
+    $sql = "INSERT INTO attendance (`date`, `userid`, `sectionid`, `schoolyearid`, `schoolid`, `status`) values ";
+    foreach (array_values($userids) as $i => $userid) {
+        $sql.= "(:classdate, :userid".$i.", :sectionid, :schoolyearid, :schoolid, :status),";
+        $params["userid".$i] = $userid;
+    }
+    $sql = rtrim($sql, ",");
+    array_push($queries, $sql);
+    array_push($bindparams, $params);
+
+    $resp = perform_transaction($queries, $bindparams);
+    if ($resp["status"]=="success"){
+        $resp["userids"] = $userids;
+    }
+    echo json_encode($resp);
 }
 
 function getAvgAttendance($id){

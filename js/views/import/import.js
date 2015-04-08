@@ -56,7 +56,7 @@ var ImportView = Backbone.View.extend({
 					dataRows.push(["", teacherid, sectionid, sessionStorage.getItem("gobind-schoolid"), sessionStorage.getItem("gobind-activeSchoolYear"), model.get("userid"), model.get("firstName"), model.get("lastName")]);
 					return true;
 				}
-				var student = ["","","","","",model.get("userid"), model.get("firstName"), model.get("lastName")];
+				var student = ["","","","","", model.get("userid"), model.get("firstName"), model.get("lastName")];
 				dataRows.push(student);
 			});
 			dataRows.forEach(function(lineArray, index){
@@ -317,7 +317,6 @@ var ImportView = Backbone.View.extend({
 									date: attendancedate,
 									schoolid: schoolid,
 									status: "active",
-									op: "POST",
 									schoolyearid: schoolyearid,
 									userids: JSON.stringify(studentids)
 								}
