@@ -60,7 +60,6 @@ var ImportView = Backbone.View.extend({
 				dataRows.push(student);
 			});
 			dataRows.forEach(function(lineArray, index){
-				console.log(lineArray);
 				dataString = lineArray.join(",");
 				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
 			});
@@ -78,7 +77,6 @@ var ImportView = Backbone.View.extend({
 				header: true,
 				complete: function(results) {
 					$("#not-found").hide();
-					console.log(results);
 
 					// STUDENT
 					if (results.data[0].city) {
@@ -89,7 +87,6 @@ var ImportView = Backbone.View.extend({
 								return true;
 							}
 							var student = new Student(row, {parse:true});
-							console.log(row);
 							var isValid = student.isValid(true);
 							var validate = student.validate();
 							if (!student.isValid()) {
@@ -147,8 +144,6 @@ var ImportView = Backbone.View.extend({
 								message: "Sorry, we could not import your CSV - one or more required fields are invalid. Please make sure your CSV doesn't end with a new line. Remove any quotes as well."
 							});
 						}
-
-						console.log("list of students", studentList);
 					}
 					// TEACHER/Admin
 					else if (results.data[0].usertype) {
@@ -164,7 +159,6 @@ var ImportView = Backbone.View.extend({
 								return true;
 							}
 							var teacher = new Teacher(row, {parse:true});
-							console.log(row);
 							var isValid = teacher.isValid(true);
 							var validate = teacher.validate();
 							if (!teacher.isValid()) {
@@ -285,18 +279,12 @@ var ImportView = Backbone.View.extend({
 							var schoolyearid = results.data[0].schoolyearid;
 
 						$.each(results.data, function(i, row) {
-							if (i==0 || i==1) {	return true; }
 							if (row.studentid && row.present == "P"){
-								console.log('test');
 								studentids.push(row.studentid);
-								console.log(row.studentid);
 							}
 						});
 						var section = new Section();
-						console.log(sectionid);
-						console.log(section.getStudentsEnrolled(sectionid));
-						$.ajax({
-							type: "GET",
+						section.fetch({
 							url: section.getStudentsEnrolled(sectionid)
 						}).then(function(data) {
 							var ids = [];
