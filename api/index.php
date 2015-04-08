@@ -886,7 +886,7 @@ function getStudentSectionGrade($sectionid, $userid){
             and userid=:userid";
     $bindparams["userid"]=$userid;
     $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
-    return ($attainedmarks/$totalmarks)*100;
+    return round(($attainedmarks/$totalmarks)*100,1);
 }
 
 
