@@ -1930,7 +1930,7 @@ var AttendanceView = Backbone.View.extend({
 					});
 
 					var numStudents = enrolledStudents.length;
-					var avg = (attendedStudents / numStudents) * 100;
+					var avg = Math.round((attendedStudents / numStudents) * 1000)/10;
 					var avgString = attendedStudents + " / " + numStudents + " = " + avg;
 
 					new AttendanceRowView({

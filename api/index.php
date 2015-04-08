@@ -830,7 +830,7 @@ function getAvgAttendance($id){
         foreach ($results as $row){
             $totalpresent += (int) $row['present'];
         }
-        $avgAttendance = ($totalpresent/($classSize*$numberofdays))*100;
+        $avgAttendance = round(($totalpresent/($classSize*$numberofdays))*100, 1);
         echo json_encode(array("avgAttendance"=>$avgAttendance."%"));
     }
     else {
