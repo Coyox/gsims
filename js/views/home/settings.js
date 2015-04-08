@@ -17,6 +17,7 @@ var UserSettingsView = Backbone.View.extend({
 	},
 
 	saveUser: function() {
+		var view = this;
 		Backbone.Validation.bind(this);
 		this.model.set("id", this.model.get("userid"));
 		if (this.model.isValid(true)) {
@@ -28,6 +29,7 @@ var UserSettingsView = Backbone.View.extend({
 					new TransactionResponseView({
 						message: "Account credentials successfully updated."
 					});
+					$("#header .username").text(view.model.get("username"));
 				}
 				else if (data.status == "duplicate"){
 					new TransactionResponseView({
