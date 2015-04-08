@@ -26,14 +26,20 @@ var UserSettingsView = Backbone.View.extend({
 				}
 				if (data.status == "success") {
 					new TransactionResponseView({
-						message: "Account successfully updated."
+						message: "Account credentials successfully updated."
 					});
-				} else {
+				}
+				else if (data.status == "duplicate"){
 					new TransactionResponseView({
-						message: "Account could not be updated.",
+						message: "The entered username has been taken, please enter a different one."
+					});
+				}
+				else {
+					new TransactionResponseView({
+						message: "Account credentials could not be updated.",
 						title: "ERROR",
 						status: "error"
-					});				
+					});
 				}
 			});
 		}
