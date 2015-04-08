@@ -1,3 +1,5 @@
+var studentViews = [];
+
 var SearchStudentsView = Backbone.View.extend({
 	initialize: function(options) {
 		this.redirect = options.redirect;
@@ -128,9 +130,10 @@ var SearchStudentsView = Backbone.View.extend({
 			});
 		} else {
 			app.Router.navigate("students/search");
-			var view = new StudentsTableView({
-				el: $("#content"),
-				results: data
+
+			new StudentsTableView({
+				el: $("#content").append("<div id='child'></div>"),
+				results: data,
 			});
 		}
 	},
@@ -253,7 +256,6 @@ var AddTableRowView = Backbone.View.extend({
 				userid: id
 			}
 		}).then(function(data) {
-			console.log(data);
 			new TransactionResponseView({
 				message: "This student has been added to this section."
 			});
@@ -274,7 +276,16 @@ var StudentsTableView = Backbone.View.extend({
 	initialize: function(options) {
 		this.template = options.template;
 		this.results = options.results;
-		this.students =[];
+		this.students = [];
+
+		// Unbind events from previous views to prevent events from being called multipel times
+		_.each(studentViews, function(view, index) {
+			view.undelegateEvents();
+		}, this);
+		
+		// Keep track of the current view
+		studentViews.push(this);
+		
 		this.render();
 	},
 
@@ -324,7 +335,6 @@ var StudentsTableView = Backbone.View.extend({
     		}
 		});
 		createEmailButton(this.$el);
-		createRefreshButton(this.$el);
 		createExportButton(this.$el);
 	},
 
@@ -355,15 +365,8 @@ var StudentsTableView = Backbone.View.extend({
         		}
 			});
 			createEmailButton(view.$el);
-			createRefreshButton(view.$el);
 			createExportButton(view.$el);
 		});
-	},
-
-	refreshTable: function(evt) {
-		evt.stopImmediatePropagation();
-		this.table.fnDestroy();
-		this.render();
 	},
 
 	addRow: function(selector, email) {
@@ -374,7 +377,6 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	openEmailModal: function(evt) {
-		console.log("email called");
 		openEmailWrapper(this.table.fnGetNodes());
 	},
 
@@ -389,7 +391,6 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	exportTable: function(evt){
-		console.log('export table called');
 		var view = this;
 		var csvContent = "data:text/csv;charset=utf-8,";
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",

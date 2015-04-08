@@ -106,14 +106,6 @@ var Router = Backbone.Router.extend({
     	});
     },
 
-
-        // if(typeof sessionStorage.getItem("gobind-user") != null){
-
-            
-        // }
-//      if(sessionStorage.getItem("gobind-usertype") != null){
-//        } else this.login();
-
     loadHome: function() {
         if(sessionStorage.getItem("gobind-usertype") != null){
             if ($("#container").html() == "") {
@@ -196,7 +188,7 @@ var Router = Backbone.Router.extend({
     	if (studentResults.length) {
     		studentResults.detach().appendTo($("#content").empty());
     	} else {
-		   	new StudentsTableView({
+		   	var view = new StudentsTableView({
 				el: $("#content")
 			});
     	}
