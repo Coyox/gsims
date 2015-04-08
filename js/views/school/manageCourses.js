@@ -2387,12 +2387,11 @@ var DocumentsView = Backbone.View.extend({
 		var marks = [];
 		_.each(rows, function(row, index) {
 			var mark = $(row).find(".mark").val();
-			if (mark != "") {
-				marks.push({
-					userid: $(row).attr("id"),
-					mark: mark
-				})
-			}
+			marks.push({
+				userid: $(row).attr("id"),
+				mark: (mark != "")? mark : 0,
+			})
+
 		}, this);
 
 		if (marks.length) {
@@ -2475,6 +2474,9 @@ var DocumentRowView = Backbone.View.extend({
 			type: "DELETE",
 			url: this.model.urlRoot + "/" + id,
 		}).then(function(data) {
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
 			if (data.status=="success") {
 				new TransactionResponseView({
 					message: "Document successfully deleted."
