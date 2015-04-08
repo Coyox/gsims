@@ -30,18 +30,6 @@ var CourseEnrollmentView = Backbone.View.extend({
 			this.populateDepartments();
 		}
 
-		if (this.userid) {
-			var student = new Student();
-			student.fetch({
-				url: student.getPrevEnrolledSections(this.userid),
-				data: {
-					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-				}
-			}).then(function(data) {
-				console.log(data);
-			});
-		}
-
 		this.courseTable = this.$el.find("#course-list").DataTable({
 			dom: "t",
 			bAutoWidth: false,
@@ -362,7 +350,7 @@ var RSectionTableRowView = Backbone.View.extend({
 	initialize: function(options) {
 		this.parentView = options.parentView;
 		this.isFull = options.isFull;
-		this.enrolledStudents = options.enrolledStudents;
+		this.enrolledStudents = options.enrolledStudents;	
 		this.render();
 	},
 
@@ -374,44 +362,106 @@ var RSectionTableRowView = Backbone.View.extend({
 
 		if (this.isFull) {
 			this.$el.find(".enroll-link").text("THIS SECTION IS FULL - Enroll in wait list");
+			this.$el.find(".enroll-link").attr("id", this.model.get("courseid"));
+		} else {
+			this.$el.find(".enroll-link").attr("id", this.model.get("sectionid"));
 		}
 	},
 
 	events: {
 		"click .enroll-link": "enrollInSection",
-		"click .remove-section": "removeSection"
 	},
 
 	enrollInSection: function(evt) {
-		if (this.isFull){
-			var row = this.parentView.enrolledTable.row.add([
-			this.model.get("courseName") + " Waitlist",
-			"","","","","<span class='remove-section link'>Remove</span>"
-			]).draw().node();
-			$(row).attr("id", this.model.get("courseid")).data("waitlist", this.model.toJSON());
+		var parent = $(evt.currentTarget).parent();
+		if (parent.find(".glyphicon-ok").length == 0) {
+			$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
+		
+			if (this.isFull){
+				new EnrolledSectionSelection({
+					el: this.addRow(this.model.get("courseid"), this.model.toJSON()),
+					model: this.model,
+					parentView: this.parentView,
+					waitlist: true
+				});
+			}
+			else {
+				new EnrolledSectionSelection({
+					el: this.addRow(this.model.get("sectionid"), this.model.toJSON()),
+					model: this.model,
+					parentView: this.parentView
+				});
+			}
 		}
-		else {
-			var row = this.parentView.enrolledTable.row.add([
-			this.model.get("courseName"),
-			this.model.get("sectionCode"),
-			this.model.get("day"),
-			this.model.get("startTime"),
-			this.model.get("endTime"),
-			"<span class='remove-section link'>Remove</span>"
-			]).draw().node();
+	},
 
-			$(row).attr("id", this.model.get("sectionid")).data("section", this.model.toJSON());
+	addRow: function(id, section, course) {
+		var parent = $("#enrolled-list");
+		if (parent.find(".dataTables_empty").length) {
+			parent.find(".dataTables_empty").closest("tr").remove();
 		}
 
-		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
+		var container = $("<tr></tr>");
+		container.attr("id", id);
+		container.data("waitlist", course);
+		container.data("section", section);
+		parent.append(container);
 
+		return container;
+	}
+});
+
+var EnrolledSectionSelection = Backbone.View.extend({
+	template: _.template("<td><%= model.courseName %></td>"
+		+	"<td><%= model.sectionCode %></td>"
+		+	"<td><%= model.day %></td>"
+		+	"<td><%= model.startTime %></td>"
+		+	"<td><%= model.endTime %></td>"
+		+	"<td><span class='remove-section link'>Remove</span></td>"),
+
+	waitlistTemplate: _.template("<td><%= name %></td>"
+		+	"<td></td>"
+		+	"<td></td>"
+		+	"<td></td>"
+		+	"<td></td>"
+		+	"<td><span class='remove-section link'>Remove</span></td>"),
+
+
+	initialize: function(options) {
+		this.parentView = options.parentView;
+		this.waitlist = options.waitlist;
+		this.render();
+	},
+
+	render: function() {
+		if (this.waitlist) {
+			this.$el.html(this.waitlistTemplate({
+				name: this.model.get("courseName") + " Waitlist",
+				model: this.model.toJSON()
+			}));
+		} else {
+			this.$el.html(this.template({
+				model: this.model.toJSON()
+			}));
+		}
+	},
+
+	events: {
+		"click .remove-section": "removeSection"
 	},
 
 	removeSection: function(evt) {
-		console.log("test");
-		this.parentView.enrolledTable
-			.row($(evt.currentTarget).parent("tr"))
-			.remove()
-			.draw();
-	}
+		var id = $(evt.currentTarget).closest("tr").attr("id");
+		$(evt.currentTarget).closest("tr").remove();
+		
+		$("#sections-list").find("#" + id).find(".glyphicon-ok").remove();
+
+		var parent = $("#enrolled-list");
+		if (parent.find("tbody tr").length == 0) {
+			parent.find("tbody").append("<tr class='odd'><td valign='top' colspan='6' class='dataTables_empty'>No data available in table</td></tr>")
+		}
+	},
 });
+
+
+

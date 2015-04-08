@@ -69,6 +69,7 @@ var RegistrationFormView = Backbone.View.extend({
 					return true; // ?
 				}
 				else if (thisID == "info-form" && nextID == "sections-form") {
+					return true;
 					return view.regStudentInfo.validate();
 				}
 				else if (thisID == "sections-form" && nextID == "terms-form") {
@@ -129,14 +130,17 @@ var RegistrationFormView = Backbone.View.extend({
 		console.log("final", studentModel);
 		console.log("sections", sections);
 
-		studentModel.save().then(function(data) {
+		var finalStudent = new Student(studentModel.toJSON(), {parse:true});
+
+		setDateOfBirth(finalStudent);
+		finalStudent.save().then(function(data) {
 			if (typeof data == "string") {
 				data = JSON.parse(data);
 			}
 			if (data.status == "success") {
 				$.ajax({
 					type: "POST",
-					url: studentModel.enrollStudentInSections(studentModel.get("userid")),
+					url: finalStudent.enrollStudentInSections(finalStudent.get("userid")),
 					data: {
 						sectionids: JSON.stringify(sectionids),
 						status: view.status,
@@ -148,7 +152,7 @@ var RegistrationFormView = Backbone.View.extend({
 					}
 					if (data.status == "success") {
 						new TransactionResponseView({
-							message: "Thank you for registering. You will receieve an email (" + studentModel.get("emailAddr") + ") when an administrator has approved your request.",
+							message: "Thank you for registering. You will receieve an email (" + finalStudent.get("emailAddr") + ") when an administrator has approved your request.",
 							redirect: true,
 							url: view.regType == "online" ? "" : "home"
 						});
@@ -156,7 +160,7 @@ var RegistrationFormView = Backbone.View.extend({
 						sendEmail({
 							from: "info@gobindsarvar.com",
 							to: [{
-								email: studentModel.get("emailAddr"),
+								email: finalStudent.get("emailAddr"),
 								name: "Gobind Sarvar",
 								type: "to"
 							}],
