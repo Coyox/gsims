@@ -181,6 +181,7 @@ To update a user's username and password(with generated hash)
 @param:
   route param: user id
   request param:
+    - checkDuplciate flag
     - username
     - password
 @return: json encoded status array
@@ -191,16 +192,17 @@ function updateLogin($id) {
     $user = json_decode($body);
 
     $bindparams = array("username" => $user->username);
-    $sql = "SELECT username from login where username=:username";
-    if (perform_query($sql,'GET', $bindparams)!= FALSE){
-        echo json_encode(array("status"=>"duplicate"));
+    if (isset($user->checkDuplicate) && $user->checkDuplicate == 1){
+        $sql = "SELECT username from login where username=:username";
+        if (perform_query($sql,'GET', $bindparams)!= FALSE){
+            echo json_encode(array("status"=>"duplicate"));
+            return;
+        }
     }
-    else {
-        $sql = "UPDATE login set username=:username, password=:password WHERE userid=:userid";
-        $hash = generatePasswordHash($user->password);
-        $bindparams = $bindparams + array("userid" => $id, "password" => $hash);
-        echo json_encode(perform_query($sql,'',$bindparams));
-    }
+    $sql = "UPDATE login set username=:username, password=:password WHERE userid=:userid";
+    $hash = generatePasswordHash($user->password);
+    $bindparams = $bindparams + array("userid" => $id, "password" => $hash);
+    echo json_encode(perform_query($sql,'',$bindparams));
 }
 
 function getLoginById($id){
