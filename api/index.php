@@ -897,15 +897,17 @@ function getDocuments(){
     $schoolyear = $_GET['schoolyearid'];
     $sectionid = $_GET['sectionid'];
     $courseid = $_GET['courseid'];
+    $status = $_GET['status'];
+    if (!isset($status)){ $status = "active"; }
 
     if (isset($schoolyearid)) {
-        return getDocumentsBySchoolYear($schoolyearid);
+        return getDocumentsBySchoolYear($schoolyearid, $status);
     }
     if (isset($sectionid)) {
-        return getDocumentsBySection($sectionid);
+        return getDocumentsBySection($sectionid, $status);
     }
     if (isset($courseid)) {
-        return getDocumentsByCourse($courseid);
+        return getDocumentsByCourse($courseid, $status);
     }
     $sql = "SELECT * from document order by lastAccessed desc";
     echo json_encode(perform_query($sql, 'GETALL'));
@@ -916,27 +918,20 @@ function getDocumentById($id){
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
-function getDocumentsBySchoolYear($schoolyearid){
-     $sql = "SELECT * from document where schoolyearid=:schoolyearid order by lastAccessed desc";
-     echo json_encode(perform_query($sql,'GETALL', array("schoolyearid"=>$schoolyearid)));
+function getDocumentsBySchoolYear($schoolyearid, $status){
+     $sql = "SELECT * from document where schoolyearid=:schoolyearid and status=:status order by lastAccessed desc";
+     echo json_encode(perform_query($sql,'GETALL', array("schoolyearid"=>$schoolyearid, "status"=>$status)));
 }
 
-function getDocumentsBySection($sectionid){
-    $status = $_GET['status'];
-    $bindparams = array("sectionid"=>$sectionid);
-    if (isset($status)){
-        $clause = "and status=:status ";
-        $bindparams["status"]=$status;
-    }
-    else { $clause = ""; }
-    $sql = "SELECT * from document where sectionid=:sectionid ".$clause."order by lastAccessed desc";
-    echo json_encode(perform_query($sql,'GETALL', $bindparams));
+function getDocumentsBySection($sectionid, $status){
+    $sql = "SELECT * from document where sectionid=:sectionid and status=:status order by lastAccessed desc";
+    echo json_encode(perform_query($sql,'GETALL', array("sectionid"=>$sectionid, "status"=>$status)));
 }
 
-function getDocumentsByCourse($courseid){
+function getDocumentsByCourse($courseid, $status){
     $sql = "SELECT * from document where sectionid in (SELECT s.sectionid from section where s.courseid=:courseid)
-            order by lastAccessed desc";
-    echo json_encode(perform_query($sql,'GETALL', array("courseid"=>$courseid)));
+            and status=:status order by lastAccessed desc";
+    echo json_encode(perform_query($sql,'GETALL', array("courseid"=>$courseid, "status"=>$status)));
 }
 
 function updateDocument($id){
@@ -992,13 +987,32 @@ function createDocument(){
     echo json_encode($resp);
 }
 
+/*
+Delete a document record
+@param:
+  route param: section id
+  request param:
+    - purge(1 = hard delete, 0 = set inactive)
+@return: json encoded status array
+*/
 function deleteDocument($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $option = json_decode($body);
-    $bindparams = array("id"=>$id);
-    $sql = ($option->purge == 1)? "DELETE from document where docid=:id" : "UPDATE document set status='inactive' where docid=:id";
-    echo json_encode(perform_query($sql,'', $bindparams));
+    $bindparams = array();
+    $params = array("id"=>$id);
+    $queries = array();
+    if ($option->purge == 1) {
+        array_push($queries, "DELETE from document where docid=:id");
+        array_push($bindparams, $params);
+    }
+    else {
+        array_push($queries, "UPDATE document set status='inactive' where docid=:id");
+        array_push($queries, "UPDATE marks set status='inactive' where docid=:id");
+        array_push($bindparams, $params);
+        array_push($bindparams, $params);
+    }
+    echo json_encode(perform_transaction($queries, $bindparams));
 }
 
 function getMarks($id) {
