@@ -881,17 +881,17 @@ function getStudentGradeForSection($id, $userid){
 }
 /*wrapper for getStudentGradeForSection*/
 function getStudentSectionGrade($sectionid, $userid){
-    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectionid and fullmark is not null";
+    $sql = "SELECT coalesce(sum(fullmark),0) from document where sectionid=:sectionid and fullmark is not null and status='active'";
     $bindparams = array("sectionid"=>$sectionid);
     $totalmarks =  (int) perform_query($sql,'GETCOL',$bindparams);
-    $sql = "SELECT count(docid) from document where sectionid=:sectionid and fullmark is not null";
+    $sql = "SELECT count(docid) from document where sectionid=:sectionid and fullmark is not null and status='active'";
     $section_hasmark = (int) perform_query($sql,'GETCOL',$bindparams);
     if ($totalmarks==0 || $section_hasmark == 0) {
         return -1;
     }
     $sql = "SELECT coalesce(sum(mark),0) from marks
             where docid in
-                (SELECT docid from document where sectionid=:sectionid and fullmark is not null)
+                (SELECT docid from document where sectionid=:sectionid and fullmark is not null and status='active')
             and userid=:userid";
     $bindparams["userid"]=$userid;
     $attainedmarks = (int) perform_query($sql,'GETCOL',$bindparams);
