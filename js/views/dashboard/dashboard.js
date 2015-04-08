@@ -194,7 +194,8 @@ var DashboardView = Backbone.View.extend({
 			data: {
 				numdays: numdays,
 				today: today,
-				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
+				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
 			_.each(data, function(teacher, index) {

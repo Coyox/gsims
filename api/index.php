@@ -2257,11 +2257,22 @@ function findStudentsWithAdvancedCriteria($schoolid){
 #================================================================================================================#
 # Notifications
 #================================================================================================================#
-//find the teachers who have not inputted attendance in the last X days
+/*
+Find the teachers who have not inputted attendance in the last X days
+@param:
+  route param: none
+  request param:
+    - numdays: the last X days
+    - schoolid
+    - schoolyearid
+    - today: date in YYYY-MM-DD
+@return: json encoded status array
+*/
 function getTeachersWithMissingInputAttendance(){
     $numdays = $_GET['numdays'];
     $today = $_GET['today'];
     $schoolyearid = $_GET['schoolyearid'];
+    $schoolid  = $_GET['schoolid'];
 
     $sql = "SELECT t.userid, t.firstName, t.lastName, t.emailAddr, a.maxdate, a.sectionid
             from teacher t,
@@ -2272,7 +2283,8 @@ function getTeachersWithMissingInputAttendance(){
     $bindparams = array(
         "today"  => $today,
         "numdays" => $numdays,
-        "schoolyearid" => $schoolyearid
+        "schoolyearid" => $schoolyearid,
+        "schoolid" => $schoolid,
     );
     echo json_encode(perform_query($sql,'GETALL', $bindparams));
 }
