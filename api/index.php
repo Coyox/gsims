@@ -214,7 +214,7 @@ function updateLogin($id){
             $resp["status"] = ($ret==1) ? "success" : "failure";
         }
     }
-    json_encode($resp);
+    echo json_encode($resp);
 }
 /*
 To update a user's username
