@@ -1562,7 +1562,7 @@ function handlePendingTestStudents(){
 
     foreach ($students as $student){
         $param = array("userid"=>$student->userid);
-        if ($student->status == "denied"){
+        if ($student->deniedList){
             $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
             list($sqlparens, $params) = parenthesisList($student->deniedList);
             $sql.=$sqlparens;
@@ -1570,7 +1570,7 @@ function handlePendingTestStudents(){
             array_push($bindparams, $params);
             array_push($queries, $sql);
         }
-        else {
+       if ($student->approvedList){
             $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
             list($sqlparens, $params) = parenthesisList($student->approvedList);
             $sql.=$sqlparens;
