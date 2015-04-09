@@ -362,7 +362,8 @@ var EnrolledSectionsView = Backbone.View.extend({
 				new EnrolledSectionsRowView({
 					el: view.addRow(),
 					model: section,
-					studentid: id
+					studentid: id,
+					parentView: view
 				});
 			});
 			view.$el.find("#enrolled-sections-table").dataTable({
@@ -405,6 +406,7 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.studentid = options.studentid;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -419,12 +421,34 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 	},
 
 	dropSection: function(evt) {
+		var view = this;
 		var id = $(evt.currentTarget).attr("id");
 		this.model.set("id", id);
 		this.model.destroy({
 			url: this.model.getDropStudentUrl(id, this.studentid)
 		}).then(function(data) {
-			console.log(data);
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
+
+			if (data.status == "success") {
+				new TransactionResponseView({
+					message: "Student has been successfully dropped from the section."
+				});
+				view.parentView.render();
+			} else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Student has been successfully dropped from the section."
+				});				
+			}
+		}).fail(function(data) {
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "Student has been successfully dropped from the section."
+			});	
 		});
 	}
 });
