@@ -69,7 +69,6 @@ var RegistrationFormView = Backbone.View.extend({
 					return true; // ?
 				}
 				else if (thisID == "info-form" && nextID == "sections-form") {
-					return true;
 					return view.regStudentInfo.validate();
 				}
 				else if (thisID == "sections-form" && nextID == "terms-form") {

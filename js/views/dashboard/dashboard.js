@@ -102,9 +102,9 @@ var DashboardView = Backbone.View.extend({
 			var parent = view.$el.find("#pending-test-stats");
 			parent.find(".count").text(data);
 			if (data != "0") {
-				parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
+				parent.find(".alert").removeClass("alert-info").addClass("alert-danger");
 			} else {
-				parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
+				parent.find(".alert").removeClass("alert-danger").addClass("alert-info");
 			}
 		});
 	},

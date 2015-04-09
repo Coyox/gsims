@@ -17,10 +17,6 @@ var HomePageView = Backbone.View.extend({
     	new HeaderView({
     		el: this.$el.find("#header")
     	});
-
-    	new FooterView({
-    		el: this.$el.find("#footer")
-    	});
 	}
 });
 
@@ -77,7 +73,6 @@ var SidebarView = Backbone.View.extend({
 
 	updateSchool: function(evt) {
 		var schoolid = $(evt.currentTarget).find("option:selected").val();
-		console.log(schoolid);
 		sessionStorage.setItem("gobind-schoolid", schoolid);
 		app.Router.navigate("home", {trigger: true});
 		app.currentSchool = schoolid;
@@ -124,6 +119,7 @@ var HeaderView = Backbone.View.extend({
 	},
 
 	logout: function(evt) {
+		console.log("logout");
 		app.Router.navigate("", {trigger:true});
 		sessionStorage.removeItem("gobind-email");
 		sessionStorage.removeItem("gobind-login");
@@ -131,20 +127,6 @@ var HeaderView = Backbone.View.extend({
 		sessionStorage.removeItem("gobind-user");
 		sessionStorage.removeItem("gobind-username");
 		sessionStorage.removeItem("gobind-usertype");
-	},
-
-	displayNotifications: function(evt) {
-
-	}
-});
-
-var FooterView = Backbone.View.extend({
-	initialize: function(options) {
-		this.render();
-	},
-
-	render: function() {
-		this.$el.html(html["footer.html"]);
 	}
 });
 

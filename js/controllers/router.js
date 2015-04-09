@@ -505,7 +505,7 @@ var Router = Backbone.Router.extend({
 
     registrationForm: function() {
         new RegistrationFormView({
-            el: $("#container"),
+            el: $("#container").empty().html("<div id='test-reg'></div>"),
             regType: "online",
             status: "pending"
         });
