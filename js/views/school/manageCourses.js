@@ -978,7 +978,8 @@ var CourseSectionView = Backbone.View.extend({
 		                el: view.addCourseWaitlist(),
 		                model: student,
                         results: sections,
-                        courseid: view.courseid
+                        courseid: view.courseid,
+                        parentView: view
 		            })
 	            });
             });
@@ -1089,8 +1090,9 @@ var CourseWaitlistRowView = Backbone.View.extend({
     sectionLink: _.template("<span class='enrol-waitlist primary-link' id='<%= model.sectionid %>'>[<%= model.sectionCode %>]</span> "),
 
 	initialize: function(options) {
-        this.sdata = options.results
-        this.tdata = options.courseid
+        this.sdata = options.results;
+        this.tdata = options.courseid;
+        this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -1099,13 +1101,14 @@ var CourseWaitlistRowView = Backbone.View.extend({
 	},
 
 	enrollWaitlist: function(evt) {
+		var view = this;
         var section = new Section();
         var courseid = this.tdata;
         var uid = this.model.get("userid");
         var sectionid = $(evt.currentTarget).attr("id");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
         section.fetch({
-        	url: section.getStudentCo(section.get("sectionid"))
+        	url: section.getStudentCount(section.get("sectionid"))
         }).then(function(data) {
         	var full = parseInt(data) >= parseInt(section.get("classSize"));
         	if (!full){
@@ -1130,7 +1133,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
         						message: "Student successfuly enrolled."
         					});
 
-        					this.render();
+        					view.parentView.render();
         				} else {
         					new TransactionResponseView({
         						title: "ERROR",
@@ -2096,7 +2099,7 @@ var AttendanceView = Backbone.View.extend({
 					var day = new Date(ymd).getDay();
 					console.log()
 					var allDays = [1,2,3,4,5,6,7];
-					if ($.inArray(allDays[day], invalidDays) < 0 && 
+					if ($.inArray(allDays[day], invalidDays) < 0 &&
 							$.inArray(day, inputtedDates) < 0) {
 						return [true];
 					}

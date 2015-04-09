@@ -1523,6 +1523,7 @@ function handlePendingStudents(){
     $transaction_result = perform_transaction($queries, $bindparams);
 
     /*************************************************************************/
+    /* Send email with login creds to approved users */
 
     if ($transaction_result["status"] == "success" && $activeList){
         $sql = "SELECT userid, firstName, lastName, emailAddr from student where userid in ";
