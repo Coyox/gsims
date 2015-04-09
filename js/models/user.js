@@ -266,17 +266,6 @@ var User = Backbone.Model.extend({
 		password: ""
 	},
 
-	validation: {
-		username: {
-			required: true,
-			msg: "Please enter a username"
-		},
-		password: {
-			required: true,
-			msg: "Please enter a password"
-		}
-	},
-
     urlRoot: app.serverUrl + "api/login",
 
    	getUsers: function(id, usertype) {

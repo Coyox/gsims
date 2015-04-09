@@ -7,7 +7,7 @@ var UserSettingsView = Backbone.View.extend({
 		this.$el.html(html["settings.html"]);
 
 		this.login = JSON.parse(sessionStorage.getItem("gobind-login"));
-		this.model = new User(this.login, {parse:true});
+		this.model = new User();
 		this.$el.find("#username").val(this.login.username);
 	},
 
@@ -19,7 +19,7 @@ var UserSettingsView = Backbone.View.extend({
 	saveUser: function() {
 		var view = this;
 		Backbone.Validation.bind(this);
-		this.model.set("id", this.model.get("userid"));
+		this.model.set("id", this.login.userid);
 		if (this.model.isValid(true)) {
 			this.model.save().then(function(data) {
 				if (typeof data == "string") {

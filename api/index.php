@@ -177,32 +177,53 @@ function validateCredentials() {
 }
 
 /*
-To update a user's username and password(with generated hash)
+Wrapper To update a user's login
 @param:
   route param: user id
   request param:
-    - checkDuplciate flag
     - username
     - password
 @return: json encoded status array
 */
-function updateLogin($id) {
+function updateLogin($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $user = json_decode($body);
-
-    $bindparams = array("username" => $user->username);
-    if (isset($user->checkDuplicate) && $user->checkDuplicate == 1){
-        $sql = "SELECT username from login where username=:username";
-        if (perform_query($sql,'GET', $bindparams)!= FALSE){
-            echo json_encode(array("status"=>"duplicate"));
-            return;
-        }
+    if ($user->username != ""){
+        updateUsername($id, $user->username);
     }
-    $sql = "UPDATE login set username=:username, password=:password WHERE userid=:userid";
-    $hash = generatePasswordHash($user->password);
-    $bindparams = $bindparams + array("userid" => $id, "password" => $hash);
-    echo json_encode(perform_query($sql,'',$bindparams));
+    if ($user->password != ""){
+        updatePassword($id, $user->password);
+    }
+}
+/*
+To update a user's username
+@param:
+    - userid
+    - username
+@return: json encoded status array
+*/
+function updateUsername($id, $username){
+    $sql = "SELECT username from login where username=:username";
+    $bindparams = array("username"=>$username);
+    if (perform_query($sql,'GET', $bindparams)!= FALSE){
+        echo json_encode(array("status"=>"duplicate"));
+        return;
+    }
+    $sql = "UPDATE login set username=:username WHERE userid=:userid";
+    echo json_encode(perform_query($sql,'', $bindparams+array("userid"=>$id)));
+}
+/*
+To update a user's password(with generated hash)
+@param:
+    - userid
+    - password
+@return: json encoded status array
+*/
+function updatePassword($id, $password) {
+    $sql = "UPDATE login set password=:password WHERE userid=:userid";
+    $hash = generatePasswordHash($password);
+    echo json_encode(perform_query($sql,'', array("userid"=>$id, "password"=>$hash)));
 }
 
 function getLoginById($id){
