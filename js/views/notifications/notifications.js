@@ -8,11 +8,11 @@ var NotificationsView = Backbone.View.extend({
 	render: function() {
 		this.$el.html(html["notifications.html"]);
 
-		new PendingRegistrationView({
-			el: this.addContainer("Students Pending Registration Approval")
+		var pendingRegView = new PendingRegistrationView({
+			el: this.addContainer("Students Pending Registration Approval"),
 		});
 
-		new PendingTestView({
+		pendingTestView = new PendingTestView({
 			el: this.addContainer("Students Pending Tests")
 		});
 	},
@@ -215,6 +215,7 @@ var PendingRegistrationView = Backbone.View.extend({
 						});
 
 						view.render();
+						pendingTestView.render();
 					}
 				}
 			});

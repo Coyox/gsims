@@ -84,7 +84,7 @@ var CreateTeacherView = Backbone.View.extend({
 							type: "POST",
 							url: view.model.getCourseCompetencyUrl(data.userid),
 							data: {
-								competencies: JSON.stringify(insertComp)
+								insertComps: JSON.stringify(insertComp)
 							}
 						}).then(function(data) {
 							if (typeof data == "string") {
