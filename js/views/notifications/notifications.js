@@ -407,7 +407,8 @@ var PendingTestView = Backbone.View.extend({
 				}
 			});
 			if (found) {
-				if (user.approvedList.length == 0 && user.testList.length == 0) {
+				user.status = "active";
+				if (user.approvedList.length == 0) {
 					user.status = "denied";
 					approvedEmails.push(user.emailAddr);
 				} else {
@@ -423,7 +424,7 @@ var PendingTestView = Backbone.View.extend({
 		var student = new Student();
 		var xhr = $.ajax({
 			type: "POST",
-			url: student.updatePendingUrl(),
+			url: student.updatePendingTestsUrl(),
 			data: {
 				students: JSON.stringify(students)
 			},

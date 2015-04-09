@@ -144,7 +144,9 @@ var Student = Backbone.Model.extend({
    	updatePendingUrl: function() {
    		return this.urlRoot + "/pending";
    	},
-
+   	updatePendingTestsUrl: function() {
+   		return this.urlRoot + "/pendingTest";
+   	},
    	enrollStudentInSections: function(id) {
    		return this.urlRoot + "/" + id + "/sections";
    	},
