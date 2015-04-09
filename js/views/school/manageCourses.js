@@ -922,19 +922,19 @@ var CourseSectionView = Backbone.View.extend({
 		+				"<th>First Name</th>"
         +				"<th>Last Name</th>"
         +				"<th>User ID</th>"
-		+				"<th>Enrol to Section</th>"
+		+				"<th>Enroll to Section</th>"
 		+			"</tr>"
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
 		+	"</table>"
-        ),
+    ),
 
 	initialize: function(options) {
         this.courseName = options.courseName;
         this.courseid = options.courseid;
         this.model = new Section();
         this.render();
- },
+ 	},
 
 	events: {
 		"click #add-section": "addSectionToCourse",
@@ -969,24 +969,19 @@ var CourseSectionView = Backbone.View.extend({
 
 
             var course = new Course();
-            //console.log(view.courseid);
             course.fetch({
                 url: course.getCourseWaitlist(view.courseid)
-               }).then(function(data){
-                    //console.log("coursesectionview data");
-                    //console.log(data);
-                    //console.log("coursesectionview sections");
-                    //console.log(sections);
-                    _.each(data, function(sec, index) {
-			            var student = new Student(sec, {parse:true});
-			            new CourseWaitlistRowView({
-			                el: view.addCourseWaitlist(),
-			                model: student,
-                            results: sections,
-                            courseid: view.courseid
-			            })
-		            });
-                });
+            }).then(function(data){
+                _.each(data, function(sec, index) {
+		            var student = new Student(sec, {parse:true});
+		            new CourseWaitlistRowView({
+		                el: view.addCourseWaitlist(),
+		                model: student,
+                        results: sections,
+                        courseid: view.courseid
+		            })
+	            });
+            });
 
 		});
 
@@ -1013,6 +1008,9 @@ var CourseSectionView = Backbone.View.extend({
 
 		var elem = $("#create-section-modal");
 		var backdrop = $(".modal-backdrop");
+
+		elem.find("input[name='startTime']").timepicker();
+		elem.find("input[name='endTime']").timepicker();
 
 		elem.modal({
 			show: true
@@ -1088,8 +1086,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		+	"<td><%= model.userid %></td>"
 		+	"<td class='section-links'></td>"),
 
-    sectionLink: _.template("<span class='enrol-waitlist primary-link center-block' id='<%= model.sectionid %>'>[<%= model.sectionCode %>]</span>"),
-    //sectionLink: _.template("<span class='add-section primary-link center-block' id='<%= model.sectionid %>'></span>"),
+    sectionLink: _.template("<span class='enrol-waitlist primary-link' id='<%= model.sectionid %>'>[<%= model.sectionCode %>]</span> "),
 
 	initialize: function(options) {
         this.sdata = options.results
@@ -1108,7 +1105,7 @@ var CourseWaitlistRowView = Backbone.View.extend({
         var sectionid = $(evt.currentTarget).attr("id");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
         section.fetch({
-        	url: section.getStudentCount(section.get("sectionid"))
+        	url: section.getStudentCo(section.get("sectionid"))
         }).then(function(data) {
         	var full = parseInt(data) >= parseInt(section.get("classSize"));
         	if (!full){
@@ -1152,23 +1149,18 @@ var CourseWaitlistRowView = Backbone.View.extend({
         		}
 
         	});
-},
+	},
 
 	render: function() {
 		this.$el.html(this.template({
 			model: this.model.toJSON()
 		}));
-        console.log("from render");
-        console.log(this.tdata);
         var links = "";
         _.each(this.sdata, function(section, index) {
             var secmodel = new Section(section, {parse:true});
-            console.log(secmodel.toJSON());
             var link = this.sectionLink({
                 model: secmodel.toJSON()
             });
-            //console.log("this is the sectioncode");
-            //console.log(secmodel.sectionCode);
             links += link;
         }, this);
 
@@ -1216,8 +1208,7 @@ var SectionView = Backbone.View.extend({
 		this.render();
 	},
 
-	render: function() {
-
+	render: function(renderTabs) {
 		var template = html["viewSection.html"];
 		var usertype = sessionStorage.getItem("gobind-usertype");
 
@@ -1228,11 +1219,14 @@ var SectionView = Backbone.View.extend({
 
 		if (this.action == "view") {
 			this.$el.find("#edit-section").removeClass("hide").show();
+			this.$el.find("#cancel").hide();
 			this.$el.find("#save-section").hide();
 		} else {
 			this.$el.find("#save-section").removeClass("hide").show();
+			this.$el.find("#cancel").removeClass("hide").show();
 			this.$el.find("#edit-section").hide();
 		}
+
 		var view = this;
 		this.model = new Section({id: this.id});
 		this.model.fetch().then(function(data) {
@@ -1255,7 +1249,8 @@ var SectionView = Backbone.View.extend({
 	events: {
 		"click #edit-section": "editSection",
 		"click #save-section": "saveSection",
-		"click #delete-section": "deleteSection"
+		"click #delete-section": "deleteSection",
+		"click #cancel": "cancel"
 	},
 
 	addRow: function() {
@@ -1301,6 +1296,7 @@ var SectionView = Backbone.View.extend({
 
 	editSection: function(evt) {
 		this.action = "edit";
+		this.untouched = JSON.stringify(this.model.toJSON());
 		this.render();
 	},
 
@@ -1336,6 +1332,15 @@ var SectionView = Backbone.View.extend({
 		Backbone.Validation.bind(this);
 		var view  = this;
 		if (this.model.isValid(true)) {
+			var days = [];
+			_.each($(".day"), function(day, index) {
+				if ($(day).is(":checked")) {
+					days.push($(day).data("day").toUpperCase());
+				}
+			});
+			days = days.join(",");
+
+			this.model.set("day", days);
 			this.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
 			this.model.save().then(function(data) {
 				if (typeof data == "string") {
@@ -1387,39 +1392,12 @@ var SectionView = Backbone.View.extend({
 
 		this.model = new Section();
 		Backbone.Validation.bind(this);
+	},
 
-		elem.on("click", "#save", function() {
-			// view.model.set("deptid", deptid);
-			// view.model.set("courseName", view.$el.find("#courseName").val());
-			// view.model.set("description", view.$el.find("#description").val());
-			// view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
-			// view.model.set("status", "active");
-			// if (view.model.isValid(true)) {
-			// 	elem.remove();
-			// 	backdrop.remove();
-			// 	view.model.save().then(function(data) {
-			// 		if (data.status=="success") {
-			// 			new TransactionResponseView({
-			// 				message: "New course successfully created."
-			// 			});
-			// 			view.render();
-			// 		}
-			// 		else {
-			// 			new TransactionResponseView({
-			// 				title: "ERROR",
-			// 				status: "error",
-			// 				message: "Could not create a new course."
-			// 			});
-			// 		}
-			// 	}).fail(function(data) {
-			// 		new TransactionResponseView({
-			// 			title: "ERROR",
-			// 			status: "error",
-			// 			message: "Could not create a new course."
-			// 		});
-			// 	});
-			// }
-		});
+	cancel: function() {
+		this.action = "view";
+		this.model.attributes = JSON.parse(this.untouched);
+		this.render();
 	}
 });
 
@@ -1427,6 +1405,18 @@ var ViewSectionRow = Backbone.View.extend({
 	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
 		+		"<span><%= value %></span>"
+		+	"</div>"),
+
+	dayTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
+		+	"<div class='col-sm-8'>"
+		+	 "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='mon'>MON </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='tue'>TUE </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='wed'>WED </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='thu'>THU </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='fri'>FRI </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='sat'>SAT </label>"
+        +    "<label class='checkbox-inline'><input type='checkbox' class='day' name='day' data-day='sun'>SUN </label>"
+		+	 "<span class='help-block hidden'></span>"
 		+	"</div>"),
 
 	editTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
@@ -1457,16 +1447,30 @@ var ViewSectionRow = Backbone.View.extend({
 				name: this.name
 			}));
 		} else {
-			this.$el.html(this.editTemplate({
-				label: this.label,
-				value: this.value,
-				name: this.name
-			}));
+			if (this.name == "day") {
+				this.$el.html(this.dayTemplate({
+					label: this.label,
+					value: this.value,
+					name: this.name
+				}));
+
+				var days = this.value.split(",");
+				_.each(days, function(day) {
+					day = day.toLowerCase();
+					this.$el.find("input[data-day='" + day + "']").prop("checked", true);
+				}, this);
+
+			} else {
+				this.$el.html(this.editTemplate({
+					label: this.label,
+					value: this.value,
+					name: this.name
+				}));
+			}
 
 			if (this.name == "startTime" || this.name == "endTime") {
 				this.$el.find("input").timepicker();
 			}
-
 		}
 	},
 
@@ -1475,7 +1479,6 @@ var ViewSectionRow = Backbone.View.extend({
 		var name = $(evt.currentTarget).attr("name");
 		this.model.set(name, val);
 	}
-
 });
 
 var TeacherSectionView = Backbone.View.extend({

@@ -150,6 +150,9 @@ var Section = Backbone.Model.extend({
 		day: {
 			required: true,
 		},
+		sectionCode: {
+			required: true
+		},
 		startTime: {
 			required: true,
 		},
