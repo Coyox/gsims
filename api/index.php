@@ -2132,11 +2132,15 @@ function findUsers($schoolid, $usertype){
         }
     }
     else if ($usertype=="A"|$usertype=="T"){
+        $both = $_GET["both"];
         if (array_key_exists('firstName', $param) || array_key_exists('lastName', $param)) {
             list($clause, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
-            $bindparams["usertype"] = $usertype;
-            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where schoolid=:schoolid".$clause." and usertype=:usertype order by firstName asc";
+            if (!isset($both)){
+                $clause.= " and usertype=:usertype";
+                $bindparams["usertype"] = $usertype;
+            }
+            $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where schoolid=:schoolid".$clause." order by firstName asc";
             echo json_encode(perform_query($sql,'GETALL', $bindparams));
         }
         else{
