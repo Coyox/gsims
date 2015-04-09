@@ -41,7 +41,7 @@ var PendingRegistrationView = Backbone.View.extend({
 			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
 				status: "pending",
-				pendingEnrollment: "1"
+				enrollment: "pending"
 			}
 		}).then(function(data) {
 			_.each(data, function(object, index) {
@@ -316,7 +316,8 @@ var PendingTestView = Backbone.View.extend({
 		student.fetch({
 			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
-				status: "pending-test"
+				status: "pending-test",
+				enrollment: "pending-test",
 			}
 		}).then(function(data) {
 			_.each(data, function(object, index) {

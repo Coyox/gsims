@@ -2088,10 +2088,10 @@ function findUsers($schoolid, $usertype){
         $status = $_GET['status'];
         $dob = $_GET['dateOfBirth'];
         $email = $_GET['emailAddr'];
-        $pendingEnrollment = $_GET['pendingEnrollment'];
+        $enrollment = $_GET['enrollment'];
 
 
-        if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)||isset($pendingEnrollment)){
+        if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)||isset($enrollment)){
             if (isset($year)){
                 $yearop = constant($_GET['yearop']);
                 $clause.=" and year(dateOfBirth) ".$yearop.":year";
@@ -2103,8 +2103,9 @@ function findUsers($schoolid, $usertype){
                 $bindparams["upperyear"] = $upperyear;
             }
             if (isset($status)){
-                if (isset($pendingEnrollment)){
-                    $clause.=" and userid in (SELECT userid from enrollment where status='pending')";
+                if (isset($enrollment)){
+                    $clause.=" and userid in (SELECT userid from enrollment where status=:enrollment)";
+                    $bindparams["enrollment"] = $enrollment;
                 }
                 else { $param['status'] = $status; }
             }
