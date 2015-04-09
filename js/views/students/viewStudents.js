@@ -154,6 +154,7 @@ var SearchStudentsView = Backbone.View.extend({
 		var parent = this.$el.find("#filter-students-container");
 		parent.find("input[type='text']").val("");
 		parent.find("select").prop("selectedIndex", 0);
+		parent.find("input[type='radio']").prop("checked", false);
 	},
 
 	changeOperator: function(evt) {

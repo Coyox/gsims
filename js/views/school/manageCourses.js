@@ -1287,7 +1287,8 @@ var SectionView = Backbone.View.extend({
 	attendanceTab: function(id) {
 		new AttendanceView({
 			el: $("#attendance"),
-			sectionid: id
+			sectionid: id,
+			model: this.model
 		});
 	},
 
@@ -1461,6 +1462,11 @@ var ViewSectionRow = Backbone.View.extend({
 				value: this.value,
 				name: this.name
 			}));
+
+			if (this.name == "startTime" || this.name == "endTime") {
+				this.$el.find("input").timepicker();
+			}
+
 		}
 	},
 
@@ -2044,10 +2050,7 @@ var AttendanceView = Backbone.View.extend({
 		var elem = $("#add-attendnace-modal");
 		var backdrop = $(".modal-backdrop");
 
-		elem.find("#date").datepicker({
-			dateFormat: "yy-mm-dd"
-		});
-
+		// list of students to input attendance for
 		var section = new Section();
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
@@ -2064,6 +2067,41 @@ var AttendanceView = Backbone.View.extend({
 			});
 		});
 
+		// list of previously inputted attendance dates
+		section.fetch({
+			url: section.getSectionDates(this.sectionid)
+		}).then(function(data) {
+			console.log(data);
+			var inputtedDates = [];
+			_.each(data, function(inputted, index) {
+				inputtedDates.push(inputted.date);
+			});
+
+			console.log(inputtedDates);
+
+			// only allow attendance to be inputted on the days that the class is running
+			var days = view.model.get("day");
+			days = days.split(",");
+			days = view.weekDayToIndex(days);
+
+			var invalidDays = view.getInvalidDays(days);
+
+			elem.find("#date").datepicker({
+				dateFormat: "yy-mm-dd",
+				beforeShowDay: function(date) {
+					var ymd = date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
+					var day = new Date(ymd).getDay();
+					console.log()
+					var allDays = [1,2,3,4,5,6,7];
+					if ($.inArray(allDays[day], invalidDays) < 0 && 
+							$.inArray(day, inputtedDates) < 0) {
+						return [true];
+					}
+					return [false];
+				}
+			});
+		});
+
 		elem.modal({
 			show: true
 		});
@@ -2076,6 +2114,50 @@ var AttendanceView = Backbone.View.extend({
 		elem.on("click", "#save", function() {
 			view.saveAttendance(elem, backdrop);
 		});
+	},
+
+	weekDayToIndex: function(days) {
+		var array = [];
+
+		_.each(days, function(day, index) {
+			switch (day) {
+				case "MON":
+					array.push(1);
+					break;
+				case "TUE":
+					array.push(2);
+					break;
+				case "WED":
+					array.push(3);
+					break;
+				case "THU":
+					array.push(4);
+					break;
+				case "FRI":
+					array.push(5);
+					break;
+				case "SAT":
+					array.push(6);
+					break;
+				case "SUN":
+					array.push(7);
+				default:
+					break;
+			}
+		}, this);
+
+		return array;
+	},
+
+	getInvalidDays: function(days) {
+		var all = [1,2,3,4,5,6,7];
+		_.each(days, function(day, index) {
+			var i = all.indexOf(day);
+			if (i > -1) {
+				all.splice(i, 1);
+			}
+		}, this);
+		return all;
 	}
 });
 
