@@ -112,17 +112,18 @@ var DashboardView = Backbone.View.extend({
 		// 	}
 		// });
 
-		count.fetch({
-			url: count.getCountUrl("S"),
+		student.fetch({
+			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
 				status: "pending-test",
+				enrollment: "pending-test",
 				schoolid: sessionStorage.getItem("gobind-schoolid"),
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-test-stats");
-			parent.find(".count").text(data);
-			if (data != "0") {
+			parent.find(".count").text(data.length);
+			if (data.length > 0) {
 				parent.find(".alert").removeClass("alert-info").addClass("alert-danger");
 			} else {
 				parent.find(".alert").removeClass("alert-danger").addClass("alert-info");

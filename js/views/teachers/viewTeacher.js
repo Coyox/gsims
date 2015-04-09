@@ -235,17 +235,16 @@ var TeachingSectionsView = Backbone.View.extend({
 
 		var view = this;
 		var id = this.model.get("userid");
-		console.log(this.model);
 		this.model.fetch({
 			url: this.model.getTeachingSectionsUrl(id)
 		}).then(function(data) {
-			console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
 				new TeachingSectionsRowView({
 					el: view.addRow(),
 					model: section,
-					teacherid: id
+					teacherid: id,
+					parentView: view
 				});
 			});
 			view.$el.find("table").dataTable({
@@ -256,7 +255,7 @@ var TeachingSectionsView = Backbone.View.extend({
 
 	addRow: function() {
         var container = $("<tr></tr>");
-        this.$el.find("#enrolled-sections-table .results").first().append(container);
+        this.$el.find("table").first().append(container);
         return container;
 	}
 });
@@ -271,6 +270,7 @@ var TeachingSectionsRowView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.teacherid = options.teacherid;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -285,6 +285,7 @@ var TeachingSectionsRowView = Backbone.View.extend({
 	},
 
 	dropSection: function(evt) {
+		var view = this;
 		var sectionid = $(evt.currentTarget).attr("id");
 		var section = new Section();
 		section.set("id", sectionid);
@@ -296,8 +297,9 @@ var TeachingSectionsRowView = Backbone.View.extend({
 			}
 			if (data.status == "success") {
 				new TransactionResponseView({
-					message: "This teacher is no longer teaching this sectin."
+					message: "This teacher is no longer teaching this section."
 				});
+				view.parentView.render();
 			} else {
 				new TransactionResponseView({
 					title: "ERROR",

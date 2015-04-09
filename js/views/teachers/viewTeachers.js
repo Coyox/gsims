@@ -269,7 +269,7 @@ var TeachersTableView = Backbone.View.extend({
 		});
 		createEmailButton(this.$el);
 		createRefreshButton(this.$el);
-		createExportButton(this.$el);
+		//createExportButton(this.$el);
 	},
 
 	fetchAllResults: function() {
@@ -300,7 +300,7 @@ var TeachersTableView = Backbone.View.extend({
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
-			createExportButton(view.$el);
+			//createExportButton(view.$el);
 		});
 	},
 

@@ -140,7 +140,7 @@ var SectionsTableView = Backbone.View.extend({
     		}
 		});
 		createRefreshButton(this.$el);
-		createExportButton(this.$el);
+		//createExportButton(this.$el);
 	},
 
 	fetchAllResults: function() {
@@ -172,7 +172,7 @@ var SectionsTableView = Backbone.View.extend({
         		}
 			});
 			createRefreshButton(view.$el);
-			createExportButton(view.$el);
+			//createExportButton(view.$el);
 		});
 	},
 

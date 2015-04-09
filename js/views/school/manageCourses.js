@@ -1385,6 +1385,9 @@ var SectionView = Backbone.View.extend({
 			both: 1
 		});
 
+		elem.find("h5").remove();
+		elem.find("hr").remove();
+
 		elem.modal({
 			show: true
 		});
