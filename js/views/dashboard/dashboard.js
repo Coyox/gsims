@@ -74,23 +74,44 @@ var DashboardView = Backbone.View.extend({
 		this.$el.find("#pending-notifications").removeClass("hide").show();
 
 		var view = this;
-		var count = new Count();
-		count.fetch({
-			url: count.getCountUrl("S"),
+		var student = new Student();
+		student.fetch({
+			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
 				status: "pending",
+				enrollment: "pending",
 				schoolid: sessionStorage.getItem("gobind-schoolid"),
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
 			var parent = view.$el.find("#pending-stats");
-			parent.find(".count").text(data);
-			if (data != "0") {
+			parent.find(".count").text(data.length);
+			if (data.length > 0) {
 				parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
 			} else {
 				parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
 			}
 		});
+
+		var count = new Count();
+		// count.fetch({
+		// 	url: count.getCountUrl("S"),
+		// 	data: {
+		// 		status: "pending",
+		// 		enrollment: "pending",
+		// 		schoolid: sessionStorage.getItem("gobind-schoolid"),
+		// 		schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+		// 	}
+		// }).then(function(data) {
+		// 	var parent = view.$el.find("#pending-stats");
+		// 	parent.find(".count").text(data);
+		// 	if (data != "0") {
+		// 		parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
+		// 	} else {
+		// 		parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
+		// 	}
+		// });
+
 		count.fetch({
 			url: count.getCountUrl("S"),
 			data: {
@@ -253,7 +274,6 @@ var DashboardView = Backbone.View.extend({
 		}
 
 		$.when(def).then(function(data) {
-			console.log(data);
 			// Get all sections
 			_.each(data, function(section, index) {
 				// Get all days for a section
@@ -720,7 +740,6 @@ var DashboardView = Backbone.View.extend({
 		var student = new Student({id: userid});
 		student.fetch().then(function(data) {
 			var model = new Student(data, {parse:true});
-			console.log(model);
 			new StudentAttendanceView({
 				el: view.$el.find("#attendance"),
 				model: model

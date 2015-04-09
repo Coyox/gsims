@@ -1381,7 +1381,8 @@ var SectionView = Backbone.View.extend({
 		new SearchTeachersView({
 			el: $(".modal-body"),
 			redirect: false,
-			sectionid: this.id
+			sectionid: this.id,
+			both: 1
 		});
 
 		elem.modal({
@@ -1585,7 +1586,8 @@ var TeacherSectionView = Backbone.View.extend({
 			courseid: this.courseid,
 			elem: elem,
 			backdrop: backdrop,
-			parentView: this
+			parentView: this,
+			both: 1
 		});
 
 		elem.modal({
@@ -1996,7 +1998,7 @@ var AttendanceView = Backbone.View.extend({
 					schoolid: sessionStorage.getItem("gobind-schoolid"),
 					schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear"),
 					userids: JSON.stringify(attended),
-					op: op || "POST"
+					status: "active"
 				}
 			}).then(function(data) {
 				if (typeof data == "string") {

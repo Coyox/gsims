@@ -6,6 +6,7 @@ var SearchTeachersView = Backbone.View.extend({
 		this.backdrop = options.backdrop;
 		this.elem = options.elem;
 		this.parentView = options.parentView;
+		this.both = options.both;
 		this.render();
 	},
 
@@ -31,6 +32,13 @@ var SearchTeachersView = Backbone.View.extend({
 		if (lastName != "") {
 			data.lastName = lastName;
 		}
+
+		console.log(this.both);
+
+		if (this.both) {
+			data.both = this.both;
+		}
+
 		var teacher = new Teacher();
 		teacher.fetch({
 			url: teacher.getSearchTeachersUrl("T", sessionStorage.getItem("gobind-schoolid")),
