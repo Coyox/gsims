@@ -63,7 +63,6 @@ var PendingRegistrationView = Backbone.View.extend({
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
-			createExportButton(view.$el);
 			addDTButtons(view.$el, "<button id='save-status' class='btn btn-primary btn-sm'>Save</button>");
 		});
 	},
@@ -337,7 +336,6 @@ var PendingTestView = Backbone.View.extend({
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
-			createExportButton(view.$el);
 			addDTButtons(view.$el, "<button id='save-status' class='btn btn-primary btn-sm'>Save</button>");
 		});
 	},
@@ -410,10 +408,8 @@ var PendingTestView = Backbone.View.extend({
 			if (found) {
 				user.status = "active";
 				if (user.approvedList.length == 0) {
-					user.status = "denied";
 					approvedEmails.push(user.emailAddr);
 				} else {
-					user.status = "active";
 					deniedEmails.push(user.emailAddr);
 				}
 				students.push(user);

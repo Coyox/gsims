@@ -1,3 +1,4 @@
+<% if (usertype == "A" || usertype == "SU") { %>
 <div id="options-container" style="padding: 10px; margin: 10px; background: #555; border-radius: 5px; margin-bottom: 10px;">
  	<% if (usertype == "SU") { %>
 	<div class="option">
@@ -6,13 +7,12 @@
 	</div>
 	<% } %>
 
-	<% if (usertype == "A" || usertype == "SU") { %>
 	<div class="option">
 		<span class="options-text">School Year</span>
 		<select id="school-year-options" class="form-control input-sm"></select>
 	</div>
-	<% } %>
 </div>
+<% } %>
 <ul class="nav" style="height: 100%;">
 	<!-- DASHBOARD -->
 	<li>
