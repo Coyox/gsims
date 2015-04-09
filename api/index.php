@@ -189,41 +189,61 @@ function updateLogin($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $user = json_decode($body);
+    $resp = array();
     if ($user->username != ""){
-        updateUsername($id, $user->username);
+        $u_ret = updateUsername($id, $user->username);
     }
     if ($user->password != ""){
-        updatePassword($id, $user->password);
+        $p_ret = updatePassword($id, $user->password);
     }
+    if (isset($u_ret) && isset($p_ret)){ // updated both username and password
+        if ($u_ret == -1){ //duplicate username
+            $resp["status"] = ($pu_ret==1) ? "duplicate-success" : "duplicate-fail";
+        }
+         else{
+            $ret = $p_ret & $u_ret;
+            $resp["status"] = ($ret==1) ? "success" : "failure";
+        }
+    }
+    else { // updated either username or password
+        $ret = (isset($u_ret))? $u_ret : $p_ret;
+        if ($ret == -1) {
+            $resp["status"] = "duplicate";
+        }
+        else {
+            $resp["status"] = ($ret==1) ? "success" : "failure";
+        }
+    }
+    json_encode($resp);
 }
 /*
 To update a user's username
 @param:
     - userid
     - username
-@return: json encoded status array
+@return: 1 - success, 0 - failure, -1 - duplicate
 */
 function updateUsername($id, $username){
     $sql = "SELECT username from login where username=:username";
     $bindparams = array("username"=>$username);
-    if (perform_query($sql,'GET', $bindparams)!= FALSE){
-        echo json_encode(array("status"=>"duplicate"));
-        return;
-    }
+    if (perform_query($sql,'GET', $bindparams)!= FALSE){ return -1; }
+
     $sql = "UPDATE login set username=:username WHERE userid=:userid";
-    echo json_encode(perform_query($sql,'', $bindparams+array("userid"=>$id)));
+    $resp = perform_query($sql,'', $bindparams+array("userid"=>$id));
+    return (($resp["status"] == "success")? 1 : 0);
 }
 /*
 To update a user's password(with generated hash)
 @param:
     - userid
     - password
-@return: json encoded status array
+@return: 1 - success, 0 - failure
 */
 function updatePassword($id, $password) {
     $sql = "UPDATE login set password=:password WHERE userid=:userid";
     $hash = generatePasswordHash($password);
-    echo json_encode(perform_query($sql,'', array("userid"=>$id, "password"=>$hash)));
+    $resp = perform_query($sql,'', array("userid"=>$id, "password"=>$hash));
+    return (($resp["status"] == "success")? 1 : 0);
 }
 
 function getLoginById($id){

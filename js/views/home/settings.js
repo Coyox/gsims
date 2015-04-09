@@ -36,6 +36,16 @@ var UserSettingsView = Backbone.View.extend({
 						message: "The entered username has been taken, please enter a different one."
 					});
 				}
+				else if (data.status == "duplicate-success"){
+					new TransactionResponseView({
+						message: "The entered username has been taken, please enter a different one. Password updated successfully."
+					});
+				}
+				else if (data.status == "duplicate-failure"){
+					new TransactionResponseView({
+						message: "The entered username has been taken, please enter a different one. Password also failed to update."
+					});
+				}
 				else {
 					new TransactionResponseView({
 						message: "Account credentials could not be updated.",
