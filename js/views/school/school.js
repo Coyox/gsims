@@ -130,17 +130,17 @@ var SchoolRowView = Backbone.View.extend({
     template: _.template("<td><%= model.location %></td>"
 		+ "<td> <%= model.postalCode %> </td>"
 		+ "<td> <%= model.yearOpened %> </td>"
-        + "<td><button class='edit-school btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit School</button> <button class='delete-school btn btn-xs btn-primary center-block' id='<%= model.schoolid %>'>Delete School</button></td>"),
+        + "<td><span class='edit-school primary-link' id='<%= model.userid %>'>[ Edit ]</span> <span class='delete-school primary-link ' id='<%= model.schoolid %>'>[ Delete ]</span></td>"),
 
     otherusertemplate: _.template("<td><%= model.location %></td>"
 		+ "<td> <%= model.postalCode %> </td>"
 		+ "<td> <%= model.yearOpened %> </td>"
-        + "<td><button class='edit-school btn btn-xs btn-primary center-block' id='<%= model.userid %>'>Edit School</button></td>"),
+        + "<td><span class='edit-school primary-link' id='<%= model.userid %>'>[ Edit ]</span></td>"),
 
     edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.location %>' name='location'></td>"
 		+ "<td> <input type='text' class='form-control input-sm' value='<%= model.postalCode %>' name='postalCode'> </td>"
 		+ "<td> <input type='text' class='form-control input-sm' value='<%= model.yearOpened %>' name='yearOpened'> </td>"
-        + "<td> <button class='save-school btn btn-xs btn-primary center-block' id='<%= model.schoolid %>'>Save School</button> <button class='cancel-school btn btn-xs btn-primary center-block' id='<%= model.schoolid %>'>Cancel Edit</button></td>"),
+        + "<td> <span class='save-school primary-link' id='<%= model.schoolid %>'>[ Save ]</span> <span class='cancel-school primary-link' id='<%= model.schoolid %>'>[ Cancel ]</span></td>"),
 
     initialize: function (options) {
         this.action = "view";

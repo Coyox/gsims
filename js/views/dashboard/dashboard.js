@@ -293,7 +293,7 @@ var DashboardView = Backbone.View.extend({
 			});
 
 			elem.fullCalendar({
-				defaultView: "basicWeek",
+				defaultView: usertype == "T" ? "agendaWeek" : "basicWeek",
 				editable: false,
 				eventLimit: true,
 				views: {

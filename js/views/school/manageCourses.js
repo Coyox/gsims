@@ -1486,7 +1486,6 @@ var ViewSectionRow = Backbone.View.extend({
 
 var TeacherSectionView = Backbone.View.extend({
 	template: _.template("<div id='course-teachers-form'>"
-		+	"<br>"
 		+	"<button id='add-teacher' class='btn btn-sm btn-primary'>Add Teacher(TA) to Course</button>"
 		+	"<br><br>"
 		+	"<table class='table table-striped table-bordered'>"
@@ -2073,39 +2072,25 @@ var AttendanceView = Backbone.View.extend({
 			});
 		});
 
-		// list of previously inputted attendance dates
-		section.fetch({
-			url: section.getSectionDates(this.sectionid)
-		}).then(function(data) {
-			console.log(data);
-			var inputtedDates = [];
-			_.each(data, function(inputted, index) {
-				inputtedDates.push(inputted.date);
-			});
+		// only allow attendance to be inputted on the days that the class is running
+		var days = view.model.get("day");
+		days = days.split(",");
+		days = view.weekDayToIndex(days);
 
-			console.log(inputtedDates);
+		var invalidDays = view.getInvalidDays(days);
 
-			// only allow attendance to be inputted on the days that the class is running
-			var days = view.model.get("day");
-			days = days.split(",");
-			days = view.weekDayToIndex(days);
-
-			var invalidDays = view.getInvalidDays(days);
-
-			elem.find("#date").datepicker({
-				dateFormat: "yy-mm-dd",
-				beforeShowDay: function(date) {
-					var ymd = date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
-					var day = new Date(ymd).getDay();
-					console.log()
-					var allDays = [1,2,3,4,5,6,7];
-					if ($.inArray(allDays[day], invalidDays) < 0 &&
-							$.inArray(day, inputtedDates) < 0) {
-						return [true];
-					}
-					return [false];
+		elem.find("#date").datepicker({
+			dateFormat: "yy-mm-dd",
+			setDate: new Date(),
+			beforeShowDay: function(date) {
+				var ymd = date.getFullYear() + "-" + ("0"+(date.getMonth()+1)).slice(-2) + "-" + ("0"+date.getDate()).slice(-2);
+				var day = new Date(ymd).getDay();
+				var allDays = [1,2,3,4,5,6,7];
+				if ($.inArray(allDays[day], invalidDays) < 0) {
+					return [true];
 				}
-			});
+				return [false];
+			}
 		});
 
 		elem.modal({
@@ -2356,7 +2341,7 @@ var DocumentsView = Backbone.View.extend({
 			if (data.length == 0) {
 				var table = view.$el.find("table");
 				table.hide();
-				table.after("<br><br><div class='alert alert-danger'>There are currently no documents/assignments/quizzes for this section.</div>");
+				table.after("<div class='alert alert-danger'>There are currently no documents/assignments/quizzes for this section.</div>");
 			} else {
 				_.each(data, function(doc, index) {
 					var d1 = new Document(doc, {parse:true});
