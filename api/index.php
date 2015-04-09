@@ -198,7 +198,7 @@ function updateLogin($id){
     }
     if (isset($u_ret) && isset($p_ret)){ // updated both username and password
         if ($u_ret == -1){ //duplicate username
-            $resp["status"] = ($pu_ret==1) ? "duplicate-success" : "duplicate-fail";
+            $resp["status"] = ($p_ret==1) ? "duplicate-success" : "duplicate-fail";
         }
          else{
             $ret = $p_ret & $u_ret;
