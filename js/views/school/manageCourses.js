@@ -1905,6 +1905,11 @@ var AttendanceView = Backbone.View.extend({
 
 		var view = this;
 
+		var totalAttendedStudents = 0;
+		var numAttendanceRecords = 0;
+		var totalEnrolled = 0;
+		var ready = 0;
+
 		// Get enrolled students
 		var enrolledStudents = [];
 		var section = new Section();
@@ -1925,8 +1930,7 @@ var AttendanceView = Backbone.View.extend({
 			view.enrolledStudents = data;
 		});
 
-		var totalAttendedStudents = 0;
-		var numAttendanceRecords = 0;
+
 
 		// Get all the attendance records for each unique date
 		section.fetch({
@@ -1939,7 +1943,8 @@ var AttendanceView = Backbone.View.extend({
 						date: obj.date
 					}
 				}).then(function(attendanceRecords) {
-					numAttendanceRecords = attendanceRecords.length;
+					totalEnrolled = enrolledStudents.length;
+					numAttendanceRecords++;
 					var attendedStudents = 0;
 					_.each(attendanceRecords, function(record, index) {
 						if (record.usertype == "S" && enrolledStudents.indexOf(record.userid) > -1) {
@@ -1951,7 +1956,6 @@ var AttendanceView = Backbone.View.extend({
 					var avg = Math.round((attendedStudents / numStudents) * 1000)/10;
 					var avgString = attendedStudents + " / " + numStudents + " = " + avg;
 					totalAttendedStudents += attendedStudents;
-					console.log(totalAttendedStudents);
 					new AttendanceRowView({
 						el: view.addRow(),
 						date: obj.date,
@@ -1962,13 +1966,13 @@ var AttendanceView = Backbone.View.extend({
 						enrolledStudents: view.enrolledStudents,
 						parentView: view
 					});
-
 					// Avg attendance for section
-					var avgAttendance = Math.round((totalAttendedStudents/(enrolledStudents.length*numAttendanceRecords))*1000)/10;
-					//console.log(avgAttendance);
+					var avgAttendance = Math.round((totalAttendedStudents/(totalEnrolled*numAttendanceRecords))*1000)/10;
 					view.$el.find(".avg-attendance").text(avgAttendance+"%");
 				});
+
 			});
+
 
 		});
 
