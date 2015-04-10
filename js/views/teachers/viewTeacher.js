@@ -1,3 +1,7 @@
+/**
+ *	View to display a teacher record. 
+ *	Route: getTeacherById
+ */
 var TeacherRecordView = Backbone.View.extend({
 	initialize: function(options) {
 		this.id = options.id;
@@ -12,6 +16,7 @@ var TeacherRecordView = Backbone.View.extend({
 		var def = $.Deferred();
 		var teacher = new Teacher({id:this.id});
 		
+		// Fetch the teacher based on usertype
 		if (this.usertype == "A") {
 			teacher.fetch({
 				url: teacher.admin_urlRoot + "/" + this.id
@@ -39,9 +44,36 @@ var TeacherRecordView = Backbone.View.extend({
 		"click #edit-teacher": "editTeacher",
 		"click #save-teacher": "saveTeacher",
 		"click #cancel": "cancelSave",
-		"click #set-admin": "setAsAdmin"
+		"click #set-admin": "setAsAdmin",
+		"click #delete-teacher": "deleteTeacher"
 	},
 
+	/**
+	 *	Deletes a teacher record.
+	 *	Route: deleteTeacher
+	 */
+	deleteTeacher: function(evt) {
+		new Teacher({id: this.id}).destroy().then(function(data) {
+			if (typeof data == "string") {
+				data = JSON.parse(data);
+			}
+			if (data.status == "success") {
+				new TransactionResponseView({
+					message: "Teacher has been successfully deleted."
+				});
+			} else {
+				new TransactionResponseView({
+					title: "ERROR",
+					status: "error",
+					message: "Teacher has been successfully deleted."
+				});
+			}
+		});
+	},
+
+	/**
+	 *	Displays general information about a teacher/admin.
+	 */
 	teacherInformationTab: function() {
 		var view = this;
 		view.$el.find("#teacher-info-table").empty();
@@ -60,6 +92,8 @@ var TeacherRecordView = Backbone.View.extend({
 			view.$el.find("#cancel").removeClass("hide").show();
 			view.$el.find("#edit-teacher").hide();
 		}
+
+		// Loop through all attributes and display them in a form
 		_.each(this.model.toJSON(), function(value, name) {
 			if (this.model.nonEditable.indexOf(name) == -1 && !isNumber(name)) {
 				new CreateTeacherRowView({
@@ -73,15 +107,19 @@ var TeacherRecordView = Backbone.View.extend({
 			}
 		}, this);
 
+		// Get the course competency level of the teacher/admin
 		var view = this;
 		var t = new Teacher();
 		t.fetch({
 			url: t.getCourseCompetencyUrl(view.model.get("userid"))
 		}).then(function(data) {
+			// Store any existing competency levels
 			view.existingLevels = [];
 			_.each(data, function(course, index) {
 				view.existingLevels.push(course);
 			});
+
+			// Display all departments/competencies
 			view.comptencyView = new TeacherCompetencyView({
 				el: view.$el,
 				model: view.model,
@@ -91,25 +129,43 @@ var TeacherRecordView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Adds a row to the general information form
+	 */
 	addRow: function() {
 		var container = $("<div class='form-group'></div>");
 		this.$el.find("#teacher-info-table").append(container);
 		return container;
 	},
 
+	/**
+	 *	Re-renders the view with all text fields as input fields. Stash
+	 *	the current model so the changes can be undone if the user 
+	 *	chooses to cancel
+	 */
 	editTeacher: function(evt) {
 		this.action = "edit";
 		this.model.untouched = JSON.stringify(this.model.toJSON());
 		this.teacherInformationTab();
 	},
 
+	/**
+	 *	Re-renders the view with all input fields and text fields. Ignore
+	 *	any changes made; restore state prior to editting
+	 */
 	cancelSave: function() {
 		this.model.attributes = JSON.parse(this.model.untouched);
 		this.action = "view";
 		this.teacherInformationTab();
 	},
 
+	/**
+	 *	Saves a teacher record after editing.
+	 *	Route: updateTeacher
+	 */
 	saveTeacher: function() {
+		var view = this;
+
 		Backbone.Validation.bind(this);
 
 		// Get existing department ids and competency levels
@@ -157,7 +213,7 @@ var TeacherRecordView = Backbone.View.extend({
 			params.deleteComps = JSON.stringify(deleteComp);
 		}
 
-		var view = this;
+		// Update the teacher if the form is valid
 		if (this.model.isValid(true)) {
 			view.model.set("id", view.model.get("userid"));
 			view.model.set("usertype", view.usertype);
@@ -169,6 +225,8 @@ var TeacherRecordView = Backbone.View.extend({
 					new TransactionResponseView({
 						message: view.usertype == "A" ? "Administrator succussfully created." : "Teacher successfully created."
 					});
+
+					// Update course competencies
 					$.ajax({
 						type: "POST",
 						url: view.model.getCourseCompetencyUrl(view.model.get("userid")),
@@ -188,25 +246,31 @@ var TeacherRecordView = Backbone.View.extend({
 		}
 	},
 
+	/**
+	 *	Sets the teacher to an administrator by updating the usertype
+	 *	Route: updateTeacher
+	 */
 	setAsAdmin: function() {
 		var view = this;
 
 		this.$el.append(html["confirmationModal.html"]);
 
-		$("#confirmation-modal .modal-body p").text("Are you sure you want to set this teacher as an administrator? He/she will have full access to the school.");
-		$("#confirmation-modal .modal-title").text("Confirmation");
+		var elem = $("#confirmation-modal");
 
-		$("#confirmation-modal").modal({
+		elem.find(".modal-body p").text("Are you sure you want to set this teacher as an administrator? He/she will have full access to the school.");
+		elem.find(".modal-title").text("Confirmation");
+
+		elem.modal({
 			show: true
 		});
 
-		$("#confirmation-modal").on("hidden.bs.modal", function() {
-			$("#confirmation-modal").remove();
+		elem.on("hidden.bs.modal", function() {
+			elem.remove();
 			$(".modal-backdrop").remove();
 		});
 
-		$("#confirmation-modal").on("click", "#confirm-yes", function() {
-			$("#confirmation-modal").remove();
+		elem.on("click", "#confirm-yes", function() {
+			elem.remove();
 			$(".modal-backdrop").remove();
 
 			view.model.set("usertype", "A");
@@ -230,6 +294,9 @@ var TeacherRecordView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Render the EmailView in the email tab
+	 */
 	emailTab: function(data) {
 		new EmailView({
 			el: $("#email"),
@@ -237,6 +304,9 @@ var TeacherRecordView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Render a list of sections that the teacher is currently teaching
+	 */
 	teacherSectionsTab: function(model) {
 		new TeachingSectionsView({
 			el: this.$el.find("#course-info"),
@@ -245,6 +315,10 @@ var TeacherRecordView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	View to display a list of all sections a teacher is currently teaching
+ *	Route: getTeachingSections
+ */
 var TeachingSectionsView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -273,6 +347,9 @@ var TeachingSectionsView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Adds a table row to the list of sections
+	 */
 	addRow: function() {
         var container = $("<tr></tr>");
         this.$el.find("table").first().append(container);
@@ -280,6 +357,10 @@ var TeachingSectionsView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	Renders a single table row with data pertaining to a section that the teacher
+ *	is currently teaching.
+ */
 var TeachingSectionsRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
 		+	"<td><%= model.sectionCode %></td>"
@@ -304,6 +385,10 @@ var TeachingSectionsRowView = Backbone.View.extend({
 		"click .drop-section": "dropSection"
 	},
 
+	/**
+	 *	Removes a teacher from the list of courses he/she is teaching
+	 *	Route: unassignTeacherUrl
+	 */
 	dropSection: function(evt) {
 		var view = this;
 		var sectionid = $(evt.currentTarget).attr("id");

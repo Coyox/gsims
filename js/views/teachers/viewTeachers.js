@@ -1,3 +1,7 @@
+/**
+ *	View to display the teacher search form.
+ *	Route: findUsers
+ */
 var SearchTeachersView = Backbone.View.extend({
 	initialize: function(options) {
 		this.redirect = options.redirect;
@@ -20,6 +24,11 @@ var SearchTeachersView = Backbone.View.extend({
 		"click #clear-fields": "clearFields",
 	},
 
+	/**
+	 *	Read the inputs from the search form. For each value that is not
+	 *	empty, add it to the form data object, and submit it as part of
+	 *	the POST request
+	 */
 	searchTeachers: function(evt) {
 		var view = this;
 		var data = {};
@@ -47,6 +56,9 @@ var SearchTeachersView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Updates the URL and renders the teacher table results view
+	 */
 	changeRoute: function(data) {
 		if (this.redirect == false) {
 			var view = new AddTeacherTableView({
@@ -73,12 +85,185 @@ var SearchTeachersView = Backbone.View.extend({
 		}
 	},
 
+	/**
+	 *	Clears all form inputs
+	 */
 	clearFields: function() {
 		var parent = this.$el.find("#filter-teachers-container");
 		parent.find("input[type='text']").val("");
 	}
 });
 
+/**
+ *	View to display a list of teachers
+ *	Route: findUsers
+ */
+var TeachersTableView = Backbone.View.extend({
+	initialize: function(options) {
+		this.results = options.results;
+		this.usertype = options.usertype;
+		this.render();
+	},
+
+	render: function() {
+		//storeContent();
+
+		this.$el.html(html["viewTeachers.html"]);
+		if (this.results) {
+			this.populateQueryResults(this.results);
+		} else {
+			this.fetchAllResults();
+		}
+	},
+
+	events: {
+		"click #refresh": "refreshTable",
+		"click .send-email": "openEmailModal",
+		"change .toggle-checkboxes": "toggleCheckboxes"
+	},
+
+	/**
+	 *	Populates the table with results from the search query
+	 */
+	populateQueryResults: function(data) {
+		_.each(data, function(object, index) {
+			var model = new Teacher(object, {parse:true});
+			new TeacherTableRowView({
+				model: model,
+				el: this.addRow(".results", model.get("emailAddr")),
+				usertype: this.usertype
+			});
+		}, this);
+		this.table = this.$el.find("table").dataTable({
+			aoColumnDefs: [
+				{ bSortable: false, aTargets: [ 4, 5 ] },
+				{ sClass: "center", aTargets: [ 4, 5 ] },
+				{ sWidth: "10%", aTargets: [ 5 ] }
+			],
+			dom: dataTables.exportDom,
+			tableTools: {
+				 aButtons: dataTables.buttons,
+       			 sSwfPath: dataTables.sSwfPath
+    		}
+		});
+		createEmailButton(this.$el);
+	},
+
+	/**
+	 *	Populates the table with all teacher results (no search)
+	 */
+	fetchAllResults: function() {
+		var view = this;
+
+		var school = new School();
+		var schoolid = sessionStorage.getItem("gobind-schoolid");
+		school.fetch({
+			url: this.usertype == "A" ? school.getAdminsUrl(schoolid) : school.getTeachersUrl(schoolid)
+		}).then(function(data) {
+			_.each(data, function(object, index) {
+				var model = new Teacher(object, {parse:true});
+				new TeacherTableRowView({
+					model: model,
+					el: view.addRow(".results", model.get("emailAddr")),
+					usertype: view.usertype
+				});
+			}, view);
+			view.table = view.$el.find("table").DataTable({
+				aoColumnDefs: [
+					{ bSortable: false, aTargets: [ 4, 5 ] },
+					{ sClass: "center", aTargets: [ 4, 5 ] },
+					{ sWidth: "10%", aTargets: [ 5 ] }
+				],
+				dom: dataTables.exportDom,
+				tableTools: {
+           			 aButtons: dataTables.buttons,
+       			 	 sSwfPath: dataTables.sSwfPath
+        		}
+			});
+			createEmailButton(view.$el);
+		});
+	},
+
+	/**
+	 *	Adds a row to the list of teachers
+	 */
+	addRow: function(selector, email) {
+		var container = $("<tr></tr>");
+		container.data("email", email);
+		this.$el.find(selector).first().append(container);
+		return container;
+	},
+
+	/**
+	 *	Opens up an email popup
+	 */
+	openEmailModal: function(evt) {
+		openEmailWrapper(this.table.fnGetNodes());
+	},
+
+	/**
+	 *	Checks/unchecks all checkboxes
+	 */
+	toggleCheckboxes: function(evt) {
+		toggleCheckboxes(this.table.fnGetNodes(), evt);
+	},
+
+	/**
+	 *	Re-render the table
+	 */
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
+	},
+});
+
+/**
+ *	Renders a single table row with data pertaining to a teacher
+ */
+var TeacherTableRowView = Backbone.View.extend({
+	template: _.template("<td><%= model.userid %></td>"
+		+	"<td><%= model.firstName %></td>"
+		+	"<td><%= model.lastName %></td>"
+		+	"<td><%= model.emailAddr %></td>"
+		+   "<td><span class='view-teacher primary-link center-block' id='<%= model.userid %>'>[ View <%= type %> ]</span></td>"
+		+	"<td><input type='checkbox' class='user-row' checked></td>"),
+	initialize: function(options) {
+		this.usertype = options.usertype;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON(),
+			type: this.usertype == "A" ? "Admin" : "Teacher"
+		}));
+	},
+
+	events: {
+		"click .view-teacher": "viewTeacher",
+	},
+
+	/**
+	 *	Change the URL to the viewTeacher form when a row is selected
+	 */
+	viewTeacher: function(evt) {
+		//storeContent();
+
+		var id = $(evt.currentTarget).attr("id");
+
+		if (this.usertype == "A") {
+			app.Router.navigate("teachers/" + id + "/A", {trigger:true});
+		} else {
+			app.Router.navigate("teachers/" + id, {trigger:true});
+		}
+	}
+});
+
+/**
+ *	View to display a list of teachers (from a section/course)
+ *	Route: findUsers
+ */
 var AddTeacherTableView = Backbone.View.extend({
 	initialize: function(options) {
 		this.template = options.template;
@@ -97,6 +282,9 @@ var AddTeacherTableView = Backbone.View.extend({
 		this.populateQueryResults(this.results);
 	},
 
+	/**
+	 *	Populates the table with results from the search query
+	 */
 	populateQueryResults: function(data) {
 		_.each(data, function(object, index) {
 			var model = new Teacher(object, {parse:true});
@@ -120,6 +308,9 @@ var AddTeacherTableView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Adds a row to the list of teachers
+	 */
 	addRow: function(selector, email) {
 		var container = $("<tr></tr>");
 		container.data("email", email);
@@ -128,6 +319,9 @@ var AddTeacherTableView = Backbone.View.extend({
 	},
 });
 
+/**
+ *	Renders a single table row with data pertaining to a teacher (from a section/course)
+ */
 var AddTeacherTableRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.userid %></td>"
 		+	"<td><%= model.firstName %></td>"
@@ -157,6 +351,10 @@ var AddTeacherTableRowView = Backbone.View.extend({
 		"click .add-teacher": "addTeacher"
 	},
 
+	/**
+	 *	Adds a teacher to a particular course/section
+	 *	Route: assignCourseTeacher
+	 */
 	addTeacher: function(evt) {
 		var view = this;
 		var id = $(evt.currentTarget).attr("id");
@@ -231,147 +429,6 @@ var AddTeacherTableRowView = Backbone.View.extend({
 	}
 });
 
-
-var TeachersTableView = Backbone.View.extend({
-	initialize: function(options) {
-		this.results = options.results;
-		this.usertype = options.usertype;
-		this.render();
-	},
-
-	render: function() {
-		//storeContent();
-
-		this.$el.html(html["viewTeachers.html"]);
-		if (this.results) {
-			this.populateQueryResults(this.results);
-		} else {
-			this.fetchAllResults();
-		}
-	},
-
-	events: {
-		"click #refresh": "refreshTable",
-		"click .send-email": "openEmailModal",
-		"change .toggle-checkboxes": "toggleCheckboxes"
-	},
-
-	populateQueryResults: function(data) {
-		_.each(data, function(object, index) {
-			var model = new Teacher(object, {parse:true});
-			new TeacherTableRowView({
-				model: model,
-				el: this.addRow(".results", model.get("emailAddr")),
-				usertype: this.usertype
-			});
-		}, this);
-		this.table = this.$el.find("table").dataTable({
-			aoColumnDefs: [
-			{ bSortable: false, aTargets: [ 4, 5 ] },
-			{ sClass: "center", aTargets: [ 4, 5 ] },
-			{ sWidth: "10%", aTargets: [ 5 ] }
-			],
-			dom: dataTables.exportDom,
-			tableTools: {
-				 aButtons: dataTables.buttons,
-       			 sSwfPath: dataTables.sSwfPath
-    		}
-		});
-		createEmailButton(this.$el);
-		createRefreshButton(this.$el);
-	},
-
-	fetchAllResults: function() {
-		var view = this;
-
-		var school = new School();
-		var schoolid = sessionStorage.getItem("gobind-schoolid");
-		school.fetch({
-			url: this.usertype == "A" ? school.getAdminsUrl(schoolid) : school.getTeachersUrl(schoolid)
-		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Teacher(object, {parse:true});
-				new TeacherTableRowView({
-					model: model,
-					el: view.addRow(".results", model.get("emailAddr")),
-					usertype: view.usertype
-				});
-			}, view);
-			view.table = view.$el.find("table").DataTable({
-				aoColumnDefs: [
-				{ bSortable: false, aTargets: [ 4, 5 ] },
-				{ sClass: "center", aTargets: [ 4, 5 ] },
-				{ sWidth: "10%", aTargets: [ 5 ] }
-				],
-				dom: dataTables.exportDom,
-				tableTools: {
-           			 aButtons: dataTables.buttons,
-       			 	 sSwfPath: dataTables.sSwfPath
-        		}
-			});
-			createEmailButton(view.$el);
-			createRefreshButton(view.$el);
-			//createExportButton(view.$el);
-		});
-	},
-
-	addRow: function(selector, email) {
-		var container = $("<tr></tr>");
-		container.data("email", email);
-		this.$el.find(selector).first().append(container);
-		return container;
-	},
-
-	openEmailModal: function(evt) {
-		openEmailWrapper(this.table.fnGetNodes());
-	},
-
-	toggleCheckboxes: function(evt) {
-		toggleCheckboxes(this.table.fnGetNodes(), evt);
-	},
-
-	refreshTable: function(evt) {
-		evt.stopImmediatePropagation();
-		this.table.fnDestroy();
-		this.render();
-	},
-});
-
-var TeacherTableRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.userid %></td>"
-		+	"<td><%= model.firstName %></td>"
-		+	"<td><%= model.lastName %></td>"
-		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><span class='view-teacher primary-link center-block' id='<%= model.userid %>'>[ View <%= type %> ]</span></td>"
-		+	"<td><input type='checkbox' class='user-row' checked></td>"),
-	initialize: function(options) {
-		this.usertype = options.usertype;
-		this.render();
-	},
-
-	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON(),
-			type: this.usertype == "A" ? "Admin" : "Teacher"
-		}));
-	},
-
-	events: {
-		"click .view-teacher": "viewTeacher",
-	},
-
-	viewTeacher: function(evt) {
-		//storeContent();
-
-		var id = $(evt.currentTarget).attr("id");
-
-		if (this.usertype == "A") {
-			app.Router.navigate("teachers/" + id + "/A", {trigger:true});
-		} else {
-			app.Router.navigate("teachers/" + id, {trigger:true});
-		}
-	}
-});
 
 function storeContent() {
 	$("#content").children().detach().appendTo($("#hidden"));

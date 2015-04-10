@@ -1,3 +1,6 @@
+/**
+ *	View to display a form to create a new teacher
+ */
 var CreateTeacherView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model = new Teacher();
@@ -45,12 +48,21 @@ var CreateTeacherView = Backbone.View.extend({
 		"click #school-menu": "updateDepartments"
 	},
 
+	/**
+	 *	Adds a row to the general information form
+	 */
 	addRow: function() {
 		var container = $("<div class='form-group'></div>");
 		this.$el.find("#teacher-info").append(container);
 		return container;
 	},
 
+	/**
+	 *	Saves a teacher record after the form has been filled. Optionally sends
+	 *	an additional request to insert a list of course competencies for the
+	 * 	teacher/administrator. 
+	 *	Route: createAdministrator/createTeacher, getCourseCompetency
+	 */
 	saveTeacher: function() {
 		Backbone.Validation.bind(this);
 		var view = this;
@@ -137,6 +149,9 @@ var CreateTeacherView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	Renders a single table row with data pertaining to a teacher's attributes
+ */
 var CreateTeacherRowView = Backbone.View.extend({
 	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
 		+	"<div class='col-sm-8'>"
@@ -213,12 +228,18 @@ var CreateTeacherRowView = Backbone.View.extend({
 		"change select": "updateSelect"
 	},
 
+	/**
+	 *	Updates the teacher/admin model when an input field changes
+	 */
 	updateModel: function(evt) {
 		var name = $(evt.currentTarget).attr("name");
 		var val = $(evt.currentTarget).val();
 		this.model.set(name, val);
 	},
 
+	/**
+	 *	Updates the teacher/admin model when a select menu changes
+	 */
 	updateSelect: function(evt) {
 		var name = $(evt.currentTarget).attr("name");
 		var val = $(evt.currentTarget).find("option:selected").val();
@@ -226,6 +247,9 @@ var CreateTeacherRowView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	View to display a list of all course competencies for a teacher
+ */
 var TeacherCompetencyView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model.competency = [];
@@ -236,6 +260,8 @@ var TeacherCompetencyView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
+
+		// Fetch a list of all departments for this school
 		var school = new School();
 		var schoolid = sessionStorage.getItem("gobind-schoolid");
 		school.fetch({
@@ -268,6 +294,9 @@ var TeacherCompetencyView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Adds a row to the competency form
+	 */
 	addRow: function(index) {
 		var parent = index % 2 == 0 ? "#comp-info" : "#comp2-info";
 		var container = $("<div class='form-group'></div>");
@@ -276,6 +305,9 @@ var TeacherCompetencyView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	Renders a single table row with data pertaining to a teacher's compentecy
+ */
 var TeacherCompetencyRowView = Backbone.View.extend({
 
 	viewTemplate: _.template("<label class='col-sm-4'><%= label %></label>"
@@ -321,6 +353,9 @@ var TeacherCompetencyRowView = Backbone.View.extend({
 		"change input[type='radio']": "updateLevel"
 	},
 
+	/**
+	 *	Updates the competency list based on the selected radio option
+	 */
 	updateLevel: function(evt) {
 		var level = $(evt.currentTarget).attr("value");
 		var name = $(evt.currentTarget).data("name");

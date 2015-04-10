@@ -70,6 +70,7 @@ var Router = Backbone.Router.extend({
         "superusers/all":       "viewAllSuperusers",
         "superusers/:id":       "viewSuperuser",
         "createSuperuser":      "createSuperuser",
+        
         "email" :               "email",
 
         "schoolyears":          "viewSchoolYears",
