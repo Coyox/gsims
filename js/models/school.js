@@ -39,5 +39,9 @@ var School = Backbone.Model.extend({
 
     getAdminsUrl: function(id){
     	return this.urlRoot + "/" + id + "/administrators";
+    },
+
+    updateOpenRegistration: function(id) {
+        return this.urlRoot + "/" + id + "/reg";
     }
 });

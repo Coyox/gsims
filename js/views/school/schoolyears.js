@@ -26,20 +26,30 @@ var SchoolYearView = Backbone.View.extend({
 				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var year = new SchoolYear(object, {parse: true});
-				view.list.push(year);
-				new SchoolYearRowView({
-					el: view.addRow(),
-					model: year,
-					action: view.action
+
+			var school = new School();
+			school.set("id", sessionStorage.getItem("gobind-schoolid"));
+			school.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
+			school.fetch().then(function(openForReg) {
+				console.log(data);
+				_.each(data, function(object, index) {
+					var year = new SchoolYear(object, {parse: true});
+					view.list.push(year);
+					new SchoolYearRowView({
+						el: view.addRow(),
+						model: year,
+						action: view.action,
+						isActive: year.get("status") == "active",
+						openForReg: openForReg.openForReg
+					});
 				});
-			});
-			view.$el.find("table").dataTable({
-				dom: "t",
-		      	aoColumnDefs: [
-		          	{ bSortable: false, aTargets: [ 1,2 ] }
-		       	]
+				view.$el.find("table").dataTable({
+					dom: "t",
+			      	aoColumnDefs: [
+			          	{ bSortable: false, aTargets: [ 1,2 ] }
+			       	]
+				});
+
 			});
 		});
 	},
@@ -162,27 +172,55 @@ var SchoolYearView = Backbone.View.extend({
 	saveSchoolYear: function(evt) {
 		var view = this;
 		var promises = [];
+
+		var schoolid, openForReg;
+		var schoolyearid;
 		_.each(this.list, function(model, index) {
-			var id = model.get("schoolyearid");
-			if (model.hasChanged("status")) {
-				model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
-				var promise = model.save(null, {
-					url: this.model.updateActiveYearUrl(id), 
-					data: {
-						schoolid: sessionStorage.getItem("gobind-schoolid")
-					}
-				});
-				promises.push(promise);
-			} else if (model.hasChanged("openForReg")) {
-				var promise = model.save(null, {
-					url: this.model.updateRegistrationUrl(id)
-				});
-				promises.push(promise);
+			if (model.get("schoolid")) {
+				schoolid = model.get("schoolid");
+				openForReg = model.get("openForReg");
+			}
+			if (model.get("activeschoolyearid")) {
+				schoolyearid = model.get("activeschoolyearid");
 			}
 		}, this);
 
-		// Wait for both queries to return
-		$.when.apply($, promises).then(function() {
+		var def1 = $.Deferred();
+		var def2 = $.Deferred();
+
+		if (schoolyearid) {
+			var year = new SchoolYear();
+			$.ajax({
+				type: "POST",
+				url: school.updateActiveYearUrl(schoolyearid),
+				data: {
+					schoolyearid: schoolyearid
+				}
+			}).then(function(data) {
+				console.log(data);
+				def1.resolve();
+			});			
+		} else {
+			def1.resolve();
+		}
+
+		if (schoolid) {
+			var school = new School();
+			$.ajax({
+				type: "PUT",
+				url: school.updateOpenRegistration(schoolid),
+				data: {
+					openForReg: openForReg
+				}
+			}).then(function(data) {
+				console.log(data);
+				def2.resolve();
+			});
+		} else {
+			def2.resolve();
+		}
+
+		$.when(def1, def2).then(function() {
 			new TransactionResponseView({
 				message: "School year(s) successfully updated."
 			});
@@ -205,14 +243,16 @@ var SchoolYearView = Backbone.View.extend({
 var SchoolYearRowView = Backbone.View.extend({
 	viewTemplate: _.template("<td><%= model.schoolyear %></td>"
 		+	"<td><%= status %></td>"
-		+	"<td><%= openForReg %></td>"),
+		+	"<td><%= isOpen %></td>"),
 
 	editTemplate: _.template("<td><%= model.schoolyear %></td>"
 		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='active-switch' checked></td>"
-		+	"<td><input type='checkbox' id='<%= model.schoolyearid %>' name='reg-switch' checked></td>"),
-
+		+	"<td><input type='checkbox' class='hide' id='<%= schoolid %>' name='reg-switch'></td>"),
 	initialize: function(options) {
 		this.action = options.action;
+		this.openForReg = options.openForReg;
+		this.isActive = options.isActive;
+		this.schoolid = options.schoolid;
 		this.render();
 	},
 
@@ -223,11 +263,12 @@ var SchoolYearRowView = Backbone.View.extend({
 			this.$el.html(this.viewTemplate({
 				model: this.model.toJSON(),
 				status: capitalize(this.model.get("status")),
-				openForReg: this.model.get("openForReg") == 1 ? "OPEN" : "CLOSED"
+				isOpen: this.isActive == true && this.openForReg == true ? "OPEN" : "CLOSED"
 			}));
 		} else {
 			this.$el.html(this.editTemplate({
-				model: this.model.toJSON()
+				model: this.model.toJSON(),
+				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}));
 
 			// active school year switch
@@ -239,22 +280,25 @@ var SchoolYearRowView = Backbone.View.extend({
 				onSwitchChange: function(event, state) {
 					var schoolyearid = $(event.currentTarget).attr("id");
 					view.model.set("id", schoolyearid);
-					view.model.set("status", state == true ? "active" : "inactive");
+					view.model.set("activeschoolyearid", id);
 				}
 			});
-
-			// registration switch
-			this.$el.find("[name='reg-switch']").bootstrapSwitch({
-				size: "mini",
-				onText: "open",
-				offText: "closed",
-				state: this.model.get("openForReg") == 1 ? true : false,
-				onSwitchChange: function(event, state) {
-					var schoolyearid = $(event.currentTarget).attr("id");
-					view.model.set("id", schoolyearid);
-					view.model.set("openForReg", state == true ? 1 : 0);
-				}
-			});
+			if (this.isActive && this.openForReg) {
+				console.log(this.openForReg);
+				// registration switch
+				this.$el.find("[name='reg-switch']").removeClass("hide");
+				this.$el.find("[name='reg-switch']").bootstrapSwitch({
+					size: "mini",
+					onText: "open",
+					offText: "closed",
+					state: this.openForReg == 1 ? true : false,
+					onSwitchChange: function(event, state) {
+						var schoolid = $(event.currentTarget).attr("id");
+						view.model.set("schoolid", schoolid);
+						view.model.set("openForReg", state == true ? 1 : 0);
+					}
+				});
+			}
 		}
 	}
 });

@@ -27,7 +27,7 @@ var Superuser = Backbone.Model.extend({
 	},
 	
 	nonEditable: [
-   		"lastAccessed", "userid"
+   		"lastAccessed", "userid", "status"
    	],
 
     urlRoot: app.serverUrl + "api/superusers",
