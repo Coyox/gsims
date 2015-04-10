@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `school` (
   `postalCode` char(6) NOT NULL,
   `yearOpened` year NOT NULL,
   `status` char(8) NOT NULL,
+  `openForReg` tinyint(1) NOT NULL,
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `school_schoolyear` (
   `schoolyearid` int(11) NOT NULL,
   `status` char(8) NOT NULL,
   PRIMARY KEY(`schoolid`, `schoolyearid`),
-  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`) ON DELETE CASCADE,
+  FOREIGN KEY (`scholid`) REFERENCES `school` (`schoolid`) ON DELETE CASCADE,
   FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
  );
 

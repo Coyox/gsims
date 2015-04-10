@@ -3,7 +3,8 @@ var School = Backbone.Model.extend({
 		location: "",
 		postalCode: "",
 		yearOpened: "",
-		status: "inactive"
+		status: "inactive",
+        openForReg: 0,
 	},
 
     validation: {
@@ -27,15 +28,15 @@ var School = Backbone.Model.extend({
     getDepartmentsUrl: function(id) {
    		return this.urlRoot + "/" + id + "/departments";
     },
-    
+
     getStudentsUrl: function(id){
     	return this.urlRoot + "/" + id + "/students";
     },
-    
+
     getTeachersUrl: function(id){
     	return this.urlRoot + "/" + id + "/teachers";
     },
-    
+
     getAdminsUrl: function(id){
     	return this.urlRoot + "/" + id + "/administrators";
     }
