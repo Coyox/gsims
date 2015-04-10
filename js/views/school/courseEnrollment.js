@@ -69,16 +69,21 @@ var CourseEnrollmentView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var dept = new Dept(object, {parse:true});
-				new DepartmentListItem({
-					el: view.addDepartmentListItem(),
-					model: dept,
-					parent: view.$el,
-					parentView: view,
-					schoolid: view.schoolid
+			view.$el.find("#department-list").empty();
+			if (data.length == 0) {
+				view.$el.find("#department-list").text("There are no departments to display.");
+			} else {
+				_.each(data, function(object, index) {
+					var dept = new Dept(object, {parse:true});
+					new DepartmentListItem({
+						el: view.addDepartmentListItem(),
+						model: dept,
+						parent: view.$el,
+						parentView: view,
+						schoolid: view.schoolid
+					});
 				});
-			});
+			}
 		});
 	},
 
