@@ -6,6 +6,119 @@ define("less","<=");
 define("greater",">=");
 
 
+#==========================================================================================#
+# Database
+#==========================================================================================#
+/*
+ * Credentials stored in a separate config file
+ */
+function getConnection() {
+    $ini = parse_ini_file("config.ini");
+    $dbname = $ini["name"];
+    $dbhost = $ini["host"];
+    $dbuser = $ini["username"];
+    $dbpass = $ini["password"];
+    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $dbh;
+}
+/*
+* wrapper to perform sql queries
+*/
+function perform_query($sql, $querytype, $bindparams=array()) {
+    try {
+        $db = getConnection();
+        if (array_filter($bindparams)){
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bindparams);
+        }
+        else{
+            $stmt = $db->query($sql);
+        }
+
+        if ($querytype == 'GET') {
+            $result = $stmt->fetchObject();
+        }
+        elseif ($querytype == 'GETALL') {
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+        }
+        elseif ($querytype == 'GETCOL'){
+            $result = $stmt->fetchColumn();
+        }
+        elseif ($querytype == 'GETASSO'){
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        else {
+            $result = array("status"=>"success");
+        }
+        $db = null;
+        return $result;
+    } catch(PDOException $e) {
+        echo $e->getMessage();
+        return array("status"=>"failure");
+    }
+}
+
+function perform_transaction($queries, $bindparams=array()){
+    try {
+        $db = getConnection();
+        $db->beginTransaction();
+
+        foreach($queries as $i => $query){
+            if (array_filter($bindparams)){
+                $stmt = $db->prepare($query);
+                $stmt->execute($bindparams[$i]);
+            }
+            else{
+                $stmt = $db->query($query);
+            }
+        }
+        $db->commit();
+        return array("status"=>"success");
+    } catch (Exception $e) {
+    echo $e->getMessage();
+        $db->rollback();
+        return array("status"=>"failure");
+    }
+}
+
+#==========================================================================================#
+# Query helpers
+#==========================================================================================#
+function buildWhereClause($fields){
+    $clause = "";
+    $bindparams = array();
+    foreach ($fields as $key=>$value) {
+        $clause.= " AND ";
+        if(substr($key, -4) === 'Name'){
+            $clause.=$key." like '%".$value."%'";
+        }
+        else {
+            $clause.=$key."=:".$key;
+            $bindparams[$key] = $value;
+        }
+
+    }
+    return array($clause, $bindparams);
+}
+
+
+function parenthesisList($ids){
+    $bindparams = array();
+    $sql = "(";
+    foreach (array_values($ids) as $i => $id) {
+        $sql.= ":id".$i.",";
+        $bindparams["id".$i] = $id;
+    }
+    $sql = rtrim($sql, ",");
+    $sql.= ")";
+    return array($sql, $bindparams);
+}
+
+
+#==========================================================================================#
+# Login
+#==========================================================================================#
 function randomNumber($digits){
   return rand(pow(10, $digits - 1) - 1, pow(10, $digits) - 1);
 }
@@ -39,6 +152,14 @@ function generatePassword(){
     }
     return $password;
 }
+
+function generatePasswordHash($password){
+    $cost = 10;
+    $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
+    $salt = sprintf("$2a$%02d$", $cost).$salt;
+    return crypt($password, $salt);
+}
+
 function generateUniqueID($sql, $param, $digit=IDdigits){
     $id = randomNumber($digit);
     $bindparam = array($param=>$id);
@@ -48,6 +169,9 @@ function generateUniqueID($sql, $param, $digit=IDdigits){
     return $id;
 }
 
+#==========================================================================================#
+# Email
+#==========================================================================================#
 function getKey($name){
     $sql = "SELECT keyid from apikeys where name=:name";
     return perform_query($sql, 'GETCOL', array("name"=>$name));
@@ -126,118 +250,10 @@ function emailLogin($emailAddr, $username, $password, $firstname, $lastname){
     }
 }
 
-/*
-* wrapper to perform sql queries
-*/
-function perform_query($sql, $querytype, $bindparams=array()) {
-    try {
-        $db = getConnection();
-        if (array_filter($bindparams)){
-            $stmt = $db->prepare($sql);
-            $stmt->execute($bindparams);
-        }
-        else{
-            $stmt = $db->query($sql);
-        }
 
-        if ($querytype == 'GET') {
-            $result = $stmt->fetchObject();
-        }
-        elseif ($querytype == 'GETALL') {
-            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-        }
-        elseif ($querytype == 'GETCOL'){
-            $result = $stmt->fetchColumn();
-        }
-        elseif ($querytype == 'GETASSO'){
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        else {
-            $result = array("status"=>"success");
-        }
-        $db = null;
-        return $result;
-    } catch(PDOException $e) {
-        echo $e->getMessage();
-        return array("status"=>"failure");
-    }
-}
-
-function perform_transaction($queries, $bindparams=array()){
-    try {
-        $db = getConnection();
-        $db->beginTransaction();
-
-        foreach($queries as $i => $query){
-            if (array_filter($bindparams)){
-                $stmt = $db->prepare($query);
-                $stmt->execute($bindparams[$i]);
-            }
-            else{
-                $stmt = $db->query($query);
-            }
-        }
-        $db->commit();
-        return array("status"=>"success");
-    } catch (Exception $e) {
-    echo $e->getMessage();
-        $db->rollback();
-        return array("status"=>"failure");
-    }
-}
-
-/*
- * TODO: put the credentials in a separate config file
- */
-function getConnection() {
-    $dbhost = "127.4.196.130";
-    $dbuser = "adminpVaqD1a";
-    $dbpass = "GpFqpeavU2dT";
-    $dbname = "thefinaltest";
-    //$dbname = "gobind";
-    //$dbname = "testdb";
-    $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
-    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    return $dbh;
-}
-
-function buildWhereClause($fields){
-    $clause = "";
-    $bindparams = array();
-    foreach ($fields as $key=>$value) {
-        $clause.= " AND ";
-        if(substr($key, -4) === 'Name'){
-            $clause.=$key." like '%".$value."%'";
-        }
-        else {
-            $clause.=$key."=:".$key;
-            $bindparams[$key] = $value;
-        }
-
-    }
-    return array($clause, $bindparams);
-}
-
-function generatePasswordHash($password){
-	$cost = 10;
-    $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
-    $salt = sprintf("$2a$%02d$", $cost).$salt;
-    return crypt($password, $salt);
-}
-
-function parenthesisList($ids){
-    $bindparams = array();
-    $sql = "(";
-    foreach (array_values($ids) as $i => $id) {
-        $sql.= ":id".$i.",";
-        $bindparams["id".$i] = $id;
-    }
-    $sql = rtrim($sql, ",");
-    $sql.= ")";
-    return array($sql, $bindparams);
-}
-
-
+#==========================================================================================#
+# Others
+#==========================================================================================#
 // for walking fetchAll(PDO::FETCH_ASSOC) array
 // e.g. a row in the array
 // "userid" => 1234, "marks" => "90"
