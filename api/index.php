@@ -439,7 +439,7 @@ function updateOpenRegistration($schoolid){
     $body = $request->getBody();
     $school = json_decode($body);
     $sql = "UPDATE school set openForReg=:openForReg where schoolid=:schoolid";
-    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$school->openForReg)));
+    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$school->data->openForReg)));
 }
 
 function deleteSchoolYear($schoolyearid) {
