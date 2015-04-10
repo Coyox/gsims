@@ -1,7 +1,8 @@
 var LoginView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model = new User();
-		Backbone.Validation.bind(this);	
+		this.model.set("login", true);
+		Backbone.Validation.bind(this);
 		this.render();
 	},
 
@@ -11,7 +12,7 @@ var LoginView = Backbone.View.extend({
 		schoolyear.fetch({
 			url: schoolyear.getActiveSchoolYearUrl()
 		}).then(function(data) {
-			view.$el.html(html["login.html"]);  
+			view.$el.html(html["login.html"]);
 			if (data.openForReg == 1) {
 				view.$el.find("#reg-open").removeClass("hide").show();
 			} else {
@@ -33,8 +34,8 @@ var LoginView = Backbone.View.extend({
 
 		this.model.set("username", this.$el.find("#username").val());
 		this.model.set("password", this.$el.find("#password").val());
-		
-		if (this.model.isValid(true)) {
+		var isValid = this.model.isValid(true);
+		if (isValid) {
 			this.model.fetch({
 				data: {
 					username: this.model.get("username"),
@@ -73,6 +74,9 @@ var LoginView = Backbone.View.extend({
 					view.$el.find(".alert").removeClass("hide");
 				}, 300);
 			});
+		}
+		else {
+			console.log(isValid);
 		}
 	},
 

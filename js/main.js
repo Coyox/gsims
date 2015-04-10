@@ -18,6 +18,16 @@ var dataTables = {
 		  "sButtonText": "PDF",
 		  "mColumns": [0,1,2,3]
 		},
+	],
+	"buttons2": [
+		{"sExtends":"csv",
+		  "sButtonText": "CSV",
+		  "mColumns": [0,1,2,3,4,5]
+		},
+		{  "sExtends":"pdf",
+		  "sButtonText": "PDF",
+		  "mColumns": [0,1,2,3,4,5]
+		},
 	]
 }
 

@@ -135,12 +135,11 @@ var SectionsTableView = Backbone.View.extend({
 	       	],
 	       	dom: dataTables.exportDom,
 			tableTools: {
-				 aButtons: dataTables.buttons,
+				 aButtons: dataTables.buttons2,
        			 sSwfPath: dataTables.sSwfPath
     		}
 		});
 		createRefreshButton(this.$el);
-		//createExportButton(this.$el);
 	},
 
 	fetchAllResults: function() {
@@ -167,7 +166,7 @@ var SectionsTableView = Backbone.View.extend({
 		       	],
 		       	dom: dataTables.exportDom,
 				tableTools: {
-           			 aButtons: dataTables.buttons,
+           			 aButtons: dataTables.buttons2,
        			 	 sSwfPath: dataTables.sSwfPath
         		}
 			});

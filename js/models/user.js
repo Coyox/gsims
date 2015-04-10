@@ -270,12 +270,30 @@ var User = Backbone.Model.extend({
 	},
 	 validation: {
     	password2: {
+    		required: function(value, attr, computedState) {
+        		console.log(value, attr, computedState);
+        		console.log(attr);
+        		if (computedState.login){
+        			return false;
+        		}
+        		return true;
+      		},
       		equalTo: "password",
-      		msg: "The passwords must match."
+      		msg: "The passwords must match.",
+      		minLength: 6
     	},
-    	password: {
-    		minLength: 6
-    	}
+    	password2: {
+    		required: function(value, attr, computedState) {
+        		console.log(value, attr, computedState);
+        		console.log(attr);
+        		if (computedState.login){
+        			return false;
+        		}
+        		return true;
+      		},
+      		minLength: 6,
+      		msg: "Password must be at least 6 characters"
+    	},
   	},
 
     urlRoot: app.serverUrl + "api/login",
