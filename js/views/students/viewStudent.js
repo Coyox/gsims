@@ -514,17 +514,21 @@ var StudentAttendanceView = Backbone.View.extend({
 			student.fetch({
 				url: student.getEnrolledSectionsUrl(view.model.get("userid"))
 			}).then(function(data) {
-				_.each(data, function(section, index) {
-					var model = new Section(section, {parse:true});
-					view.addCourseRow(model.get("courseName"));
-					new StudentAttendanceRowView({
-						el: view.addRow(),
-						model: model,
-						courseName: model.get("courseName"),
-						attendance: att,
-						sectionid: model.get("sectionid")
+				if (data.length == 0) {
+					view.$el.html("<div class='alert alert-danger'>This student has no attendance records.</div>");
+				} else {
+					_.each(data, function(section, index) {
+						var model = new Section(section, {parse:true});
+						view.addCourseRow(model.get("courseName"));
+						new StudentAttendanceRowView({
+							el: view.addRow(),
+							model: model,
+							courseName: model.get("courseName"),
+							attendance: att,
+							sectionid: model.get("sectionid")
+						});
 					});
-				});
+				}
 			});
 		});
 	},
@@ -664,34 +668,38 @@ var ReportCardView = Backbone.View.extend({
 
 		var view = this;
 		var id = this.model.get("userid");
-		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
-			var promises = [];
+		this.model.fetch({
+			url:this.model.getEnrolledSectionsUrl(id)
+		}).then(function(data) {
+			if (data.length == 0) {
+				view.$el.html("<div class='alert alert-danger'>This student does not have a report card to view.</div>");
+			} else {
+				var promises = [];
+				_.each(data, function(object, index) {
+					var section = new Section(object, {parse:true});
 
-			_.each(data, function(object, index) {
-				var section = new Section(object, {parse:true});
+					var def = $.Deferred();
+					promises.push(def);
 
-				var def = $.Deferred();
-				promises.push(def);
+					new ReportCardRowView({
+						el: view.addRow(),
+						model: section,
+						id: id,
+						def: def
+					});
+				}, this);
 
-				new ReportCardRowView({
-					el: view.addRow(),
-					model: section,
-					id: id,
-					def: def
+				$.when.apply($, promises).then(function() {
+					view.table = view.$el.find("#report-card-table").dataTable({
+						dom: dataTables.exportDom,
+						tableTools: {
+			       			 aButtons: dataTables.buttons3,
+			   			 	 sSwfPath: dataTables.sSwfPath
+			    		}
+					});
 				});
-			}, this);
-
-			$.when.apply($, promises).then(function() {
-				view.table = view.$el.find("#report-card-table").dataTable({
-					dom: dataTables.exportDom,
-					tableTools: {
-		       			 aButtons: dataTables.buttons3,
-		   			 	 sSwfPath: dataTables.sSwfPath
-		    		}
-				});
-			});
+			}
 		});
-
 	},
 
 	addRow: function() {
