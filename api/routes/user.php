@@ -1,12 +1,12 @@
 <?php
 require_once '../helpers/general.php';
 require_once '../helpers/email.php';
+define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
 
 class User {
     #================================================================================================================#
     # Constants
     #================================================================================================================#
-    define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
 
     public function __construct($app) {
         $this->app = $app;
@@ -1037,7 +1037,7 @@ public function generateUsername($userid, $firstname, $lastname){
 public function generatePassword(){
     // password to be hashed
     $password='';
-    $chars = pwchars;
+    $chars = constant('pwchars');
     $count = strlen($chars);
     $desired_length = rand(8, 12);
     for($length = 0; $length < $desired_length; $length++) {

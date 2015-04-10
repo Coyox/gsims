@@ -1,12 +1,12 @@
 <?php
 require_once '../helpers/general.php';
 
-class Function {
+define("less","<=");
+define("greater",">=");
+class Functionality {
     #================================================================================================================#
     # Constants
     #================================================================================================================#
-    define("less","<=");
-    define("greater",">=");
     public function __construct($app) {
         $this->app = $app;
     }

@@ -12,7 +12,7 @@ $app = new \Slim\Slim();
 
 $school = new School($app);
 $user = new User($app);
-$function = new Function($app);
+$function = new Functionality($app);
 
 $school->createRoutes();
 $user->createRoutes();
