@@ -250,7 +250,7 @@ function getLoginById($id){
 #================================================================================================================#
 function getSchoolYears(){
     $schoolid = $_GET["schoolid"];
-    $sql = "SELECT s.schoolyearid, sy.status, s.openForReg from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
+    $sql = "SELECT s.schoolyearid, s.schoolyear, sy.status, s.openForReg from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL', array("schoolid"=>$schoolid)));
 }
 
