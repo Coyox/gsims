@@ -52,13 +52,15 @@
 						<label>The following teachers have not inputted attendance in the last <select id="day-menu" class='form-control'></select> days.</label>
 					</div>
 					<table id="teacher-reminder-table" class="table table-bordered table-striped">
+						<caption>					
+							<button id="email" class="btn btn-primary btn-sm pull-right"><span class="glyphicon glyphicon-envelope"></span> Send Email</button>
+						</caption>
 						<thead>
 							<th>Teacher</th>
 							<th>Last Attendance Input Date</th>
 							<th>Email</th>
 						</thead>
 					</table>
-					<button id="email" class="btn btn-primary btn-sm pull-right"><span class="glyphicon glyphicon-envelope"></span> Send Email</button>
 				</div>
 			</div>
 		</div>
@@ -88,7 +90,7 @@
 	</div>
 
 	<div id="pie-charts">
-		<div id="user-panel" class="col-sm-4">
+		<div id="location-panel" class="col-sm-4">
 			<div class="panel panel-default">
 				<div class="panel-heading font-14">Location Statistics</div>
 				<div class="panel-body">
@@ -96,7 +98,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="user-panel" class="col-sm-4">
+		<div id="gender-panel" class="col-sm-4">
 			<div class="panel panel-default">
 				<div class="panel-heading font-14">Gender Statistics</div>
 				<div class="panel-body">
@@ -104,7 +106,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="user-panel" class="col-sm-4">
+		<div id="age-panel" class="col-sm-4">
 			<div class="panel panel-default">
 				<div class="panel-heading font-14">Age Statistics</div>
 				<div class="panel-body">

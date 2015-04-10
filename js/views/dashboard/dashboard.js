@@ -243,13 +243,18 @@ var DashboardView = Backbone.View.extend({
 				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
-			_.each(data, function(teacher, index) {
-				var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
-				view.$el.find("#teacher-reminder-table").append(row);
-			});
-			view.reminderTable = view.$el.find("#teacher-reminder-table").dataTable({
-				dom: "t"
-			});
+			if (data.length == 0) {
+				view.$el.find("#teacher-reminder-table").hide();
+				view.$el.find("#teacher-reminder-table").after("<br><span>There are no teachers that have not inputted attendance.</span>");
+			} else {
+				_.each(data, function(teacher, index) {
+					var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
+					view.$el.find("#teacher-reminder-table").append(row);
+				});
+				view.reminderTable = view.$el.find("#teacher-reminder-table").dataTable({
+					dom: "t"
+				});
+			}
 		});
 	},
 
@@ -311,91 +316,95 @@ var DashboardView = Backbone.View.extend({
 		var mon = [], tue = [], wed = [], thu = [], fri = [], sat = [], sun = [];
 
 		$.when(def).then(function(data) {
-			// Get all sections
-			_.each(data, function(section, index) {
-				// Get all days for a section
-				var days = section.day.split(",");
-				_.each(days, function(day, index) {
-					var obj = {
-						start: section.startTime,
-						end: section.endTime,
-						courseName: section.courseName
-					};
-					switch (day) {
-						case "MON":
-						mon.push(obj);
-						break;
-						case "TUE":
-						tue.push(obj);
-						break;
-						case "WED":
-						wed.push(obj);
-						break;
-						case "THU":
-						thu.push(obj);
-						break;
-						case "FRI":
-						fri.push(obj);
-						break;
-						case "SAT":
-						sat.push(obj);
-						break;
-						case "SUN":
-						sun.push(obj);
-						break;
-						default:
-						break;
-					}
+			if (data.length == 0) {
+				elem.closest(".panel-body").text("There are no sections to display.");
+			} else {
+				// Get all sections
+				_.each(data, function(section, index) {
+					// Get all days for a section
+					var days = section.day.split(",");
+					_.each(days, function(day, index) {
+						var obj = {
+							start: section.startTime,
+							end: section.endTime,
+							courseName: section.courseName
+						};
+						switch (day) {
+							case "MON":
+							mon.push(obj);
+							break;
+							case "TUE":
+							tue.push(obj);
+							break;
+							case "WED":
+							wed.push(obj);
+							break;
+							case "THU":
+							thu.push(obj);
+							break;
+							case "FRI":
+							fri.push(obj);
+							break;
+							case "SAT":
+							sat.push(obj);
+							break;
+							case "SUN":
+							sun.push(obj);
+							break;
+							default:
+							break;
+						}
+					});
 				});
-			});
 
-			// Initialize the calendar widget
-			elem.fullCalendar({
-				defaultView: usertype == "T" ? "agendaWeek" : "basicWeek",
-				editable: false,
-				eventLimit: true,
-				views: {
-					agenda: {
-						eventLimit: 3
-					}
-				},
-				eventRender: function(event, element) {
-					element.popover({
-						title: event.title,
-						placement:'auto',
-						html:true,
-						trigger : 'click',
-						animation : 'true',
-						content: event.description,
-						container:'body'
-					});
-					$('body').on('click', function (e) {
-						if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-							element.popover('hide');
-					});
-				}
-			});
-
-			// Populate the calendar with events (sections)
-			elem.fullCalendar( 'addEventSource',
-				function(start, end, status, callback) {
-					var events = [];
-
-					for (loop = start._d.getTime(); loop <= end._d.getTime(); loop = loop + (24 * 60 * 60 * 1000)) {
-						var test_date = new Date(loop);
-						var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-						_.each(day, function(section, index) {
-							events.push({
-								title: section.courseName,
-								start: view.getStartTime(test_date, section),
-								end: view.getEndTime(test_date, section),
-								description: section.description,
-							});
+				// Initialize the calendar widget
+				elem.fullCalendar({
+					defaultView: usertype == "T" ? "agendaWeek" : "basicWeek",
+					editable: false,
+					eventLimit: true,
+					views: {
+						agenda: {
+							eventLimit: 3
+						}
+					},
+					eventRender: function(event, element) {
+						element.popover({
+							title: event.title,
+							placement:'auto',
+							html:true,
+							trigger : 'click',
+							animation : 'true',
+							content: event.description,
+							container:'body'
+						});
+						$('body').on('click', function (e) {
+							if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+								element.popover('hide');
 						});
 					}
-					callback( events );
-				}
-			);
+				});
+
+				// Populate the calendar with events (sections)
+				elem.fullCalendar( 'addEventSource',
+					function(start, end, status, callback) {
+						var events = [];
+
+						for (loop = start._d.getTime(); loop <= end._d.getTime(); loop = loop + (24 * 60 * 60 * 1000)) {
+							var test_date = new Date(loop);
+							var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
+							_.each(day, function(section, index) {
+								events.push({
+									title: section.courseName,
+									start: view.getStartTime(test_date, section),
+									end: view.getEndTime(test_date, section),
+									description: section.description,
+								});
+							});
+						}
+						callback( events );
+					}
+				);
+			}
 		});
 	},
 
@@ -431,25 +440,29 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
-				dataArray.push(city);
-			});
+			if (data.length == 0) {
+				view.$el.find("#location-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
+					dataArray.push(city);
+				});
 
-			if (dataArray.length > 1){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
+				if (dataArray.length > 1){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
 
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-location-piechart').get(0));
-	        	chart.draw(data, options);
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-location-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
@@ -464,25 +477,29 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
-				dataArray.push(gender);
-			});
-			if (dataArray.length > 1){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
-	          		colors:['#00B88A','#9d426b']
+			if (data.length == 0) {
+				view.$el.find("#gender-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
+					dataArray.push(gender);
+				});
+				if (dataArray.length > 1){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
+		          		colors:['#00B88A','#9d426b']
 
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
-	        	chart.draw(data, options);
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
@@ -505,40 +522,44 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getAgeStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var age = parseInt(model.get("age"));
-				var studentcount = parseInt(model.get("studentCount"));
-				if (age <= 17){ kids += studentcount; }
-				if (18 <= age && age <= 24){ teens += studentcount; }
-				if (25 <= age && age <= 34){ youngadults += studentcount; }
-				if (35 <= age && age <= 44){ adults += studentcount; }
-				if (45 <= age && age <= 54){ oldadults += studentcount; }
-				if (55 <= age && age <= 64){ seniors += studentcount; }
-				if (age >= 65){ elderly += studentcount; }
-			});
+			if (data.length == 0) {
+				view.$el.find("#age-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var age = parseInt(model.get("age"));
+					var studentcount = parseInt(model.get("studentCount"));
+					if (age <= 17){ kids += studentcount; }
+					if (18 <= age && age <= 24){ teens += studentcount; }
+					if (25 <= age && age <= 34){ youngadults += studentcount; }
+					if (35 <= age && age <= 44){ adults += studentcount; }
+					if (45 <= age && age <= 54){ oldadults += studentcount; }
+					if (55 <= age && age <= 64){ seniors += studentcount; }
+					if (age >= 65){ elderly += studentcount; }
+				});
 
-			dataArray.push(['0-17', kids]);
-			dataArray.push(['18-24', teens]);
-			dataArray.push(['25-32', youngadults]);
-			dataArray.push(['35-44', adults]);
-			dataArray.push(['45-54', oldadults]);
-			dataArray.push(['55-64', seniors]);
-			dataArray.push(['65+', elderly]);
+				dataArray.push(['0-17', kids]);
+				dataArray.push(['18-24', teens]);
+				dataArray.push(['25-32', youngadults]);
+				dataArray.push(['35-44', adults]);
+				dataArray.push(['45-54', oldadults]);
+				dataArray.push(['55-64', seniors]);
+				dataArray.push(['65+', elderly]);
 
 
-			if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-age-piechart').get(0));
-	        	chart.draw(data, options);
+				if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-age-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
@@ -558,30 +579,34 @@ var DashboardView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var date = model.get("date").split("-");
-				var year = date[0];
-				var month = date[1];
-				var day = date[2];
-				var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
-				dataArray.push(stat);
-			});
+			if (data.length == 0) {
+				view.$el.find("#admin-attendance .panel-body").text("There are no attendance records to be displayed.")
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var date = model.get("date").split("-");
+					var year = date[0];
+					var month = date[1];
+					var day = date[2];
+					var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
+					dataArray.push(stat);
+				});
 
-			if (dataArray){
-				var dataTable = new google.visualization.DataTable();
-				dataTable.addColumn({ type: 'date', id: 'Date' });
-	       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
-	       		dataTable.addRows(dataArray);
+				if (dataArray){
+					var dataTable = new google.visualization.DataTable();
+					dataTable.addColumn({ type: 'date', id: 'Date' });
+		       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
+		       		dataTable.addRows(dataArray);
 
-		    	var options = {
-	          		title: "School Attendance",
-	          		height: 200,
-	          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
-	      		}
+			    	var options = {
+		          		title: "School Attendance",
+		          		height: 200,
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
+		      		}
 
-	        	var chart = new google.visualization.Calendar(view.$el.find('#calendar_basic').get(0));
-	        	chart.draw(dataTable, options);
+		        	var chart = new google.visualization.Calendar(view.$el.find('#calendar_basic').get(0));
+		        	chart.draw(dataTable, options);
+				}
 			}
 		});
 	},
