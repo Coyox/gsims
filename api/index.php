@@ -45,7 +45,6 @@ $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 $app->post('/schoolyears/active/:id', 'updateActiveSchoolYear');
-//$app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
 $app->post('/schoolyears/:id', 'deleteSchoolYear');
 
 $app->get('/schools', 'getSchools');
@@ -56,7 +55,7 @@ $app->get('/schools/:id/administrators', 'getAdministratorsBySchool');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
-$app->put('/schools/:id/reg', 'updateOpenRegistration');
+$app->post('/schools/:id/reg', 'updateOpenRegistration');
 $app->put('/schools/:id', 'updateSchool');
 $app->delete('/schools/:id', 'deleteSchool');
 
@@ -435,11 +434,9 @@ function updateActiveSchoolYear($schoolyearid){
 
 }
 function updateOpenRegistration($schoolid){
-    $request = \Slim\Slim::getInstance()->request();
-    $body = $request->getBody();
-    $school = json_decode($body);
+    $openForReg = $_POST["openForReg"];
     $sql = "UPDATE school set openForReg=:openForReg where schoolid=:schoolid";
-    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$school->data->openForReg)));
+    echo json_encode(perform_query($sql, '', array("schoolid"=>$schoolid, "openForReg"=>$openForReg)));
 }
 
 function deleteSchoolYear($schoolyearid) {

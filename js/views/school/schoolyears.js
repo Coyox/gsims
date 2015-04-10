@@ -92,14 +92,14 @@ var SchoolYearView = Backbone.View.extend({
                     	title: "ERROR",
                     	status: "error",
                     	message: "The selected could not be purged. Please try again."
-                    });               
+                    });
                 }
             }).fail(function(data) {
                 new TransactionResponseView({
                     title: "ERROR",
                     status: "error",
                     message: "The selected could not be purged. Please try again."
-                }); 
+                });
             });
         });
     },
@@ -199,7 +199,7 @@ var SchoolYearView = Backbone.View.extend({
 			}).then(function(data) {
 				console.log(data);
 				def1.resolve();
-			});			
+			});
 		} else {
 			def1.resolve();
 		}
@@ -207,7 +207,7 @@ var SchoolYearView = Backbone.View.extend({
 		if (schoolid) {
 			var school = new School();
 			$.ajax({
-				type: "PUT",
+				type: "POST",
 				url: school.updateOpenRegistration(schoolid),
 				data: {
 					openForReg: openForReg
