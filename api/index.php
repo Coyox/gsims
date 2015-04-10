@@ -10,5 +10,13 @@ require_once 'routes/function.php';
 
 $app = new \Slim\Slim();
 
+$school = new School($app);
+$user = new User($app);
+$function = new Function($app);
+
+$school->createRoutes();
+$user->createRoutes();
+$function->createRoutes();
+
 $app->run();
 

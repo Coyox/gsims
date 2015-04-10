@@ -1,35 +1,43 @@
 <?php
 require_once '../helpers/general.php';
 
-$app->get('/search/:schoolid/users/:usertype', 'findUsers');
-$app->get('/search/:schoolid/sections', 'findSections');
-$app->get('/search/:schoolid/advanced', 'findStudentsWithAdvancedCriteria');
+class Function {
+    public function __construct($app) {
+        $this->app = $app;
+    }
+    public function createRoutes(){
+        $this->app->get('/search/:schoolid/users/:usertype', 'findUsers');
+        $this->app->get('/search/:schoolid/sections', 'findSections');
+        $this->app->get('/search/:schoolid/advanced', 'findStudentsWithAdvancedCriteria');
 
-$app->get('/login', 'validateCredentials');
-$app->put('/login/:id', 'updateLogin');
-$app->get('/login/:id', 'getLoginById');
+        $this->app->get('/login', 'validateCredentials');
+        $this->app->put('/login/:id', 'updateLogin');
+        $this->app->get('/login/:id', 'getLoginById');
 
-$app->get('/count/:usertype', 'getUserCount');
+        $this->app->get('/count/:usertype', 'getUserCount');
 
-$app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
+        $this->app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
 
-$app->post('/purge/attendance', 'purgeAttendance');
-$app->post('/purge/waitlist', 'purgeWaitlist');
-$app->post('/purge/user', 'purgeUsers');
-$app->post('/purge/schoolyear', 'purgeSchoolYears');
-$app->post('/purge/school', 'purgeSchools');
-$app->post('/purge/department', 'purgeDepartments');
-$app->post('/purge/course', 'purgeCourses');
-$app->post('/purge/section', 'purgeSections');
-$app->post('/purge/document', 'purgeDocuments');
-$app->delete('/purge/inactive', 'purgeInactive');
+        $this->app->post('/purge/attendance', 'purgeAttendance');
+        $this->app->post('/purge/waitlist', 'purgeWaitlist');
+        $this->app->post('/purge/user', 'purgeUsers');
+        $this->app->post('/purge/schoolyear', 'purgeSchoolYears');
+        $this->app->post('/purge/school', 'purgeSchools');
+        $this->app->post('/purge/department', 'purgeDepartments');
+        $this->app->post('/purge/course', 'purgeCourses');
+        $this->app->post('/purge/section', 'purgeSections');
+        $this->app->post('/purge/document', 'purgeDocuments');
+        $this->app->delete('/purge/inactive', 'purgeInactive');
 
-$app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
-$app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
-$app->get('/stats/age/:schoolid/students', 'getStudentAgeStats');
-$app->get('/stats/attendance/:schoolid', 'getAttendanceStats');
+        $this->app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
+        $this->app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
+        $this->app->get('/stats/age/:schoolid/students', 'getStudentAgeStats');
+        $this->app->get('/stats/attendance/:schoolid', 'getAttendanceStats');
 
-$app->get('/keys/:name', 'getKeyByName');
+        $this->app->get('/keys/:name', 'getKeyByName');
+    }
+
+}
 
 #================================================================================================================#
 # Constants

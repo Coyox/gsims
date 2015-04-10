@@ -2,43 +2,52 @@
 require_once '../helpers/general.php';
 require_once '../helpers/email.php';
 
-$app->get('/students', 'getStudents');
-$app->get('/students/:id', 'getStudentById');
-$app->get('/students/:id/sections', 'getEnrolledSections');
-$app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
-$app->get('/students/:id/avgGrade', 'getAvgGrade');
-$app->get('/students/:id/attendance', 'getStudentAttendance');
-$app->post('/students', 'createStudent');
-$app->post('/students/:id/sections', 'enrollStudentInSections');
-$app->post('/students/:id/waitlists', 'enrollStudentInWaitlists');
-$app->post('/students/pending', 'handlePendingStudents');
-$app->post('/students/pendingTest', 'handlePendingTestStudents');
-$app->put('/students/:id', 'updateStudent');
-$app->delete('/students/:id', 'deleteStudent');
+class User {
+    public function __construct($app) {
+        $this->app = $app;
+    }
+    public function createRoutes() {
+        $this->app->get('/students', 'getStudents');
+        $this->app->get('/students/:id', 'getStudentById');
+        $this->app->get('/students/:id/sections', 'getEnrolledSections');
+        $this->app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
+        $this->app->get('/students/:id/avgGrade', 'getAvgGrade');
+        $this->app->get('/students/:id/attendance', 'getStudentAttendance');
+        $this->app->post('/students', 'createStudent');
+        $this->app->post('/students/:id/sections', 'enrollStudentInSections');
+        $this->app->post('/students/:id/waitlists', 'enrollStudentInWaitlists');
+        $this->app->post('/students/pending', 'handlePendingStudents');
+        $this->app->post('/students/pendingTest', 'handlePendingTestStudents');
+        $this->app->put('/students/:id', 'updateStudent');
+        $this->app->delete('/students/:id', 'deleteStudent');
 
-$app->get('/teachers', 'getTeachers');
-$app->get('/teachers/:id', 'getTeacherById');
-$app->get('/teachers/:id/sections', 'getTeachingSections');
-$app->get('/teachers/:id/competency', 'getCourseCompetencies');
-$app->get('/teachers/:id/attendance', 'getTeacherAttendance');
-$app->post('/teachers/:id/competency', 'updateCourseCompetencies');
-$app->post('/teachers', 'createTeacher');
-$app->put('/teachers/:id', 'updateTeacher');
-$app->delete('/teachers/:id', 'deleteTeacher');
+        $this->app->get('/teachers', 'getTeachers');
+        $this->app->get('/teachers/:id', 'getTeacherById');
+        $this->app->get('/teachers/:id/sections', 'getTeachingSections');
+        $this->app->get('/teachers/:id/competency', 'getCourseCompetencies');
+        $this->app->get('/teachers/:id/attendance', 'getTeacherAttendance');
+        $this->app->post('/teachers/:id/competency', 'updateCourseCompetencies');
+        $this->app->post('/teachers', 'createTeacher');
+        $this->app->put('/teachers/:id', 'updateTeacher');
+        $this->app->delete('/teachers/:id', 'deleteTeacher');
 
-$app->get('/administrators', 'getAdministrators');
-$app->get('/administrators/:id', 'getAdministratorById');
-$app->post('/administrators', 'createAdministrator');
-$app->delete('/administrators/:id', 'deleteTeacher');
+        $this->app->get('/administrators', 'getAdministrators');
+        $this->app->get('/administrators/:id', 'getAdministratorById');
+        $this->app->post('/administrators', 'createAdministrator');
+        $this->app->delete('/administrators/:id', 'deleteTeacher');
 
-$app->get('/superusers', 'getSuperusers');
-$app->get('/superusers/:id', 'getSuperuserById');
-$app->post('/superusers', 'createSuperuser');
-$app->put('/superusers/:id', 'updateSuperuser');
-$app->delete('/superusers/:id', 'deleteSuperuser');
+        $this->app->get('/superusers', 'getSuperusers');
+        $this->app->get('/superusers/:id', 'getSuperuserById');
+        $this->app->post('/superusers', 'createSuperuser');
+        $this->app->put('/superusers/:id', 'updateSuperuser');
+        $this->app->delete('/superusers/:id', 'deleteSuperuser');
 
-$app->get('/users/:id/:usertype', 'getUserById');
-$app->get('/users/:emailAddr', 'getUserByEmailAddr');
+        $this->app->get('/users/:id/:usertype', 'getUserById');
+        $this->app->get('/users/:emailAddr', 'getUserByEmailAddr');
+    }
+
+}
+
 
 #================================================================================================================#
 # Constants
@@ -103,17 +112,17 @@ function getEnrolledSections($id, $flag=0, $status="active"){
 function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
-            FROM section s, course c
-            WHERE s.sectionid
-                IN (SELECT e.sectionid FROM enrollment e
-                    WHERE e.userid=:id
-                    AND e.schoolyearid IN
-                   (SELECT sy.schoolyearid from schoolyear sy
-                    WHERE substr(sy.schoolyear,1,4) <= (SELECT substr(sy2.schoolyear,1,4) from schoolyear sy2 where sy2.schoolyearid=:schoolyearid)
-                    AND sy.schoolyearid <> :schoolyearid
-                 ))
-            AND s.courseid = c.courseid";
-    echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id, "schoolyearid"=>$schoolyearid)));
+    FROM section s, course c
+    WHERE s.sectionid
+    IN (SELECT e.sectionid FROM enrollment e
+        WHERE e.userid=:id
+        AND e.schoolyearid IN
+        (SELECT sy.schoolyearid from schoolyear sy
+            WHERE substr(sy.schoolyear,1,4) <= (SELECT substr(sy2.schoolyear,1,4) from schoolyear sy2 where sy2.schoolyearid=:schoolyearid)
+            AND sy.schoolyearid <> :schoolyearid
+            ))
+AND s.courseid = c.courseid";
+echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 
 /*
@@ -163,8 +172,8 @@ function updateStudent($id) {
         "schoolid" => $student->schoolid,
         "paid" => $student->paid,
         "status" => $student->status,
-    );
-    echo json_encode(perform_query($sql,'',$bindparams));
+        );
+echo json_encode(perform_query($sql,'',$bindparams));
 }
 
 
@@ -193,59 +202,59 @@ function createStudent() {
     $bindparams[0] = $loginbindparam;
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
-    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
-    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status) values (:userid, :firstName, :lastName, :dateOfBirth, :gender, :streetAddr1, :streetAddr2, :city,
-    :province, :country, :postalCode, :phoneNumber, :emailAddr, :allergies, :prevSchools, :parentFirstName, :parentLastName,
-    :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
-    :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
+        province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+        parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+        emergencyContactPhoneNumber, schoolid, paid, status) values (:userid, :firstName, :lastName, :dateOfBirth, :gender, :streetAddr1, :streetAddr2, :city,
+        :province, :country, :postalCode, :phoneNumber, :emailAddr, :allergies, :prevSchools, :parentFirstName, :parentLastName,
+        :parentPhoneNumber, :parentEmailAddr, :emergencyContactFirstName, :emergencyContactLastName, :emergencyContactRelation,
+        :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
 
-    array_push($queries, $sql);
-    $bindparams[1] = array(
-        "userid" => $userid,
-        "firstName" => $student->firstName,
-        "lastName" => $student->lastName,
-        "dateOfBirth" => $student->dateOfBirth,
-        "gender" => $student->gender,
-        "streetAddr1" => $student->streetAddr1,
-        "streetAddr2" => $student->streetAddr2,
-        "city" => $student->city,
-        "province" => $student->province,
-        "country" => $student->country,
-        "postalCode" => $student->postalCode,
-        "phoneNumber" => $student->phoneNumber,
-        "emailAddr" => $student->emailAddr,
-        "allergies" => $student->allergies,
-        "prevSchools" => $student->prevSchools,
-        "parentFirstName" => $student->parentFirstName,
-        "parentLastName" => $student->parentLastName,
-        "parentPhoneNumber" => $student->parentPhoneNumber,
-        "parentEmailAddr" => $student->parentEmailAddr,
-        "emergencyContactFirstName" => $student->emergencyContactFirstName,
-        "emergencyContactLastName" => $student->emergencyContactLastName,
-        "emergencyContactRelation" => $student->emergencyContactRelation,
-        "emergencyContactPhoneNumber" => $student->emergencyContactPhoneNumber,
-        "schoolid" => $student->schoolid,
-        "paid" => $student->paid,
-        "status" => $student->status,
+array_push($queries, $sql);
+$bindparams[1] = array(
+    "userid" => $userid,
+    "firstName" => $student->firstName,
+    "lastName" => $student->lastName,
+    "dateOfBirth" => $student->dateOfBirth,
+    "gender" => $student->gender,
+    "streetAddr1" => $student->streetAddr1,
+    "streetAddr2" => $student->streetAddr2,
+    "city" => $student->city,
+    "province" => $student->province,
+    "country" => $student->country,
+    "postalCode" => $student->postalCode,
+    "phoneNumber" => $student->phoneNumber,
+    "emailAddr" => $student->emailAddr,
+    "allergies" => $student->allergies,
+    "prevSchools" => $student->prevSchools,
+    "parentFirstName" => $student->parentFirstName,
+    "parentLastName" => $student->parentLastName,
+    "parentPhoneNumber" => $student->parentPhoneNumber,
+    "parentEmailAddr" => $student->parentEmailAddr,
+    "emergencyContactFirstName" => $student->emergencyContactFirstName,
+    "emergencyContactLastName" => $student->emergencyContactLastName,
+    "emergencyContactRelation" => $student->emergencyContactRelation,
+    "emergencyContactPhoneNumber" => $student->emergencyContactPhoneNumber,
+    "schoolid" => $student->schoolid,
+    "paid" => $student->paid,
+    "status" => $student->status,
     );
 
-    $transaction_result = perform_transaction($queries, $bindparams);
-    if ($transaction_result["status"] == "success"){
-        $resp["userid"] = $userid;
-        $transaction_result = $resp + $transaction_result;
-        if ($student->status != "pending"){
-            emailLogin($student->emailAddr, $username, $password, $student->firstName, $student->lastName);
-        }
+$transaction_result = perform_transaction($queries, $bindparams);
+if ($transaction_result["status"] == "success"){
+    $resp["userid"] = $userid;
+    $transaction_result = $resp + $transaction_result;
+    if ($student->status != "pending"){
+        emailLogin($student->emailAddr, $username, $password, $student->firstName, $student->lastName);
     }
-    echo json_encode($transaction_result);
+}
+echo json_encode($transaction_result);
 }
 
 /*
  Mass create student records with generated login info
  Will send out email if transaction is successful
 */
-function massCreateStudents($students) {
+ function massCreateStudents($students) {
     $resp = array();
     $queries = array();
     $bindparams = array();
@@ -255,60 +264,60 @@ function massCreateStudents($students) {
     $bindparams[0] = $loginbindparams;
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
-    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
-    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status) values ";
+        province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
+        parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
+        emergencyContactPhoneNumber, schoolid, paid, status) values ";
 
-    $insertbindparams = array();
-    foreach (array_values($students) as $i => $student) {
-        $sql.= "(:userid".$i.", :firstName".$i.", :lastName".$i.", :dateOfBirth".$i.", :gender".$i.", :streetAddr1".$i.", :streetAddr2".$i.", :city".$i.",
+$insertbindparams = array();
+foreach (array_values($students) as $i => $student) {
+    $sql.= "(:userid".$i.", :firstName".$i.", :lastName".$i.", :dateOfBirth".$i.", :gender".$i.", :streetAddr1".$i.", :streetAddr2".$i.", :city".$i.",
         :province".$i.", :country".$i.", :postalCode".$i.", :phoneNumber".$i.", :emailAddr".$i.", :allergies".$i.", :prevSchools".$i.", :parentFirstName".$i.", :parentLastName".$i.",
         :parentPhoneNumber".$i.", :parentEmailAddr".$i.", :emergencyContactFirstName".$i.", :emergencyContactLastName".$i.", :emergencyContactRelation".$i.",
         :emergencyContactPhoneNumber".$i.", :schoolid".$i.", :paid".$i.", :status".$i."),";
 
-        $insertbindparams["userid".$i] = $userids[$i];
-        $insertbindparams["firstName".$i] = $student->firstName;
-        $insertbindparams["lastName".$i] = $student->lastName;
-        $insertbindparams["dateOfBirth".$i] = $student->dateOfBirth;
-        $insertbindparams["gender".$i] = $student->gender;
-        $insertbindparams["streetAddr1".$i] = $student->streetAddr1;
-        $insertbindparams["streetAddr2".$i] = $student->streetAddr2;
-        $insertbindparams["city".$i] = $student->city;
-        $insertbindparams["province".$i] = $student->province;
-        $insertbindparams["country".$i] = $student->country;
-        $insertbindparams["postalCode".$i] = $student->postalCode;
-        $insertbindparams["phoneNumber".$i] = $student->phoneNumber;
-        $insertbindparams["emailAddr".$i] = $student->emailAddr;
-        $insertbindparams["allergies".$i] = $student->allergies;
-        $insertbindparams["prevSchools".$i] = $student->prevSchools;
-        $insertbindparams["parentFirstName".$i] = $student->parentFirstName;
-        $insertbindparams["parentLastName".$i] = $student->parentLastName;
-        $insertbindparams["parentPhoneNumber".$i] = $student->parentPhoneNumber;
-        $insertbindparams["parentEmailAddr".$i] = $student->parentEmailAddr;
-        $insertbindparams["parentEmailAddr".$i] = $student->parentEmailAddr;
-        $insertbindparams["emergencyContactFirstName".$i] = $student->emergencyContactFirstName;
-        $insertbindparams["emergencyContactLastName".$i] = $student->emergencyContactLastName;
-        $insertbindparams["emergencyContactRelation".$i] = $student->emergencyContactRelation;
-        $insertbindparams["emergencyContactPhoneNumber".$i] = $student->emergencyContactPhoneNumber;
-        $insertbindparams["schoolid".$i] = $student->schoolid;
-        $insertbindparams["paid".$i] = $student->paid;
-        $insertbindparams["status".$i] = $student->status;
-    }
-    $bindparams[1] = $insertbindparams;
-    $sql = rtrim($sql, ",");
-    array_push($queries, $sql);
+$insertbindparams["userid".$i] = $userids[$i];
+$insertbindparams["firstName".$i] = $student->firstName;
+$insertbindparams["lastName".$i] = $student->lastName;
+$insertbindparams["dateOfBirth".$i] = $student->dateOfBirth;
+$insertbindparams["gender".$i] = $student->gender;
+$insertbindparams["streetAddr1".$i] = $student->streetAddr1;
+$insertbindparams["streetAddr2".$i] = $student->streetAddr2;
+$insertbindparams["city".$i] = $student->city;
+$insertbindparams["province".$i] = $student->province;
+$insertbindparams["country".$i] = $student->country;
+$insertbindparams["postalCode".$i] = $student->postalCode;
+$insertbindparams["phoneNumber".$i] = $student->phoneNumber;
+$insertbindparams["emailAddr".$i] = $student->emailAddr;
+$insertbindparams["allergies".$i] = $student->allergies;
+$insertbindparams["prevSchools".$i] = $student->prevSchools;
+$insertbindparams["parentFirstName".$i] = $student->parentFirstName;
+$insertbindparams["parentLastName".$i] = $student->parentLastName;
+$insertbindparams["parentPhoneNumber".$i] = $student->parentPhoneNumber;
+$insertbindparams["parentEmailAddr".$i] = $student->parentEmailAddr;
+$insertbindparams["parentEmailAddr".$i] = $student->parentEmailAddr;
+$insertbindparams["emergencyContactFirstName".$i] = $student->emergencyContactFirstName;
+$insertbindparams["emergencyContactLastName".$i] = $student->emergencyContactLastName;
+$insertbindparams["emergencyContactRelation".$i] = $student->emergencyContactRelation;
+$insertbindparams["emergencyContactPhoneNumber".$i] = $student->emergencyContactPhoneNumber;
+$insertbindparams["schoolid".$i] = $student->schoolid;
+$insertbindparams["paid".$i] = $student->paid;
+$insertbindparams["status".$i] = $student->status;
+}
+$bindparams[1] = $insertbindparams;
+$sql = rtrim($sql, ",");
+array_push($queries, $sql);
 
-    $transaction_result = perform_transaction($queries, $bindparams);
-    if ($transaction_result["status"] == "success"){
-        $resp["userids"] = json_encode($userids);
-        $transaction_result = $resp + $transaction_result;
-        foreach ($emailparams as $student) {
-            if ($student->status != "pending"){
-                emailLogin($student["emailAddr"], $student["username"], $student["password"], $student["firstName"], $student["lastName"]);
-            }
+$transaction_result = perform_transaction($queries, $bindparams);
+if ($transaction_result["status"] == "success"){
+    $resp["userids"] = json_encode($userids);
+    $transaction_result = $resp + $transaction_result;
+    foreach ($emailparams as $student) {
+        if ($student->status != "pending"){
+            emailLogin($student["emailAddr"], $student["username"], $student["password"], $student["firstName"], $student["lastName"]);
         }
     }
-    echo json_encode($transaction_result);
+}
+echo json_encode($transaction_result);
 }
 /*
  * mark student as inactive
@@ -334,7 +343,7 @@ function enrollStudentInSections($id){
         "userid" => $id,
         "schoolyearid" => $schoolyearid,
         "status" => $status,
-    );
+        );
     $sql = "INSERT INTO enrollment (userid, sectionid, schoolyearid, status) values ";
     foreach (array_values($sectionids) as $i => $sectionid) {
         $sql.= "(:userid, :sectionid".$i.", :schoolyearid, :status),";
@@ -372,7 +381,7 @@ function enrollStudentInWaitlists($id){
   Handing pending students who are either denied, approved, or signed up for tests
   Send out emails if status of student was previously pending
 */
-function handlePendingStudents(){
+  function handlePendingStudents(){
     $queries = array();
     $bindparams = array();
     $purgeList = array();
@@ -472,7 +481,7 @@ function handlePendingStudents(){
 /*
  Handle pending-test students who are either denied or approved
 */
-function handlePendingTestStudents(){
+ function handlePendingTestStudents(){
     $queries = array();
     $bindparams = array();
     $students = json_decode($_POST['students']);
@@ -487,14 +496,14 @@ function handlePendingTestStudents(){
             array_push($bindparams, $params);
             array_push($queries, $sql);
         }
-       if ($student->approvedList){
+        if ($student->approvedList){
             $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
             list($sqlparens, $params) = parenthesisList($student->approvedList);
             $sql.=$sqlparens;
             $params += $param;
             array_push($bindparams, $params);
             array_push($queries, $sql);
-       }
+        }
     }
     echo json_encode(perform_transaction($queries, $bindparams));
 }
@@ -535,7 +544,7 @@ function getAvgGrade($id, $flag=0){
 /*
  Wrapper to get student attendance
 */
-function getStudentAttendance($id){
+ function getStudentAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
     $month = $_GET["month"];
     if (isset($month)){
@@ -561,7 +570,7 @@ function getTeacherById($id) {
  Create teacher record with generated login info
  Will send out email if transaction is successful
 */
-function createTeacher() {
+ function createTeacher() {
     if (isset($_POST['teachers'])){
         return massCreateTeachers(json_decode($_POST['teachers']), 'T');
     }
@@ -579,7 +588,7 @@ function createTeacher() {
     $bindparams[0] = $loginbindparam;
 
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
-                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
+    values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
     array_push($queries, $sql);
     $bindparams[1] = array(
         "userid" => $userid,
@@ -589,7 +598,7 @@ function createTeacher() {
         "emailAddr" => $teacher->emailAddr,
         "status" => $teacher->status,
         "usertype" => 'T'
-    );
+        );
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
@@ -604,7 +613,7 @@ function createTeacher() {
  Mass create teacher records with generated login info
  Will send out email if transaction is successful
 */
-function massCreateTeachers($teachers, $usertype) {
+ function massCreateTeachers($teachers, $usertype) {
     $resp = array();
     $queries = array();
     $bindparams = array();
@@ -643,7 +652,7 @@ function massCreateTeachers($teachers, $usertype) {
 /*
  Update teacher/administrator record
 */
-function updateTeacher($id) {
+ function updateTeacher($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
@@ -660,7 +669,7 @@ function updateTeacher($id) {
         "emailAddr" => $teacher->emailAddr,
         "status" => $teacher->status,
         "usertype" => $teacher->usertype
-    );
+        );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 /*
@@ -709,7 +718,7 @@ function updateCourseCompetencies($id){
         array_push($queries, $sql);
         array_push($combinedbindparams, $bindparams);
     }
-   if (isset($_POST["deleteComps"])){
+    if (isset($_POST["deleteComps"])){
         $list = json_decode($_POST["deleteComps"]);
         $sql = "DELETE from teacherCourseCompetency where userid=:userid and deptid in  ";
         list($sqlparens, $bindparams) = parenthesisList($list);
@@ -769,7 +778,7 @@ function createAdministrator() {
     $bindparams[0] = $loginbindparam;
 
     $sql = "INSERT into teacher (userid, schoolid, firstName, lastName, emailAddr, status, usertype)
-                         values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
+    values (:userid, :schoolid, :firstName, :lastName, :emailAddr, :status, :usertype)";
     array_push($queries, $sql);
     $bindparams[1] = array(
         "userid" => $userid,
@@ -779,7 +788,7 @@ function createAdministrator() {
         "emailAddr" => $teacher->emailAddr,
         "status" => $teacher->status,
         "usertype" => 'A'
-    );
+        );
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
@@ -815,7 +824,7 @@ function createSuperuser() {
     $bindparams[0] = $loginbindparam;
 
     $sql = "INSERT into superuser (userid, firstName, lastName, emailAddr, status)
-                         values (:userid, :firstName, :lastName, :emailAddr, :status)";
+    values (:userid, :firstName, :lastName, :emailAddr, :status)";
     array_push($queries, $sql);
     $bindparams[1] = array(
         "userid" => $userid,
@@ -823,7 +832,7 @@ function createSuperuser() {
         "lastName" => $superuser->lastName,
         "emailAddr" => $superuser->emailAddr,
         "status" => $superuser->status,
-    );
+        );
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
@@ -849,7 +858,7 @@ function updateSuperuser($id) {
         "lastName" => $superuser->lastName,
         "emailAddr" => $superuser->emailAddr,
         "status" => $superuser->status,
-    );
+        );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 function deleteSuperuser($id) {
@@ -949,14 +958,14 @@ function getAttendanceByMonth($id, $schoolyearid, $month){
 
 function createLogin($firstname, $lastname, $usertype){
     $sql = "INSERT into login (userid, username, password, usertype)
-            VALUES (:userid, :username, :password, :usertype)";
+    VALUES (:userid, :username, :password, :usertype)";
 
     list($userid, $username, $password) = generateLogin($firstname, $lastname);
     $passwordhash = generatePasswordHash($password);
     $bindparams=array("userid" => $userid,
-                      "username"=> $username,
-                      "password"=> $passwordhash,
-                      "usertype" => $usertype);
+      "username"=> $username,
+      "password"=> $passwordhash,
+      "usertype" => $usertype);
 
     return array(array($userid, $username, $password), $sql, $bindparams);
 }
@@ -1036,8 +1045,8 @@ function generatePassword(){
     for($length = 0; $length < $desired_length; $length++) {
      $index = rand(0, $count-1);
      $password .= $chars[$index];
-    }
-    return $password;
+ }
+ return $password;
 }
 
 function generatePasswordHash($password){
