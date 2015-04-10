@@ -222,6 +222,11 @@ var Teacher = Backbone.Model.extend({
    	addCourseCompetencyUrl: function(id) {
    		return this.urlRoot + "/" + id;
    	},
+
+   	createAdministratorUrl: function()  {
+   		return app.serverUrl + "api/administrators";
+   	},
+
    	teacherStatuses:[
    		"active",
    		"inactive"
@@ -271,8 +276,6 @@ var User = Backbone.Model.extend({
 	 validation: {
     	password2: {
     		required: function(value, attr, computedState) {
-        		console.log(value, attr, computedState);
-        		console.log(attr);
         		if (computedState.login){
         			return false;
         		}
@@ -284,8 +287,6 @@ var User = Backbone.Model.extend({
     	},
     	password2: {
     		required: function(value, attr, computedState) {
-        		console.log(value, attr, computedState);
-        		console.log(attr);
         		if (computedState.login){
         			return false;
         		}

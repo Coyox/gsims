@@ -7,6 +7,7 @@ var SearchTeachersView = Backbone.View.extend({
 		this.elem = options.elem;
 		this.parentView = options.parentView;
 		this.both = options.both;
+		this.usertype = options.usertype || "T";
 		this.render();
 	},
 
@@ -33,15 +34,13 @@ var SearchTeachersView = Backbone.View.extend({
 			data.lastName = lastName;
 		}
 
-		console.log(this.both);
-
 		if (this.both) {
 			data.both = this.both;
 		}
 
 		var teacher = new Teacher();
 		teacher.fetch({
-			url: teacher.getSearchTeachersUrl("T", sessionStorage.getItem("gobind-schoolid")),
+			url: teacher.getSearchTeachersUrl(this.usertype, sessionStorage.getItem("gobind-schoolid")),
 			data: data
 		}).then(function(data) {
 			view.changeRoute(data);
@@ -57,13 +56,19 @@ var SearchTeachersView = Backbone.View.extend({
 				courseid: this.courseid,
 				elem: this.elem,
 				backdrop: this.backdrop,
-				parentView: this.parentView
+				parentView: this.parentView,
+				usertype: this.usertype
 			});
 		} else {
-			app.Router.navigate("teachers/search");
+			if (this.usertype == "A" ) {
+				app.Router.navigate("teachers/search/A");
+			} else {
+				app.Router.navigate("teachers/search");
+			}
 			var view = new TeachersTableView({
 				el: $("#content"),
-				results: data
+				results: data,
+				usertype: this.usertype
 			});
 		}
 	},
@@ -83,6 +88,7 @@ var AddTeacherTableView = Backbone.View.extend({
 		this.elem = options.elem;
 		this.backdrop = options.backdrop;
 		this.parentView = options.parentView;
+		this.usertype = options.usertype;
 		this.render();
 	},
 
@@ -101,7 +107,8 @@ var AddTeacherTableView = Backbone.View.extend({
 				courseid: this.courseid,
 				elem: this.elem,
 				backdrop: this.backdrop,
-				parentView: this.parentView
+				parentView: this.parentView,
+				usertype: this.usertype
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
@@ -126,7 +133,7 @@ var AddTeacherTableRowView = Backbone.View.extend({
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><span class='add-teacher primary-link center-block' id='<%= model.userid %>'>[ Add Teacher ]</span></td>"
+		+   "<td><span class='add-teacher primary-link center-block' id='<%= model.userid %>'>[ Add <%= type %> ]</span></td>"
 		+	"<td></td>"),
 
 	initialize: function(options) {
@@ -135,12 +142,14 @@ var AddTeacherTableRowView = Backbone.View.extend({
 		this.elem = options.elem;
 		this.backdrop = options.backdrop;
 		this.parentView = options.parentView;
+		this.usertype = options.usertype;
 		this.render();
 	},
 
 	render: function() {
 		this.$el.html(this.template({
-			model: this.model.toJSON()
+			model: this.model.toJSON(),
+			type: this.usertype == "A" ? "Admin" : "Teacher"
 		}));
 	},
 
@@ -226,11 +235,12 @@ var AddTeacherTableRowView = Backbone.View.extend({
 var TeachersTableView = Backbone.View.extend({
 	initialize: function(options) {
 		this.results = options.results;
+		this.usertype = options.usertype;
 		this.render();
 	},
 
 	render: function() {
-		storeContent();
+		//storeContent();
 
 		this.$el.html(html["viewTeachers.html"]);
 		if (this.results) {
@@ -251,7 +261,8 @@ var TeachersTableView = Backbone.View.extend({
 			var model = new Teacher(object, {parse:true});
 			new TeacherTableRowView({
 				model: model,
-				el: this.addRow(".results", model.get("emailAddr"))
+				el: this.addRow(".results", model.get("emailAddr")),
+				usertype: this.usertype
 			});
 		}, this);
 		this.table = this.$el.find("table").dataTable({
@@ -274,14 +285,16 @@ var TeachersTableView = Backbone.View.extend({
 		var view = this;
 
 		var school = new School();
+		var schoolid = sessionStorage.getItem("gobind-schoolid");
 		school.fetch({
-			url: school.getTeachersUrl(sessionStorage.getItem("gobind-schoolid"))
+			url: this.usertype == "A" ? school.getAdminsUrl(schoolid) : school.getTeachersUrl(schoolid)
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var model = new Teacher(object, {parse:true});
 				new TeacherTableRowView({
 					model: model,
-					el: view.addRow(".results", model.get("emailAddr"))
+					el: view.addRow(".results", model.get("emailAddr")),
+					usertype: view.usertype
 				});
 			}, view);
 			view.table = view.$el.find("table").DataTable({
@@ -329,15 +342,17 @@ var TeacherTableRowView = Backbone.View.extend({
 		+	"<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
 		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><span class='view-teacher primary-link center-block' id='<%= model.userid %>'>[ View Teacher ]</span></td>"
+		+   "<td><span class='view-teacher primary-link center-block' id='<%= model.userid %>'>[ View <%= type %> ]</span></td>"
 		+	"<td><input type='checkbox' class='user-row' checked></td>"),
 	initialize: function(options) {
+		this.usertype = options.usertype;
 		this.render();
 	},
 
 	render: function() {
 		this.$el.html(this.template({
-			model: this.model.toJSON()
+			model: this.model.toJSON(),
+			type: this.usertype == "A" ? "Admin" : "Teacher"
 		}));
 	},
 
@@ -346,10 +361,15 @@ var TeacherTableRowView = Backbone.View.extend({
 	},
 
 	viewTeacher: function(evt) {
-		storeContent();
+		//storeContent();
 
 		var id = $(evt.currentTarget).attr("id");
-		app.Router.navigate("teachers/" + id, {trigger:true});
+
+		if (this.usertype == "A") {
+			app.Router.navigate("teachers/" + id + "/A", {trigger:true});
+		} else {
+			app.Router.navigate("teachers/" + id, {trigger:true});
+		}
 	}
 });
 

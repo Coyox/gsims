@@ -2,15 +2,29 @@ var TeacherRecordView = Backbone.View.extend({
 	initialize: function(options) {
 		this.id = options.id;
 		this.action = "view";
+		this.usertype = options.usertype;
 		this.render();
 	},
 
 	render: function() {
 		var view = this;
-		var teacher = new Teacher({id:this.id});
-		teacher.fetch().then(function(data) {
-			console.log(data);
 
+		var def = $.Deferred();
+		var teacher = new Teacher({id:this.id});
+		
+		if (this.usertype == "A") {
+			teacher.fetch({
+				url: teacher.admin_urlRoot + "/" + this.id
+			}).then(function(data) {
+				def.resolve(data);
+			});
+		} else {
+			teacher.fetch().then(function(data) {
+				def.resolve(data);
+			});
+		}
+
+		$.when(def).then(function(data) {
 	        view.$el.html(html["viewTeacher.html"]);
 
 			view.model = new Teacher(data, {parse:true});
@@ -32,6 +46,10 @@ var TeacherRecordView = Backbone.View.extend({
 		var view = this;
 		view.$el.find("#teacher-info-table").empty();
 		view.$el.find("#comp-info, #comp2-info").empty();
+
+		if (this.usertype == "A") {
+			view.$el.find("#set-admin").remove();
+		}
 
 		if (view.action == "view") {
 			view.$el.find("#edit-teacher").removeClass("hide").show();
@@ -142,13 +160,14 @@ var TeacherRecordView = Backbone.View.extend({
 		var view = this;
 		if (this.model.isValid(true)) {
 			view.model.set("id", view.model.get("userid"));
+			view.model.set("usertype", view.usertype);
 			view.model.save().then(function(data) {
 				if (typeof data == "string") {
 					data = JSON.parse(data);
 				}
 				if (data.status == "success") {
 					new TransactionResponseView({
-						message: "Teacher successfully saved."
+						message: view.usertype == "A" ? "Administrator succussfully created." : "Teacher successfully created."
 					});
 					$.ajax({
 						type: "POST",
@@ -161,7 +180,8 @@ var TeacherRecordView = Backbone.View.extend({
 					new TransactionResponseView({
 						title: "ERROR",
 						status: "error",
-						message: "Sorry, there was a problem saving this teacher. Please try again."
+						message: view.usertype == "A" ? "Sorry, there was a problem saving this administrator. Please try again." :
+							"Sorry, there was a problem saving this teahcer. Please try again."
 					});
 				}
 			});

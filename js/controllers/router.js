@@ -61,11 +61,17 @@ var Router = Backbone.Router.extend({
         "teachers/:id": 		"viewTeacher",
         "createTeacher":        "createTeacher",
 
-        "filterAdmins": 		"filterAdmins",
-        "admins/search": 		"viewFilteredAdmins",
-        "admins/all": 			"viewAllAdmins",
-        "admins/:id": 			"viewAdmin",
-        "createAdmin":          "createAdmin",
+        "filterTeachers/A":     "filterAdmins",
+        "teachers/search/A":    "viewFilteredAdmins",
+        "teachers/all/A":       "viewAllAdmins",
+        "teachers/:id/A":       "viewAdmin",
+        "createTeacher/A":      "createAdmin",
+
+        // "filterAdmins": 		"filterAdmins",
+        // "admins/search": 		"viewFilteredAdmins",
+        // "admins/all": 			"viewAllAdmins",
+        // "admins/:id": 			"viewAdmin",
+        // "createAdmin":          "createAdmin",
 
         "superusers/all":       "viewAllSuperusers",
         "superusers/:id":       "viewSuperuser",
@@ -319,58 +325,62 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("Search Administrators", "user");
 
-    	var filterAdmins = $("#hidden").find("#filter-admins-container");
-    	if (filterAdmins.length) {
-    		filterAdmins.detach().appendTo($("#content").empty());
-    	} else {
-	    	new SearchAdminsView({
-	    		el: this.createChild(),
-	    	});
-    	}
+        var filterTeachers = $("#hidden").find("#filter-teachers-container");
+        if (filterTeachers.length) {
+            filterTeachers.detach().appendTo($("#content").empty());
+        } else {
+            new SearchTeachersView({
+                el: this.createChild(),
+                usertype: "A"
+            });
+        }
     },
 
     viewFilteredAdmins: function() {
         this.loadHome();
         this.updatePageBreadcrumb("Administrators", "user");
 
-    	var adminResults = $("#hidden").find("#admins-table-container");
-    	if (adminResults.length) {
-    		adminResults.detach().appendTo($("#content").empty());
-    	} else {
-		   	new AdminsTableView({
-				el: this.createChild()
-			});
-    	}
+        var teacherResults = $("#hidden").find("#teachers-table-container");
+        if (teacherResults.length) {
+            teacherResults.detach().appendTo($("#content").empty());
+        } else {
+            new TeachersTableView({
+                el: this.createChild(),
+                usertype: "A"
+            });
+        }
     },
 
     viewAllAdmins: function() {
         this.loadHome();
         this.updatePageBreadcrumb("Administrators", "user");
 
-    	var adminResults = $("#hidden").find("#admins-table-container");
-    	if (adminResults.length) {
-    		adminResults.detach().appendTo($("#content").empty());
-    	} else {
-		   	new AdminsTableView({
-				el: this.createChild()
-			});
-    	}
+        var teacherResults = $("#hidden").find("#teachers-table-container");
+        if (teacherResults.length) {
+            teacherResults.detach().appendTo($("#content").empty());
+        } else {
+            new TeachersTableView({
+                el: this.createChild(),
+                usertype: "A"
+            });
+        }
     },
 
     viewAdmin: function(id) {
         this.loadHome();
-        this.updatePageBreadcrumb("View Admin", "user");
+        this.updatePageBreadcrumb("View Administrator", "user");
 
-        new AdminRecordView({
+        new TeacherRecordView({
             id: id,
             el: this.createChild(),
             action: "view",
+            usertype: "A"
         });
     },
 
     createAdmin: function() {
         this.loadHome();
-        this.updatePageBreadcrumb("Create Admin", "user");
+        this.updatePageBreadcrumb("Create Administrator", "user");
 
         new CreateTeacherView({
             el: this.createChild(),

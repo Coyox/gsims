@@ -2,12 +2,6 @@ var CreateTeacherView = Backbone.View.extend({
 	initialize: function(options) {
 		this.model = new Teacher();
 		this.usertype = options.usertype || "T";
-		if (this.usertype == "A") { 
-			console.log("setting as a");
-			this.model.set("usertype", "A");
-		} else {
-			this.model.set("usertype", "T");
-		}
 		this.render();
 	},
 
@@ -62,9 +56,22 @@ var CreateTeacherView = Backbone.View.extend({
 		var view = this;
 		this.model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 		this.model.set("status",  "active");
+		this.model.set("usertype", this.usertype);
 
 		if (this.model.isValid(true)) {
-			this.model.save().then(function(data) {
+			var def = $.Deferred();
+			if (this.usertype == "A") {
+				this.model.save(null, {
+					url: this.model.createAdministratorUrl()
+				}).then(function(data) {
+					def.resolve(data);
+				});
+			} else {
+				this.model.save().then(function(data) {
+					def.resolve(data);
+				});
+			}
+			$.when(def).then(function(data) {
 				if (typeof data == "string") {
 					data = JSON.parse(data);
 				}
@@ -94,7 +101,12 @@ var CreateTeacherView = Backbone.View.extend({
 								new TransactionResponseView({
 									message: "Teacher successfully created. " + insertComp.length + " competency levels updated."
 								});
-								app.Router.navigate("teachers/" + userid, {trigger:true});
+
+								if (view.usertype == "A") {
+									app.Router.navigate("teachers/" + userid + "/A", {trigger:true});
+								} else {
+									app.Router.navigate("teachers/" + userid, {trigger:true});
+								}
 							} else {
 								new TransactionResponseView({
 									title: "ERROR",
@@ -234,7 +246,6 @@ var TeacherCompetencyView = Backbone.View.extend({
 		}).then(function(data) {
 			_.each(data, function(dept, index) {
 				var level = 0;
-				console.log(dept.deptid);
 				_.each(view.existingLevels, function(existing, index) {
 					if (existing.deptid == dept.deptid) {
 						level = existing.level;

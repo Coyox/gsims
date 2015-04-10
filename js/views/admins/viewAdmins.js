@@ -1,182 +1,185 @@
-var SearchAdminsView = Backbone.View.extend({
-	initialize: function(options) {
-		this.render();
-	},
 
-	render: function() {
-		this.$el.html(html["searchAdmins.html"]);
-	},
+// var SearchAdminsView = Backbone.View.extend({
+// 	initialize: function(options) {
+// 		this.render();
+// 	},
 
-	events: {
-		"click #search-admins": "searchAdmins",
-		"click #clear-fields": "clearFields",
-	},
+// 	render: function() {
+// 		this.$el.html(html["searchAdmins.html"]);
+// 	},
 
-	searchAdmins: function(evt) {
-		var view = this;
-		var data = {};
+// 	events: {
+// 		"click #search-admins": "searchAdmins",
+// 		"click #clear-fields": "clearFields",
+// 	},
 
-		var firstName = this.$el.find("#first-name").val();
-		if (firstName != "") {
-			data.firstName = firstName;
-		}
+// 	searchAdmins: function(evt) {
+// 		var view = this;
+// 		var data = {};
 
-		var lastName = this.$el.find("#last-name").val();
-		if (lastName != "") {
-			data.lastName = lastName;
-		}
+// 		var firstName = this.$el.find("#first-name").val();
+// 		if (firstName != "") {
+// 			data.firstName = firstName;
+// 		}
 
-		var teacher = new Teacher();
-		teacher.fetch({
-			url: teacher.getSearchTeachersUrl("A", sessionStorage.getItem("gobind-schoolid")),
-			data: data
-		}).then(function(data) {
-			view.changeRoute(data);
-		});
-	},
+// 		var lastName = this.$el.find("#last-name").val();
+// 		if (lastName != "") {
+// 			data.lastName = lastName;
+// 		}
 
-	changeRoute: function(data) {
-		app.Router.navigate("admins/search");
-		var view = new AdminsTableView({
-			el: $("#content"),
-			results: data
-		});
-	},
+// 		var teacher = new Teacher();
+// 		teacher.fetch({
+// 			url: teacher.getSearchTeachersUrl("A", sessionStorage.getItem("gobind-schoolid")),
+// 			data: data
+// 		}).then(function(data) {
+// 			view.changeRoute(data);
+// 		});
+// 	},
 
-	clearFields: function() {
-		var parent = this.$el.find("#filter-admins-container");
-		parent.find("input[type='text']").val("");
-	}
-});
+// 	changeRoute: function(data) {
+// 		app.Router.navigate("admins/search");
+// 		var view = new AdminsTableView({
+// 			el: $("#content"),
+// 			results: data
+// 		});
+// 	},
 
-var AdminsTableView = Backbone.View.extend({
-	initialize: function(options) {
-		this.results = options.results;
-		this.render();
-	},
+// 	clearFields: function() {
+// 		var parent = this.$el.find("#filter-admins-container");
+// 		parent.find("input[type='text']").val("");
+// 	}
+// });
 
-	render: function() {
-		storeContent();
+// var AdminsTableView = Backbone.View.extend({
+// 	initialize: function(options) {
+// 		this.results = options.results;
+// 		this.render();
+// 	},
 
-		this.$el.html(html["viewAdmins.html"]);
-		if (this.results) {
-			this.populateQueryResults(this.results);
-		} else {
-			this.fetchAllResults();
-		}
-	},
+// 	render: function() {
+// 		//storeContent();
 
-	events: {
-		"click #refresh": "refreshTable",
-		"click .send-email": "openEmailModal",
-		"change .toggle-checkboxes": "toggleCheckboxes"
-	},
+// 		this.$el.html(html["viewAdmins.html"]);
+// 		if (this.results) {
+// 			this.populateQueryResults(this.results);
+// 		} else {
+// 			this.fetchAllResults();
+// 		}
+// 	},
 
-	populateQueryResults: function(data) {
-		var view = this;
-		_.each(data, function(object, index) {
-			var model = new Teacher(object, {parse:true});
-			new AdminTableRowView({
-				model: model,
-				el: this.addRow(".results", model.get("emailAddr"))
-			});
-		}, this);
-		view.table = this.$el.find("table").dataTable({
-	      	aoColumnDefs: [
-	          	{ bSortable: false, aTargets: [ 4, 5 ] },
-	          	{ sClass: "center", aTargets: [ 4, 5 ] },
-	          	{ sWidth: "10%", aTargets: [ 5 ] }
-	       	],
-			dom: dataTables.exportDom,
-			tableTools: {
-       			 aButtons: dataTables.buttons,
-   			 	 sSwfPath: dataTables.sSwfPath
-    		}
-		});
-		createEmailButton(this.$el);
-		createRefreshButton(this.$el);
-		createExportButton(this.$el);
-	},
+// 	events: {
+// 		"click #refresh": "refreshTable",
+// 		"click .send-email": "openEmailModal",
+// 		"click #export-table": "exportTable",
+// 		"change .toggle-checkboxes": "toggleCheckboxes"
+// 	},
 
-	fetchAllResults: function() {
-		var view = this;
-		var school = new School();
-		school.fetch({
-			url: school.getAdminsUrl(sessionStorage.getItem("gobind-schoolid"), "A")
-		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Teacher(object, {parse:true});
-				new AdminTableRowView({
-					model: model,
-					el: view.addRow(".results", model.get("emailAddr"))
-				});
-			}, view);
-			view.table = view.$el.find("table").dataTable({
-		      	aoColumnDefs: [
-		          	{ bSortable: false, aTargets: [ 4, 5 ] },
-		          	{ sClass: "center", aTargets: [ 4, 5 ] },
-		          	{ sWidth: "10%", aTargets: [ 5 ] }
-		       	],
-				dom: dataTables.exportDom,
-				tableTools: {
-           			 aButtons: dataTables.buttons,
-       			 	 sSwfPath: dataTables.sSwfPath
-        		}
-			});
-			createEmailButton(view.$el);
-			createRefreshButton(view.$el);
-		});
-	},
+// 	populateQueryResults: function(data) {
+// 		var view = this;
+// 		_.each(data, function(object, index) {
+// 			var model = new Teacher(object, {parse:true});
+// 			new AdminTableRowView({
+// 				model: model,
+// 				el: this.addRow(".results", model.get("emailAddr"))
+// 			});
+// 		}, this);
+// 		view.table = this.$el.find("table").dataTable({
+// 	      	aoColumnDefs: [
+// 	          	{ bSortable: false, aTargets: [ 4, 5 ] },
+// 	          	{ sClass: "center", aTargets: [ 4, 5 ] },
+// 	          	{ sWidth: "10%", aTargets: [ 5 ] }
+// 	       	],
+// 			dom: dataTables.exportDom,
+// 			tableTools: {
+//        			 aButtons: dataTables.buttons,
+//    			 	 sSwfPath: dataTables.sSwfPath
+//     		}
+// 		});
+// 		createEmailButton(this.$el);
+// 		createRefreshButton(this.$el);
+// 		createExportButton(this.$el);
+// 	},
 
-	addRow: function(selector, email) {
-        var container = $("<tr></tr>");
-        container.data("email", email);
-        this.$el.find(selector).first().append(container);
-        return container;
-	},
+// 	fetchAllResults: function() {
+// 		var view = this;
+// 		var school = new School();
+// 		school.fetch({
+// 			url: school.getAdminsUrl(sessionStorage.getItem("gobind-schoolid"), "A")
+// 		}).then(function(data) {
+// 			_.each(data, function(object, index) {
+// 				var model = new Teacher(object, {parse:true});
+// 				new AdminTableRowView({
+// 					model: model,
+// 					el: view.addRow(".results", model.get("emailAddr"))
+// 				});
+// 			}, view);
+// 			view.table = view.$el.find("table").dataTable({
+// 		      	aoColumnDefs: [
+// 		          	{ bSortable: false, aTargets: [ 4, 5 ] },
+// 		          	{ sClass: "center", aTargets: [ 4, 5 ] },
+// 		          	{ sWidth: "10%", aTargets: [ 5 ] }
+// 		       	],
+// 				dom: dataTables.exportDom,
+// 				tableTools: {
+//            			 aButtons: dataTables.buttons,
+//        			 	 sSwfPath: dataTables.sSwfPath
+//         		}
+// 			});
+// 			createEmailButton(view.$el);
+// 			createRefreshButton(view.$el);
+// 			createExportButton(view.$el);
+// 		});
+// 	},
 
-	openEmailModal: function(evt) {
-		openEmailWrapper(this.table.fnGetNodes());
-	},
+// 	addRow: function(selector, email) {
+//         var container = $("<tr></tr>");
+//         container.data("email", email);
+//         this.$el.find(selector).first().append(container);
+//         return container;
+// 	},
 
-	toggleCheckboxes: function(evt) {
-		toggleCheckboxes(this.table.fnGetNodes(), evt);
-	},
+// 	openEmailModal: function(evt) {
+// 		openEmailWrapper(this.table.fnGetNodes());
+// 	},
+
+// 	toggleCheckboxes: function(evt) {
+// 		toggleCheckboxes(this.table.fnGetNodes(), evt);
+// 	},
 
 
-	refreshTable: function(evt) {
-		evt.stopImmediatePropagation();
-		this.table.fnDestroy();
-		this.render();
-	},
-});
+// 	refreshTable: function(evt) {
+// 		evt.stopImmediatePropagation();
+// 		this.table.fnDestroy();
+// 		this.render();
+// 	},
+// });
 
-var AdminTableRowView = Backbone.View.extend({
-	template: _.template("<td><%= model.userid %></td>"
-		+	"<td><%= model.firstName %></td>"
-		+	"<td><%= model.lastName %></td>"
-		+	"<td><%= model.emailAddr %></td>"
-		+   "<td><span class='view-admin primary-link center-block' id='<%= model.userid %>'>[ View Admin ]</span></td>"
-		+	"<td><input type='checkbox' class='user-row' checked></td>"),
+// var AdminTableRowView = Backbone.View.extend({
+// 	template: _.template("<td><%= model.userid %></td>"
+// 		+	"<td><%= model.firstName %></td>"
+// 		+	"<td><%= model.lastName %></td>"
+// 		+	"<td><%= model.emailAddr %></td>"
+// 		+   "<td><span class='view-admin primary-link center-block' id='<%= model.userid %>'>[ View Admin ]</span></td>"
+// 		+	"<td><input type='checkbox' class='user-row' checked></td>"),
 
-	initialize: function(options) {
-		this.render();
-	},
+// 	initialize: function(options) {
+// 		this.render();
+// 	},
 
-	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
-	},
+// 	render: function() {
+// 		this.$el.html(this.template({
+// 			model: this.model.toJSON()
+// 		}));
+// 	},
 
-	events: {
-		"click .view-admin": "viewAdmin",
-	},
+// 	events: {
+// 		"click .view-admin": "viewAdmin",
+// 	},
 
-	viewAdmin: function(evt) {
-		storeContent();
+// 	viewAdmin: function(evt) {
+// 		storeContent();
 
-		var id = $(evt.currentTarget).attr("id");
-		app.Router.navigate("admins/" + id, {trigger:true});
-	}
-});
+// 		var id = $(evt.currentTarget).attr("id");
+// 		app.Router.navigate("admins/" + id, {trigger:true});
+// 	}
+// });
