@@ -193,7 +193,6 @@ function setActiveSchoolYear(def) {
 			schoolid: sessionStorage.getItem("gobind-schoolid")
 		}
 	}).then(function(data) {
-		console.log(data);
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;
 		sessionStorage.setItem("gobind-activeSchoolYear", data.schoolyearid);

@@ -9,25 +9,23 @@ var LoginView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 		var schoolyear = new SchoolYear();
-		schoolyear.fetch({
-			url: schoolyear.getActiveSchoolYearUrl(),
+		var school = new School();
+		school.fetch({
 			data: {
-				schoolid: sessionStorage.getItem("gobind-schoolid") || 863941
+				openForReg: 1
 			}
 		}).then(function(data) {
+			console.log(data);
+
+			app.openForReg = data.length ? true : false;
+
 			view.$el.html(html["login.html"]);
 
-			var key = sessionStorage.getItem("gobind-schoolid");
-			if (sessionStorage.getItem("gobind-schoolid") == null) {
-				sessionStorage.setItem("gobind-schoolyearid", data.schoolyearid);
-			}
-
-			if (data.openForReg == 1) {
+			if (app.openForReg) {
 				view.$el.find("#reg-open").removeClass("hide").show();
 			} else {
 				view.$el.find("#reg-closed").removeClass("hide").show();
 			}
-			app.openForReg = data.openForReg;
 		});
 	},
 
@@ -70,7 +68,12 @@ var LoginView = Backbone.View.extend({
 							app.Router.navigate("selectSchool", {trigger:true});
 						} else {
 							sessionStorage.setItem("gobind-schoolid", data.schoolid);
-							app.Router.navigate("home", {trigger:true});
+
+							var def = $.Deferred();
+							setActiveSchoolYear(def);
+							$.when(def).then(function(data) {
+								app.Router.navigate("home", {trigger:true});
+							});
 						}
 					});
 				} else {
@@ -220,7 +223,11 @@ var SelectSchoolView = Backbone.View.extend({
 		var id = $(evt.currentTarget).attr("id");
 		if (id) {
 			sessionStorage.setItem("gobind-schoolid", id);
-			app.Router.navigate("home", {trigger:true});
+			var def = $.Deferred();
+			setActiveSchoolYear(def);
+			$.when(def).then(function(data) {
+				app.Router.navigate("home", {trigger:true});
+			});
 		}
 	}
 });
