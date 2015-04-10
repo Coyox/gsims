@@ -46,9 +46,6 @@ class User {
         $this->app->get('/users/:emailAddr', 'getUserByEmailAddr');
     }
 
-}
-
-
 #================================================================================================================#
 # Constants
 #================================================================================================================#
@@ -1054,4 +1051,5 @@ function generatePasswordHash($password){
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
     $salt = sprintf("$2a$%02d$", $cost).$salt;
     return crypt($password, $salt);
+}
 }
