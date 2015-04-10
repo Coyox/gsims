@@ -1496,14 +1496,15 @@ var ViewSectionRow = Backbone.View.extend({
 
 var TeacherSectionView = Backbone.View.extend({
 	template: _.template("<div id='course-teachers-form'>"
-		+	"<br><button id='add-teacher' class='btn btn-sm btn-primary'>Add Teacher To Section</button>"
-		+	"<br><br>"
+		+	"<% if (usertype == 'A' || usertype == 'SU') { %><br><button id='add-teacher' class='btn btn-sm btn-primary'>Add Teacher To Section</button><br><br><% } %>"
 		+	"<table class='table table-striped table-bordered'>"
 		+		"<thead>"
 		+			"<tr>"
 		+				"<th>First Name</th>"
 		+				"<th>Last Name</th>"
+		+ 				"<% if (usertype == 'A' || usertype == 'SU') { %>"
 		+				"<th>Unassign</th>"
+		+               "<% } %>"
 		+			"</tr>"
 		+		"</thead>"
 		+		"<tbody class='results'></tbody>"
@@ -1522,8 +1523,7 @@ var TeacherSectionView = Backbone.View.extend({
 
 	render: function() {
 		var view = this;
-
-		this.$el.html(this.template());
+		this.$el.html(this.template({usertype: sessionStorage.getItem("gobind-usertype")}));
 
 		if(typeof (this.sectionid) === 'undefined'){
 			var course = new Course({id: this.courseid});
@@ -1541,7 +1541,7 @@ var TeacherSectionView = Backbone.View.extend({
 							el: view.addRow(),
 							model: model,
 							courseid: view.courseid,
-							parent: view
+							parent: view,
 						});
 					});
 				}
@@ -1608,7 +1608,8 @@ var TeacherSectionView = Backbone.View.extend({
 var TeacherSectionRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.firstName %></td>"
 		+	"<td><%= model.lastName %></td>"
-		+   "<td><span class='unassign-teacher primary-link center-block' id='<%= model.userid %>'>[ Unassign ]</span></td>"),
+		+   "<% if (usertype == 'A' || usertype == 'SU') { %>"
+		+   "<td><span class='unassign-teacher primary-link center-block' id='<%= model.userid %>'>[ Unassign ]</span></td> <% } %>"),
 
 	initialize: function(options) {
 		this.sectionid = options.sectionid;
@@ -1623,7 +1624,8 @@ var TeacherSectionRowView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(this.template({
-			model: this.model.toJSON()
+			model: this.model.toJSON(),
+			usertype: sessionStorage.getItem("gobind-usertype")
 		}));
 	},
 

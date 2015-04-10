@@ -11,6 +11,7 @@
 				<span class="glyphicon glyphicon-th-list"></span> Teachers
 			</a>
 		</li>
+		<% if (usertype == "A" || usertype == "SU" || usertype == "T") { %>
 		<li>
 			<a data-toggle="tab" data-target="#student-enrolled">
 				<span class="glyphicon glyphicon-th-list"></span> Students
@@ -26,6 +27,7 @@
 				<span class="glyphicon glyphicon-file"></span> Tests / Assignments
 			</a>
 		</li>
+		<% } %>
 	</ul>
 
 	<div class="tab-content">
