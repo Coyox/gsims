@@ -237,3 +237,12 @@ CREATE TABLE IF NOT EXISTS `apikeys` (
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`keyid`, `name`)
 );
+
+
+CREATE TABLE IF NOT EXISTS `student_year` (
+  `userid` int(11) NOT NULL,
+  `schoolyearid` int(11) NOT NULL,
+  PRIMARY KEY (`userid`, `schoolyearid`),
+  FOREIGN KEY (`userid`) REFERENCES `student` (`userid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
+);

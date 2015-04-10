@@ -7,7 +7,6 @@ require_once 'crossdomain.php';
 
 $app = new \Slim\Slim();
 
-$app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
@@ -282,17 +281,19 @@ function createSchoolYear(){
 
         // create a row for each department
         $sql = "SELECT count(*) from department where schoolyearid=:activeschoolyear";
+        // get the number of departments for the current school year
         $rowcount = (int) perform_query($sql, 'GETCOL', array("activeschoolyear"=>$current_schoolyear));
 
         $idsql = "SELECT deptid from department where deptid=:deptid";
         $sql = "INSERT into department (deptid, schoolid, deptName, schoolyearid, status)
                 SELECT :deptid, schoolid, deptName, :schoolyearid, :status FROM department where schoolyearid=:activeschoolyear
-                AND (deptName not in (SELECT deptName from department where schoolyearid=:schoolyearid)) LIMIT 1";
+                AND (deptName not in (SELECT deptName from department where =:schoolyearidschoolyearid)) LIMIT 1";
         $bindparams = array(
             "schoolyearid" => $schoolyearid,
             "activeschoolyear" => $current_schoolyear,
             "status" => $schoolyear->status
         );
+        // generate a unique ID for each new department
         for ($i=0 ; $i<$rowcount; $i++){
             $id = generateUniqueID($idsql, "deptid");
             $bindparams["deptid"] = $id;
@@ -393,13 +394,14 @@ function getDepartmentCount($id){
     $sql = "SELECT count(*) from department where schoolid=:schoolid and schoolyearid=:schoolyear";
     echo json_encode(perform_query($sql,'GETCOL', array("schoolid"=>$id,"schoolyear"=>$schoolyear)));
 }
-function getStudentsBySchool($id){
-    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
-    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
-    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status
-    from student where schoolid=:schoolid";
-    echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id)));
+function getStudentsBySchool($id, $schoolyearid){
+    if (!isset($schoolyearid)){ $schoolyearid= $_GET["schoolyearid"]; }
+    $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
+    s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
+    s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
+    s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
+    from student s and student_year sy where s.schoolid=:schoolid and sy.userid=s.userid and sy.schoolyearid=:schoolyearid";
+    echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 function getTeachersBySchool($id){
     $sql = $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status, usertype from teacher where usertype='T' and schoolid=:schoolid" ;
@@ -1111,17 +1113,6 @@ function handleMarks($id){
 # Students
 #================================================================================================================#
 /*
- * Returns a list of students
- */
-function getStudents() {
-    $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
-    province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
-    parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status
-    from student";
-    echo json_encode(perform_query($sql, 'GETALL'));
-}
-/*
  * Returns a single student record
  */
 function getStudentById($id) {
@@ -1238,8 +1229,9 @@ function updateStudent($id) {
  *  request param: (optional) a list of 'students' for mass creating student records
  */
 function createStudent() {
+    $schoolyearid = $_POST['schoolyearid'];
     if (isset($_POST['students'])){
-        return massCreateStudents(json_decode($_POST['students']));
+        return massCreateStudents(json_decode($_POST['students']), $schoolyearid);
     }
 
     $request = \Slim\Slim::getInstance()->request();
@@ -1253,7 +1245,7 @@ function createStudent() {
     list($logincreds, $loginsql, $loginbindparam) = createLogin($student->firstName, $student->lastName,'S');
     list($userid, $username, $password) = $logincreds;
     array_push($queries, $loginsql);
-    $bindparams[0] = $loginbindparam;
+    array_push($bindparams, $loginbindparam);
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
@@ -1264,7 +1256,7 @@ function createStudent() {
     :emergencyContactPhoneNumber, :schoolid, :paid, :status)";
 
     array_push($queries, $sql);
-    $bindparams[1] = array(
+    array_push($bindparams, array(
         "userid" => $userid,
         "firstName" => $student->firstName,
         "lastName" => $student->lastName,
@@ -1291,7 +1283,12 @@ function createStudent() {
         "schoolid" => $student->schoolid,
         "paid" => $student->paid,
         "status" => $student->status,
-    );
+    ));
+
+    // add entry in student_year table
+    array_push($queries, "INSERT into student_year(userid, schoolyearid) values (:userid, :schoolyearid)");
+    array_push($bindparams, array("userid"=>$userid, "schoolyearid"=>$schoolyearid));
+
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
@@ -1308,19 +1305,22 @@ function createStudent() {
  Mass create student records with generated login info
  Will send out email if transaction is successful
 */
-function massCreateStudents($students) {
+function massCreateStudents($students, $schoolyearid) {
     $resp = array();
     $queries = array();
     $bindparams = array();
 
     list($userids, $emailparams, $loginsql, $loginbindparams) = massCreateLogins($students, 'S');
     array_push($queries, $loginsql);
-    $bindparams[0] = $loginbindparams;
+    array_push($bindparams, $loginbindparams);
 
     $sql = "INSERT into student (userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
     emergencyContactPhoneNumber, schoolid, paid, status) values ";
+
+    $studentyear_sql = "INSERT into student_year (userid, schoolyearid) values ";
+    $studentyear_params = array();
 
     $insertbindparams = array();
     foreach (array_values($students) as $i => $student) {
@@ -1328,6 +1328,9 @@ function massCreateStudents($students) {
         :province".$i.", :country".$i.", :postalCode".$i.", :phoneNumber".$i.", :emailAddr".$i.", :allergies".$i.", :prevSchools".$i.", :parentFirstName".$i.", :parentLastName".$i.",
         :parentPhoneNumber".$i.", :parentEmailAddr".$i.", :emergencyContactFirstName".$i.", :emergencyContactLastName".$i.", :emergencyContactRelation".$i.",
         :emergencyContactPhoneNumber".$i.", :schoolid".$i.", :paid".$i.", :status".$i."),";
+
+        $studentyear_sql.= "(:userid".$i.", :schoolyearid),";
+        $studentyear_params["userid".$i] = $userids[$i];
 
         $insertbindparams["userid".$i] = $userids[$i];
         $insertbindparams["firstName".$i] = $student->firstName;
@@ -1357,9 +1360,13 @@ function massCreateStudents($students) {
         $insertbindparams["paid".$i] = $student->paid;
         $insertbindparams["status".$i] = $student->status;
     }
-    $bindparams[1] = $insertbindparams;
     $sql = rtrim($sql, ",");
+    array_push($bindparams, $insertbindparams);
     array_push($queries, $sql);
+
+    $studentyear_sql = rtrim($studentyear_sql, ",");
+    array_push($bindparams, $studentyear_params);
+    array_push($queries, $studentyear_sql);
 
     $transaction_result = perform_transaction($queries, $bindparams);
     if ($transaction_result["status"] == "success"){
@@ -1500,7 +1507,6 @@ function handlePendingStudents(){
 
     /*************************************************************************/
     /* Send email with login creds to approved users */
-
     if ($transaction_result["status"] == "success" && $activeList){
         $sql = "SELECT userid, firstName, lastName, emailAddr from student where userid in ";
         $sql.=$sqlparens;
@@ -1933,9 +1939,6 @@ function getUsers($schoolid, $type){
     if ($type == "T"){
         return getTeachersBySchool($schoolid);
     }
-    else if ($type == "S"){
-        return getStudentsBySchool($schoolid);
-    }
     else if ($type == "A"){
         return getAdministratorsBySchool($schoolid);
     }
@@ -2073,6 +2076,7 @@ function findUsers($schoolid, $usertype){
     }
 
     if ($usertype=='S'){
+        $schoolyearid = $_GET['schoolyearid']; // must be set
         $year = $_GET['year'];
         $loweryear = $_GET['lowerYear'];
         $upperyear = $_GET['upperYear'];
@@ -2116,14 +2120,16 @@ function findUsers($schoolid, $usertype){
             list($where, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
             $clause.= $where;
-            $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
+            $sql = "SELECT * from student_year sy, (SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
-    emergencyContactPhoneNumber, schoolid, paid, status from student where schoolid=:schoolid".$clause." order by firstName asc";
+    emergencyContactPhoneNumber, schoolid, paid, status from student where schoolid=:schoolid".$clause.")temp
+            where sy.schoolyearid=:schoolyearid and temp.userid=sy.userid
+            order by temp.firstName asc";
             echo json_encode(perform_query($sql,'GETALL',$bindparams));
         }
         else{
-            return getUsers($schoolid, $usertype);
+            return getStudentsBySchool($schoolid, $schoolyearid);
         }
     }
     else if ($usertype=="A"|$usertype=="T"){
@@ -2213,11 +2219,12 @@ function findStudentsWithAdvancedCriteria($schoolid){
     $uppergrade = $_GET['upperGrade'];
     $assignmentcount = $_GET['numAssignment'];
     $failcount = $_GET['numFailedSections'];
+    $schoolyearid = $_GET['schoolyearid'];
 
     $qualifiedstudents = array();
 
-    $sql = "SELECT userid from student where status='active'";
-    $students = perform_query($sql, 'GETASSO');
+    $sql = "SELECT s.userid from student s, student_year sy where s.status='active' and sy.userid=s.userid and sy.schoolyearid=:schoolyearid";
+    $students = perform_query($sql, 'GETASSO', array("schoolyearid"=>$schoolyearid));
 
     // has average between X and Y
     if (isset($lowergrade) && isset($uppergrade)){
