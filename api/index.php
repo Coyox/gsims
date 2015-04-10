@@ -437,9 +437,9 @@ function updateActiveSchoolYear($schoolyearid){
 function updateOpenRegistration($schoolid){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
-    $schoolyear = json_decode($body);
+    $school = json_decode($body);
     $sql = "UPDATE school set openForReg=:openForReg where schoolid=:schoolid";
-    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$schoolyear->openForReg)));
+    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$school->openForReg)));
 }
 
 function deleteSchoolYear($schoolyearid) {
@@ -461,12 +461,12 @@ function getSchools() {
         $bindparams["openForReg"]=$openForReg;
     }
     else {
-        $sql = "SELECT schoolid, location, postalCode, yearOpened, status from school order by location asc" ;
+        $sql = "SELECT schoolid, location, postalCode, yearOpened, status, openForReg from school order by location asc" ;
     }
     echo json_encode(perform_query($sql, 'GETALL', $bindparams));
 }
 function getSchoolById($id) {
-    $sql = "SELECT location, postalCode, yearOpened, status from school where schoolid=:id";
+    $sql = "SELECT location, postalCode, yearOpened, status, openForReg from school where schoolid=:id";
     echo json_encode(perform_query($sql,'GET',array("id"=>$id)));
 }
 /* Get all departments for a school */
