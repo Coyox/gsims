@@ -123,6 +123,9 @@ var ExportView = Backbone.View.extend({
 		var school = new School();
 		school.fetch({
 			url: school.getStudentsUrl(schoolid),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var student = $.map(object, function(element) { return element; });

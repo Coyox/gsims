@@ -1312,7 +1312,7 @@ function createStudent() {
 
     // add entry in student_year table
     array_push($queries, "INSERT into student_year(userid, schoolyearid) values (:userid, :schoolyearid)");
-    array_push($bindparams, array("userid"=>$userid, "schoolyearid"=>$student->data->schoolyearid));
+    array_push($bindparams, array("userid"=>$userid, "schoolyearid"=>$student->schoolyearid));
 
 
     $transaction_result = perform_transaction($queries, $bindparams);
