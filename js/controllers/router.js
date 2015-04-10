@@ -30,9 +30,9 @@ var Router = Backbone.Router.extend({
                     $("#back-container").hide();
                     break;
                 default:
-                    $("#content").prepend(view.buttons());
-                    $("#button-container").removeClass("hide").show();
-                    $(".buttons").children().appendTo($("#button-container"));
+                    // $("#content").prepend(view.buttons());
+                    // $("#button-container").removeClass("hide").show();
+                    // $(".buttons").children().appendTo($("#button-container"));
                     break;
            }
 		});
@@ -102,45 +102,45 @@ var Router = Backbone.Router.extend({
 
     login: function() {
     	new LoginView({
-    		el: this.el
+    		el: this.createChild($("#container"))
     	});
     },
 
     loadHome: function() {
-        if(sessionStorage.getItem("gobind-usertype") != null){
+        if (sessionStorage.getItem("gobind-usertype") != null) { 
             if ($("#container").html() == "") {
              this.home();
            }
-        } else
+        } else {
             this.login();
+        }
     },
 
-    createChild: function() {
-        $("#content").html("<div id='child'></div>");
+    createChild: function(elem) {
+        elem = elem || $("#content");
+
+        var container = $("<div></div>");
+        container.attr("id", "child");
+        elem.html(container);
+        return container;
     },
 
     home: function(isHome) {
-        if(sessionStorage.getItem("gobind-usertype") != null){
+        if (sessionStorage.getItem("gobind-usertype") != null) {
 
-        this.updatePageBreadcrumb("Home", "home");
+            this.updatePageBreadcrumb("Home", "home");
 
-    	new HomePageView({
-    		el: this.el
-    	});
+        	new HomePageView({
+        		el: this.el
+        	});
 
-        if (Backbone.history.fragment == "home") {
-            new DashboardView({
-                el: $("#content")
-            });
-        }
-      } else
-        this.login();
-
-        // $("#main-content .left").affix({
-        //     offset: {
-        //         top: 50
-        //     }
-        // })
+            if (Backbone.history.fragment == "home") {
+                new DashboardView({
+                    el: this.createChild()
+                });
+            }
+        } else
+            this.login();
     },
 
     email: function() {
@@ -148,13 +148,13 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Send Email", "envelope");
 
         new EmailView({
-            el: $("#content"),
+            el: this.createChild(),
         });    
     },
 
     forgotPassword: function() {
     	new ForgotPasswordView({
-    		el: this.el
+    		el: this.createChild($("#container"))
     	});
     },
 
@@ -162,7 +162,7 @@ var Router = Backbone.Router.extend({
         new ResetPasswordView({
             id: id,
             username: username,
-            el: $("#container")
+            el: this.resetPassword($("#container"))
         });
     },
 
@@ -175,7 +175,7 @@ var Router = Backbone.Router.extend({
     		filterStudents.detach().appendTo($("#content").empty());
     	} else {
 	    	new SearchStudentsView({
-	    		el: $("#content"),
+	    		el: this.createChild(),
 	    	});
     	}
     },
@@ -189,7 +189,7 @@ var Router = Backbone.Router.extend({
     		studentResults.detach().appendTo($("#content").empty());
     	} else {
 		   	var view = new StudentsTableView({
-				el: $("#content")
+				el: this.createChild()
 			});
     	}
     },
@@ -202,8 +202,8 @@ var Router = Backbone.Router.extend({
     	if (studentResults.length) {
     		studentResults.detach().appendTo($("#content").empty());
     	} else {
-		   	new StudentsTableView({
-				el: $("#content")
+		   	var view = new StudentsTableView({
+				el: this.createChild()
 			});
     	}
     },
@@ -212,24 +212,22 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("View Student", "user");
 
-		$("#content").html(html["viewStudent.html"]);
-
-		var parent = $("#student-content");
-		new StudentRecordView({
-			id: id,
-			el: $("#student-info"),
-			action: "view",
-			parentContainer: parent
-		});
+        new StudentRecordView({
+            id: id,
+            el: this.createChild(),
+            action: "view"
+        });
     },
 
     createStudent: function(id) {
         this.loadHome();
         this.updatePageBreadcrumb("Create Student", "user");
 
-        $("#content").html("<div id='test-reg'></div>");
+        var container = this.createChild();
+        container.append("<div id='test-reg'></div>");
+
         new RegistrationFormView({
-            el: $("#test-reg"),
+            el: $(container).find("#test-reg"),
             regType: "admin",
             status: "active"
         });
@@ -240,7 +238,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Create Student", "user");
 
         app.enrollmentFormView = new EnrollmentFormView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -251,7 +249,7 @@ var Router = Backbone.Router.extend({
         var user = JSON.parse(sessionStorage.getItem("gobind-user"));
 
         app.courseEnrollmentView = new CourseEnrollmentView({
-            el: $("#content"),
+            el: this.createChild(),
             userid: user ? user.userid : false
         });
     },
@@ -265,7 +263,7 @@ var Router = Backbone.Router.extend({
     		filterTeachers.detach().appendTo($("#content").empty());
     	} else {
 	    	new SearchTeachersView({
-	    		el: $("#content"),
+	    		el: this.createChild(),
 	    	});
     	}
     },
@@ -279,7 +277,7 @@ var Router = Backbone.Router.extend({
     		teacherResults.detach().appendTo($("#content").empty());
     	} else {
 		   	new TeachersTableView({
-				el: $("#content")
+				el: this.createChild()
 			});
     	}
     },
@@ -293,7 +291,7 @@ var Router = Backbone.Router.extend({
     		teacherResults.detach().appendTo($("#content").empty());
     	} else {
 		   	new TeachersTableView({
-				el: $("#content")
+				el: this.createChild()
 			});
     	}
     },
@@ -303,7 +301,7 @@ var Router = Backbone.Router.extend({
 
         new TeacherRecordView({
             id: id,
-            el: $("#content"),
+            el: this.createChild(),
             action: "view",
         });
     },
@@ -313,7 +311,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Create Teacher", "user");
 
         new CreateTeacherView({
-            el: $("#content").html("")
+            el: this.createChild()
         });
     },
 
@@ -326,7 +324,7 @@ var Router = Backbone.Router.extend({
     		filterAdmins.detach().appendTo($("#content").empty());
     	} else {
 	    	new SearchAdminsView({
-	    		el: $("#content"),
+	    		el: this.createChild(),
 	    	});
     	}
     },
@@ -340,7 +338,7 @@ var Router = Backbone.Router.extend({
     		adminResults.detach().appendTo($("#content").empty());
     	} else {
 		   	new AdminsTableView({
-				el: $("#content")
+				el: this.createChild()
 			});
     	}
     },
@@ -354,7 +352,7 @@ var Router = Backbone.Router.extend({
     		adminResults.detach().appendTo($("#content").empty());
     	} else {
 		   	new AdminsTableView({
-				el: $("#content")
+				el: this.createChild()
 			});
     	}
     },
@@ -365,7 +363,7 @@ var Router = Backbone.Router.extend({
 
         new AdminRecordView({
             id: id,
-            el: $("#content"),
+            el: this.createChild(),
             action: "view",
         });
     },
@@ -375,7 +373,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Create Admin", "user");
 
         new CreateTeacherView({
-            el: $("#content").html(""),
+            el: this.createChild(),
             usertype: "A"
         });
     },
@@ -389,7 +387,7 @@ var Router = Backbone.Router.extend({
             superuserResults.detach().appendTo($("#content").empty());
         } else {
             new SuperusersTableView({
-                el: $("#content")
+                el: this.createChild()
             });
         }
     },
@@ -399,7 +397,7 @@ var Router = Backbone.Router.extend({
 
         new SuperuserRecordView({
             id: id,
-            el: $("#content"),
+            el: this.createChild(),
             action: "view",
         });
     },
@@ -409,7 +407,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Create Superuser", "user");
 
         new CreateTeacherView({
-            el: $("#content").html(""),
+            el: this.createChild(),
             usertype: "SU"
         });
     },
@@ -418,7 +416,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("School Years", "calendar");
 
         new SchoolYearView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -427,7 +425,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Schools", "education");
 
         new SchoolView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -436,7 +434,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Departments", "th-list");
 
         new DepartmentView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -445,7 +443,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Courses", "th-list");
 
         new CourseView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -454,7 +452,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("My Sections", "th-list");
 
         new MySectionsView({
-            el: $("#content")
+            el: this.createChild()
         });
     },    
 
@@ -463,7 +461,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Sections", "th-list");
 
         new DepartmentView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -476,7 +474,7 @@ var Router = Backbone.Router.extend({
             filterSections.detach().appendTo($("#content").empty());
         } else {
             new SearchSectionsView({
-                el: $("#content"),
+                el: this.createChild(),
             });
         }
     },
@@ -490,7 +488,7 @@ var Router = Backbone.Router.extend({
             sectionResults.detach().appendTo($("#content").empty());
         } else {
             new SectionsTableView({
-                el: $("#content")
+                el: this.createChild()
             });
         }
     },
@@ -499,13 +497,17 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Notifications", "bell");
 
         new NotificationsView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
     registrationForm: function() {
+
+        var container = this.createChild($("#container"));
+        container.append("<div id='test-reg'></div>");
+
         new RegistrationFormView({
-            el: $("#container").empty().html("<div id='test-reg'></div>"),
+            el: $(container).find("#test-reg"),
             regType: "online",
             status: "pending"
         });
@@ -516,7 +518,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Settings", "wrench");
 
         new UserSettingsView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -525,7 +527,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Import Data", "import");
 
         new ImportView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -534,7 +536,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Export Data", "export");
 
         new ExportView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -543,7 +545,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Purge Data", "trash");
 
         new PurgeView({
-            el: $("#content")
+            el: this.createChild()
         });
     },
 
@@ -551,7 +553,7 @@ var Router = Backbone.Router.extend({
         this.loadHome();
         this.updatePageBreadcrumb("Manage Courses", "wrench");
         new CourseManagement({
-            el: $("#content")
+            el: this.createChild()
         })
     },
 
@@ -560,7 +562,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("View Course", "th-list");
 
         new ViewCourse({
-            el: $("#content"),
+            el: this.createChild(),
             id: id,
             deptid: deptid
         });
@@ -571,7 +573,7 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("View Section", "th-list");
 
         new SectionView({
-            el: $("#content"),
+            el: this.createChild(),
             id: id
         });
     },
@@ -581,13 +583,13 @@ var Router = Backbone.Router.extend({
         this.updatePageBreadcrumb("Help", "th-list");
 
         new HelpView({
-            el: $("#content"),
+            el: this.createChild(),
         });
     },    
 
     selectSchool: function(evt) {
         new SelectSchoolView({
-            el: $("#container")
+            el: this.createChild($("#container"))
         });
     }
 });
