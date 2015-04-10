@@ -45,8 +45,8 @@ $app->get('/schoolyears', 'getSchoolYears');
 $app->get('/schoolyears/active', 'getActiveSchoolYear');
 $app->post('/schoolyears', 'createSchoolYear');
 $app->post('/schoolyears/active/:id', 'updateActiveSchoolYear');
-$app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
-$app->delete('/schoolyears/:id', 'deleteSchoolYear');
+//$app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
+$app->post('/schoolyears/:id', 'deleteSchoolYear');
 
 $app->get('/schools', 'getSchools');
 $app->get('/schools/:id', 'getSchoolById');
@@ -56,6 +56,7 @@ $app->get('/schools/:id/administrators', 'getAdministratorsBySchool');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
+$app->put('/schools/id/reg', 'updateOpenRegistration');
 $app->put('/schools/:id', 'updateSchool');
 $app->delete('/schools/:id', 'deleteSchool');
 
@@ -250,13 +251,13 @@ function getLoginById($id){
 #================================================================================================================#
 function getSchoolYears(){
     $schoolid = $_GET["schoolid"];
-    $sql = "SELECT s.schoolyearid, s.schoolyear, sy.status, s.openForReg from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
+    $sql = "SELECT s.schoolyearid, s.schoolyear, sy.status from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL', array("schoolid"=>$schoolid)));
 }
 
 function getActiveSchoolYear(){
     $schoolid = $_GET["schoolid"];
-    $sql = "SELECT s.schoolyearid, s.schoolyear, s.openForReg from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid and sy.status='active' limit 1 ";
+    $sql = "SELECT s.schoolyearid, s.schoolyear from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid and sy.status='active' limit 1 ";
     echo json_encode(perform_query($sql, 'GET', array("schoolid"=>$schoolid)));
 }
 
@@ -371,38 +372,98 @@ function createSchoolYear(){
     echo json_encode(perform_transaction($queries, $combinedbindparams));
 }
 
-// Updates school year and all other related records
+// Updates the school's active school year and all other related records
 function updateActiveSchoolYear($schoolyearid){
-    $schoolid = $_POST["schoolid"];
-    $tables = array("school_schoolyear", "department", "course", "section", "document", "attendance", "enrollment", "marks");
-    foreach ($tables as $table) {
-        $sql = "UPDATE ".$table." set status = case when schoolyearid=:schoolyearid and schoolid=:schoolid then 'active' else 'inactive' end";
-        echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid)));
-    }
-}
+    $queries = array();
+    $bindparams = array();
 
-function updateOpenRegistration($schoolyearid){
+    $schoolid = $_POST["schoolid"];
+    $tables = array("school_schoolyear", "department", "attendance");
+    foreach ($tables as $table) {
+        $sql = "UPDATE ".$table." set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where schoolid=:schoolid";
+        array_push($queries, $sql);
+        array_push($bindparams, array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid));
+    }
+
+    // get department count
+    $sql = "SELECT deptid from department where schoolid=:schoolid and status='active'";
+    $deptids = perform_query($sql,"GETASSO",array("schoolid"=>$schoolid));
+
+    // "course", "section", "document", "enrollment", "marks"
+    // update course
+    $sql = "UPDATE course set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where deptid in ";
+    list($sqlparens, $param) = parenthesisList($deptids);
+    $param["schoolyearid"] = $schoolyearid;
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT courseid from course where status='active' and deptid in ".$sqlparens;
+    $courseids = perform_query($sql,"GETASSO",array("schoolid"=>$schoolid));
+
+    // update section
+    $sql = "UPDATE section set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where courseid in ";
+    list($sqlparens, $param) = parenthesisList($courseids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT sectionid from section where status='active' and courseid in ".$sqlparens;
+    $sectionids = perform_query($sql,"GETASSO",$param);
+
+    //update enrollment
+    $sql = "UPDATE enrollment set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where sectionid in ";
+    list($sqlparens, $param) = parenthesisList($sectionids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+
+    //update document
+    $sql = "UPDATE document set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where sectionid in ";
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT docid from section where status='active' and sectionid in ".$sqlparens;
+    $docids = perform_query($sql,"GETASSO",$param);
+
+    //update marks
+    $sql = "UPDATE mark set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where docid in ";
+    list($sqlparens, $param) = parenthesisList($docids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+
+    echo json_encode(perform_transaction($queries,$bindparams));
+
+}
+function updateOpenRegistration($schoolid){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $schoolyear = json_decode($body);
-    $sql = "UPDATE schoolyear set openForReg=:openForReg where schoolyearid=:schoolyearid";
-    echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "openForReg"=>$schoolyear->openForReg)));
+    $sql = "UPDATE school set openForReg=:openForReg where schoolid=:schoolid";
+    echo json_encode(perform_query($sql, 'PUT', array("schoolid"=>$schoolid, "openForReg"=>$schoolyear->openForReg)));
 }
 
-function deleteSchoolYear($id) {
-//     $request = \Slim\Slim::getInstance()->request();
-//     $body = $request->getBody();
-//     $option = json_decode($body);
-//     $bindparams = array("id"=>$id);
-//     $sql = ($option->purge == 1)? "DELETE from school_schoolyear where schoolyearid=:id" : "UPDATE schoolyear set status='inactive' where schoolyearid=:id";
-//     echo json_encode(perform_query($sql,'', $bindparams));
+function deleteSchoolYear($schoolyearid) {
+    $schoolid = $_POST["schoolid"];
+    $purge = $_POST["purge"];
+    $bindparams = array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid);
+    $sql = ($purge == 1)? "DELETE from school_schoolyear where schoolyearid=:id and schoolid=:schoolid" : "UPDATE school_schoolyear set status='inactive' where schoolid=:schoolid and schoolyearid=:schoolyearid";
+    echo json_encode(perform_query($sql,'', $bindparams));
 }
+
 #================================================================================================================#
 # Schools
 #================================================================================================================#
 function getSchools() {
-    $sql = "SELECT schoolid, location, postalCode, yearOpened, status from school order by location asc" ;
-    echo json_encode(perform_query($sql, 'GETALL'));
+    $openForReg = $_GET["openForReg"];
+    $bindparams = array();
+    if (isset($openForReg)){
+        $sql = "SELECT schoolid, location, postalCode, yearOpened, status, openForReg from school where openForReg=:openForReg order by location asc";
+        $bindparams["openForReg"]=$openForReg;
+    }
+    else {
+        $sql = "SELECT schoolid, location, postalCode, yearOpened, status from school order by location asc" ;
+    }
+    echo json_encode(perform_query($sql, 'GETALL', $bindparams));
 }
 function getSchoolById($id) {
     $sql = "SELECT location, postalCode, yearOpened, status from school where schoolid=:id";
