@@ -372,16 +372,68 @@ function createSchoolYear(){
     echo json_encode(perform_transaction($queries, $combinedbindparams));
 }
 
-// Updates school year and all other related records
+// Updates the school's active school year and all other related records
 function updateActiveSchoolYear($schoolyearid){
-    $schoolid = $_POST["schoolid"];
-    $tables = array("school_schoolyear", "department", "course", "section", "document", "attendance", "enrollment", "marks");
-    foreach ($tables as $table) {
-        $sql = "UPDATE ".$table." set status = case when schoolyearid=:schoolyearid and schoolid=:schoolid then 'active' else 'inactive' end";
-        echo json_encode(perform_query($sql, 'PUT', array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid)));
-    }
-}
+    $queries = array();
+    $bindparams = array();
 
+    $schoolid = $_POST["schoolid"];
+    $tables = array("school_schoolyear", "department", "attendance");
+    foreach ($tables as $table) {
+        $sql = "UPDATE ".$table." set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where schoolid=:schoolid";
+        array_push($queries, $sql);
+        array_push($bindparams, array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid));
+    }
+
+    // get department count
+    $sql = "SELECT deptid from department where schoolid=:schoolid and status='active'";
+    $deptids = perform_query($sql,"GETASSO",array("schoolid"=>$schoolid));
+
+    // "course", "section", "document", "enrollment", "marks"
+    // update course
+    $sql = "UPDATE course set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where deptid in ";
+    list($sqlparens, $param) = parenthesisList($deptids);
+    $param["schoolyearid"] = $schoolyearid;
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT courseid from course where status='active' and deptid in ".$sqlparens;
+    $courseids = perform_query($sql,"GETASSO",array("schoolid"=>$schoolid));
+
+    // update section
+    $sql = "UPDATE section set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where courseid in ";
+    list($sqlparens, $param) = parenthesisList($courseids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT sectionid from section where status='active' and courseid in ".$sqlparens;
+    $sectionids = perform_query($sql,"GETASSO",$param);
+
+    //update enrollment
+    $sql = "UPDATE enrollment set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where sectionid in ";
+    list($sqlparens, $param) = parenthesisList($sectionids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+
+    //update document
+    $sql = "UPDATE document set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where sectionid in ";
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+    $sql = "SELECT docid from section where status='active' and sectionid in ".$sqlparens;
+    $docids = perform_query($sql,"GETASSO",$param);
+
+    //update marks
+    $sql = "UPDATE mark set status = case when schoolyearid=:schoolyearid then 'active' else 'inactive' end where docid in ";
+    list($sqlparens, $param) = parenthesisList($docids);
+    $sql.=$sqlparens;
+    array_push($queries, $sql);
+    array_push($bindparams, $param+array("schoolyearid"=>$schoolyearid));
+
+    echo json_encode(perform_transaction($queries,$bindparams));
+
+}
 function updateOpenRegistration($schoolid){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
