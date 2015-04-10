@@ -79,6 +79,8 @@ var SearchStudentsView = Backbone.View.extend({
 			data.city = city;
 		}
 
+		data.schoolyearid = sessionStorage.getItem("gobind-activeSchoolYear");
+
 		var student = new Student();
 		student.fetch({
 			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
@@ -108,6 +110,8 @@ var SearchStudentsView = Backbone.View.extend({
 		if (numFailedSections != "") {
 			data.numFailedSections = numFailedSections;
 		}
+
+		data.schoolyearid = sessionStorage.getItem("gobind-activeSchoolYear");
 
 		var model = new Student();
 		model.fetch({
@@ -294,7 +298,6 @@ var StudentsTableView = Backbone.View.extend({
 		if (this.template) {
 			this.$el.html(html[this.template]);
 		} else {
-			console.log(this.el);
 			this.$el.html(html["viewStudents.html"]);
 		}
 
@@ -342,7 +345,10 @@ var StudentsTableView = Backbone.View.extend({
 		var view = this;
 		var school = new School();
 		school.fetch({
-			url: school.getStudentsUrl(sessionStorage.getItem("gobind-schoolid"))
+			url: school.getStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			view.students = data;
 			_.each(data, function(object, index) {
