@@ -2114,7 +2114,7 @@ function findUsers($schoolid, $usertype){
         $dob = $_GET['dateOfBirth'];
         $email = $_GET['emailAddr'];
         $enrollment = $_GET['enrollment'];
-
+        $bindparams["schoolyearid"] = $schoolyearid;
 
         if (isset($firstname)||isset($lastname)||isset($status)||isset($year)||isset($loweryear)||isset($dob)||isset($gender)||isset($paid)||isset($email)||isset($city)||isset($province)||isset($country)||isset($enrollment)){
             if (isset($year)){
@@ -2142,7 +2142,6 @@ function findUsers($schoolid, $usertype){
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
             if (isset($email)){ $param['emailAddr'] = $email; }
 
-            $bindparams["schoolyearid"] = $schoolyearid;
             list($where, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
             $clause.= $where;

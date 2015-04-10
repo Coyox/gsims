@@ -101,7 +101,8 @@ var ImportView = Backbone.View.extend({
 								type: "POST",
 								url: studentmodel.urlRoot,
 								data: {
-									students: JSON.stringify(studentList)
+									students: JSON.stringify(studentList),
+									schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 								}
 							}).then(function(data) {
 								try {
