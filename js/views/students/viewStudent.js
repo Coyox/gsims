@@ -667,7 +667,7 @@ var ReportCardView = Backbone.View.extend({
 
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				
+
 				var def = $.Deferred();
 				promises.push(def);
 
@@ -683,7 +683,7 @@ var ReportCardView = Backbone.View.extend({
 				view.table = view.$el.find("#report-card-table").dataTable({
 					dom: dataTables.exportDom,
 					tableTools: {
-		       			 aButtons: dataTables.buttons,
+		       			 aButtons: dataTables.buttons3,
 		   			 	 sSwfPath: dataTables.sSwfPath
 		    		}
 				});

@@ -11,17 +11,13 @@ $app->get('/students', 'getStudents');
 $app->get('/students/:id', 'getStudentById');
 $app->get('/students/:id/sections', 'getEnrolledSections');
 $app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
-// $app->get('/students/:id/tests', 'getEnrolledTests');
 $app->get('/students/:id/avgGrade', 'getAvgGrade');
 $app->get('/students/:id/attendance', 'getStudentAttendance');
-// $app->get('/students/tests', 'getAllEnrolledTests');
 $app->post('/students', 'createStudent');
 $app->post('/students/:id/sections', 'enrollStudentInSections');
 $app->post('/students/:id/waitlists', 'enrollStudentInWaitlists');
-// $app->post('/students/:id/tests', 'enrollStudentInTests');
 $app->post('/students/pending', 'handlePendingStudents');
 $app->post('/students/pendingTest', 'handlePendingTestStudents');
-// $app->put('/students/:id/sections', 'approveDenyEnrollment');
 $app->put('/students/:id', 'updateStudent');
 $app->delete('/students/:id', 'deleteStudent');
 
@@ -1308,6 +1304,10 @@ function createStudent() {
     echo json_encode($transaction_result);
 }
 
+/*
+ Mass create student records with generated login info
+ Will send out email if transaction is successful
+*/
 function massCreateStudents($students) {
     $resp = array();
     $queries = array();
@@ -1418,6 +1418,7 @@ function enrollStudentInSections($id){
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+
 function enrollStudentInWaitlists($id){
     $courseids = json_decode($_POST["courseids"]);
     $bindparams = array("userid" => $id);
@@ -1430,47 +1431,10 @@ function enrollStudentInWaitlists($id){
     echo json_encode(perform_query($sql,'POST',$bindparams));
 }
 
-// Approve/deny sections enrolled by a student
-/*function approveDenyEnrollment($id){
-    $queries = array();
-    $bindparams = array();
-    $param = array("userid"=>$id);
-    if (isset($_POST['approvedList'])){
-        $sectionids = json_decode($_POST['approvedList']);
-        $sql = "UPDATE enrollment set status='active' where userid=:userid and sectionid in ";
-        list($sqlparens, $params) = parenthesisList($ids);
-        $sql.=$sqlparens;
-        $params += $param;
-        array_push($bindparams, $params);
-        array_push($queries, $sql);
-    }
-    if (isset($_POST['deniedList'])){
-        $students = json_decode($_POST['deniedList']);
-        $sql = "DELETE from enrollment where userid=:userid and sectionid in ";
-        list($sqlparens, $param) = parenthesisList($ids);
-        $sql.=$sqlparens;
-        $params += $param;
-        array_push($bindparams, $params);
-        array_push($queries, $sql);
-    }
-    echo json_encode(perform_transaction($queries, $bindparams));
-}*/
-
-
-// function enrollStudentInTests($id){
-//     $courseids = json_decode($_POST["courseids"]);
-
-//     $bindparams = array("userid" => $id);
-//     $sql = "INSERT INTO studentCompetencyTest(userid, courseid) values ";
-//     foreach (array_values($courseids) as $i => $courseid) {
-//         $sql.= "(:userid, :courseid".$i."),";
-//         $bindparams["courseid".$i] = $courseid;
-//     }
-//     $sql = rtrim($sql, ",");
-
-//     echo json_encode(perform_query($sql,'POST',$bindparams));
-// }
-
+/*
+  Handing pending students who are either denied, approved, or signed up for tests
+  Send out emails if status of student was previously pending
+*/
 function handlePendingStudents(){
     $queries = array();
     $bindparams = array();
@@ -1568,6 +1532,9 @@ function handlePendingStudents(){
 
 }
 
+/*
+ Handle pending-test students who are either denied or approved
+*/
 function handlePendingTestStudents(){
     $queries = array();
     $bindparams = array();
@@ -1595,6 +1562,9 @@ function handlePendingTestStudents(){
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+/*
+Wrapper for getting a student's average grade
+*/
 function getAvgGrade($id, $flag=0){
     $totalgrade = 0;
     $sections = getEnrolledSections($id, 1);
@@ -1625,6 +1595,9 @@ function getAvgGrade($id, $flag=0){
     echo json_encode(array("avgGrade"=>$grade."%"));
 }
 
+/*
+ Wrapper to get student attendance
+*/
 function getStudentAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
     $month = $_GET["month"];
@@ -1647,6 +1620,10 @@ function getTeacherById($id) {
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
+/*
+ Create teacher record with generated login info
+ Will send out email if transaction is successful
+*/
 function createTeacher() {
     if (isset($_POST['teachers'])){
         return massCreateTeachers(json_decode($_POST['teachers']), 'T');
@@ -1686,6 +1663,10 @@ function createTeacher() {
     echo json_encode($transaction_result);
 }
 
+/*
+ Mass create teacher records with generated login info
+ Will send out email if transaction is successful
+*/
 function massCreateTeachers($teachers, $usertype) {
     $resp = array();
     $queries = array();
@@ -2043,7 +2024,8 @@ function createLogin($firstname, $lastname, $usertype){
     return array(array($userid, $username, $password), $sql, $bindparams);
 }
 
-/**
+/*
+ * Mass create login credentials
  * @param array(array()) : array of users
  * @return array(array(), string, array());
  */
@@ -2074,6 +2056,7 @@ function massCreateLogins($users, $usertype){
 # Search
 #================================================================================================================#
 /*
+ Search function that searches a given usertype for provided parameters
  usertype has to be either 'S', 'A' or 'T' for student, admin and teacher
 */
 function findUsers($schoolid, $usertype){
@@ -2161,7 +2144,9 @@ function findUsers($schoolid, $usertype){
     }
 }
 
-
+/*
+ Search section query
+*/
 function findSections($schoolid){
     //Non-filter options
     $schoolyearid = $_GET['schoolyearid'];
@@ -2218,8 +2203,7 @@ function findSections($schoolid){
 }
 
 /*
-// advanced search
-students who
+Advanced search query for students who
 - are missing an X number of assignments,
 - are failing X number of classes,
 - has average between X and Y
@@ -2353,6 +2337,9 @@ function getTeachersWithMissingInputAttendance(){
 #================================================================================================================#
 # Purge
 #================================================================================================================#
+/*
+ Purge query
+*/
 function purge($ids, $sql){
     list($sqlparens, $bindparams) = parenthesisList($list);
     $sql.= $sqlparens;
@@ -2523,6 +2510,9 @@ function getStudentAgeStats($schoolid){
 #================================================================================================================#
 # Key
 #================================================================================================================#
+/*
+ Get key record given key name
+*/
 function getKeyByName($name){
     echo json_encode(getKey($name));
 }

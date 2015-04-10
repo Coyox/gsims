@@ -7,7 +7,7 @@ var app = {
 };
 
 var dataTables = {
-	"sSwfPath": "https://cdn.datatables.net/tabletools/2.2.3/swf/copy_csv_xls_pdf.swf",
+	"sSwfPath": "https://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf",
 	"exportDom": "lfrtipT",
 	"buttons": [
 		{"sExtends":"csv",
@@ -28,6 +28,10 @@ var dataTables = {
 		  "sButtonText": "PDF",
 		  "mColumns": [0,1,2,3,4,5]
 		},
+	],
+	"buttons3": [
+		"csv",
+		"pdf"
 	]
 }
 
