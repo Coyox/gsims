@@ -69,7 +69,6 @@ var AdminsTableView = Backbone.View.extend({
 	events: {
 		"click #refresh": "refreshTable",
 		"click .send-email": "openEmailModal",
-		"click #export-table": "exportTable",
 		"change .toggle-checkboxes": "toggleCheckboxes"
 	},
 
@@ -126,7 +125,6 @@ var AdminsTableView = Backbone.View.extend({
 			});
 			createEmailButton(view.$el);
 			createRefreshButton(view.$el);
-			createExportButton(view.$el);
 		});
 	},
 

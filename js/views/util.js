@@ -165,7 +165,7 @@ function createEmailButton(elem) {
 }
 
 function createExportButton(elem) {
-	addDTButtons(elem, "<button id='export-table' class='btn btn-sm btn-primary dt-btn'><span class='glyphicon glyphicon-export'></span></button>");
+	addDTButtons(elem, "<button id='export-table' class='btn btn-sm btn-primary dt-btn'><span class='glyphicon glyphicon-export'></span> Export as PDF</button>");
 }
 
 function openEmailWrapper(nodes) {

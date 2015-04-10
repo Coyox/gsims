@@ -243,7 +243,6 @@ var TeachersTableView = Backbone.View.extend({
 	events: {
 		"click #refresh": "refreshTable",
 		"click .send-email": "openEmailModal",
-		"click #export-table": "exportTable",
 		"change .toggle-checkboxes": "toggleCheckboxes"
 	},
 
@@ -269,7 +268,6 @@ var TeachersTableView = Backbone.View.extend({
 		});
 		createEmailButton(this.$el);
 		createRefreshButton(this.$el);
-		//createExportButton(this.$el);
 	},
 
 	fetchAllResults: function() {

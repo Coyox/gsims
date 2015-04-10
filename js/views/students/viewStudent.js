@@ -15,7 +15,7 @@ var StudentRecordView = Backbone.View.extend({
 		student.fetch().then(function(data) {
 			var model = new Student(data, {parse:true});
 			view.model = model;
-			Backbone.Validation.bind(view);	
+			Backbone.Validation.bind(view);
 
 			view.model.set("id", view.model.get("userid"));
 			view.studentInformationTab(data, model);
@@ -46,7 +46,7 @@ var StudentRecordView = Backbone.View.extend({
         	parent = "#student-info-table";
         }
         this.$el.find(parent + ".form-horizontal").append(container);
-        return container;	
+        return container;
 	},
 
 	addEditRow: function(table) {
@@ -81,7 +81,7 @@ var StudentRecordView = Backbone.View.extend({
 	saveStudent: function(evt) {
 		var view = this;
 		var def = $.Deferred();
-		
+
 		if ($(evt.currentTarget).hasClass("cancel-btn")) {
 			this.model.attributes = JSON.parse(this.model.untouched);
 			def.resolve();
@@ -95,7 +95,7 @@ var StudentRecordView = Backbone.View.extend({
 						});
 						def.resolve();
 					});
-				} 
+				}
 			}
 		}
 
@@ -140,7 +140,7 @@ var StudentRecordView = Backbone.View.extend({
 		new DeleteRecordView({
 			id: this.model.get("id"),
 			el: $("#container")
-		});	
+		});
 	},
 
 	studentInformationTab: function(data, model) {
@@ -245,13 +245,13 @@ var StudentRecordRowView = Backbone.View.extend({
 		var params = {
 			name: this.name,
 			label: this.label,
-			value: this.value			
+			value: this.value
 		};
 
 		if (this.action == "view") {
 			if (this.name == "prevAttendedGS") {
 				params.value = "n/a";
-			} 
+			}
 			else if (this.name == "paid") {
 				params.value = this.value == 1 ? "Paid" : "Unpaid";
 			}
@@ -282,17 +282,17 @@ var StudentRecordRowView = Backbone.View.extend({
 					month = dob[1];
 					day = dob[2];
 					year = dob[0];
-				} 
+				}
 				this.$el.html(this.dobTemplate(params));
 				populateMonthMenu(this.$el.find("#month-menu"), month);
 				populateDayMenu(this.$el.find("#day-menu"), day);
 				populateYearMenu(this.$el.find("#year-menu"), year);
-			} 
+			}
 			// Gender radio boxes
 			else if (this.name == "gender") {
 				this.$el.html(this.genderTemplate(params));
 				this.$el.find("[value='" + this.value + "']").prop("checked", true);
-			} 
+			}
 			// Status dropdown menu
 			else if (this.name == "status") {
 				this.$el.html(this.statusTemplate(params));
@@ -302,7 +302,7 @@ var StudentRecordRowView = Backbone.View.extend({
 			else if (this.name == "paid") {
 				this.$el.html(this.paidTemplate(params));
 				this.$el.find("[value='" + this.value + "']").prop("checked", true);
-			} 
+			}
 			// Plain text field
 			else {
 				this.$el.html(this.editTemplate(params));
@@ -331,7 +331,7 @@ var StudentRecordRowView = Backbone.View.extend({
 		var name = $(evt.currentTarget).attr("name");
 		var val = $(evt.currentTarget).attr("value");
 		this.model.set(name, val);
-	}, 
+	},
 
 	simplifyName: function(str) {
 		if (str.toLowerCase().indexOf("parent") > -1) {
@@ -443,14 +443,14 @@ var EnrolledSectionsRowView = Backbone.View.extend({
 					title: "ERROR",
 					status: "error",
 					message: "Student has been successfully dropped from the section."
-				});				
+				});
 			}
 		}).fail(function(data) {
 			new TransactionResponseView({
 				title: "ERROR",
 				status: "error",
 				message: "Student has been successfully dropped from the section."
-			});	
+			});
 		});
 	}
 });
@@ -653,28 +653,39 @@ var ReportCardView = Backbone.View.extend({
 		this.render();
 	},
 
-		events: {
-		"click #report-card-pdf":  "reportCardPDF",
-		},
+		// events: {
+		// "click #report-card-pdf":  "reportCardPDF",
+		// },
 
 	render: function() {
-		//console.log("render");
 		this.$el.html(html["reportCard.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
 		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
-			//console.log(data);
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
-				//console.log(id);
 				new ReportCardRowView({
 					el: view.addRow(),
 					model: section,
 					id: id
 				});
-			});
+			}, this);
+
+			view.table = view.$el.find("#report-card-table").dataTable({
+	      	// aoColumnDefs: [
+	       //    	{ bSortable: false, aTargets: [ 4, 5 ] },
+	       //    	{ sClass: "center", aTargets: [ 4, 5 ] },
+	       //    	{ sWidth: "10%", aTargets: [ 5 ] }
+	       // 	],
+			// dom: dataTables.exportDom,
+			// tableTools: {
+   //     			 aButtons: dataTables.buttons,
+   // 			 	 sSwfPath: dataTables.sSwfPath
+   //  		}
 		});
+		});
+
 	},
 
 	addRow: function() {
@@ -683,7 +694,7 @@ var ReportCardView = Backbone.View.extend({
         return container;
 	},
 
-	reportCardPDF: function() {
+/*	reportCardPDF: function() {
 		var table = tableToJson($('#report-card-table').get(0));
 		var id = this.model.get("userid");
 		var fname = this.model.get("firstName");
@@ -696,7 +707,6 @@ var ReportCardView = Backbone.View.extend({
         doc.setFontSize(18);
         doc.text(40, 50, fname + " " + lname);
 		doc.setFontSize(12);
-		//doc.table(20,20, table, ['coursename', 'sectioncode', 'teachername', 'grade'], {printHeaders: true, autoSize:true});
 		doc.cellInitialize();
 		$.each(table, function (i, row){
 			$.each(row, function(j, cell){
@@ -705,37 +715,42 @@ var ReportCardView = Backbone.View.extend({
 		})
 
         doc.save("Reportcard-" +id+ ".pdf");
-	},
+	},*/
 
+	refreshTable: function(evt) {
+		evt.stopImmediatePropagation();
+		this.table.fnDestroy();
+		this.render();
+	},
 
 });
 
-function tableToJson(table) {
-    var data = [];
+// function tableToJson(table) {
+//     var data = [];
 
-    // first row needs to be headers
-    var headers = [];
-    for (var i=0; i<table.rows[0].cells.length; i++) {
-        headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
-    }
+//     // first row needs to be headers
+//     var headers = [];
+//     for (var i=0; i<table.rows[0].cells.length; i++) {
+//         headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
+//     }
 
-    // go through cells
-    for (var i=1; i<table.rows.length; i++) {
+//     // go through cells
+//     for (var i=1; i<table.rows.length; i++) {
 
-        var tableRow = table.rows[i];
-        var rowData = {};
+//         var tableRow = table.rows[i];
+//         var rowData = {};
 
-        for (var j=0; j<tableRow.cells.length; j++) {
+//         for (var j=0; j<tableRow.cells.length; j++) {
 
-            rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
+//             rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
 
-        }
+//         }
 
-        data.push(rowData);
-    }       
+//         data.push(rowData);
+//     }
 
-    return data;
-}
+//     return data;
+// }
 
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
@@ -751,7 +766,7 @@ var ReportCardRowView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 		var sid = this.id;
-		var secid = this.model.get("sectionid");	
+		var secid = this.model.get("sectionid");
 		//Get teacher names
 		this.model.fetch({
 			url: this.model.getSectionTeachersUrl(secid)
@@ -775,7 +790,7 @@ var ReportCardRowView = Backbone.View.extend({
 			}))});
 		});
 	},
-	
+
 });
 
 function dlReportCardPDF() {
@@ -813,7 +828,7 @@ function dlReportCardPDF() {
 
 function dlReportCardCSV() {
 	var csvContent = "data:text/csv;charset=utf-8,";
-	
+
 	var output = "";
 	var i;
 	var j;
