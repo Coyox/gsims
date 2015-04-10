@@ -125,6 +125,7 @@ var RegistrationFormView = Backbone.View.extend({
 		}, this);
 		studentModel.set("schoolid", schoolid);
 		studentModel.set("status", this.status);
+		studentModel.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
 
 		console.log("final", studentModel);
 		console.log("sections", sections);
@@ -132,11 +133,7 @@ var RegistrationFormView = Backbone.View.extend({
 		var finalStudent = new Student(studentModel.toJSON(), {parse:true});
 
 		setDateOfBirth(finalStudent);
-		finalStudent.save(null, {
-			data: {
-				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-			}
-		}).then(function(data) {
+		finalStudent.save().then(function(data) {
 			if (typeof data == "string") {
 				data = JSON.parse(data);
 			}
@@ -227,12 +224,13 @@ var RegSearchView = Backbone.View.extend({
 				params.dateOfBirth = dob;
 			}
 
+			params.schoolyearid = sessionStorage.getItem("gobind-activeSchoolYear");
+
 			var student = new Student();
 			student.fetch({
 				url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 				data: params
 			}).then(function(data) {
-				console.log(data);
 				var ret;
 				if (data.length == 0) {
 					ret = true;
@@ -394,8 +392,6 @@ var RegFinalView = Backbone.View.extend({
 	render: function() {
 		this.studentModel.nonEditable.push("paid");
 		this.studentModel.nonEditable.push("status");		
-		console.log(this.studentModel);
-		console.log(this.sections);
 		_.each(this.studentModel.toJSON(), function(value, attr) {
 			if (this.studentModel.nonEditable.indexOf(attr) == -1) {
 				new StudentRecordRowView({

@@ -1,9 +1,6 @@
 /** Global application object */
 var app = {
 	serverUrl: "https://gobind-sarvar.rhcloud.com/",
-	// currentSchoolYear: "2014-2015",
-	// selectedSchoolYearId: "100000",
-	// selectedSchoolId: "412312",
 };
 
 var dataTables = {
@@ -189,7 +186,10 @@ function init() {
 function setActiveSchoolYear(def) {
 	var schoolyear = new SchoolYear();
 	schoolyear.fetch({
-		url: schoolyear.getActiveSchoolYearUrl()
+		url: schoolyear.getActiveSchoolYearUrl(),
+		data: {
+			schoolid: sessionStorage.getItem("gobind-schoolid")
+		}
 	}).then(function(data) {
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;

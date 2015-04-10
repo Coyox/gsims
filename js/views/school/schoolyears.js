@@ -16,11 +16,16 @@ var SchoolYearView = Backbone.View.extend({
 			this.$el.find("#edit-year").removeClass("hide").show();
 		} else {
 			this.$el.find("#save-year").removeClass("hide").show();
+			this.$el.find("#cancel").removeClass("hide").show();
 		}
 
 		var view = this;
 		var schoolyear = new SchoolYear();
-		schoolyear.fetch().then(function(data) {
+		schoolyear.fetch({
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
+		}).then(function(data) {
 			_.each(data, function(object, index) {
 				var year = new SchoolYear(object, {parse: true});
 				view.list.push(year);
@@ -43,7 +48,14 @@ var SchoolYearView = Backbone.View.extend({
 		"click #create-year": "createSchoolYear",
 		"click #edit-year": "editSchoolYear",
 		"click #save-year": "saveSchoolYear",
-        "click #purge-year": "purgeSchoolYear"
+        "click #purge-year": "purgeSchoolYear",
+        "click #cancel": "cancel"
+	},
+
+	cancel: function() {
+		this.model.attributes = JSON.parse(this.untouched);
+		this.action = "view";
+		this.render();
 	},
 
     purgeSchoolYear: function(){
@@ -61,18 +73,15 @@ var SchoolYearView = Backbone.View.extend({
                   schoolyearids: JSON.stringify(ids)
                 }
             }).then(function(data) {
-           // if (typeof data == "string") {
-           //     data = JSON.parse(data);
-           // }
                 if (data.status == "success") {
-                  new TransactionResponseView({
-                      message: "The selected records have successfully been purged."
-                  });
-             } else {
-                  new TransactionResponseView({
-                    title: "ERROR",
-                    status: "error",
-                    message: "The selected could not be purged. Please try again."
+	                new TransactionResponseView({
+	                    message: "The selected records have successfully been purged."
+	                });
+             	} else {
+                  	new TransactionResponseView({
+                    	title: "ERROR",
+                    	status: "error",
+                    	message: "The selected could not be purged. Please try again."
                     });               
                 }
             }).fail(function(data) {
@@ -80,10 +89,10 @@ var SchoolYearView = Backbone.View.extend({
                     title: "ERROR",
                     status: "error",
                     message: "The selected could not be purged. Please try again."
-             }); 
-         });
-     });
-     },
+                }); 
+            });
+        });
+    },
 
 	addRow: function() {
 		var container = $("<tr></tr>");
@@ -115,8 +124,10 @@ var SchoolYearView = Backbone.View.extend({
 				elem.remove();
 				backdrop.remove();
 				view.model.save({
-					data: {duplicate:1,
-						   currentSchoolYear:sessionStorage.getItem("gobind-activeSchoolYear")}
+					data: {
+						duplicate:1,
+						currentSchoolYear:sessionStorage.getItem("gobind-activeSchoolYear")
+					}
 				}).then(function(data) {
 					if (data.status=="success") {
 						new TransactionResponseView({
@@ -143,6 +154,7 @@ var SchoolYearView = Backbone.View.extend({
 	},
 
 	editSchoolYear: function(evt) {
+		this.untouched = JSON.stringify(this.model.toJSON());
 		this.action = "edit";
 		this.render();
 	},
@@ -153,6 +165,7 @@ var SchoolYearView = Backbone.View.extend({
 		_.each(this.list, function(model, index) {
 			var id = model.get("schoolyearid");
 			if (model.hasChanged("status")) {
+				model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 				var promise = model.save(null, {
 					url: this.model.updateActiveYearUrl(id)
 				});
@@ -207,7 +220,7 @@ var SchoolYearRowView = Backbone.View.extend({
 			this.$el.html(this.viewTemplate({
 				model: this.model.toJSON(),
 				status: capitalize(this.model.get("status")),
-				openForReg: this.model.get("openForReg") == 1 ? "Yes" : "No"
+				openForReg: this.model.get("openForReg") == 1 ? "OPEN" : "CLOSED"
 			}));
 		} else {
 			this.$el.html(this.editTemplate({
