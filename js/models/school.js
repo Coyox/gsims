@@ -211,9 +211,6 @@ var Section = Backbone.Model.extend({
 	getSectionAttendance: function(id) {
 		return this.urlRoot + "/" + id + "/attendance";
 	},
-	getAverageAttendance: function(id) {
-		return this.urlRoot + "/" + id + "/avgAttendance";
-	},
 	getStudentCount: function(id) {
 		return this.urlRoot + "/" + id + "/count";
 	},

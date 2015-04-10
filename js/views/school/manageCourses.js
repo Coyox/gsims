@@ -1094,7 +1094,6 @@ var CourseWaitlistRowView = Backbone.View.extend({
         this.courseid = options.courseid;
         this.parentView = options.parentView;
 		this.render();
-		console.log("sdata :", this.sdata);
 	},
 
 	render: function() {
@@ -1924,25 +1923,21 @@ var AttendanceView = Backbone.View.extend({
 			view.enrolledStudents = data;
 		});
 
-		// Get avg attendance for section
-		section.fetch({
-			url: section.getAverageAttendance(view.sectionid)
-		}).then(function(data) {
-			view.$el.find(".avg-attendance").text(data.avgAttendance);
-		});
+		var totalAttendedStudents = 0;
+		var numAttendanceRecords = 0;
 
 		// Get all the attendance records for each unique date
 		section.fetch({
 			url: section.getSectionDates(this.sectionid),
 		}).then(function(sectionDates) {
 			_.each(sectionDates, function(obj, index) {
-
 				section.fetch({
 					url: section.getSectionAttendance(view.sectionid),
 					data: {
 						date: obj.date
 					}
 				}).then(function(attendanceRecords) {
+					numAttendanceRecords = attendanceRecords.length;
 					var attendedStudents = 0;
 					_.each(attendanceRecords, function(record, index) {
 						if (record.usertype == "S" && enrolledStudents.indexOf(record.userid) > -1) {
@@ -1953,7 +1948,8 @@ var AttendanceView = Backbone.View.extend({
 					var numStudents = enrolledStudents.length;
 					var avg = Math.round((attendedStudents / numStudents) * 1000)/10;
 					var avgString = attendedStudents + " / " + numStudents + " = " + avg;
-
+					totalAttendedStudents += attendedStudents;
+					console.log(totalAttendedStudents);
 					new AttendanceRowView({
 						el: view.addRow(),
 						date: obj.date,
@@ -1964,9 +1960,16 @@ var AttendanceView = Backbone.View.extend({
 						enrolledStudents: view.enrolledStudents,
 						parentView: view
 					});
+
+					// Avg attendance for section
+					var avgAttendance = Math.round((totalAttendedStudents/(enrolledStudents.length*numAttendanceRecords))*1000)/10;
+					//console.log(avgAttendance);
+					view.$el.find(".avg-attendance").text(avgAttendance+"%");
 				});
 			});
+
 		});
+
 	},
 
 	addRow: function() {

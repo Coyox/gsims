@@ -91,7 +91,6 @@ $app->get('/sections/:id/students/:userid', 'getStudentGradeForSection');
 $app->get('/sections/:id/students', 'getStudentsEnrolled');
 $app->get('/sections/:id/count', 'getStudentCount');
 $app->get('/sections/:id/teachers', 'getSectionTeachers');
-$app->get('/sections/:id/avgAttendance', 'getAvgAttendance');
 $app->get('/sections/:id/attendance', 'getSectionAttendance');
 $app->get('/sections/:id/dates', 'getSectionDates');
 $app->post('/sections/:id/teachers/:tid', 'assignSectionTeacher');
@@ -864,31 +863,6 @@ function inputAttendance($id){
     echo json_encode($resp);
 }
 
-function getAvgAttendance($id){
-    $bindparams = array("id"=>$id);
-    $classSize = (int) getStudentCount($id, 1);
-
-    $sql = "SELECT count(distinct `date`) from attendance where sectionid=:id";
-    $numberofdays = (int) perform_query($sql, 'GETCOL', $bindparams);
-    if ($numberofdays != 0){
-        $sql = "SELECT `date`, count(userid) as present
-            from attendance
-            where userid in (SELECT userid from student)
-            and sectionid=:id
-            group by `date`";
-
-        $totalpresent = 0;
-        $results = perform_query($sql, 'GETASSO', $bindparams);
-        foreach ($results as $row){
-            $totalpresent += (int) $row['present'];
-        }
-        $avgAttendance = round(($totalpresent/($classSize*$numberofdays))*100, 1);
-        echo json_encode(array("avgAttendance"=>$avgAttendance."%"));
-    }
-    else {
-        echo json_encode(array("avgAttendance"=>"N/A"));
-    }
-}
 function getSectionAttendance($id){
     $classdate = $_GET["date"];
     $sql = "SELECT temp.userid, temp.firstName, temp.lastName, temp.T as usertype  from
@@ -986,6 +960,14 @@ function getDocumentsByCourse($courseid, $status){
     echo json_encode(perform_query($sql,'GETALL', array("courseid"=>$courseid, "status"=>$status)));
 }
 
+/*
+ * Update a document record
+ * @param:
+ *   route param: docid
+ *   request param:
+ *    - all document model attributes
+ * @return: json encoded status array
+*/
 function updateDocument($id){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -1009,6 +991,14 @@ function updateDocument($id){
     echo json_encode(perform_query($sql,'PUT',$bindparams));
 }
 
+/*
+ * Create a document record
+ * @param:
+ *   route param: -
+ *   request param:
+ *    - all document model attributes except for docid
+ * @return: json encoded status array
+*/
 function createDocument(){
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
@@ -1040,12 +1030,12 @@ function createDocument(){
 }
 
 /*
-Delete a document record
-@param:
-  route param: section id
-  request param:
-    - purge(1 = hard delete, 0 = set inactive)
-@return: json encoded status array
+ * Delete a document record
+ * @param:
+ *   route param: section id
+ *   request param:
+ *    - purge(1 = hard delete, 0 = set inactive)
+ * @return: json encoded status array
 */
 function deleteDocument($id) {
     $request = \Slim\Slim::getInstance()->request();
@@ -1067,12 +1057,28 @@ function deleteDocument($id) {
     echo json_encode(perform_transaction($queries, $bindparams));
 }
 
+/*
+ * Get marks for a particular document for a given schoolyear
+ * @param:
+ *  route param: docid
+ *  request param:
+ *    - schoolyearid
+ * @return: json encoded array of (userid, mark)
+*/
 function getMarks($id) {
     $schoolyearid = $_GET["schoolyearid"];
     $sql = "SELECT `userid`, `mark` from marks where docid=:docid and schoolyearid=:schoolyearid";
     echo json_encode(perform_query($sql, 'GETALL', array("docid"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 
+/*
+ * Input or update marks for a document record
+ * @param:
+ *  route param: docid
+ *   request param:
+ *     - op: POST - input marks, PUT - update marks
+ * @return: json encoded status array
+*/
 function handleMarks($id){
     $schoolyearid = $_POST["schoolyearid"];
     $students = json_decode($_POST["students"]);
@@ -1131,9 +1137,14 @@ function getStudentById($id) {
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
 
-// flag=1: return array
-// flag=0: echo json
-// Require status
+/*
+ * Get enrolled sections
+ * @param:
+ *  - student id
+ *  - flag: 1 - return array, 0 - echo json
+ *  - status: "active" by default
+@return: json encoded status array
+*/
 function getEnrolledSections($id, $flag=0, $status="active"){
     if (isset($_GET['status'])){
         $status = $_GET['status'];
@@ -1149,20 +1160,13 @@ function getEnrolledSections($id, $flag=0, $status="active"){
     echo json_encode(perform_query($sql, 'GETALL', $bindparams));
 }
 
-// function getEnrolledTests($id){
-//     $sql = "SELECT c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status,
-//     FROM course c, department d, enrollment e
-//     WHERE e.userid = :userid and c.courseid = t.courseid and c.deptid = d.deptid";
-//     echo json_encode(perform_query($sql, 'GETALL', array("userid"=>$id)));
-// }
-
-// function getAllEnrolledTests(){
-//     $sql = "SELECT s.userid, s.firstName, s.lastName, s.status, s.emailAddr, c.courseid, c.courseName, c.description, c.deptid, d.deptName, c.schoolyearid, c.status, t.mark
-//     FROM course c, department d, studentCompetencyTest t, student s
-//     WHERE t.userid = s.userid and c.courseid = t.courseid and c.deptid = d.deptid and s.status='pending-test'";
-//     echo json_encode(perform_query($sql, 'GETALL'));
-// }
-
+/*
+ * Get a list of previously enrolled sections for a student
+ * @param:
+ *   route param: studentid
+ *   request param: schoolyearid
+ * @return: json encoded array
+*/
 function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
@@ -1181,6 +1185,10 @@ function getPrevEnrolledSections($id){
 
 /*
  * Updates a student record
+ * @param:
+ *  route param: studentid
+ *  request param: all student model attributes
+ * @return: json encoded status array
  */
 function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
@@ -1226,8 +1234,12 @@ function updateStudent($id) {
     echo json_encode(perform_query($sql,'',$bindparams));
 }
 
+
 /*
  * Creates a student record
+ * Also sends an email with the student login information to the provided student email address
+ * @param:
+ *  request param: (optional) a list of 'students' for mass creating student records
  */
 function createStudent() {
     if (isset($_POST['students'])){
