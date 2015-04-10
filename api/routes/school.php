@@ -7,15 +7,15 @@ class School {
     }
 
     public function createRoutes() {
-        $this->app->get('/schoolyears', 'getSchoolYears');
-        $this->app->get('/schoolyears', 'getSchoolYears');
-        $this->app->get('/schoolyears/active', 'getActiveSchoolYear');
-        $this->app->post('/schoolyears', 'createSchoolYear');
-        $this->app->put('/schoolyears/active/:id', 'updateActiveSchoolYear');
-        $this->app->put('/schoolyears/reg/:id', 'updateOpenRegistration');
-        $this->app->delete('/schoolyears/:id', 'deleteSchoolYear');
+        $this->app->get('/schoolyears', array($this, 'getSchoolYears'));
+        $this->app->get('/schoolyears', array($this, 'getSchoolYears'));
+        $this->app->get('/schoolyears/active', array($this, 'getActiveSchoolYear'));
+        $this->app->post('/schoolyears', array($this, 'createSchoolYear'));
+        $this->app->put('/schoolyears/active/:id', array($this, 'updateActiveSchoolYear'));
+        $this->app->put('/schoolyears/reg/:id', array($this, 'updateOpenRegistration'));
+        $this->app->delete('/schoolyears/:id', array($this, 'deleteSchoolYear'));
 
-        $this->app->get('/schools', 'getSchools');
+        $this->app->get('/schools', array($this, 'getSchools'));
         $this->app->get('/schools/:id', 'getSchoolById');
         $this->app->get('/schools/:id/students', 'getStudentsBySchool');
         $this->app->get('/schools/:id/teachers', 'getTeachersBySchool');

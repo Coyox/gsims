@@ -11,35 +11,35 @@ class Function {
         $this->app = $app;
     }
     public function createRoutes(){
-        $this->app->get('/search/:schoolid/users/:usertype', 'findUsers');
-        $this->app->get('/search/:schoolid/sections', 'findSections');
-        $this->app->get('/search/:schoolid/advanced', 'findStudentsWithAdvancedCriteria');
+        $this->app->get('/search/:schoolid/users/:usertype',  array($this, 'findUsers'));
+        $this->app->get('/search/:schoolid/sections', array($this, 'findSections'));
+        $this->app->get('/search/:schoolid/advanced', array($this, 'findStudentsWithAdvancedCriteria'));
 
-        $this->app->get('/login', 'validateCredentials');
-        $this->app->put('/login/:id', 'updateLogin');
-        $this->app->get('/login/:id', 'getLoginById');
+        $this->app->get('/login', array($this, 'validateCredentials'));
+        $this->app->put('/login/:id', array($this, 'updateLogin'));
+        $this->app->get('/login/:id', array($this, 'getLoginById'));
 
-        $this->app->get('/count/:usertype', 'getUserCount');
+        $this->app->get('/count/:usertype', array($this, 'getUserCount'));
 
-        $this->app->get('/notif/missingInputAttendance', 'getTeachersWithMissingInputAttendance');
+        $this->app->get('/notif/missingInputAttendance', array($this, 'getTeachersWithMissingInputAttendance'));
 
-        $this->app->post('/purge/attendance', 'purgeAttendance');
-        $this->app->post('/purge/waitlist', 'purgeWaitlist');
-        $this->app->post('/purge/user', 'purgeUsers');
-        $this->app->post('/purge/schoolyear', 'purgeSchoolYears');
-        $this->app->post('/purge/school', 'purgeSchools');
-        $this->app->post('/purge/department', 'purgeDepartments');
-        $this->app->post('/purge/course', 'purgeCourses');
-        $this->app->post('/purge/section', 'purgeSections');
-        $this->app->post('/purge/document', 'purgeDocuments');
-        $this->app->delete('/purge/inactive', 'purgeInactive');
+        $this->app->post('/purge/attendance', array($this, 'purgeAttendance'));
+        $this->app->post('/purge/waitlist', array($this, 'purgeWaitlist'));
+        $this->app->post('/purge/user', array($this, 'purgeUsers'));
+        $this->app->post('/purge/schoolyear', array($this, 'purgeSchoolYears'));
+        $this->app->post('/purge/school', array($this, 'purgeSchools'));
+        $this->app->post('/purge/department', array($this, 'purgeDepartments'));
+        $this->app->post('/purge/course', array($this, 'purgeCourses'));
+        $this->app->post('/purge/section', array($this, 'purgeSections'));
+        $this->app->post('/purge/document', array($this, 'purgeDocuments'));
+        $this->app->delete('/purge/inactive', array($this, 'purgeInactive'));
 
-        $this->app->get('/stats/geographic/:schoolid/students', 'getStudentGeographics');
-        $this->app->get('/stats/gender/:schoolid/students', 'getStudentGenderStats');
-        $this->app->get('/stats/age/:schoolid/students', 'getStudentAgeStats');
-        $this->app->get('/stats/attendance/:schoolid', 'getAttendanceStats');
+        $this->app->get('/stats/geographic/:schoolid/students', array($this, 'getStudentGeographics'));
+        $this->app->get('/stats/gender/:schoolid/students', array($this, 'getStudentGenderStats'));
+        $this->app->get('/stats/age/:schoolid/students', array($this, 'getStudentAgeStats'));
+        $this->app->get('/stats/attendance/:schoolid', array($this, 'getAttendanceStats'));
 
-        $this->app->get('/keys/:name', 'getKeyByName');
+        $this->app->get('/keys/:name', array($this, 'getKeyByName'));
     }
 
 
