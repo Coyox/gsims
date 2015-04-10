@@ -438,7 +438,10 @@ var DashboardView = Backbone.View.extend({
 		var stats = new Stats();
 		var dataArray = [['City', 'Student Count']];
 		stats.fetch({
-			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid"))
+			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			if (data.length == 0) {
 				view.$el.find("#location-panel .panel-body").text("No location statistics to display");
@@ -475,10 +478,13 @@ var DashboardView = Backbone.View.extend({
 		var stats = new Stats();
 		var dataArray = [['Gender', 'Student Count']];
 		stats.fetch({
-			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
+			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			if (data.length == 0) {
-				view.$el.find("#gender-panel .panel-body").text("No location statistics to display");
+				view.$el.find("#gender-panel .panel-body").text("No gender statistics to display");
 			} else {
 				_.each(data, function(object, index) {
 					var model = new Stats(object, {parse:true});
@@ -520,10 +526,13 @@ var DashboardView = Backbone.View.extend({
 
 		var dataArray = [['Age Range', 'Student Count']];
 		stats.fetch({
-			url: stats.getAgeStatsUrl(sessionStorage.getItem("gobind-schoolid"))
+			url: stats.getAgeStatsUrl(sessionStorage.getItem("gobind-schoolid")),
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
 		}).then(function(data) {
 			if (data.length == 0) {
-				view.$el.find("#age-panel .panel-body").text("No location statistics to display");
+				view.$el.find("#age-panel .panel-body").text("No age statistics to display");
 			} else {
 				_.each(data, function(object, index) {
 					var model = new Stats(object, {parse:true});
