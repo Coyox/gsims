@@ -265,8 +265,18 @@ var Superuser = Backbone.Model.extend({
 var User = Backbone.Model.extend({
 	defaults: {
 		username: "",
-		password: ""
+		password: "",
+		password2: "",
 	},
+	 validation: {
+    	password2: {
+      		equalTo: "password",
+      		msg: "The passwords must match."
+    	},
+    	password: {
+    		minLength: 6
+    	}
+  	},
 
     urlRoot: app.serverUrl + "api/login",
 

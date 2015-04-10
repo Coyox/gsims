@@ -20,6 +20,7 @@ var UserSettingsView = Backbone.View.extend({
 		var view = this;
 		Backbone.Validation.bind(this);
 		this.model.set("id", this.login.userid);
+
 		if (this.model.isValid(true)) {
 			this.model.save().then(function(data) {
 				if (typeof data == "string") {
