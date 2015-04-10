@@ -108,56 +108,6 @@ var CourseManagement = Backbone.View.extend({
 		return container;
 	},
 
-	// saveEnrolledSections: function() {
-	// 	var sections = [];
-	// 	var rows = this.$el.find("#enrolled-list tbody tr");
-	// 	var valid = false;
-	// 	_.each(rows, function(row, index) {
-	// 		if ($(row).find(".dataTables_empty").length) {
-	// 			valid = false;
-	// 		} else {
-	// 			valid = true;
-	// 			sections.push($(row).data("section").sectionid);
-	// 		}
-	// 	}, this);
-
-	// 	if (!valid) {
-	// 		new TransactionResponseView({
-	// 			title: "Course Selection",
-	// 			message: "Please select at least one section before proceeding."
-	// 		});
-	// 	} else {
-	// 		var view = this;
-	// 		var student = new Student();
-	// 		$.ajax({
-	// 			type: "POST",
-	// 			url: student.enrollStudentInSections(this.userid),
-	// 			data: {
-	// 				sectionids: JSON.stringify(sections),
-	// 				status: "pending",
-	// 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-	// 			}
-	// 		}).then(function(data) {
-	// 			if (typeof data == "string") {
-	// 				data = JSON.parse(data);
-	// 			}
-	// 			if (data.status == "success") {
-	// 				new TransactionResponseView({
-	// 					message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
-	// 					redirect: true,
-	// 					url: view.regType == "online" ? "" : "home"
-	// 				});
-	// 			} else {
-	// 				new TransactionResponseView({
-	// 					title: "ERROR",
-	// 					status: "error",
-	// 					message: "Sorry, we could not process your request. Please try again."
-	// 				});
-	// 			}
-	// 		});
-	// 	}
-	// },
-
 	addCourseToDept: function(evt) {
 		var deptid = $(".department.active").attr("id");
 
@@ -369,154 +319,6 @@ var CourseTableRowView = Backbone.View.extend({
 		app.Router.navigate("viewCourse/" + id + "/" + this.deptid, {trigger:true});
 	}
 });
-
-// var SectionSubView = Backbone.View.extend({
-// 	initialize: function(options) {
-// 		this.data = options.data;
-// 		this.parentView = options.parentView;
-// 		this.courseid = options.courseid;
-// 		this.render();
-// 	},
-
-// 	render: function() {
-// 		this.$el.find("#sections-container").prepend("<button class='add-section btn btn-primary btn-sm' data-courseid='" + this.courseid + "'>Add Section to Course</button><br><br>");
-
-// 		if (this.data.length == 0) {
-// 			this.$el.find("td").append("<div class='well'>There are currently no sections available.</div>");
-// 		} else {
-// 			_.each(this.data, function(object, index) {
-// 				var section = new Section(object, {parse:true});
-// 				new SectionTableRowView({
-// 					el: this.addRow(),
-// 					model: section,
-// 					parentView: this.parentView
-// 				});
-// 			}, this);
-// 		}
-// 	},
-
-// 	events: {
-// 		"click .add-section": "addSectionToCourse",
-// 		"keyup input": "updateSection"
-// 	},
-
-// 	addRow: function() {
-// 		var row = $("<li></li>");
-// 		this.$el.find("#sections-list").append(row);
-// 		return row;
-// 	},
-
-// 	addSectionToCourse: function(evt) {
-// 		var courseid = $(evt.currentTarget).data("courseid");
-
-// 		var view = this;
-
-// 		$("#container").append(html["createSection.html"]);
-
-// 		var elem = $("#create-section-modal");
-// 		var backdrop = $(".modal-backdrop");
-
-// 		elem.modal({
-// 			show: true
-// 		});
-
-// 		elem.on("hidden.bs.modal", function() {
-// 			elem.remove();
-// 			backdrop.remove();
-// 		});
-
-// 		this.model = new Section();
-// 		Backbone.Validation.bind(this);
-
-// 		elem.on("click", "#save", function() {
-// 			view.model.set("deptid", deptid);
-// 			view.model.set("courseName", view.$el.find("#courseName").val());
-// 			view.model.set("description", view.$el.find("#description").val());
-// 			view.model.set("schoolyearid", sessionStorage.getItem("gobind-activeSchoolYear"));
-// 			view.model.set("status", "active");
-// 			if (view.model.isValid(true)) {
-// 				elem.remove();
-// 				backdrop.remove();
-// 				view.model.save().then(function(data) {
-// 					if (data.status=="success") {
-// 						new TransactionResponseView({
-// 							message: "New course successfully created."
-// 						});
-// 						view.render();
-// 					}
-// 					else {
-// 						new TransactionResponseView({
-// 							title: "ERROR",
-// 							status: "error",
-// 							message: "Could not create a new course."
-// 						});
-// 					}
-// 				}).fail(function(data) {
-// 					new TransactionResponseView({
-// 						title: "ERROR",
-// 						status: "error",
-// 						message: "Could not create a new course."
-// 					});
-// 				});
-// 			}
-// 		});
-// 	},
-
-// 	updateSection: function(evt) {
-// 		var val = $(evt.currentTarget).val();
-// 		var name = $(evt.currentTarget).attr("name");
-// 		this.model.set(name, val);
-// 	}
-// });
-
-// var SectionTableRowView = Backbone.View.extend({
-// 	template: _.template("<span><strong>Time: </strong><span><%= model.day %> <%= model.startTime %> to <%= model.endTime %></span></span>"
-// 		+	"<br>"
-// 		+	"<strong>Location: </strong><span><%= model.roomLocation %></span>"
-// 		+	"<br>"
-// 		+	"<strong>Registered Students: <%= model.classSize %> (<%= model.roomCapacity %> spaces available)"
-// 		+	"<br>"
-// 		+	"<a class='enroll-link'>Edit this section</a>"
-// 		+	"<br>"),
-
-// 	initialize: function(options) {
-// 		this.parentView = options.parentView;
-// 		this.render();
-// 	},
-
-// 	render: function() {
-// 		this.$el.html(this.template({
-// 			model: this.model.toJSON()
-// 		}));
-// 	},
-
-// 	events: {
-// 		"click .enroll-link": "enrollInSection",
-// 		"click .remove-section": "removeSection"
-// 	},
-
-// 	enrollInSection: function(evt) {
-// 		var row = this.parentView.enrolledTable.row.add([
-// 			this.model.get("courseName"),
-// 			this.model.get("sectionCode"),
-// 			this.model.get("day"),
-// 			this.model.get("startTime"),
-// 			this.model.get("endTime"),
-// 			"<span class='remove-section link'>Remove</span>"
-// 			]).draw().node();
-
-// 		$(evt.currentTarget).append("<span class='glyphicon glyphicon-ok'></span>");
-// 		$(row).attr("id", this.model.get("sectionid"))
-// 		.data("section", this.model.toJSON());
-// 	},
-
-// 	removeSection: function(evt) {
-// 		this.parentView.enrolledTable
-// 		.row($(evt.currentTarget).parents("tr"))
-// 		.remove()
-// 		.draw();
-// 	}
-// });
 
 var ViewCourse = Backbone.View.extend({
 	initialize: function(options) {
@@ -972,6 +774,11 @@ var CourseSectionView = Backbone.View.extend({
             course.fetch({
                 url: course.getCourseWaitlist(view.courseid)
             }).then(function(data){
+				if (data.length == 0) {
+					var table = view.$el.find("#waitlist-table");
+					table.hide();
+					table.after("<br><div class='alert alert-danger'>No students are waitlisted for this course.</div>");
+				}
                 _.each(data, function(sec, index) {
 		            var student = new Student(sec, {parse:true});
 		            new CourseWaitlistRowView({
@@ -983,9 +790,7 @@ var CourseSectionView = Backbone.View.extend({
 		            })
 	            });
             });
-
 		});
-
 	},
 
 	addCourseSection: function() {
@@ -1075,9 +880,13 @@ var CourseSectionView = Backbone.View.extend({
 	updateModel: function(evt) {
 		var val = $(evt.currentTarget).val();
 		var name = $(evt.currentTarget).attr("name");
-		this.model.set(name, val);
-	}
 
+		if (this.name == "startTime" || this.name == "endTime") {
+			this.model.set(this.name, val.substring(0, -2));
+		} else {
+			this.model.set(name, val);
+		}
+	}
 });
 
 
@@ -1393,6 +1202,7 @@ var SectionView = Backbone.View.extend({
 
 		elem.find("h5").remove();
 		elem.find("hr").remove();
+		elem.find(".form-horizontal").removeClass("col-sm-6")
 
 		elem.modal({
 			show: true
