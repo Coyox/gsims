@@ -1,8 +1,9 @@
 var CourseEnrollmentView = Backbone.View.extend({
 	initialize: function(options) {
-		var view = this;
+		console.log(options);
 		this.results = options.results;
 		this.userid = options.userid;
+		this.regType = options.regType;
 		this.render();
 	},
 
@@ -18,8 +19,12 @@ var CourseEnrollmentView = Backbone.View.extend({
 					var option = $("<option></option>");
 					option.attr("value", object.schoolid);
 					option.text(object.location);
+					if (view.regType == "admin") {
+						option.prop("selected", object.schoolid == sessionStorage.getItem("gobind-schoolid"));
+					}
 					menu.append(option);
 				});
+				menu.trigger("change");
 			});
 		} else {
 			this.$el.html(html["courseEnrollment.html"]);

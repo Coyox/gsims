@@ -69,6 +69,7 @@ $(function() {
 	promises.push(prom2);
 
 	$.when.apply($, promises).done(function () {
+		console.log("DONE");
 	  	loadLoginTemplate();
 		loadTemplates();
 	});
@@ -185,15 +186,19 @@ function init() {
 /** Set the current school year (for all requests) */
 function setActiveSchoolYear(def) {
 	var schoolyear = new SchoolYear();
+	var schoolid = sessionStorage.getItem("gobind-schoolid");
 	schoolyear.fetch({
 		url: schoolyear.getActiveSchoolYearUrl(),
 		data: {
 			schoolid: sessionStorage.getItem("gobind-schoolid")
 		}
 	}).then(function(data) {
+		console.log(data);
 		app.currentSchoolYear = data.schoolyear;
 		app.currentSchoolYearId = data.schoolyearid;
 		sessionStorage.setItem("gobind-activeSchoolYear", data.schoolyearid);
+		def.resolve();
+	}).fail(function(xhr) {
 		def.resolve();
 	});
 	return def;

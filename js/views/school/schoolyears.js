@@ -167,7 +167,10 @@ var SchoolYearView = Backbone.View.extend({
 			if (model.hasChanged("status")) {
 				model.set("schoolid", sessionStorage.getItem("gobind-schoolid"));
 				var promise = model.save(null, {
-					url: this.model.updateActiveYearUrl(id)
+					url: this.model.updateActiveYearUrl(id), 
+					data: {
+						schoolid: sessionStorage.getItem("gobind-schoolid")
+					}
 				});
 				promises.push(promise);
 			} else if (model.hasChanged("openForReg")) {

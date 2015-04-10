@@ -23,9 +23,10 @@ var RegistrationFormView = Backbone.View.extend({
 			el: this.$el.find("#info-form"),
 			regType: this.regType
 		});
-
+		console.log(this.regType);
 		this.regSectionsView = new RegSectionsView({
-			el: this.$el.find("#sections-form")
+			el: this.$el.find("#sections-form"),
+			regType: this.regType
 		});
 
 		if (this.regType == "online") {
@@ -331,16 +332,19 @@ var RegStudentInfo = Backbone.View.extend({
 });
 
 var RegSectionsView = Backbone.View.extend({
-	initialize: function() {
+	initialize: function(options) {
 		this.sections = [];
+		this.regType = options.regType;
 		this.render();
 	},
 
 	render: function() {
 		var view = this;
+		console.log(this.regType);
 		this.courseEnrollmentView = new CourseEnrollmentView({
 			el: this.el,
-			results: true
+			results: true,
+			regType: this.regType
 		});
 	},
 

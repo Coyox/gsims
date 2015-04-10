@@ -12,10 +12,16 @@ var LoginView = Backbone.View.extend({
 		schoolyear.fetch({
 			url: schoolyear.getActiveSchoolYearUrl(),
 			data: {
-				schoolid: sessionStorage.getItem("gobind-schoolid")
+				schoolid: sessionStorage.getItem("gobind-schoolid") || 863941
 			}
 		}).then(function(data) {
 			view.$el.html(html["login.html"]);
+
+			var key = sessionStorage.getItem("gobind-schoolid");
+			if (sessionStorage.getItem("gobind-schoolid") == null) {
+				sessionStorage.setItem("gobind-schoolyearid", data.schoolyearid);
+			}
+
 			if (data.openForReg == 1) {
 				view.$el.find("#reg-open").removeClass("hide").show();
 			} else {
