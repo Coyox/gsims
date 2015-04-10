@@ -249,13 +249,15 @@ function getLoginById($id){
 # School Years
 #================================================================================================================#
 function getSchoolYears(){
-    $sql = "SELECT * from schoolyear order by schoolyear desc";
-    echo json_encode(perform_query($sql,'GETALL'));
+    $schoolid = $_GET["schoolid"];
+    $sql = "SELECT s.schoolid, s.schoolyearid, s.oepnForReg, sy.status from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
+    echo json_encode(perform_query($sql,'GETALL', array("schoolid"=>$schoolid)));
 }
 
 function getActiveSchoolYear(){
-    $sql = "SELECT schoolyearid, schoolyear, openForReg from schoolyear where status='active' limit 1 ";
-    echo json_encode(perform_query($sql, 'GET'));
+    $schoolid = $_GET["schoolid"];
+    $sql = "SELECT s.schoolyearid, s.schoolyear, s.openForReg from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid and sy.status='active' limit 1 ";
+    echo json_encode(perform_query($sql, 'GET', array("schoolid"=>$schoolid)));
 }
 
 function createSchoolYear(){
@@ -1320,7 +1322,7 @@ function massCreateStudents($students, $schoolyearid) {
     emergencyContactPhoneNumber, schoolid, paid, status) values ";
 
     $studentyear_sql = "INSERT into student_year (userid, schoolyearid) values ";
-    $studentyear_params = array();
+    $studentyear_params = array("schoolyearid"=>$schoolyearid);
 
     $insertbindparams = array();
     foreach (array_values($students) as $i => $student) {
@@ -2499,8 +2501,9 @@ function purgeInactive(){
 # Stats
 #================================================================================================================#
 function getStudentGeographics($schoolid){
-    $sql = "SELECT city, count(*) as studentCount from student where schoolid=:schoolid group by city";
-    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
+    $schoolyearid= $_GET["schoolyearid"];
+    $sql = "SELECT s.city, count(*) as studentCount from student s, student_year sy where s.schoolid=:schoolid and s.userid=sy.userid and sy.schoolyearid=:schoolyearid group by city";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid, "schoolyearid"=>$schoolyearid)));
 }
 function getAttendanceStats($schoolid){
     $schoolyearid = $_GET["schoolyearid"];
@@ -2508,12 +2511,14 @@ function getAttendanceStats($schoolid){
     echo json_encode(perform_query($sql,'GETASSO',array("schoolyearid"=>$schoolyearid, "schoolid"=>$schoolid)));
 }
 function getStudentGenderStats($schoolid){
-    $sql = "SELECT gender, count(*) as studentCount from student where schoolid=:schoolid group by gender";
-    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
+    $schoolyearid= $_GET["schoolyearid"];
+    $sql = "SELECT s.gender, count(*) as studentCount from student s, student_year sy where s.schoolid=:schoolid and s.userid=sy.userid and sy.schoolyearid=:schoolyearid group by gender";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid, "schoolyearid"=>$schoolyearid)));
 }
 function getStudentAgeStats($schoolid){
-    $sql = "SELECT (year(Now())-year(dateOfBirth)) as age, count(*) as studentCount from student where schoolid=:schoolid group by year(dateOfBirth)";
-    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid)));
+    $schoolyearid= $_GET["schoolyearid"];
+    $sql = "SELECT (year(Now())-year(s.dateOfBirth)) as age, count(*) as studentCount from student s, student_year sy where s.schoolid=:schoolid and s.userid=sy.userid and sy.schoolyearid=:schoolyearid group by year(dateOfBirth)";
+    echo json_encode(perform_query($sql,'GETASSO',array("schoolid"=>$schoolid, "schoolyearid"=>$schoolyearid)));
 }
 #================================================================================================================#
 # Key

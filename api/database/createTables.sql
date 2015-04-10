@@ -22,6 +22,15 @@ CREATE TABLE IF NOT EXISTS `school` (
   `lastAccessed` timestamp NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS `school_schoolyear` (
+  `schoolid` int(11) NOT NULL,
+  `schoolyearid` int(11) NOT NULL,
+  `status` char(8) NOT NULL,
+  PRIMARY KEY(`schoolid`, `schoolyearid`),
+  FOREIGN KEY (`schoolid`) REFERENCES `school` (`schoolid`) ON DELETE CASCADE,
+  FOREIGN KEY (`schoolyearid`) REFERENCES `schoolyear` (`schoolyearid`) ON DELETE CASCADE
+ );
+
 
 CREATE TABLE IF NOT EXISTS `department` (
   `deptid` int(11) PRIMARY KEY NOT NULL,
