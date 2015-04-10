@@ -663,27 +663,31 @@ var ReportCardView = Backbone.View.extend({
 		var view = this;
 		var id = this.model.get("userid");
 		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
+			var promises = [];
+
 			_.each(data, function(object, index) {
 				var section = new Section(object, {parse:true});
+				
+				var def = $.Deferred();
+				promises.push(def);
+
 				new ReportCardRowView({
 					el: view.addRow(),
 					model: section,
-					id: id
+					id: id,
+					def: def
 				});
 			}, this);
 
-			view.table = view.$el.find("#report-card-table").dataTable({
-	      	// aoColumnDefs: [
-	       //    	{ bSortable: false, aTargets: [ 4, 5 ] },
-	       //    	{ sClass: "center", aTargets: [ 4, 5 ] },
-	       //    	{ sWidth: "10%", aTargets: [ 5 ] }
-	       // 	],
-			// dom: dataTables.exportDom,
-			// tableTools: {
-   //     			 aButtons: dataTables.buttons,
-   // 			 	 sSwfPath: dataTables.sSwfPath
-   //  		}
-		});
+			$.when.apply($, promises).then(function() {
+				view.table = view.$el.find("#report-card-table").dataTable({
+					dom: dataTables.exportDom,
+					tableTools: {
+		       			 aButtons: dataTables.buttons,
+		   			 	 sSwfPath: dataTables.sSwfPath
+		    		}
+				});
+			});
 		});
 
 	},
@@ -759,6 +763,7 @@ var ReportCardRowView = Backbone.View.extend({
 		+	"<td><%= grade %></td>"),
 
 	initialize: function(options) {
+		this.def = options.def;
 		this.render();
 	},
 
@@ -784,13 +789,15 @@ var ReportCardRowView = Backbone.View.extend({
 			}).then(function(data){
 				var grade = data.studentGrade;
 				view.$el.html(view.template({
-				model: view.model.toJSON(),
-				teacher: names,
-				grade: grade
-			}))});
+					model: view.model.toJSON(),
+					teacher: names,
+					grade: grade
+				}));
+
+				view.def.resolve();
+			});
 		});
 	},
-
 });
 
 function dlReportCardPDF() {
