@@ -291,11 +291,10 @@ var StudentsTableView = Backbone.View.extend({
 	},
 
 	render: function() {
-		storeContent();
-
 		if (this.template) {
 			this.$el.html(html[this.template]);
 		} else {
+			console.log(this.el);
 			this.$el.html(html["viewStudents.html"]);
 		}
 

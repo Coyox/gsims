@@ -8,6 +8,8 @@ var StudentRecordView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 
+		this.$el.html(html["viewStudent.html"]);
+
 		var student = new Student();
 		student.set("id", this.id);
 		student.fetch().then(function(data) {
