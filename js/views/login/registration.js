@@ -132,7 +132,11 @@ var RegistrationFormView = Backbone.View.extend({
 		var finalStudent = new Student(studentModel.toJSON(), {parse:true});
 
 		setDateOfBirth(finalStudent);
-		finalStudent.save().then(function(data) {
+		finalStudent.save(null, {
+			data: {
+				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
+			}
+		}).then(function(data) {
 			if (typeof data == "string") {
 				data = JSON.parse(data);
 			}
