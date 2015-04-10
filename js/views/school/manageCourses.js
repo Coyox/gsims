@@ -1908,7 +1908,6 @@ var AttendanceView = Backbone.View.extend({
 		var totalAttendedStudents = 0;
 		var numAttendanceRecords = 0;
 		var totalEnrolled = 0;
-		var ready = 0;
 
 		// Get enrolled students
 		var enrolledStudents = [];
