@@ -5,8 +5,6 @@ var SuperusersTableView = Backbone.View.extend({
 	},
 
 	render: function() {
-		storeContent();
-
 		this.$el.html(html["viewSuperusers.html"]);
 		if (this.results) {
 			this.populateQueryResults(this.results);

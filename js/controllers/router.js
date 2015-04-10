@@ -67,12 +67,6 @@ var Router = Backbone.Router.extend({
         "teachers/:id/A":       "viewAdmin",
         "createTeacher/A":      "createAdmin",
 
-        // "filterAdmins": 		"filterAdmins",
-        // "admins/search": 		"viewFilteredAdmins",
-        // "admins/all": 			"viewAllAdmins",
-        // "admins/:id": 			"viewAdmin",
-        // "createAdmin":          "createAdmin",
-
         "superusers/all":       "viewAllSuperusers",
         "superusers/:id":       "viewSuperuser",
         "createSuperuser":      "createSuperuser",
