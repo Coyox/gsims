@@ -1,3 +1,19 @@
+/* *******************************************************************************
+ *  This file contains all the widgets displayed on the dashboard page.
+ *		- statistics
+ *		- notifications
+ *		- attendance calendar
+ * 		- weekly calendar
+ *		- my sections
+ *		- attendance reminder
+ *		- pie charts (location, gender, age)
+ *		- student report card and attendance
+ *	The widgets are displayed based on usertype. 
+ * ******************************************************************************* */
+
+/**
+ *	View to display the main dashboard page.
+ */
 var DashboardView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -5,16 +21,15 @@ var DashboardView = Backbone.View.extend({
 
 	render: function() {
 		var template = html["dashboard.html"];
+
+		// Get usertype
 		var usertype = sessionStorage.getItem("gobind-usertype");
 		template = template({
 			usertype: usertype
 		});
 		this.$el.html(template);
 
-		// User info (all users)
-		this.populateUser();
-
-		// School statistics and notification management
+		// School statistics, notificaations, attendance calendar
 		if (usertype == "SU" || usertype == "A") {
 			this.populateStats();
 			this.populateNotifications();
@@ -25,17 +40,21 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#admin-attendance").remove();
 		}
 
+		// Weekly calendar
 		if (usertype == "SU" || usertype == "A" || usertype == "T") {
 			this.calendarWidget(usertype);
 		} else {
 			this.$el.find("#calendar-panel").remove();
 		}
 
+		// My sections 
 		if (usertype == "T"){
 			this.mySectionsWidget();
-		} else
+		} else {
 			this.$el.find("#my-sections").remove();
+		}
 
+		// Teacher attendance reminder, pie charts
 		if (usertype == "SU" || usertype == "A") {
 			this.teacherAttendanceReminder();
 			this.studentGeoGraph();
@@ -45,6 +64,7 @@ var DashboardView = Backbone.View.extend({
 			this.$el.find("#pie-charts").remove();
 		}
 
+		// Student report card and attendance
 		if (usertype == "S") {
 			this.displayStudentDashboard();
 		} else {
@@ -60,16 +80,26 @@ var DashboardView = Backbone.View.extend({
 		"change #day-menu": "teacherAttendanceReminder"
 	},
 
+	/**
+	 *	Displays a widget that shows all the sections a teacher is currently teaching
+	 */
 	mySectionsWidget: function(){
 		new MySectionsView({
             el: this.$el.find("#my-sections").find("#sections")
         });
 	},
 
+	/**
+	 *	Navigates to the nofications page when the noficiation alert is clicked
+	 */
 	viewNotification: function() {
 		app.Router.navigate("notifications", {trigger:true});
 	},
 
+	/**
+	 *	Populates the notifications alert with the number of pending students
+	 *	and number of students waiting to take a test
+	 */
 	populateNotifications: function() {
 		this.$el.find("#pending-notifications").removeClass("hide").show();
 
@@ -94,24 +124,6 @@ var DashboardView = Backbone.View.extend({
 		});
 
 		var count = new Count();
-		// count.fetch({
-		// 	url: count.getCountUrl("S"),
-		// 	data: {
-		// 		status: "pending",
-		// 		enrollment: "pending",
-		// 		schoolid: sessionStorage.getItem("gobind-schoolid"),
-		// 		schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-		// 	}
-		// }).then(function(data) {
-		// 	var parent = view.$el.find("#pending-stats");
-		// 	parent.find(".count").text(data);
-		// 	if (data != "0") {
-		// 		parent.find(".alert").removeClass("alert-success").addClass("alert-danger");
-		// 	} else {
-		// 		parent.find(".alert").removeClass("alert-danger").addClass("alert-success");
-		// 	}
-		// });
-
 		student.fetch({
 			url: student.getSearchStudentsUrl(sessionStorage.getItem("gobind-schoolid")),
 			data: {
@@ -131,16 +143,15 @@ var DashboardView = Backbone.View.extend({
 		});
 	},
 
-	populateUser: function() {
-		var parent = this.$el.find("#user-panel");
-		var object = JSON.parse(sessionStorage.getItem("gobind-login"));
-		parent.find(".username").text(sessionStorage.getItem("gobind-username"));
-		parent.find(".last-logged-in").text(object.lastLogin);
-	},
-
+	/**
+	 *	Populates the school statistic panel with the number of students, 
+	 *	teachers, admins, superusers and sections in the school
+	 */
 	populateStats: function() {
 		var parent = this.$el.find("#stats-panel");
 		var count = new Count();
+
+		// STUDENTS
 		count.fetch({
 			url: count.getCountUrl("S"),
 			data: {
@@ -149,6 +160,8 @@ var DashboardView = Backbone.View.extend({
 		}).then(function(data) {
 			parent.find(".students").text(data);
 		});
+
+		// TEACHERS
 		count.fetch({
 			url: count.getCountUrl("T"),
 			data: {
@@ -157,6 +170,8 @@ var DashboardView = Backbone.View.extend({
 		}).then(function(data) {
 			parent.find(".teachers").text(data);
 		});
+
+		// ADMINS
 		count.fetch({
 			url: count.getCountUrl("A"),
 			data: {
@@ -165,6 +180,8 @@ var DashboardView = Backbone.View.extend({
 		}).then(function(data) {
 			parent.find(".administrators").text(data);
 		});
+
+		// SUPERUSERS
 		count.fetch({
 			url: count.getCountUrl("SU"),
 			data: {
@@ -173,6 +190,8 @@ var DashboardView = Backbone.View.extend({
 		}).then(function(data) {
 			parent.find(".superusers").text(data);
 		});
+
+		// SECTIONS
 		count.fetch({
 			url: count.getSectionCountURL(),
 			data: {
@@ -184,6 +203,10 @@ var DashboardView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Displays an attendance reminder widget that checks to see when a 
+	 * 	teacher last inputted attendance
+	 */
 	teacherAttendanceReminder: function(evt) {
 		if (this.reminderTable) {
 			this.reminderTable.fnDestroy();
@@ -220,20 +243,32 @@ var DashboardView = Backbone.View.extend({
 				schoolid: sessionStorage.getItem("gobind-schoolid")
 			}
 		}).then(function(data) {
-			_.each(data, function(teacher, index) {
-				var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
-				view.$el.find("#teacher-reminder-table").append(row);
-			});
-			view.reminderTable = view.$el.find("#teacher-reminder-table").dataTable({
-				dom: "t"
-			});
+			if (data.length == 0) {
+				view.$el.find("#teacher-reminder-table").hide();
+				view.$el.find("#teacher-reminder-table").after("<br><span>There are no teachers that have not inputted attendance.</span>");
+			} else {
+				_.each(data, function(teacher, index) {
+					var row = "<tr data-email='" + teacher.emailAddr + "'><td>" + teacher.firstName + " " + teacher.lastName + "</td><td>" + teacher.maxdate + "<td><input type='checkbox' class='email' checked></td></tr>"
+					view.$el.find("#teacher-reminder-table").append(row);
+				});
+				view.reminderTable = view.$el.find("#teacher-reminder-table").dataTable({
+					dom: "t"
+				});
+			}
 		});
 	},
 
+	/**
+	 *	Opens up an email modal to email all teachers that have yet to
+	 * 	input attendance within the last X number of days
+	 */
 	openEmailModal: function(evt) {
 		openEmailWrapper(this.reminderTable.fnGetNodes());
 	},
 
+	/**
+	 *	Enlarges the weekly calendar widget in a popup
+	 */
 	toggleCalendar: function(evt) {
 		this.$el.append(html["viewCalendar.html"]);
 
@@ -247,11 +282,15 @@ var DashboardView = Backbone.View.extend({
 		this.calendarWidget(sessionStorage.getItem("gobind-usertype"), elem.find("#calendar"));
 	},
 
+	/**
+	 *	Displays a weekly calendar widget that shows the courses running this week
+	 */
 	calendarWidget: function(usertype, elem) {
 		var view = this;
-		var elem = elem || view.$el.find("#calendar")
-		var mon = [], tue = [], wed = [], thu = [], fri = [], sat = [], sun = [];
+		var elem = elem || view.$el.find("#calendar");
 
+		// Get the sections that the teacher is currently teaching, or all sections
+		// if the usertype is SU/A
 		var def = $.Deferred();
 		if (usertype == "T") {
 			var user = JSON.parse(sessionStorage.getItem("gobind-user"));
@@ -274,293 +313,104 @@ var DashboardView = Backbone.View.extend({
 			});
 		}
 
+		var mon = [], tue = [], wed = [], thu = [], fri = [], sat = [], sun = [];
+
 		$.when(def).then(function(data) {
-			// Get all sections
-			_.each(data, function(section, index) {
-				// Get all days for a section
-				var days = section.day.split(",");
-				_.each(days, function(day, index) {
-					var obj = {
-						start: section.startTime,
-						end: section.endTime,
-						courseName: section.courseName
-					};
-					switch (day) {
-						case "MON":
-						mon.push(obj);
-						break;
-						case "TUE":
-						tue.push(obj);
-						break;
-						case "WED":
-						wed.push(obj);
-						break;
-						case "THU":
-						thu.push(obj);
-						break;
-						case "FRI":
-						fri.push(obj);
-						break;
-						case "SAT":
-						sat.push(obj);
-						break;
-						case "SUN":
-						sun.push(obj);
-						break;
-						default:
-						break;
+			if (data.length == 0) {
+				elem.closest(".panel-body").text("There are no sections to display.");
+			} else {
+				// Get all sections
+				_.each(data, function(section, index) {
+					// Get all days for a section
+					var days = section.day.split(",");
+					_.each(days, function(day, index) {
+						var obj = {
+							start: section.startTime,
+							end: section.endTime,
+							courseName: section.courseName
+						};
+						switch (day) {
+							case "MON":
+							mon.push(obj);
+							break;
+							case "TUE":
+							tue.push(obj);
+							break;
+							case "WED":
+							wed.push(obj);
+							break;
+							case "THU":
+							thu.push(obj);
+							break;
+							case "FRI":
+							fri.push(obj);
+							break;
+							case "SAT":
+							sat.push(obj);
+							break;
+							case "SUN":
+							sun.push(obj);
+							break;
+							default:
+							break;
+						}
+					});
+				});
+
+				// Initialize the calendar widget
+				elem.fullCalendar({
+					defaultView: usertype == "T" ? "agendaWeek" : "basicWeek",
+					editable: false,
+					eventLimit: true,
+					views: {
+						agenda: {
+							eventLimit: 3
+						}
+					},
+					eventRender: function(event, element) {
+						element.popover({
+							title: event.title,
+							placement:'auto',
+							html:true,
+							trigger : 'click',
+							animation : 'true',
+							content: event.description,
+							container:'body'
+						});
+						$('body').on('click', function (e) {
+							if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
+								element.popover('hide');
+						});
 					}
 				});
-			});
 
-			elem.fullCalendar({
-				defaultView: usertype == "T" ? "agendaWeek" : "basicWeek",
-				editable: false,
-				eventLimit: true,
-				views: {
-					agenda: {
-						eventLimit: 3
+				// Populate the calendar with events (sections)
+				elem.fullCalendar( 'addEventSource',
+					function(start, end, status, callback) {
+						var events = [];
+
+						for (loop = start._d.getTime(); loop <= end._d.getTime(); loop = loop + (24 * 60 * 60 * 1000)) {
+							var test_date = new Date(loop);
+							var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
+							_.each(day, function(section, index) {
+								events.push({
+									title: section.courseName,
+									start: view.getStartTime(test_date, section),
+									end: view.getEndTime(test_date, section),
+									description: section.description,
+								});
+							});
+						}
+						callback( events );
 					}
-				},
-				eventRender: function(event, element) {
-					element.popover({
-						title: event.title,
-						placement:'auto',
-						html:true,
-						trigger : 'click',
-						animation : 'true',
-						content: event.description,
-						container:'body'
-					});
-					$('body').on('click', function (e) {
-						if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-							element.popover('hide');
-					});
-				}
-			});
-
-			elem.fullCalendar( 'addEventSource',
-				function(start, end, status, callback) {
-					var events = [];
-
-					for (loop = start._d.getTime();
-						loop <= end._d.getTime();
-						loop = loop + (24 * 60 * 60 * 1000)) {
-						var test_date = new Date(loop);
-					var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-					_.each(day, function(section, index) {
-						events.push({
-							title: section.courseName,
-							start: view.getStartTime(test_date, section),
-							end: view.getEndTime(test_date, section),
-							description: section.description,
-						});
-					});
-				}
-				callback( events );
-				}
-			);
+				);
+			}
 		});
-
-
-	// 		var teacher = new Teacher();
-	// 		teacher.fetch({
-	// 			url: teacher.getTeachingSectionsUrl(userid)
-	// 		}).then(function(data){
-	// 			console.log(data);
-	// 			// Get all sections
-	// 			_.each(data, function(section, index) {
-	// 			// Get all days for a section
-	// 			var days = section.day.split(",");
-	// 			_.each(days, function(day, index) {
-	// 					var obj = {
-	// 						start: section.startTime,
-	// 						end: section.endTime,
-	// 						courseName: section.courseName,
-	// 					};
-	// 					switch (day) {
-	// 						case "MON":
-	// 						mon.push(obj);
-	// 						break;
-	// 						case "TUE":
-	// 						tue.push(obj);
-	// 						break;
-	// 						case "WED":
-	// 						wed.push(obj);
-	// 						break;
-	// 						case "THU":
-	// 						thu.push(obj);
-	// 						break;
-	// 						case "FRI":
-	// 						fri.push(obj);
-	// 						break;
-	// 						case "SAT":
-	// 						sat.push(obj);
-	// 						break;
-	// 						case "SUN":
-	// 						sun.push(obj);
-	// 						break;
-	// 						default:
-	// 						break;
-	// 					}
-	// 				});
-	// 			});
-
-	// 			elem.fullCalendar({
-	// 				defaultView: "basicWeek",
-	// 				editable: false,
-	// 				eventLimit: true,
-	// 				views: {
-	// 					agenda: {
-	// 						eventLimit: 3
-	// 					}
-	// 				},
-	// 				eventRender: function(event, element) {
-	// 					element.popover({
-	// 						title: event.title,
-	// 						placement:'auto',
-	// 						html:true,
-	// 						trigger : 'click',
-	// 						animation : 'true',
-	// 						content: event.description,
-	// 						container:'body'
-	// 					});
-	// 					$('body').on('click', function (e) {
-	// 						if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-	// 							element.popover('hide');
-	// 					});
-	// 				}
-
-	// 			});
-
-	// 			console.log(mon,tue,wed,thu,fri,sat,sun);
-
-	// 			elem.fullCalendar( 'addEventSource',
-	// 				function(start, end, status, callback) {
-	// 					var events = [];
-
-	// 					for (loop = start._d.getTime();
-	// 						loop <= end._d.getTime();
-	// 						loop = loop + (24 * 60 * 60 * 1000)) {
-	// 						var test_date = new Date(loop);
-
-	// 					var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-	// 					_.each(day, function(section, index) {
-	// 						events.push({
-	// 							title: section.courseName,
-	// 							start: view.getStartTime(test_date, section),
-	// 							end: view.getEndTime(test_date, section),
-	// 							description: section.description,
-	// 								//sectionCode: section.sectionCode
-
-	// 							});
-	// 					});
-	// 					console.log(events);
-	// 				}
-	// 				callback( events );
-	// 				}
-	// 			);
-	// 		});
-
-	// 	}
-	// 	else {
-	// var section = new Section();
-	// section.fetch({
-	// 	data: {
-	// 		schoolid: sessionStorage.getItem("gobind-schoolid"),
-	// 		schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
-	// 	}
-	// }).then(function(data) {
-	// 		// Get all sections
-	// 		_.each(data, function(section, index) {
-	// 			// Get all days for a section
-	// 			var days = section.day.split(",");
-	// 			_.each(days, function(day, index) {
-	// 				var obj = {
-	// 					start: section.startTime,
-	// 					end: section.endTime,
-	// 					courseName: section.courseName
-	// 				};
-	// 				switch (day) {
-	// 					case "MON":
-	// 					mon.push(obj);
-	// 					break;
-	// 					case "TUE":
-	// 					tue.push(obj);
-	// 					break;
-	// 					case "WED":
-	// 					wed.push(obj);
-	// 					break;
-	// 					case "THU":
-	// 					thu.push(obj);
-	// 					break;
-	// 					case "FRI":
-	// 					fri.push(obj);
-	// 					break;
-	// 					case "SAT":
-	// 					sat.push(obj);
-	// 					break;
-	// 					case "SUN":
-	// 					sun.push(obj);
-	// 					break;
-	// 					default:
-	// 					break;
-	// 				}
-	// 			});
-	// 		});
-
-	// 		elem.fullCalendar({
-	// 			defaultView: "basicWeek",
-	// 			editable: false,
-	// 			eventLimit: true,
-	// 			views: {
-	// 				agenda: {
-	// 					eventLimit: 3
-	// 				}
-	// 			},
-	// 			eventRender: function(event, element) {
-	// 				element.popover({
-	// 					title: event.title,
-	// 					placement:'auto',
-	// 					html:true,
-	// 					trigger : 'click',
-	// 					animation : 'true',
-	// 					content: event.description,
-	// 					container:'body'
-	// 				});
-	// 				$('body').on('click', function (e) {
-	// 					if (!element.is(e.target) && element.has(e.target).length === 0 && $('.popover').has(e.target).length === 0)
-	// 						element.popover('hide');
-	// 				});
-	// 			}
-	// 		});
-
-	// 		elem.fullCalendar( 'addEventSource',
-	// 			function(start, end, status, callback) {
-	// 				var events = [];
-
-	// 				for (loop = start._d.getTime();
-	// 					loop <= end._d.getTime();
-	// 					loop = loop + (24 * 60 * 60 * 1000)) {
-	// 					var test_date = new Date(loop);
-	// 				var day = test_date.is().monday()? mon: test_date.is().tuesday()? tue : test_date.is().wednesday()? wed : test_date.is().thursday()? thu : test_date.is().friday()? fri : test_date.is().saturday()? sat : sun;
-	// 				_.each(day, function(section, index) {
-	// 					events.push({
-	// 						title: section.courseName,
-	// 						start: view.getStartTime(test_date, section),
-	// 						end: view.getEndTime(test_date, section),
-	// 						description: section.description,
-	// 					});
-	// 				});
-	// 			}
-
-	// 			callback( events );
-	// 		}
-	// 		);
-	// 	});
-	// 	}
 	},
 
+	/**
+	 *	Returns a date object with the section's startTime
+	 */
 	getStartTime: function(test_date, section) {
 		var start = new Date(test_date.getTime());
 		var str = section.start.split(":");
@@ -569,6 +419,9 @@ var DashboardView = Backbone.View.extend({
 		return start;
 	},
 
+	/**
+	 *	Returns a date object with the section's endTime
+	 */
 	getEndTime: function(test_date, section) {
 		var end = new Date(test_date.getTime());
 		var str = section.end.split(":");
@@ -577,6 +430,9 @@ var DashboardView = Backbone.View.extend({
 		return end;
 	},
 
+	/**
+	 *	Displays a pie chart that shows student location information
+	 */
 	studentGeoGraph:function(){
 		var view = this;
 		var stats = new Stats();
@@ -584,30 +440,36 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getGeoStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
-				dataArray.push(city);
-			});
+			if (data.length == 0) {
+				view.$el.find("#location-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var city = [model.get("city").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}), parseInt(model.get("studentCount"))];
+					dataArray.push(city);
+				});
 
-			if (dataArray.length > 1){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		//title: "Location",
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:0,right:0,top:0}
+				if (dataArray.length > 1){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
 
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-location-piechart').get(0));
-	        	chart.draw(data, options);
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-location-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
 
+	/**
+	 *	Displays a pie chart that shows student gender information
+	 */
 	studentGenderGraph:function(){
 		var view = this;
 		var stats = new Stats();
@@ -615,31 +477,36 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getGenderStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
-				dataArray.push(gender);
-			});
-			if (dataArray.length > 1){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		//title: "Gender",
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:0,right:0,top:0},
-	          		// chartArea:{left:10,top:20,width:"100%",height:"100%"},
-	          		colors:['#00B88A','#9d426b']
+			if (data.length == 0) {
+				view.$el.find("#gender-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var gender = [model.get("gender"), parseInt(model.get("studentCount"))];
+					dataArray.push(gender);
+				});
+				if (dataArray.length > 1){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
+		          		colors:['#00B88A','#9d426b']
 
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
-	        	chart.draw(data, options);
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-gender-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
 
+	/**
+	 *	Displays a pie chart that shows student age information
+	 */
 	studentAgeGraph:function(){
 		var view = this;
 		var stats = new Stats();
@@ -655,46 +522,52 @@ var DashboardView = Backbone.View.extend({
 		stats.fetch({
 			url: stats.getAgeStatsUrl(sessionStorage.getItem("gobind-schoolid"))
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var age = parseInt(model.get("age"));
-				var studentcount = parseInt(model.get("studentCount"));
-				if (age <= 17){ kids += studentcount; }
-				if (18 <= age && age <= 24){ teens += studentcount; }
-				if (25 <= age && age <= 34){ youngadults += studentcount; }
-				if (35 <= age && age <= 44){ adults += studentcount; }
-				if (45 <= age && age <= 54){ oldadults += studentcount; }
-				if (55 <= age && age <= 64){ seniors += studentcount; }
-				if (age >= 65){ elderly += studentcount; }
-			});
+			if (data.length == 0) {
+				view.$el.find("#age-panel .panel-body").text("No location statistics to display");
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var age = parseInt(model.get("age"));
+					var studentcount = parseInt(model.get("studentCount"));
+					if (age <= 17){ kids += studentcount; }
+					if (18 <= age && age <= 24){ teens += studentcount; }
+					if (25 <= age && age <= 34){ youngadults += studentcount; }
+					if (35 <= age && age <= 44){ adults += studentcount; }
+					if (45 <= age && age <= 54){ oldadults += studentcount; }
+					if (55 <= age && age <= 64){ seniors += studentcount; }
+					if (age >= 65){ elderly += studentcount; }
+				});
 
-			dataArray.push(['0-17', kids]);
-			dataArray.push(['18-24', teens]);
-			dataArray.push(['25-32', youngadults]);
-			dataArray.push(['35-44', adults]);
-			dataArray.push(['45-54', oldadults]);
-			dataArray.push(['55-64', seniors]);
-			dataArray.push(['65+', elderly]);
+				dataArray.push(['0-17', kids]);
+				dataArray.push(['18-24', teens]);
+				dataArray.push(['25-32', youngadults]);
+				dataArray.push(['35-44', adults]);
+				dataArray.push(['45-54', oldadults]);
+				dataArray.push(['55-64', seniors]);
+				dataArray.push(['65+', elderly]);
 
 
-			if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
-				view.$el.find("#demographics-label").removeClass("hide").show();
-				var data = google.visualization.arrayToDataTable(dataArray);
-	        	var options = {
-	          		//title: "Age",
-	          		is3D: true,
-	          		legend: {
-	          			position: "bottom"
-	          		},
-	          		chartArea:{left:0,right:0,top:0}
-	          		// chartArea:{left:10,top:20,width:"100%",height:"100%"}
-	      		}
-	        	var chart = new google.visualization.PieChart(view.$el.find('#student-age-piechart').get(0));
-	        	chart.draw(data, options);
+				if (kids!=0|teens!=0|youngadults!=0|adults!=0|oldadults!=0|seniors!=0|elderly!=0){
+					view.$el.find("#demographics-label").removeClass("hide").show();
+					var data = google.visualization.arrayToDataTable(dataArray);
+		        	var options = {
+		          		is3D: true,
+		          		legend: {
+		          			position: "bottom"
+		          		},
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"},
+		      		}
+		        	var chart = new google.visualization.PieChart(view.$el.find('#student-age-piechart').get(0));
+		        	chart.draw(data, options);
+				}
 			}
 		});
 	},
 
+	/**
+	 *	Displays an attendance trend widget that shows the number of students
+	 *	who attended on a given day  
+	 */
 	attendanceCalendar:function(){
 		var view = this;
 		var stats = new Stats();
@@ -706,34 +579,41 @@ var DashboardView = Backbone.View.extend({
 				schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")
 			}
 		}).then(function(data) {
-			_.each(data, function(object, index) {
-				var model = new Stats(object, {parse:true});
-				var date = model.get("date").split("-");
-				var year = date[0];
-				var month = date[1];
-				var day = date[2];
-				var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
-				dataArray.push(stat);
-			});
+			if (data.length == 0) {
+				view.$el.find("#admin-attendance .panel-body").text("There are no attendance records to be displayed.")
+			} else {
+				_.each(data, function(object, index) {
+					var model = new Stats(object, {parse:true});
+					var date = model.get("date").split("-");
+					var year = date[0];
+					var month = date[1];
+					var day = date[2];
+					var stat = [new Date(year, month, day), parseInt(model.get("totalAttendance"))];
+					dataArray.push(stat);
+				});
 
-			if (dataArray){
-				var dataTable = new google.visualization.DataTable();
-				dataTable.addColumn({ type: 'date', id: 'Date' });
-	       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
-	       		dataTable.addRows(dataArray);
+				if (dataArray){
+					var dataTable = new google.visualization.DataTable();
+					dataTable.addColumn({ type: 'date', id: 'Date' });
+		       		dataTable.addColumn({ type: 'number', id: 'Attendance' });
+		       		dataTable.addRows(dataArray);
 
-		    	var options = {
-	          		title: "School Attendance",
-	          		height: 200,
-	          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
-	      		}
+			    	var options = {
+		          		title: "School Attendance",
+		          		height: 200,
+		          		chartArea:{left:10,top:20,width:"100%",height:"100%"}
+		      		}
 
-	        	var chart = new google.visualization.Calendar(view.$el.find('#calendar_basic').get(0));
-	        	chart.draw(dataTable, options);
+		        	var chart = new google.visualization.Calendar(view.$el.find('#calendar_basic').get(0));
+		        	chart.draw(dataTable, options);
+				}
 			}
 		});
 	},
 
+	/**
+	 *	Displays a student's report card and attendance report on their dashboard page
+	 */
 	displayStudentDashboard: function() {
 		var view = this;
 		var user = JSON.parse(sessionStorage.getItem("gobind-user"));

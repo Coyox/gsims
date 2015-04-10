@@ -1,3 +1,6 @@
+/**
+ *	View to display the export page.
+ */
 var ExportView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -5,7 +8,6 @@ var ExportView = Backbone.View.extend({
 
 	render: function() {
 		this.$el.html(html["export.html"]);
-		this.loadOptions();
 	},
 
 	events: {
@@ -15,22 +17,9 @@ var ExportView = Backbone.View.extend({
 		"click #exportSections": "exportSections",
 	},
 
-	loadOptions: function(){
-		var x = document.getElementById("schoolid");
-		var school = new School();
-		school.fetch({
-			url: school.getSchoolsUrl(),
-		}).then(function(data){
-			console.log(data);
-			_.each(data, function(object,index){
-				var option = document.createElement("option");
-				option.id = object.schoolid;
-				option.text = object.location + " (" + object.schoolid + ")";
-				x.add(option);
-			});
-		});
-	},
-
+	/**
+	 *	Downloads all sections as a CSV
+	 */
 	exportSections: function(){
 		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["sectionid", "courseid", "courseName", "sectionCode", "day", "startTime", "endTime", "roomCapacity", "roomLocation", "classSize", "status"]];
@@ -63,6 +52,10 @@ var ExportView = Backbone.View.extend({
 			link.click();
 		});
 	},
+
+	/**
+	 *	Downloads all admins as a CSV
+	 */
 	exportAdmins: function(){
 		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
@@ -79,7 +72,6 @@ var ExportView = Backbone.View.extend({
 			dataRows.forEach(function(lineArray, index){
 				dataString = lineArray.join(",");
 				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
-				console.log(csvContent);
 			});
 			var encodedUri = encodeURI(csvContent);
 			var link = document.createElement("a");
@@ -88,6 +80,10 @@ var ExportView = Backbone.View.extend({
 			link.click();
 		});
 	},
+
+	/**
+	 *	Downloads all teachers as a CSV
+	 */
 	exportTeachers: function(){
 		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
 		var dataRows = [["userid", "schoolid", "firstName", "lastName", "emailAddr", "status", "usertype"]];
@@ -102,7 +98,6 @@ var ExportView = Backbone.View.extend({
 				dataRows.push(teacher);
 			});
 			dataRows.forEach(function(lineArray, index){
-				console.log(lineArray);
 				dataString = lineArray.join(",");
 				csvContent += index < dataRows.length ? dataString+ "\n" : dataString;
 			});
@@ -114,9 +109,11 @@ var ExportView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Downloads all students as a CSV
+	 */
 	exportStudents: function(){
 		var schoolid = this.$el.find("#schoolid option:selected").attr("id");
-		console.log(schoolid);
 		var dataRows = [["userid", "firstName", "lastName", "dateOfBirth", "gender", "streetAddr1"," streetAddr2", "city",
 		"province, country", "postalCode", "phoneNumber", "emailAddr", "allergies", "prevSchools", "parentFirstName", "parentLastName",
 		"parentPhoneNumber", "parentEmailAddr", "emergencyContactFirstName", "emergencyContactLastName", "emergencyContactRelation",

@@ -17,17 +17,23 @@ var DepartmentView = Backbone.View.extend({
         school.fetch({
             url: school.getDepartmentsUrl(sessionStorage.getItem("gobind-schoolid")),
             data: {
-            schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")}}).then(function(data) {
-                _.each(data, function (object, index) {
-                    var dept1 = new Dept(object, { parse: true });
+            schoolyearid: sessionStorage.getItem("gobind-activeSchoolYear")}
+        }).then(function(data) {
+            _.each(data, function (object, index) {
+                var dept1 = new Dept(object, { parse: true });
+                if (dept1.get("status") == "active") {
                     new DepartmentRowView({
                         el: view.addRow(),
                         model: dept1,
                         untouchedModel: JSON.stringify(dept1.toJSON()),
+                        parentView: view
                     });
+                }
             });
+            
             view.$el.find("table").dataTable({
-                dom: "t"
+                dom: "t",
+                iDisplayLength: 100
             });
         });
     },
@@ -58,9 +64,6 @@ var DepartmentView = Backbone.View.extend({
                   deptids: JSON.stringify(ids)
                 }
             }).then(function(data) {
-           // if (typeof data == "string") {
-           //     data = JSON.parse(data);
-           // }
                 if (data.status == "success") {
                   new TransactionResponseView({
                       message: "The selected records have successfully been purged."
@@ -130,17 +133,21 @@ var DepartmentView = Backbone.View.extend({
 
 var DepartmentRowView = Backbone.View.extend({
     template: _.template("<td><%= model.deptName %></td>"
-        + "<td><span class='edit-dept primary-link pull-left center-block' id='<%= model.userid %>'>[ Edit ] </span> <span class='delete-dept primary-link center-block' id='<%= model.deptid %>'>[ Delete ]</span></td>"),
+        + "<td><%= model.status %></td>"
+        + "<td><span class='edit-dept primary-link pull-left' id='<%= model.userid %>'>[ Edit ] </span> <span class='delete-dept primary-link' id='<%= model.deptid %>'>[ Delete ]</span></td>"),
 
     otherusertemplate: _.template("<td><%= model.deptName %></td>"
-        + "<td><span class='edit-dept primary-link pull-left center-block' id='<%= model.userid %>'>[ Edit ] </span></td>"),
+        + "<td><%= model.status %></td>"
+        + "<td><span class='edit-dept primary-link pull-left' id='<%= model.userid %>'>[ Edit ] </span></td>"),
 
-    edittemplate: _.template("<td><input type='text' class='form-control input-sm' value='<%= model.deptName %>' name='deptName'></td>"
-		+ "<td> <span class='save-dept primary-link center-block' id='<%= model.deptid %>'>[ Save ]</span> <span class='cancel-dept primary-link center-block' id='<%= model.deptid %>'>[ Cancel ]</span></td>"),
+    edittemplate: _.template("<td><input type='text' class='form-control input-sm w-100' value='<%= model.deptName %>' name='deptName'></td>"
+	    + "<td><%= model.status %></td>"
+        + "<td> <span class='save-dept primary-link' id='<%= model.deptid %>'>[ Save ]</span> <span class='cancel-dept primary-link' id='<%= model.deptid %>'>[ Cancel ]</span></td>"),
 
     initialize: function (options) {
         this.action = "view";
         this.untouchedModel = options.untouchedModel;
+        this.parentView = options.parentView;
         this.render();
         
     },
@@ -193,20 +200,39 @@ var DepartmentRowView = Backbone.View.extend({
         var usertype = sessionStorage.getItem("gobind-usertype");
         var view = this;
         var id = $(evt.currentTarget).attr("id");
-        this.model.set("id", id);
         if (usertype == "SU") {
-           this.model.destroy({data:{"purge":1}}).then(function(data){
-                    view.action = "view";
-                    view.render();
-        });
-        }else{
-           this.model.destroy().then(function(data){
-                    view.action = "view";
-                    view.render();
-            }
-        );
-        }
+            $.ajax({
+                type: "DELETE",
+                data: {
+                    purge: 1
+                },
+                url: view.model.deleteDepartment(id)
+            }).then(function(data) {
+                if (typeof data == "string") {
+                    data = JSON.parse(data);
+                }
+                if (data.status == "success") {
+                    new TransactionResponseView({
+                        message: "Department successfully deleted."
+                    });
+                } else {
+                    new TransactionResponseView({
+                        title: "ERROR",
+                        status: "error",
+                        message: "Department successfully deleted."
+                    });
+                }
 
+                view.action = "view";
+                view.parentView.render();
+            });
+        }
+        else {
+            this.model.destroy().then(function(data){
+                view.action = "view";
+                view.render();
+            });
+        }
     },
 
     saveDept: function (evt) {

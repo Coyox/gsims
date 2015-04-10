@@ -47,7 +47,6 @@ var PendingRegistrationView = Backbone.View.extend({
 			_.each(data, function(object, index) {
 				var s = new Student(object, {parse:true});
 				view.list.push(s);
-				console.log(s.toJSON());
 				new PendingRowView({
 					el: view.addRow(s.get("userid"), s.get("emailAddr"), s.get("status")),
 					model: s,
