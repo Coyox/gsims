@@ -7,43 +7,43 @@ class User {
         $this->app = $app;
     }
     public function createRoutes() {
-        $this->app->get('/students', 'getStudents');
-        $this->app->get('/students/:id', 'getStudentById');
-        $this->app->get('/students/:id/sections', 'getEnrolledSections');
-        $this->app->get('/students/:id/prevSections', 'getPrevEnrolledSections');
-        $this->app->get('/students/:id/avgGrade', 'getAvgGrade');
-        $this->app->get('/students/:id/attendance', 'getStudentAttendance');
-        $this->app->post('/students', 'createStudent');
-        $this->app->post('/students/:id/sections', 'enrollStudentInSections');
-        $this->app->post('/students/:id/waitlists', 'enrollStudentInWaitlists');
-        $this->app->post('/students/pending', 'handlePendingStudents');
-        $this->app->post('/students/pendingTest', 'handlePendingTestStudents');
-        $this->app->put('/students/:id', 'updateStudent');
-        $this->app->delete('/students/:id', 'deleteStudent');
+        $this->app->get('/students', array($this,'getStudents'));
+        $this->app->get('/students/:id', array($this,'getStudentById'));
+        $this->app->get('/students/:id/sections', array($this,'getEnrolledSections'));
+        $this->app->get('/students/:id/prevSections', array($this,'getPrevEnrolledSections'));
+        $this->app->get('/students/:id/avgGrade', array($this,'getAvgGrade'));
+        $this->app->get('/students/:id/attendance', array($this,'getStudentAttendance'));
+        $this->app->post('/students', array($this,'createStudent'));
+        $this->app->post('/students/:id/sections', array($this,'enrollStudentInSections'));
+        $this->app->post('/students/:id/waitlists', array($this,'enrollStudentInWaitlists'));
+        $this->app->post('/students/pending', array($this,'handlePendingStudents'));
+        $this->app->post('/students/pendingTest', array($this,'handlePendingTestStudents'));
+        $this->app->put('/students/:id', array($this,'updateStudent'));
+        $this->app->delete('/students/:id', array($this,'deleteStudent'));
 
-        $this->app->get('/teachers', 'getTeachers');
-        $this->app->get('/teachers/:id', 'getTeacherById');
-        $this->app->get('/teachers/:id/sections', 'getTeachingSections');
-        $this->app->get('/teachers/:id/competency', 'getCourseCompetencies');
-        $this->app->get('/teachers/:id/attendance', 'getTeacherAttendance');
-        $this->app->post('/teachers/:id/competency', 'updateCourseCompetencies');
-        $this->app->post('/teachers', 'createTeacher');
-        $this->app->put('/teachers/:id', 'updateTeacher');
-        $this->app->delete('/teachers/:id', 'deleteTeacher');
+        $this->app->get('/teachers', array($this,'getTeachers'));
+        $this->app->get('/teachers/:id', array($this,'getTeacherById'));
+        $this->app->get('/teachers/:id/sections', array($this,'getTeachingSections'));
+        $this->app->get('/teachers/:id/competency', array($this,'getCourseCompetencies'));
+        $this->app->get('/teachers/:id/attendance', array($this,'getTeacherAttendance'));
+        $this->app->post('/teachers/:id/competency', array($this,'updateCourseCompetencies'));
+        $this->app->post('/teachers', array($this,'createTeacher'));
+        $this->app->put('/teachers/:id', array($this,'updateTeacher'));
+        $this->app->delete('/teachers/:id', array($this,'deleteTeacher'));
 
-        $this->app->get('/administrators', 'getAdministrators');
-        $this->app->get('/administrators/:id', 'getAdministratorById');
-        $this->app->post('/administrators', 'createAdministrator');
-        $this->app->delete('/administrators/:id', 'deleteTeacher');
+        $this->app->get('/administrators', array($this,'getAdministrators'));
+        $this->app->get('/administrators/:id', array($this,'getAdministratorById'));
+        $this->app->post('/administrators', array($this,'createAdministrator'));
+        $this->app->delete('/administrators/:id', array($this,'deleteTeacher'));
 
-        $this->app->get('/superusers', 'getSuperusers');
-        $this->app->get('/superusers/:id', 'getSuperuserById');
-        $this->app->post('/superusers', 'createSuperuser');
-        $this->app->put('/superusers/:id', 'updateSuperuser');
-        $this->app->delete('/superusers/:id', 'deleteSuperuser');
+        $this->app->get('/superusers', array($this,'getSuperusers'));
+        $this->app->get('/superusers/:id', array($this,'getSuperuserById'));
+        $this->app->post('/superusers', array($this,'createSuperuser'));
+        $this->app->put('/superusers/:id', array($this,'updateSuperuser'));
+        $this->app->delete('/superusers/:id', array($this,'deleteSuperuser'));
 
-        $this->app->get('/users/:id/:usertype', 'getUserById');
-        $this->app->get('/users/:emailAddr', 'getUserByEmailAddr');
+        $this->app->get('/users/:id/:usertype', array($this,'getUserById'));
+        $this->app->get('/users/:emailAddr', array($this,'getUserByEmailAddr'));
     }
 
 #================================================================================================================#
