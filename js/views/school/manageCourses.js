@@ -2365,7 +2365,8 @@ var DocumentsView = Backbone.View.extend({
 					new DocumentRowView({
 						el: view.addRow(),
 						model: d1,
-						sectionid: view.sectionid
+						sectionid: view.sectionid,
+						parentView: view
 					});
 				});
 			}
@@ -2535,6 +2536,7 @@ var DocumentRowView = Backbone.View.extend({
 		this.userid = options.userid;
 		this.sectionid = options.sectionid;
 		this.action = options.action;
+		this.parentView = options.parentView;
 		this.render();
 	},
 
@@ -2569,8 +2571,7 @@ var DocumentRowView = Backbone.View.extend({
 				new TransactionResponseView({
 					message: "Document successfully deleted."
 				});
-				view.table.fnDestroy();
-				view.render();
+				view.parentView.render();
 			}
 			else {
 				new TransactionResponseView({
