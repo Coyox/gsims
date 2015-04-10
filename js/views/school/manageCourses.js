@@ -1722,6 +1722,7 @@ var AttendanceView = Backbone.View.extend({
 		// Get enrolled students
 		var enrolledStudents = [];
 		var section = new Section();
+		var def = $.Deferred();
 		section.fetch({
 			url: section.getStudentsEnrolled(this.sectionid),
 		}).then(function(data) {
@@ -1736,55 +1737,53 @@ var AttendanceView = Backbone.View.extend({
 					userid: model.get("userid")
 				});
 			});
+			def.resolve();
 			view.enrolledStudents = data;
 		});
 
-
-
 		// Get all the attendance records for each unique date
-		section.fetch({
-			url: section.getSectionDates(this.sectionid),
-		}).then(function(sectionDates) {
-			_.each(sectionDates, function(obj, index) {
-				section.fetch({
-					url: section.getSectionAttendance(view.sectionid),
-					data: {
-						date: obj.date
-					}
-				}).then(function(attendanceRecords) {
-					totalEnrolled = enrolledStudents.length;
-					numAttendanceRecords++;
-					var attendedStudents = 0;
-					_.each(attendanceRecords, function(record, index) {
-						if (record.usertype == "S" && enrolledStudents.indexOf(record.userid) > -1) {
-							attendedStudents++;
+		$.when(def).then(function() {
+			section.fetch({
+				url: section.getSectionDates(view.sectionid),
+			}).then(function(sectionDates) {
+				_.each(sectionDates, function(obj, index) {
+					section.fetch({
+						url: section.getSectionAttendance(view.sectionid),
+						data: {
+							date: obj.date
 						}
+					}).then(function(attendanceRecords) {
+						totalEnrolled = enrolledStudents.length;
+						numAttendanceRecords++;
+						var attendedStudents = 0;
+						_.each(attendanceRecords, function(record, index) {
+							if (record.usertype == "S" && enrolledStudents.indexOf(record.userid) > -1) {
+								attendedStudents++;
+							}
+						});
+
+						var numStudents = enrolledStudents.length;
+						var avg = Math.round((attendedStudents / numStudents) * 1000)/10;
+						var avgString = attendedStudents + " / " + numStudents + " = " + avg;
+						totalAttendedStudents += attendedStudents;
+						new AttendanceRowView({
+							el: view.addRow(),
+							date: obj.date,
+							numStudents: numStudents,
+							attendedStudents: attendedStudents,
+							avg: avgString + "%",
+							sectionid: view.sectionid,
+							enrolledStudents: view.enrolledStudents,
+							parentView: view
+						});
+						// Avg attendance for section
+						var avgAttendance = Math.round((totalAttendedStudents/(totalEnrolled*numAttendanceRecords))*1000)/10;
+						view.$el.find(".avg-attendance").text(avgAttendance+"%");
 					});
 
-					var numStudents = enrolledStudents.length;
-					var avg = Math.round((attendedStudents / numStudents) * 1000)/10;
-					var avgString = attendedStudents + " / " + numStudents + " = " + avg;
-					totalAttendedStudents += attendedStudents;
-					new AttendanceRowView({
-						el: view.addRow(),
-						date: obj.date,
-						numStudents: numStudents,
-						attendedStudents: attendedStudents,
-						avg: avgString + "%",
-						sectionid: view.sectionid,
-						enrolledStudents: view.enrolledStudents,
-						parentView: view
-					});
-					// Avg attendance for section
-					var avgAttendance = Math.round((totalAttendedStudents/(totalEnrolled*numAttendanceRecords))*1000)/10;
-					view.$el.find(".avg-attendance").text(avgAttendance+"%");
 				});
-
 			});
-
-
 		});
-
 	},
 
 	addRow: function() {
@@ -1922,6 +1921,15 @@ var AttendanceView = Backbone.View.extend({
 				return [false];
 			}
 		});
+
+		// get todays date
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		var day =  date.getDay();
+		date = year + "-" + month + "-" + day;
+
+		elem.find("#date").val(date);
 
 		elem.modal({
 			show: true
