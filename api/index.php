@@ -56,7 +56,7 @@ $app->get('/schools/:id/administrators', 'getAdministratorsBySchool');
 $app->get('/schools/:id/departments', 'getDepartments');
 $app->get('/schools/:id/departments/count', 'getDepartmentCount');
 $app->post('/schools', 'createSchool');
-$app->put('/schools/id/reg', 'updateOpenRegistration');
+$app->put('/schools/:id/reg', 'updateOpenRegistration');
 $app->put('/schools/:id', 'updateSchool');
 $app->delete('/schools/:id', 'deleteSchool');
 
