@@ -250,7 +250,7 @@ function getLoginById($id){
 #================================================================================================================#
 function getSchoolYears(){
     $schoolid = $_GET["schoolid"];
-    $sql = "SELECT s.schoolid, s.schoolyearid, s.oepnForReg, sy.status from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
+    $sql = "SELECT s.schoolyearid, s.oepnForReg, sy.status from schoolyear s, school_schoolyear sy where s.schoolyearid=sy.schoolyearid and sy.schoolid=:schoolid order by s.schoolyear desc";
     echo json_encode(perform_query($sql,'GETALL', array("schoolid"=>$schoolid)));
 }
 
@@ -370,7 +370,7 @@ function deleteSchoolYear($id) {
     $body = $request->getBody();
     $option = json_decode($body);
     $bindparams = array("id"=>$id);
-    $sql = ($option->purge == 1)? "DELETE from schoolyear where schoolyearid=:id" : "UPDATE schoolyear set status='inactive' where schoolyearid=:id";
+    $sql = ($option->purge == 1)? "DELETE from school_schoolyear where schoolyearid=:id" : "UPDATE schoolyear set status='inactive' where schoolyearid=:id";
     echo json_encode(perform_query($sql,'', $bindparams));
 }
 #================================================================================================================#

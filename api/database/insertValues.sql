@@ -1227,4 +1227,6 @@ VALUES
 
 INSERT into apikeys(`keyid`, `name`) values ('C_s6D7OmZEgKBIspAvuBcw', 'mandrill');
 
-INSERT into student_year (userid, schoolyearid) (SELECT userid, 233464 FROM student)
+INSERT into student_year (userid, schoolyearid) (SELECT userid, 233464 FROM student);
+
+INSERT into school_schoolyear (schoolid, schoolyearid, status) (SELECT 863941, schoolyearid, status FROM schoolyear);
