@@ -3,6 +3,11 @@ require_once '../helpers/general.php';
 require_once '../helpers/email.php';
 
 class User {
+    #================================================================================================================#
+    # Constants
+    #================================================================================================================#
+    define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
+
     public function __construct($app) {
         $this->app = $app;
     }
@@ -47,16 +52,12 @@ class User {
     }
 
 #================================================================================================================#
-# Constants
-#================================================================================================================#
-define("pwchars","bcdefghijkmnpqrstvwxyzABCDEFGHIJKLMNPQRSTVWXYZ23456789@#$%^&*()+=");
-#================================================================================================================#
 # Students
 #================================================================================================================#
 /*
  * Returns a list of students
  */
-function getStudents() {
+public function getStudents() {
     $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -67,7 +68,7 @@ function getStudents() {
 /*
  * Returns a single student record
  */
-function getStudentById($id) {
+public function getStudentById($id) {
     $sql = "SELECT userid, firstName, lastName, dateOfBirth, gender, streetAddr1, streetAddr2, city,
     province, country, postalCode, phoneNumber, emailAddr, allergies, prevSchools, parentFirstName, parentLastName,
     parentPhoneNumber, parentEmailAddr, emergencyContactFirstName, emergencyContactLastName, emergencyContactRelation,
@@ -84,7 +85,7 @@ function getStudentById($id) {
  *  - status: "active" by default
 @return: json encoded status array
 */
-function getEnrolledSections($id, $flag=0, $status="active"){
+public function getEnrolledSections($id, $flag=0, $status="active"){
     if (isset($_GET['status'])){
         $status = $_GET['status'];
     }
@@ -106,7 +107,7 @@ function getEnrolledSections($id, $flag=0, $status="active"){
  *   request param: schoolyearid
  * @return: json encoded array
 */
-function getPrevEnrolledSections($id){
+public function getPrevEnrolledSections($id){
     $schoolyearid = $_GET['schoolyearid'];
     $sql = "SELECT s.sectionid, s.courseid, c.courseName, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid, s.status
     FROM section s, course c
@@ -129,7 +130,7 @@ echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id, "schoolyearid"=>
  *  request param: all student model attributes
  * @return: json encoded status array
  */
-function updateStudent($id) {
+public function updateStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $student = json_decode($body);
@@ -180,7 +181,7 @@ echo json_encode(perform_query($sql,'',$bindparams));
  * @param:
  *  request param: (optional) a list of 'students' for mass creating student records
  */
-function createStudent() {
+public function createStudent() {
     if (isset($_POST['students'])){
         return massCreateStudents(json_decode($_POST['students']));
     }
@@ -251,7 +252,7 @@ echo json_encode($transaction_result);
  Mass create student records with generated login info
  Will send out email if transaction is successful
 */
- function massCreateStudents($students) {
+ public function massCreateStudents($students) {
     $resp = array();
     $queries = array();
     $bindparams = array();
@@ -319,7 +320,7 @@ echo json_encode($transaction_result);
 /*
  * mark student as inactive
  */
-function deleteStudent($id) {
+public function deleteStudent($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $option = json_decode($body);
@@ -330,7 +331,7 @@ function deleteStudent($id) {
     echo json_encode(perform_query($sql,'', array("id"=>$id)));
 }
 
-function enrollStudentInSections($id){
+public function enrollStudentInSections($id){
     $schoolyearid = $_POST["schoolyearid"];
     $status = $_POST["status"];
     $sectionids = json_decode($_POST["sectionids"]);
@@ -362,7 +363,7 @@ function enrollStudentInSections($id){
 }
 
 
-function enrollStudentInWaitlists($id){
+public function enrollStudentInWaitlists($id){
     $courseids = json_decode($_POST["courseids"]);
     $bindparams = array("userid" => $id);
     $sql = "INSERT INTO waitlisted (userid, waitlistid) values ";
@@ -378,7 +379,7 @@ function enrollStudentInWaitlists($id){
   Handing pending students who are either denied, approved, or signed up for tests
   Send out emails if status of student was previously pending
 */
-  function handlePendingStudents(){
+  public function handlePendingStudents(){
     $queries = array();
     $bindparams = array();
     $purgeList = array();
@@ -478,7 +479,7 @@ function enrollStudentInWaitlists($id){
 /*
  Handle pending-test students who are either denied or approved
 */
- function handlePendingTestStudents(){
+ public function handlePendingTestStudents(){
     $queries = array();
     $bindparams = array();
     $students = json_decode($_POST['students']);
@@ -508,7 +509,7 @@ function enrollStudentInWaitlists($id){
 /*
 Wrapper for getting a student's average grade
 */
-function getAvgGrade($id, $flag=0){
+public function getAvgGrade($id, $flag=0){
     $totalgrade = 0;
     $sections = getEnrolledSections($id, 1);
     $numsections = count($sections);
@@ -541,7 +542,7 @@ function getAvgGrade($id, $flag=0){
 /*
  Wrapper to get student attendance
 */
- function getStudentAttendance($id){
+ public function getStudentAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
     $month = $_GET["month"];
     if (isset($month)){
@@ -554,11 +555,11 @@ function getAvgGrade($id, $flag=0){
 #================================================================================================================#
 # Teachers
 #================================================================================================================#
-function getTeachers() {
+public function getTeachers() {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='T' order by firstName asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
 }
-function getTeacherById($id) {
+public function getTeacherById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status, usertype from teacher where usertype='T' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
@@ -567,7 +568,7 @@ function getTeacherById($id) {
  Create teacher record with generated login info
  Will send out email if transaction is successful
 */
- function createTeacher() {
+ public function createTeacher() {
     if (isset($_POST['teachers'])){
         return massCreateTeachers(json_decode($_POST['teachers']), 'T');
     }
@@ -610,7 +611,7 @@ function getTeacherById($id) {
  Mass create teacher records with generated login info
  Will send out email if transaction is successful
 */
- function massCreateTeachers($teachers, $usertype) {
+ public function massCreateTeachers($teachers, $usertype) {
     $resp = array();
     $queries = array();
     $bindparams = array();
@@ -649,7 +650,7 @@ function getTeacherById($id) {
 /*
  Update teacher/administrator record
 */
- function updateTeacher($id) {
+ public function updateTeacher($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
@@ -672,7 +673,7 @@ function getTeacherById($id) {
 /*
  * mark teacher as inactive
  */
-function deleteTeacher($id) {
+public function deleteTeacher($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $option = json_decode($body);
@@ -685,20 +686,20 @@ function deleteTeacher($id) {
 /*
 * Get the sections the teacher teaches
 */
-function getTeachingSections($id){
+public function getTeachingSections($id){
     $sql = "SELECT c.courseid, c.courseName, c.description, s.sectionid, s.sectionCode, s.day, s.startTime, s.endTime, s.roomCapacity, s.roomLocation, s.classSize, s.schoolyearid
     from teachingSection t, course c, section s
     where t.userid=:id and t.sectionid=s.sectionid and c.courseid=s.courseid";
     echo json_encode(perform_query($sql,'GETALL', array("id"=>$id)));
 }
 
-function getCourseCompetencies($id) {
+public function getCourseCompetencies($id) {
     $sql = "SELECT userid, deptid, level, status from teacherCourseCompetency where userid=:id";
     echo json_encode(perform_query($sql, 'GETALL', array("id"=>$id)));
 }
 
 
-function updateCourseCompetencies($id){
+public function updateCourseCompetencies($id){
     $queries = array();
     $combinedbindparams = array();
 
@@ -736,7 +737,7 @@ function updateCourseCompetencies($id){
     echo json_encode(perform_transaction($queries, $combinedbindparams));
 }
 
-function getTeacherAttendance($id){
+public function getTeacherAttendance($id){
     $schoolyearid = $_GET["schoolyearid"];
     $month = $_GET["month"];
     if (isset($month)){
@@ -749,15 +750,15 @@ function getTeacherAttendance($id){
 #================================================================================================================#
 # Administrators
 #================================================================================================================#
-function getAdministrators() {
+public function getAdministrators() {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' order by firstName asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
 }
-function getAdministratorById($id) {
+public function getAdministratorById($id) {
     $sql = "SELECT userid, schoolid, firstName, lastName, emailAddr, status from teacher where usertype='A' and userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
-function createAdministrator() {
+public function createAdministrator() {
     if (isset($_POST['administrators'])){
         return massCreateTeachers(json_decode($_POST['administrators']), 'A');
     }
@@ -798,15 +799,15 @@ function createAdministrator() {
 #================================================================================================================#
 # Superusers
 #================================================================================================================#
-function getSuperusers() {
+public function getSuperusers() {
     $sql = "SELECT userid, firstName, lastName, emailAddr, status from superuser order by firstName asc" ;
     echo json_encode(perform_query($sql, 'GETALL'));
 }
-function getSuperuserById($id) {
+public function getSuperuserById($id) {
     $sql = "SELECT userid, firstName, lastName, emailAddr, status from superuser where userid=:id";
     echo json_encode(perform_query($sql,'GET', array("id"=>$id)));
 }
-function createSuperuser() {
+public function createSuperuser() {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $teacher = json_decode($body);
@@ -840,7 +841,7 @@ function createSuperuser() {
     echo json_encode($transaction_result);
 }
 
-function updateSuperuser($id) {
+public function updateSuperuser($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $superuser = json_decode($body);
@@ -858,7 +859,7 @@ function updateSuperuser($id) {
         );
     echo json_encode(perform_query($sql,'',$bindparams));
 }
-function deleteSuperuser($id) {
+public function deleteSuperuser($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $option = json_decode($body);
@@ -872,7 +873,7 @@ function deleteSuperuser($id) {
 #================================================================================================================#
 # Users
 #================================================================================================================#
-function getUsers($schoolid, $type){
+public function getUsers($schoolid, $type){
     if ($type == "T"){
         return getTeachersBySchool($schoolid);
     }
@@ -887,7 +888,7 @@ function getUsers($schoolid, $type){
     }
 }
 
-function getUserById($id, $usertype){
+public function getUserById($id, $usertype){
 
     if ($usertype == "T"){
         return getTeacherById($id);
@@ -903,7 +904,7 @@ function getUserById($id, $usertype){
     }
 }
 
-function getUserByEmailAddr($emailAddr){
+public function getUserByEmailAddr($emailAddr){
     $usertypes = array("student", "teacher", "superuser");
     foreach($usertypes as $type){
         $sql = "SELECT userid from ".$type." where emailAddr=:emailAddr";
@@ -919,7 +920,7 @@ function getUserByEmailAddr($emailAddr){
     }
 }
 
-function getUserCount($usertype){
+public function getUserCount($usertype){
     $table=($usertype=='S')? "student" : (($usertype=="A"|$usertype=="T")? "teacher" : "superuser");
     $status = $_GET['status'];
     $schoolid = $_GET['schoolid'];
@@ -943,17 +944,17 @@ function getUserCount($usertype){
 }
 
 
-function getAttendance($id, $schoolyearid){
+public function getAttendance($id, $schoolyearid){
     $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid";
     return perform_query($sql, 'GETALL', array("userid"=>$id, "schoolyearid"=>$schoolyearid));
 }
 
-function getAttendanceByMonth($id, $schoolyearid, $month){
+public function getAttendanceByMonth($id, $schoolyearid, $month){
     $sql = "SELECT `sectionid`, `date` from attendance where userid=:userid and schoolyearid=:schoolyearid and month(`date`)=:month";
     return perform_query($sql, 'GETALL', array("userid"=>$id, "month"=>$month, "schoolyearid"=>$schoolyearid));
 }
 
-function createLogin($firstname, $lastname, $usertype){
+public function createLogin($firstname, $lastname, $usertype){
     $sql = "INSERT into login (userid, username, password, usertype)
     VALUES (:userid, :username, :password, :usertype)";
 
@@ -972,7 +973,7 @@ function createLogin($firstname, $lastname, $usertype){
  * @param array(array()) : array of users
  * @return array(array(), string, array());
  */
-function massCreateLogins($users, $usertype){
+public function massCreateLogins($users, $usertype){
     $loginbindparams = array();
     $userids = array();
     $emailparams = array();
@@ -999,7 +1000,7 @@ function massCreateLogins($users, $usertype){
 #================================================================================================================#
 # Helpers/Wrappers
 #================================================================================================================#
-function buildWhereClause($fields){
+public function buildWhereClause($fields){
     $clause = "";
     $bindparams = array();
     foreach ($fields as $key=>$value) {
@@ -1016,7 +1017,7 @@ function buildWhereClause($fields){
     return array($clause, $bindparams);
 }
 
-function generateLogin($firstname, $lastname){
+public function generateLogin($firstname, $lastname){
     // 6 digit userid
     $sql = "SELECT userid from login where userid=:userid";
     $userid = generateUniqueID($sql, "userid");
@@ -1027,13 +1028,13 @@ function generateLogin($firstname, $lastname){
 }
 
 // wrapper
-function generateUsername($userid, $firstname, $lastname){
+public function generateUsername($userid, $firstname, $lastname){
     // username = first letter of first name + last name + last 5 digits of userid
     $firstname = strtolower($firstname);
     $lastname = strtolower($lastname);
     return $firstname[0].$lastname.substr($userid, -5);
 }
-function generatePassword(){
+public function generatePassword(){
     // password to be hashed
     $password='';
     $chars = pwchars;
@@ -1046,7 +1047,7 @@ function generatePassword(){
  return $password;
 }
 
-function generatePasswordHash($password){
+public function generatePasswordHash($password){
     $cost = 10;
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), '+', '.');
     $salt = sprintf("$2a$%02d$", $cost).$salt;
