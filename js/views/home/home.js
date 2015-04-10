@@ -1,3 +1,13 @@
+/* *******************************************************************************
+ *  This file contains the subviews that make up the home page, including:
+ *		- header
+ *		- sidebar
+ *		- breadcrumb
+ * ******************************************************************************* */
+
+/**
+ *	View to display the main home page.
+ */
 var HomePageView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -20,6 +30,9 @@ var HomePageView = Backbone.View.extend({
 	}
 });
 
+/**
+ *	View to display the sidebar.
+ */
 var SidebarView = Backbone.View.extend({
 	initialize: function(options) {
 		this.render();
@@ -27,12 +40,17 @@ var SidebarView = Backbone.View.extend({
 
 	render: function() {
 		var template = html["sidebar.html"];
+		var usertype = sessionStorage.getItem("gobind-usertype");
 		template = template({
-			usertype: sessionStorage.getItem("gobind-usertype")
+			usertype: usertype
 		});
 		this.$el.html(template);
-		populateSchoolMenu(this.$el.find("#school-options"), app.schoolOptions, sessionStorage.getItem("gobind-schoolid"));
-		this.populateSchoolYearMenu();
+
+		// Fetch the available schools
+		if (usertype == "SU") {
+			populateSchoolMenu(this.$el.find("#school-options"), app.schoolOptions, sessionStorage.getItem("gobind-schoolid"));
+			this.populateSchoolYearMenu();
+		}
 	},
 
 	events: {
@@ -41,13 +59,9 @@ var SidebarView = Backbone.View.extend({
 		"change #school-options": "updateSchool"
 	},
 
-	updateActiveLink: function(evt) {
-		this.$el.find("li.active").removeAttr("class");
-
-		var li = $(evt.currentTarget).closest("li");
-		li.addClass("active");
-	},
-
+	/**
+	 *	Displays general information about a teacher/admin.
+	 */
 	populateSchoolYearMenu: function() {
 		var select = this.$el.find("#school-year-options");
 		new SchoolYear().fetch().then(function(data) {
@@ -63,6 +77,9 @@ var SidebarView = Backbone.View.extend({
 		});
 	},
 
+	/**
+	 *	Displays general information about a teacher/admin.
+	 */
 	updateSchoolYear: function(evt) {
 		var schoolyearid = $(evt.currentTarget).find("option:selected").attr("id");
 		sessionStorage.setItem("gobind-activeSchoolYear", schoolyearid);
@@ -119,7 +136,6 @@ var HeaderView = Backbone.View.extend({
 	},
 
 	logout: function(evt) {
-		console.log("logout");
 		app.Router.navigate("", {trigger:true});
 		sessionStorage.removeItem("gobind-email");
 		sessionStorage.removeItem("gobind-login");

@@ -1,3 +1,13 @@
+/* *******************************************************************************
+ *  This file contains the general email interface used throughout the application.
+ *	It also includes a function that can be used to send an email out in the
+ *	background (without the interface), and a function that can be called to display
+ *	the interface in a popup window.
+ * ******************************************************************************* */
+
+/**
+ *	View to display the email interface
+ */
 var EmailView = Backbone.View.extend({
 	initialize: function(options) {
 		var view = this;
@@ -40,6 +50,9 @@ var EmailView = Backbone.View.extend({
 		"click #preview": "previewHTML"
 	},
 
+	/**
+	 *	Previews the email body
+	 */
 	previewHTML: function(evt){
 
 		var body = this.$el.find("#email-message").val();
@@ -48,6 +61,14 @@ var EmailView = Backbone.View.extend({
 
 	},
 
+	/**
+	 *	Fetches statistics about the current mandrill account, including:
+	 *		- hourly quota
+	 *		- current backlog
+	 *		- emails sent today
+	 *		- emails sent in the last 30 days
+	 *		- emails bounded in the last 30 days
+	 */
 	checkAccountStatus: function(evt){
 		var parent = this.$el.find("#stats-panel");
 		var apiKey = this.key;
@@ -60,15 +81,17 @@ var EmailView = Backbone.View.extend({
 	  			"key": apiKey
 	  		}
 		}).done(function(response) {
-	   	parent.find(".hourly-quota").text(response.hourly_quota);
-	   	parent.find(".backlog").text(response.backlog);
-	   	parent.find(".sent-today").text(response.stats.today.sent);
-	   	parent.find(".sent-month").text(response.stats.last_30_days.sent);
-	   	parent.find(".bounces-month").text(response.stats.last_30_days.hard_bounces);
-
+		   	parent.find(".hourly-quota").text(response.hourly_quota);
+		   	parent.find(".backlog").text(response.backlog);
+		   	parent.find(".sent-today").text(response.stats.today.sent);
+		   	parent.find(".sent-month").text(response.stats.last_30_days.sent);
+		   	parent.find(".bounces-month").text(response.stats.last_30_days.hard_bounces);
 	 	});
 	},
 
+	/**
+	 *	Sends an email to the provided recipients
+	 */
 	sendEmail: function(evt){
 		var recipientInput = this.$el.find("#email-to").val(); // Input from the "to" form
 		var recipients = []; // array where each index contains an email
@@ -80,8 +103,6 @@ var EmailView = Backbone.View.extend({
 		var self = this.$el.find("#self").prop("checked");
 
 		//Build the JSON request
-		//request.type = 'POST'
-		//request.url = "https://mandrillapp.com/api/1.0/messages/send.json"
 		request.data = {};
 		request.data.key = apiKey;
 		request.data.message = {};
@@ -96,7 +117,9 @@ var EmailView = Backbone.View.extend({
 		if (recipients.length == 0){
 			recipients = recipientInput.replace(/ /g, '').split(","); // Spaces removed, Emails deliminated by comma
 		}
-		if(self == true){
+
+		// Send an additional email to the sender if the self flag is set to true
+		if (self == true) {
 			recipients.push(from);
 		}
 
@@ -107,25 +130,32 @@ var EmailView = Backbone.View.extend({
         		'name':"",
         		'type': 'to'
     		}
-    	request.data.message.to.push(to);
-		})
+    		request.data.message.to.push(to);
+		});
 
-		// JSONify final request
-		//console.log(JSON.stringify(request.data));
 		// Send using mandrill API and read response
 		$.ajax({
 			type: 'POST',
   			url: "https://mandrillapp.com/api/1.0/messages/send.json",
   			data: JSON.stringify(request.data),
 		}).done(function(response) {
-   		//console.log(response);
-   			alert("Message(s) sent successfully!"); //TODO: Change to use in-page alert
+			new TransactionResponseView({
+				message: "Message(s) sent successfully!"
+			});
  		}).fail(function(xhr, textStatus, errorThrown){
- 			alert("Error sending email:\n\n" + xhr.responseText);
+			new TransactionResponseView({
+				title: "ERROR",
+				status: "error",
+				message: "Error sending email(s). Reason: " + xhr.responseText
+			});
  		});
 	}
 });
 
+/**
+ *	Ping's the email host to ensure the server is available to send emails. If not,
+ *	display an alert to indicate that the email service is unavailable.
+ */
 function areYouAlive(key){
 	var apiKey = key;
 
@@ -137,14 +167,10 @@ function areYouAlive(key){
   			"key": apiKey
   		}
 	}).done(function(response) {
-   	if (response != "PONG!"){
-   		// Alert user
-   		alert("Mandrill API is not currently responding:\n" +
-   		 "Your emails may not be sent.\nStats may not be fetched.\n\n" +
-   			"Please try again later.");
-   	}
+	   	if (response != "PONG!"){
+	   		$("#content").append("<div class='alert alert-danger'>" + "Mandrill API is currently not responding. Your emails may not be sent, and stats may not be fetched. Please try again later." + "</div>");
+	   	}
  	});
-
 }
 
 /** Common email function that can be used by any page to send an email (not
@@ -156,10 +182,10 @@ function areYouAlive(key){
 	call the function as follows:
 
 	sendEmail({
-		from: "cbarretto7@gmail.com",
+		from: "claire@gmail.com",
 		to: [{
-			email: "cbarretto7@gmail.com",
-			name: "Claire Barretto",
+			email: "claire@gmail.com",
+			name: "Claire",
 			type: "to"
 		}],
 		subject: "test email",
@@ -198,12 +224,9 @@ function sendEmail(params, callback) {
 	});
 }
 
-// Adam: this function will create a popup email interface. The first chunk of
-// code is creating the actual pop up (its called a modal in Bootstrap), and
-// it eventually calls your EmailView to add the actual email interface.
-// The recipients are sent in the "emails" property as an array of strings
-// (ie. an array of emails). To see an example of this, go to the notifications page,
-// and under pending-test students, select a couple students and click on the email button
+/**
+ *	Opens the email interface in a popup dialog
+ */
 function openEmailModal(recipients) {
 	$("#container").append(html["emailModal.html"]);
 

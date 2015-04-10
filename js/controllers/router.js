@@ -1,41 +1,16 @@
-var LoginRouter = Backbone.Router.extend({
-    routes: {
-        "": "login"
-    },
+/* *******************************************************************************
+ *  This file contains the two routers defined in our application. The router
+ *  controls the flow of the application based on changes made to the URL. All
+ *  pages in the applications are listed in the "routes" object below. 
+ * ******************************************************************************* */
 
-    login: function() {
-        new LoginView({
-            el: $("#container")
-        });
-    },
-});
-
+/**
+ *  Main application router. 
+ */
 var Router = Backbone.Router.extend({
-    buttons: _.template("<div id='button-container' class='hide'>"
-        +       "<button id='back-btn' class='btn btn-primary btn-sm'>Back</button>"
-        +   "</div>"),
-
 	initialize: function(options) {
         var view = this;
 		this.el = $("#container");
-
-        /** Hide/show the back button depending on what the current page is (routeName).
-            The back button should essentially be shown on all pages except for the
-            home page */
-		Backbone.history.on("all", function(route, router, routeName) {
-            switch (routeName) {
-                case "login":
-                case "forgotPassword":
-                case "home":
-                    $("#back-container").hide();
-                    break;
-                default:
-                    // $("#content").prepend(view.buttons());
-                    // $("#button-container").removeClass("hide").show();
-                    // $(".buttons").children().appendTo($("#button-container"));
-                    break;
-           }
-		});
 	},
 
     routes: {
@@ -598,3 +573,19 @@ var Router = Backbone.Router.extend({
         });
     }
 });
+
+/**
+ *  Independent login router.
+ */
+var LoginRouter = Backbone.Router.extend({
+    routes: {
+        "": "login"
+    },
+
+    login: function() {
+        new LoginView({
+            el: $("#container")
+        });
+    },
+});
+
