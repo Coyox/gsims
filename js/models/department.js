@@ -3,12 +3,16 @@ var Dept = Backbone.Model.extend({
 		schoolid: "",
 		deptName: "",
 		schoolyearid: "",
-		status: "inactive"
+		status: "active"
 	},
 
     urlRoot: app.serverUrl + "api/departments",
 
     getCoursesUrl: function(id) {
     	return this.urlRoot + "/" + id + "/courses";
+    },
+
+    deleteDepartment: function(id) {
+    	return this.urlRoot + "/" + id;
     }
 });
