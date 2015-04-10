@@ -110,13 +110,15 @@ var StudentRecordView = Backbone.View.extend({
 
 			_.each(view.model.toJSON(), function(value, attr) {
 				if (props.indexOf(attr) > -1 && view.model.nonEditable.indexOf(attr) == -1) {
-					new StudentRecordRowView({
-						el: view.addEditRow(table),
-						action: "view",
-						name: attr,
-						value: value,
-						model: view.model,
-					});
+					if (attr != "day" && attr != "year" && attr != "month") {
+						new StudentRecordRowView({
+							el: view.addEditRow(table),
+							action: "view",
+							name: attr,
+							value: value,
+							model: view.model,
+						});
+					}
 				}
 			}, view);
 		});

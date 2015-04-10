@@ -9,10 +9,6 @@ var CourseEnrollmentView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 
-		if (this.onlineReg) {
-			this.$el.find("#save-sections").remove();
-		}
-
 		if (this.results) {
 			var school = new School();
 			school.fetch().then(function(data) {
@@ -148,17 +144,17 @@ var CourseEnrollmentView = Backbone.View.extend({
 			}
 			if (success == 1){
 				new TransactionResponseView({
-							message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
-							redirect: true,
-							url: view.regType == "online" ? "" : "home"
+					message: "Thank you for enrolling. An administrator will email you when your selected courses have been approved for registration.",
+					redirect: true,
+					url: view.regType == "online" ? "" : "home"
 				});
 			}
 			else {
 				new TransactionResponseView({
-							title: "ERROR",
-							status: "error",
-							message: "Sorry, we could not process your request. Please try again."
-						});
+					title: "ERROR",
+					status: "error",
+					message: "Sorry, we could not process your request. Please try again."
+				});
 			}
 		}
 	}

@@ -10,7 +10,10 @@ var LoginView = Backbone.View.extend({
 		var view = this;
 		var schoolyear = new SchoolYear();
 		schoolyear.fetch({
-			url: schoolyear.getActiveSchoolYearUrl()
+			url: schoolyear.getActiveSchoolYearUrl(),
+			data: {
+				schoolid: sessionStorage.getItem("gobind-schoolid")
+			}
 		}).then(function(data) {
 			view.$el.html(html["login.html"]);
 			if (data.openForReg == 1) {

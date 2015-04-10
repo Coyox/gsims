@@ -30,10 +30,15 @@ var EmailView = Backbone.View.extend({
 
 	render: function() {
 		var template = html["email.html"];
+		var usertype = sessionStorage.getItem("gobind-usertype");
 		template = template({
-			usertype: sessionStorage.getItem("gobind-usertype")
+			usertype: usertype
 		});
 		this.$el.html(template);
+
+		if (usertype == "SU" || usertype == "A") {
+			this.$el.find("#stats-panel").removeClass("hide");
+		}
 
 		if(this.emailAddr){
 			this.$el.find("#email-to").val(this.emailAddr);
