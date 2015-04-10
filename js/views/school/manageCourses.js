@@ -1087,14 +1087,32 @@ var CourseWaitlistRowView = Backbone.View.extend({
 		+	"<td><%= model.userid %></td>"
 		+	"<td class='section-links'></td>"),
 
-    sectionLink: _.template("<span class='enrol-waitlist primary-link' id='<%= model.sectionid %>'>[<%= model.sectionCode %>]</span> "),
+    sectionLink: _.template("<span class='enrol-waitlist primary-link' id='<%= model.sectionid %>' data-size='<%= model.classSize %>'>[<%= model.sectionCode %>]</span> "),
 
 	initialize: function(options) {
         this.sdata = options.results;
-        this.tdata = options.courseid;
+        this.courseid = options.courseid;
         this.parentView = options.parentView;
 		this.render();
+		console.log("sdata :", this.sdata);
 	},
+
+	render: function() {
+		this.$el.html(this.template({
+			model: this.model.toJSON()
+		}));
+        var links = "";
+        _.each(this.sdata, function(section, index) {
+            var secmodel = new Section(section, {parse:true});
+            var link = this.sectionLink({
+                model: secmodel.toJSON()
+            });
+            links += link;
+        }, this);
+
+        this.$el.find(".section-links").html(links);
+	},
+
 
     events: {
 		"click .enrol-waitlist": "enrollWaitlist"
@@ -1103,23 +1121,22 @@ var CourseWaitlistRowView = Backbone.View.extend({
 	enrollWaitlist: function(evt) {
 		var view = this;
         var section = new Section();
-        var courseid = this.tdata;
         var uid = this.model.get("userid");
         var sectionid = $(evt.currentTarget).attr("id");
+        var classSize = $(evt.currentTarget).data("size");
         var schoolyear = sessionStorage.getItem("gobind-activeSchoolYear");
         section.fetch({
-        	url: section.getStudentCount(section.get("sectionid"))
+        	url: section.getStudentCount(sectionid)
         }).then(function(data) {
-        	var full = parseInt(data) >= parseInt(section.get("classSize"));
+        	var full = parseInt(data) >= parseInt(classSize);
+        	console.log("classSize: " + classSize);
         	if (!full){
-
         		$.ajax({
         			type: "POST",
-
         			url: section.enrollStudent(sectionid, uid),
         			data: {
         				schoolyearid: schoolyear,
-        				courseid: courseid,
+        				courseid: view.courseid,
         				status: "active"}
         			}).then(function(data) {
         				if (typeof data == "string"){
@@ -1150,26 +1167,16 @@ var CourseWaitlistRowView = Backbone.View.extend({
 
         			});
         		}
-
+        		else {
+        			new TransactionResponseView({
+        					title: "FAILURE",
+        					status: "failure",
+        					message: "Could not add student to section - section is full."
+        			});
+        		}
         	});
 	},
 
-	render: function() {
-		this.$el.html(this.template({
-			model: this.model.toJSON()
-		}));
-        var links = "";
-        _.each(this.sdata, function(section, index) {
-            var secmodel = new Section(section, {parse:true});
-            var link = this.sectionLink({
-                model: secmodel.toJSON()
-            });
-            links += link;
-        }, this);
-
-        this.$el.find(".section-links").html(links);
-
-	}
 });
 
 var CourseSectionRowView = Backbone.View.extend({
