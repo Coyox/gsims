@@ -19,7 +19,12 @@ var EmailView = Backbone.View.extend({
 	},
 
 	render: function() {
-		this.$el.html(html["email.html"]);
+		var template = html["email.html"];
+		template = template({
+			usertype: sessionStorage.getItem("gobind-usertype")
+		});
+		this.$el.html(template);
+
 		if(this.emailAddr){
 			this.$el.find("#email-to").val(this.emailAddr);
 		}
@@ -40,7 +45,7 @@ var EmailView = Backbone.View.extend({
 		var body = this.$el.find("#email-message").val();
 		this.$el.find("#pre").show();
 		this.$el.find('#dialog').html(body);
-	 	
+
 	},
 
 	checkAccountStatus: function(evt){
@@ -51,7 +56,7 @@ var EmailView = Backbone.View.extend({
 			type: 'POST',
 
 	  		url: "https://mandrillapp.com/api/1.0/users/info.json",
-	  		data: { 
+	  		data: {
 	  			"key": apiKey
 	  		}
 		}).done(function(response) {
@@ -66,14 +71,14 @@ var EmailView = Backbone.View.extend({
 
 	sendEmail: function(evt){
 		var recipientInput = this.$el.find("#email-to").val(); // Input from the "to" form
-		var recipients = []; // array where each index contains an email 
+		var recipients = []; // array where each index contains an email
 		var request = {}; // Will hold the Json request for mandrill
 		var subject = this.$el.find("#email-subject").val();
 		var body = this.$el.find("#email-message").val();
 		var apiKey = this.key;
 		var from = this.$el.find("#email-from").val();
 		var self = this.$el.find("#self").prop("checked");
-		
+
 		//Build the JSON request
 		//request.type = 'POST'
 		//request.url = "https://mandrillapp.com/api/1.0/messages/send.json"
@@ -100,7 +105,7 @@ var EmailView = Backbone.View.extend({
     		var to = {
         		'email': entry,
         		'name':"",
-        		'type': 'to'        
+        		'type': 'to'
     		}
     	request.data.message.to.push(to);
 		})
@@ -128,7 +133,7 @@ function areYouAlive(key){
 		type: 'POST',
 
   		url: "https://mandrillapp.com/api/1.0/users/ping.json",
-  		data: { 
+  		data: {
   			"key": apiKey
   		}
 	}).done(function(response) {
@@ -142,11 +147,11 @@ function areYouAlive(key){
 
 }
 
-/** Common email function that can be used by any page to send an email (not 
-	just EmailView()). Expects a "params" object as the first parameter that 
+/** Common email function that can be used by any page to send an email (not
+	just EmailView()). Expects a "params" object as the first parameter that
 	contains the from email, to email(s), email subject, and email body. The
 	second parameter is an optional callback function that will be executed
-	after all emails have been successfully sent. 
+	after all emails have been successfully sent.
 
 	call the function as follows:
 
@@ -167,7 +172,7 @@ function sendEmail(params, callback) {
 	var to = params.to;
 	var subject = params.subject || "Notice from Gobind Sarvar";
 	var body = params.body;
-	
+
 	var xhr = $.ajax({
 		type: "POST",
 		url: "https://mandrillapp.com/api/1.0/messages/send.json",
@@ -189,12 +194,12 @@ function sendEmail(params, callback) {
 			callback.call();
 		} else {
 			// display some kind of message if it was successful or not
-		} 
+		}
 	});
 }
 
 // Adam: this function will create a popup email interface. The first chunk of
-// code is creating the actual pop up (its called a modal in Bootstrap), and 
+// code is creating the actual pop up (its called a modal in Bootstrap), and
 // it eventually calls your EmailView to add the actual email interface.
 // The recipients are sent in the "emails" property as an array of strings
 // (ie. an array of emails). To see an example of this, go to the notifications page,
@@ -226,7 +231,7 @@ function openEmailModal(recipients) {
 		});
 
 		elem.find("#stats-panel").remove();
-		
+
 		var form = elem.find(".form-horizontal");
 		form.removeClass("col-sm-8").addClass("col-sm-12").removeClass("well");
 		form.parent().addClass("o-auto");

@@ -1490,7 +1490,7 @@ var ViewSectionRow = Backbone.View.extend({
 
 var TeacherSectionView = Backbone.View.extend({
 	template: _.template("<div id='course-teachers-form'>"
-		+	"<button id='add-teacher' class='btn btn-sm btn-primary'>Add Teacher(TA) to Course</button>"
+		+	"<br><button id='add-teacher' class='btn btn-sm btn-primary'>Add Teacher To Section</button>"
 		+	"<br><br>"
 		+	"<table class='table table-striped table-bordered'>"
 		+		"<thead>"
