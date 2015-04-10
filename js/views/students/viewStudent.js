@@ -659,47 +659,67 @@ var ReportCardView = Backbone.View.extend({
 		this.render();
 	},
 
-		// events: {
-		// "click #report-card-pdf":  "reportCardPDF",
-		// },
+		events: {
+		"click #report-card-pdf":  "reportCardPDF",
+		},
 
 	render: function() {
+		//this.$el.html(html["reportCard.html"]);
+
+
+		//console.log("render");
 		this.$el.html(html["reportCard.html"]);
 
 		var view = this;
 		var id = this.model.get("userid");
-		this.model.fetch({
-			url:this.model.getEnrolledSectionsUrl(id)
-		}).then(function(data) {
-			if (data.length == 0) {
-				view.$el.html("<div class='alert alert-danger'>This student does not have a report card to view.</div>");
-			} else {
-				var promises = [];
-				_.each(data, function(object, index) {
-					var section = new Section(object, {parse:true});
-
-					var def = $.Deferred();
-					promises.push(def);
-
-					new ReportCardRowView({
-						el: view.addRow(),
-						model: section,
-						id: id,
-						def: def
-					});
-				}, this);
-
-				$.when.apply($, promises).then(function() {
-					view.table = view.$el.find("#report-card-table").dataTable({
-						dom: dataTables.exportDom,
-						tableTools: {
-			       			 aButtons: dataTables.buttons3,
-			   			 	 sSwfPath: dataTables.sSwfPath
-			    		}
-					});
+		this.model.fetch({url:this.model.getEnrolledSectionsUrl(id)}).then(function(data) {
+			//console.log(data);
+			_.each(data, function(object, index) {
+				var section = new Section(object, {parse:true});
+				//console.log(id);
+				new ReportCardRowView({
+					el: view.addRow(),
+					model: section,
+					id: id
 				});
-			}
+			});
 		});
+
+		// var view = this;
+		// var id = this.model.get("userid");
+		// this.model.fetch({
+		// 	url:this.model.getEnrolledSectionsUrl(id)
+		// }).then(function(data) {
+		// 	console.log(data);
+		// 	if (data.length == 0) {
+		// 		view.$el.html("<div class='alert alert-danger'>This student does not have a report card to view.</div>");
+		// 	} else {
+		// 		var promises = [];
+		// 		_.each(data, function(object, index) {
+		// 			var section = new Section(object, {parse:true});
+
+		// 			var def = $.Deferred();
+		// 			promises.push(def);
+
+		// 			new ReportCardRowView({
+		// 				el: view.addRow(),
+		// 				model: section,
+		// 				id: id,
+		// 				def: def
+		// 			});
+		// 		}, this);
+
+		// 		$.when.apply($, promises).then(function() {
+		// 			view.table = view.$el.find("#report-card-table").dataTable({
+		// 				dom: dataTables.exportDom,
+		// 				tableTools: {
+		// 	       			 aButtons: dataTables.buttons3,
+		// 	   			 	 sSwfPath: dataTables.sSwfPath
+		// 	    		}
+		// 			});
+		// 		});
+		// 	}
+		// });
 	},
 
 	addRow: function() {
@@ -708,7 +728,7 @@ var ReportCardView = Backbone.View.extend({
         return container;
 	},
 
-/*	reportCardPDF: function() {
+	reportCardPDF: function() {
 		var table = tableToJson($('#report-card-table').get(0));
 		var id = this.model.get("userid");
 		var fname = this.model.get("firstName");
@@ -729,7 +749,7 @@ var ReportCardView = Backbone.View.extend({
 		})
 
         doc.save("Reportcard-" +id+ ".pdf");
-	},*/
+	},
 
 	refreshTable: function(evt) {
 		evt.stopImmediatePropagation();
@@ -739,32 +759,32 @@ var ReportCardView = Backbone.View.extend({
 
 });
 
-// function tableToJson(table) {
-//     var data = [];
+function tableToJson(table) {
+    var data = [];
 
-//     // first row needs to be headers
-//     var headers = [];
-//     for (var i=0; i<table.rows[0].cells.length; i++) {
-//         headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
-//     }
+    // first row needs to be headers
+    var headers = [];
+    for (var i=0; i<table.rows[0].cells.length; i++) {
+        headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
+    }
 
-//     // go through cells
-//     for (var i=1; i<table.rows.length; i++) {
+    // go through cells
+    for (var i=1; i<table.rows.length; i++) {
 
-//         var tableRow = table.rows[i];
-//         var rowData = {};
+        var tableRow = table.rows[i];
+        var rowData = {};
 
-//         for (var j=0; j<tableRow.cells.length; j++) {
+        for (var j=0; j<tableRow.cells.length; j++) {
 
-//             rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
+            rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
 
-//         }
+        }
 
-//         data.push(rowData);
-//     }
+        data.push(rowData);
+    }
 
-//     return data;
-// }
+    return data;
+}
 
 var ReportCardRowView = Backbone.View.extend({
 	template: _.template("<td><%= model.courseName %></td>"
@@ -781,7 +801,7 @@ var ReportCardRowView = Backbone.View.extend({
 	render: function() {
 		var view = this;
 		var sid = this.id;
-		var secid = this.model.get("sectionid");
+		var secid = this.model.get("sectionid");	
 		//Get teacher names
 		this.model.fetch({
 			url: this.model.getSectionTeachersUrl(secid)
@@ -799,14 +819,39 @@ var ReportCardRowView = Backbone.View.extend({
 			}).then(function(data){
 				var grade = data.studentGrade;
 				view.$el.html(view.template({
-					model: view.model.toJSON(),
-					teacher: names,
-					grade: grade
-				}));
-
-				view.def.resolve();
-			});
+				model: view.model.toJSON(),
+				teacher: names,
+				grade: grade
+			}))});
 		});
+		// var view = this;
+		// var sid = this.id;
+		// var secid = this.model.get("sectionid");
+		// //Get teacher names
+		// this.model.fetch({
+		// 	url: this.model.getSectionTeachersUrl(secid)
+		// }).then(function(data) {
+		// 	// Get teacher names
+		// 	var names = "";
+		// 	_.each(data, function(teacher, index) {
+		// 		var fullName = teacher.firstName + " " + teacher.lastName;
+		// 		names += fullName + ","
+		// 	});
+		// 	names = names.slice(0,-1);
+		// 	// Get grades
+		// 	view.model.fetch({
+		// 		url: view.model.getStudentGradeForSection(secid, sid)
+		// 	}).then(function(data){
+		// 		var grade = data.studentGrade;
+		// 		view.$el.html(view.template({
+		// 			model: view.model.toJSON(),
+		// 			teacher: names,
+		// 			grade: grade
+		// 		}));
+
+		// 		view.def.resolve();
+		// 	});
+		// });
 	},
 });
 

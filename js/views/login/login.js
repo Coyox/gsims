@@ -15,8 +15,6 @@ var LoginView = Backbone.View.extend({
 				openForReg: 1
 			}
 		}).then(function(data) {
-			console.log(data);
-
 			app.openForReg = data.length ? true : false;
 
 			view.$el.html(html["login.html"]);
