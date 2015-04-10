@@ -395,12 +395,13 @@ function getDepartmentCount($id){
     echo json_encode(perform_query($sql,'GETCOL', array("schoolid"=>$id,"schoolyear"=>$schoolyear)));
 }
 function getStudentsBySchool($id, $schoolyearid){
+
     if (!isset($schoolyearid)){ $schoolyearid= $_GET["schoolyearid"]; }
     $sql = "SELECT s.userid, s.firstName, s.lastName, s.dateOfBirth, s.gender, s.streetAddr1, s.streetAddr2, s.city,
     s.province, s.country, s.postalCode, s.phoneNumber, s.emailAddr, s.allergies, s.prevSchools, s.parentFirstName, s.parentLastName,
     s.parentPhoneNumber, s.parentEmailAddr, s.emergencyContactFirstName, s.emergencyContactLastName, s.emergencyContactRelation,
     s.emergencyContactPhoneNumber, s.schoolid, s.paid, s.status
-    from student s and student_year sy where s.schoolid=:schoolid and sy.userid=s.userid and sy.schoolyearid=:schoolyearid";
+    from student s, student_year sy where s.schoolid=:schoolid and sy.userid=s.userid and sy.schoolyearid=:schoolyearid";
     echo json_encode(perform_query($sql, 'GETALL', array("schoolid"=>$id, "schoolyearid"=>$schoolyearid)));
 }
 function getTeachersBySchool($id){
@@ -2116,6 +2117,8 @@ function findUsers($schoolid, $usertype){
             if (isset($country)){ $param['country'] = $country; }
             if (isset($dob)){ $param['dateOfBirth'] = $dob; }
             if (isset($email)){ $param['emailAddr'] = $email; }
+
+            $param["schoolyearid"] = $schoolyearid;
 
             list($where, $where_bindparams) = buildWhereClause($param);
             $bindparams = $bindparams + $where_bindparams;
