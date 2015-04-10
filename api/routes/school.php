@@ -34,7 +34,7 @@ class School {
         $this->app->delete('/departments/:id', array($this, 'deleteDepartment'));
 
         $this->app->get('/courses/:id', array($this, 'getCourseById'));
-        $this->app->get('/courses/:id/prereqs', array($this, 'getCoursePrereqs');
+        $this->app->get('/courses/:id/prereqs', array($this, 'getCoursePrereqs'));
         $this->app->get('/courses/:id/waitlist', array($this, 'getWaitlistedStudents'));
         $this->app->get('/courses/:id/teachers', array($this, 'getCourseTeachers'));
         $this->app->post('/courses/:id/prereqs', array($this, 'addCoursePrereqs'));
